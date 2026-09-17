@@ -2,8 +2,17 @@ import { getAllArticles, parseArticle } from "./articles";
 
 describe("parseArticle", () => {
   it("applies defaults for tags and access", () => {
-    const a = parseArticle("x", `---\ntitle: T\nsummary: S\npublishedAt: "2026-09-17"\n---\nbody`);
+    const a = parseArticle(
+      "x",
+      `---\ntitle: T\nsummary: S\npublishedAt: "2026-09-17"\nverifiedAt: "2026-09-17"\nsources: []\n---\nbody`,
+    );
     expect(a).toMatchObject({ slug: "x", tags: [], access: "public", content: "body" });
+  });
+
+  it("rejects an article that was not verified", () => {
+    expect(() =>
+      parseArticle("x", `---\ntitle: T\nsummary: S\npublishedAt: "2026-09-17"\nsources: []\n---\n`),
+    ).toThrow(/verifiedAt/);
   });
 
   it("rejects missing required fields", () => {

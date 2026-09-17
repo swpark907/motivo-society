@@ -5,7 +5,7 @@ describe("parseLibraryItem", () => {
     expect(() =>
       parseLibraryItem(
         "x",
-        `---\ntitle: T\nsummary: S\npublishedAt: "2026-09-17"\ncategory: nope\n---\n`,
+        `---\ntitle: T\nsummary: S\npublishedAt: "2026-09-17"\nverifiedAt: "2026-09-17"\nsources: []\ncategory: nope\n---\n`,
       ),
     ).toThrow(/Invalid frontmatter/);
   });
@@ -14,7 +14,7 @@ describe("parseLibraryItem", () => {
     for (const c of LIBRARY_CATEGORIES) {
       const item = parseLibraryItem(
         "x",
-        `---\ntitle: T\nsummary: S\npublishedAt: "2026-09-17"\ncategory: ${c.id}\n---\n`,
+        `---\ntitle: T\nsummary: S\npublishedAt: "2026-09-17"\nverifiedAt: "2026-09-17"\nsources: []\ncategory: ${c.id}\n---\n`,
       );
       expect(item.category).toBe(c.id);
     }

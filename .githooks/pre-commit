@@ -2,5 +2,11 @@
 # 완료 기준(pnpm check)을 커밋 시점에 강제한다. 사람·Codex·Claude 누가 커밋하든 동일하게 적용.
 # 우회가 필요하면 `git commit --no-verify` — 단, 그 이유를 커밋 메시지에 적을 것.
 set -e
+branch=$(git symbolic-ref --short HEAD 2>/dev/null || echo detached)
+if [ "$branch" = "main" ] && [ -z "$ALLOW_MAIN" ]; then
+  echo "[pre-commit] main에 직접 커밋하지 않습니다. 브랜치를 만드세요 (feat/* fix/* docs/* chore/*)."
+  echo "             정말 필요하면 ALLOW_MAIN=1 git commit ... 하고 이유를 메시지에 적으세요."
+  exit 1
+fi
 echo "[pre-commit] pnpm check"
 pnpm check
