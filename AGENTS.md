@@ -21,6 +21,8 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
   - `../motivo-content/` — 인스타 콘텐츠 제작소. `shared/브랜드.md`에 계정 톤·정직함 원칙이 있다.
   - `../vibe-web-class-ssot/` — 기획클래스〈바이브코딩으로 시작하는 웹개발 기초〉SSOT.
     `공통-컨텍스트/05-모쏘-웹앱.md`의 기록·퀴즈 앱(누나 제작)도 장기적으로 여기로 들어온다.
+  - `../motivo-class-landingpage/` — **운영 중인** 오프라인 클래스 랜딩 + 회원용 클래스룸(Q&A·설문). Next.js + Tailwind + Supabase(auth·DB) + Resend, Netlify 배포.
+    **단기간 내 흡수 대상** — Yard의 한 종류(오프라인 강의)로 들어온다. 흡수 방식은 미결(아래 TODO).
 - 사람: 승우 = 총괄매니저(이 레포의 결정자). 대표 = 승우의 누나(가격·환불 등 최종 승인).
 
 ## 정체성
@@ -122,6 +124,19 @@ src/test/           테스트 셋업
   - **Library 카드**: **16:9** 단색 면 위 카테고리명 디스플레이 타이포 2줄. 카테고리로 들어가는 문 역할.
 - 컨셉 레퍼런스 원본은 `docs/design-references/`. 새 레퍼런스가 생기면 거기에 넣고 README 표에 한 줄 추가한다.
 - 토큰은 `src/app/globals.scss`의 `:root`. 원색(`--orange`, `--black`…)을 직접 쓰지 말고 의미 토큰(`--surface`, `--ink`, `--accent`, `--line`)을 쓴다 — `.paper` 스코프에서 자동으로 뒤집힌다.
+
+## 열린 결정 · TODO
+
+결정이 안 난 것은 여기 모아 둔다. 에이전트는 이 항목을 **확정처럼 구현하지 않는다.** 결정되면 해당 절로 옮기고 여기서 지운다.
+
+- [ ] **motivo-class-landingpage 흡수 방식.** 운영 중인 서비스라 중단 없이 옮겨야 한다. 정할 것: ① Supabase 프로젝트를 그대로 쓸지(회원·Q&A 데이터 보존) ② Tailwind → SCSS Modules 전환 범위 ③ 랜딩 URL 리다이렉트 ④ 클래스룸(로그인 필요)이 이 레포의 첫 "회원" 기능이 되는데, '이후' 단계로 미뤄둔 회원 개념을 앞당길지. — 흡수 전까지는 참조만.
+- [ ] **콘텐츠 발행 정책.** frontmatter에 `sources`(출처)·`verifiedAt`(직접 확인한 날짜) 필수화 여부. 신뢰 원칙을 도구로 강제하는 첫 장치.
+- [ ] **Library 카테고리 확정.** 현재 4개(`ai`·`skills`·`vibe-coding`·`tools`)는 초안. id는 URL 앵커이므로 확정 후엔 바꾸지 않는다.
+- [ ] **오렌지 컬러코드.** `#ff4f1f` 임시.
+- [ ] **한글 디스플레이 폰트.** Black Han Sans 임시. 브랜드가 굳으면 유료 컨덴스드 검토.
+- [ ] **CI.** GitHub Actions에서 `pnpm check`. 리모트 생기면 함께.
+- [ ] **Vercel 연결.** 보류.
+- [ ] **Yard 신청·결제.** 보류.
 
 ## 개발 규약 (도구가 강제하지 못하는 것만 적는다)
 
