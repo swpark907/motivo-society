@@ -1,0 +1,38 @@
+.main {
+  flex: 1;
+  width: 100%;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-4);
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: var(--space-2);
+
+  @include up(md) {
+    font-size: 2rem;
+  }
+}
+
+.lead {
+  color: var(--color-muted);
+}
+
+.list {
+  list-style: none;
+  margin-top: var(--space-6);
+  display: grid;
+  gap: var(--space-4);
+}
+
+.item h2 {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.meta {
+  font-size: 0.875rem;
+  color: var(--color-muted);
+}

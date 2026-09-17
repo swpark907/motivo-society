@@ -1,0 +1,40 @@
+.main {
+  flex: 1;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-4);
+}
+
+.header {
+  margin-bottom: var(--space-6);
+}
+
+.title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.3;
+  margin-bottom: var(--space-2);
+
+  @include up(md) {
+    font-size: 2.25rem;
+  }
+}
+
+.meta {
+  font-size: 0.875rem;
+  color: var(--color-muted);
+}
+
+.body {
+  line-height: 1.75;
+
+  > * + * {
+    margin-top: var(--space-4);
+  }
+
+  h2 {
+    font-size: 1.25rem;
+    margin-top: var(--space-8);
+  }
+}

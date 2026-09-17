@@ -1,0 +1,13 @@
+@use "sass:map";
+@use "./tokens" as *;
+
+// Mobile-first: @include up(md) { ... }
+@mixin up($key) {
+  $bp: map.get($breakpoints, $key);
+  @if $bp == null {
+    @error "Unknown breakpoint `#{$key}`. Known: #{map.keys($breakpoints)}";
+  }
+  @media (min-width: $bp) {
+    @content;
+  }
+}
