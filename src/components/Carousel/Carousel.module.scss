@@ -1,0 +1,65 @@
+.wrap {
+  position: relative;
+}
+
+// 왼쪽부터 쌓이는 가로 트랙. 카드 폭은 자식이 정한다 (4장 기준 = (100% - 3×8px) / 4).
+.track {
+  list-style: none;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  // 카드 폭은 트랙이 정한다: 모바일 70vw(최대 266px), lg 이상 4장 기준
+  > li {
+    flex: 0 0 min(70vw, 266px);
+    scroll-snap-align: start;
+
+    @include up(lg) {
+      flex-basis: calc((100% - 24px) / 4);
+    }
+
+    > * {
+      width: 100%;
+    }
+  }
+}
+
+.arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--white);
+  color: var(--black);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  display: none;
+
+  @include up(md) {
+    display: grid;
+    place-items: center;
+  }
+
+  &:hover {
+    background: var(--orange);
+  }
+}
+
+.prev {
+  left: -18px;
+}
+
+.next {
+  right: -18px;
+}

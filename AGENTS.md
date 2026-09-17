@@ -66,6 +66,14 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 ## 구조
 
+**구현 우선순위: 홈 → Library.** (Article·Yard·Workbook은 그 다음.)
+
+**주요 진입 경로 = 인스타그램 DM(ManyChat) → Library 개별 콘텐츠 링크.** 여기서 따라오는 규칙:
+
+- Library 콘텐츠 URL은 **영구**다. slug를 바꾸지 않는다. 바꿔야 하면 옛 slug에서 redirect를 남긴다.
+- 링크로 바로 들어온 화면이 **그 자체로 완결**되어야 한다 — 홈을 거치지 않은 사람이 무엇인지 알고, 다음으로 갈 곳(다른 Library 글·홈)이 한 번에 보여야 한다.
+- 모든 Library·Article 페이지는 **OG 메타(title·description·image)** 를 갖는다. DM 미리보기가 첫인상이다.
+
 **라우팅 = 콘텐츠 유형 축.** GNB 메뉴와 최상위 경로는 1:1이며, 정의는 `src/lib/nav.ts` 한 곳에만 둔다.
 "배우고·만들고·발견하고"는 URL이 아니라 슬로건·태그·큐레이션 층에서 산다.
 
@@ -107,6 +115,12 @@ src/test/           테스트 셋업
 - **날카롭게.** `--radius: 2px`, 1px 선, 그림자·글래스·글로우 없음. 면은 색으로만 구분한다.
 - **모션은 작게.** 120ms 이내 색·불투명도 전환. 바운스·패럴랙스·자동재생 없음.
 - **OS 다크모드에 반응하지 않는다.** 브랜드 테마는 고정. `prefers-color-scheme` 미디어쿼리를 쓰지 않는다.
+- **홈 섹션 레이아웃 — SHARE X 홈을 구조 레퍼런스로 삼는다** (`docs/design-references/README.md`에 실측값). 톤은 빌리지 않는다: 그라디언트·라운드·회색 UI 제외.
+  - 섹션 헤더 = 한글 제목 + 영문 대문자 부제(`.label`).
+  - 카드 행 = **좌우 캐러셀, 왼쪽부터 쌓임**, 4장 기준, 간격 8px, radius `--radius`. 오른쪽 끝 원형 화살표.
+  - **Yard 카드**: 이미지 **4:5** (인스타 카드뉴스 비율과 동일 — 카드뉴스 표지를 그대로 쓴다), 아래 제목 + 태그.
+  - **Library 카드**: **16:9** 단색 면 위 카테고리명 디스플레이 타이포 2줄. 카테고리로 들어가는 문 역할.
+- 컨셉 레퍼런스 원본은 `docs/design-references/`. 새 레퍼런스가 생기면 거기에 넣고 README 표에 한 줄 추가한다.
 - 토큰은 `src/app/globals.scss`의 `:root`. 원색(`--orange`, `--black`…)을 직접 쓰지 말고 의미 토큰(`--surface`, `--ink`, `--accent`, `--line`)을 쓴다 — `.paper` 스코프에서 자동으로 뒤집힌다.
 
 ## 개발 규약 (도구가 강제하지 못하는 것만 적는다)

@@ -1,0 +1,46 @@
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: min(70vw, 266px);
+  aspect-ratio: 16 / 9;
+  padding: var(--space-4);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  transition:
+    border-color 120ms ease,
+    background 120ms ease;
+
+  @include up(lg) {
+    width: calc((100% - 24px) / 4);
+  }
+
+  &:hover {
+    border-color: var(--orange);
+
+    .title {
+      color: var(--orange);
+    }
+  }
+}
+
+.title {
+  display: flex;
+  flex-direction: column;
+  font-size: 1.75rem;
+  color: var(--white);
+  transition: color 120ms ease;
+}
+
+.meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.count {
+  font-size: 0.75rem;
+  color: var(--ink-muted);
+}

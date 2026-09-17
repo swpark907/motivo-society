@@ -1,0 +1,21 @@
+.category {
+  padding: var(--space-12) 0;
+  border-top: 1px solid var(--line);
+  scroll-margin-top: calc(var(--gnb-height) + var(--space-4));
+}
+
+.categoryHeader {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.categoryTitle {
+  font-size: 2rem;
+  color: var(--white);
+}
+
+.empty {
+  color: var(--ink-muted);
+}

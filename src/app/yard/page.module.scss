@@ -1,0 +1,15 @@
+.grid {
+  list-style: none;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(2, 1fr);
+  margin-top: var(--space-12);
+
+  @include up(md) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @include up(lg) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
