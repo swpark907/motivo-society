@@ -1,0 +1,34 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm check)",
+      "Bash(pnpm test)",
+      "Bash(pnpm test:*)",
+      "Bash(pnpm lint)",
+      "Bash(pnpm typecheck)",
+      "Bash(pnpm format)",
+      "Bash(pnpm format:check)",
+      "Bash(pnpm build)",
+      "Bash(pnpm exec prettier *)",
+      "Bash(pnpm exec next typegen)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_response.filePath // .tool_input.file_path' | { read -r f; pnpm exec prettier --write --ignore-unknown \"$f\"; } >/dev/null 2>&1 || true",
+            "timeout": 30,
+            "statusMessage": "prettier"
+          }
+        ]
+      }
+    ]
+  }
+}

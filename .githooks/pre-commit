@@ -1,0 +1,6 @@
+#!/bin/sh
+# 완료 기준(pnpm check)을 커밋 시점에 강제한다. 사람·Codex·Claude 누가 커밋하든 동일하게 적용.
+# 우회가 필요하면 `git commit --no-verify` — 단, 그 이유를 커밋 메시지에 적을 것.
+set -e
+echo "[pre-commit] pnpm check"
+pnpm check
