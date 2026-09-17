@@ -6,7 +6,10 @@ describe("Home", () => {
   it("links to every top-level section", () => {
     render(<Home />);
     for (const item of NAV_ITEMS) {
-      expect(screen.getByRole("link", { name: item.label })).toHaveAttribute("href", item.href);
+      expect(screen.getByRole("link", { name: new RegExp(item.label) })).toHaveAttribute(
+        "href",
+        item.href,
+      );
     }
   });
 });

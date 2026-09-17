@@ -1,10 +1,15 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Anton, Black_Han_Sans } from "next/font/google";
 import { Gnb } from "@/components/Gnb/Gnb";
+import "pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css";
 import "./globals.scss";
 
-const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
-const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
+const anton = Anton({ weight: "400", subsets: ["latin"], variable: "--font-anton" });
+const blackHan = Black_Han_Sans({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-black-han",
+});
 
 export const metadata: Metadata = {
   title: { default: "motivo society", template: "%s · motivo society" },
@@ -13,7 +18,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="ko" className={`${geistSans.variable} ${geistMono.variable}`}>
+    <html lang="ko" className={`${anton.variable} ${blackHan.variable}`}>
       <body>
         <Gnb />
         {children}

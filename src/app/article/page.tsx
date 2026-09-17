@@ -9,7 +9,7 @@ export default async function ArticleListPage() {
   const articles = await getAllArticles();
   return (
     <main className={styles.main}>
-      <h1 className={styles.title}>Article</h1>
+      <h1 className={`display ${styles.title}`}>Article</h1>
       <ul className={styles.list}>
         {articles.map((a) => (
           <li key={a.slug} className={styles.item}>

@@ -7,8 +7,8 @@ export function Gnb() {
   return (
     <header className={styles.header}>
       <nav className={styles.nav} aria-label="주 메뉴">
-        <Link href="/" className={styles.brand}>
-          motivo society
+        <Link href="/" className={`display ${styles.brand}`}>
+          Motivo Society
         </Link>
         <ul className={styles.menu}>
           {NAV_ITEMS.map((item) => (

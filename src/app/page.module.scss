@@ -3,36 +3,111 @@
   width: 100%;
   max-width: var(--max-width);
   margin: 0 auto;
-  padding: var(--space-8) var(--space-4);
+  padding: var(--space-12) var(--space-4) var(--space-16);
 }
 
-.title {
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin-bottom: var(--space-2);
+.hero {
+  padding-bottom: var(--space-12);
+  border-bottom: 1px solid var(--line);
+}
+
+.heroTitle {
+  display: flex;
+  flex-direction: column;
+  font-size: clamp(4rem, 18vw, 13rem);
+  color: var(--white);
+}
+
+.heroAccent {
+  color: var(--orange);
+}
+
+.heroLead {
+  margin-top: var(--space-6);
+  font-size: 1.125rem;
+  color: var(--ink-muted);
+}
+
+.index {
+  display: grid;
+  gap: 1px;
+  background: var(--line);
+  margin-top: var(--space-12);
 
   @include up(md) {
-    font-size: 2rem;
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include up(lg) {
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 
+.indexItem {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-6) var(--space-4) var(--space-8);
+  background: var(--surface);
+  transition: background 120ms ease;
+
+  &:hover {
+    background: var(--surface-2);
+
+    .indexTitle {
+      color: var(--orange);
+    }
+  }
+}
+
+.indexTitle {
+  font-size: 2.5rem;
+  color: var(--white);
+  transition: color 120ms ease;
+}
+
+.indexDesc {
+  font-size: 0.9375rem;
+  color: var(--ink-muted);
+}
+
+// 섹션 공용 (yard/library/workbook/article 목록)
+.title {
+  font-size: clamp(3rem, 10vw, 6rem);
+  color: var(--white);
+}
+
 .lead {
-  color: var(--color-muted);
+  margin-top: var(--space-4);
+  color: var(--ink-muted);
 }
 
 .list {
   list-style: none;
-  margin-top: var(--space-6);
-  display: grid;
-  gap: var(--space-4);
+  margin-top: var(--space-12);
+  border-top: 1px solid var(--line);
 }
 
-.item h2 {
-  font-size: 1.125rem;
-  font-weight: 600;
+.item {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-6) 0;
+  border-bottom: 1px solid var(--line);
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  h2 a:hover {
+    color: var(--orange);
+  }
 }
 
 .meta {
-  font-size: 0.875rem;
-  color: var(--color-muted);
+  font-size: 0.8125rem;
+  color: var(--ink-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }

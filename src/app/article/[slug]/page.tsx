@@ -24,13 +24,14 @@ export default async function ArticlePage({ params }: PageProps<"/article/[slug]
   if (!article) notFound();
 
   return (
-    <main className={styles.main}>
-      <article>
+    <main className={`paper ${styles.main}`}>
+      <article className={styles.article}>
         <header className={styles.header}>
-          <h1 className={styles.title}>{article.title}</h1>
-          <p className={styles.meta}>
-            <time dateTime={article.publishedAt}>{article.publishedAt}</time>
+          <p className="label">
+            Article · <time dateTime={article.publishedAt}>{article.publishedAt}</time>
           </p>
+          <h1 className={styles.title}>{article.title}</h1>
+          <p className={styles.summary}>{article.summary}</p>
         </header>
         <div className={styles.body}>
           <MDXRemote source={article.content} />

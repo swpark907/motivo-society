@@ -1,5 +1,4 @@
-// Design tokens as CSS custom properties. Declared once on :root (see globals.scss).
-// Modules reference them as var(--token), never as hard-coded values.
+// Sass-time tokens (브레이크포인트). 런타임 토큰(색·간격·서체)은 globals.scss의 CSS 변수.
 $breakpoints: (
   sm: 640px,
   md: 768px,
