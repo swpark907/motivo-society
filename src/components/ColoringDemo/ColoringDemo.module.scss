@@ -1,0 +1,131 @@
+.root {
+  padding: var(--space-8) var(--space-4);
+  max-width: 1600px;
+  width: 100%;
+  margin: 0 auto;
+}
+.header {
+  margin-bottom: var(--space-6);
+  h1 {
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    color: var(--accent);
+  }
+  > p:last-child {
+    color: var(--ink-muted);
+  }
+}
+.workspace {
+  display: grid;
+  gap: var(--space-6);
+  @include up(md) {
+    grid-template-columns: 220px minmax(0, 1fr);
+  }
+}
+.tools {
+  h2 {
+    font-size: 1rem;
+    margin-bottom: var(--space-4);
+  }
+}
+.palette {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: var(--space-2);
+}
+.swatch {
+  aspect-ratio: 1;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  cursor: pointer;
+  &[aria-pressed="true"] {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+}
+.custom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: var(--space-4) 0;
+  font-size: 0.875rem;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.actions button,
+.toolbar button,
+.keyboard button {
+  background: var(--surface-2);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: var(--space-2) var(--space-3);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.8125rem;
+  &:hover {
+    border-color: var(--ink-muted);
+  }
+  &:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+  &[aria-pressed="true"] {
+    border-color: var(--ink);
+  }
+}
+.progress {
+  margin-top: var(--space-6);
+  font-variant-numeric: tabular-nums;
+}
+.note,
+.status {
+  color: var(--ink-muted);
+  font-size: 0.8125rem;
+  margin-top: var(--space-3);
+}
+.drawing {
+  min-width: 0;
+}
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+  span {
+    font-size: 0.8125rem;
+  }
+}
+.viewport {
+  overflow: auto;
+  max-height: 70svh;
+  border: 1px solid var(--line);
+  background: var(--paper);
+}
+.sheet {
+  line-height: 0;
+}
+.canvas,
+.reference {
+  width: 100%;
+  height: auto;
+}
+.keyboard {
+  margin-top: var(--space-6);
+  font-size: 0.8125rem;
+  summary {
+    cursor: pointer;
+    color: var(--ink-muted);
+  }
+  label {
+    display: flex;
+    gap: var(--space-2);
+    margin: var(--space-3) 0;
+  }
+  input {
+    width: 80px;
+  }
+}
