@@ -1,0 +1,546 @@
+.page {
+  padding: var(--space-6);
+  max-width: 1400px;
+  margin-inline: auto;
+  line-height: 1.8;
+  h1 {
+    font-size: clamp(1.8rem, 4vw, 3.5rem);
+    line-height: 1.2;
+    margin-block: var(--space-4);
+  }
+  h2 {
+    font-size: 1.3rem;
+  }
+  p {
+    margin-block: var(--space-4);
+    color: var(--ink-muted);
+  }
+  button {
+    cursor: pointer;
+    background: var(--accent);
+    color: var(--accent-ink);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: var(--space-3) var(--space-4);
+    font: inherit;
+  }
+  button:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
+  button:focus-visible,
+  a:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 4px;
+  }
+  small {
+    display: block;
+    color: var(--ink-muted);
+    margin-block: var(--space-3);
+  }
+  blockquote {
+    padding: var(--space-4);
+    border-left: 2px solid var(--accent);
+    background: var(--surface-2);
+    margin-block: var(--space-6);
+  }
+  .quiet {
+    background: transparent;
+    color: var(--ink);
+  }
+}
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-4);
+  font-size: 0.8rem;
+  flex-wrap: wrap;
+}
+.notice {
+  font-size: 0.8rem;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: var(--space-4);
+}
+.cover,
+.story {
+  display: grid;
+  gap: var(--space-6);
+  align-items: center;
+  margin-block: var(--space-8);
+  > img {
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius);
+  }
+  @include up(lg) {
+    grid-template-columns: 1.2fr 1fr;
+  }
+}
+.story .character {
+  max-width: 380px;
+  justify-self: center;
+  image-rendering: pixelated;
+}
+.section {
+  margin-block: var(--space-8);
+  padding: var(--space-6);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+}
+.worlds {
+  list-style: none;
+  display: grid;
+  gap: var(--space-3);
+  margin-block: var(--space-6);
+  li {
+    display: flex;
+    gap: var(--space-4);
+    padding-block: var(--space-3);
+    border-bottom: 1px solid var(--line);
+  }
+  span {
+    color: var(--accent);
+  }
+}
+.tokens {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  span {
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--line);
+  }
+}
+.map {
+  width: 100%;
+  height: auto;
+  image-rendering: pixelated;
+  border-radius: var(--radius);
+}
+.lab {
+  display: grid;
+  gap: var(--space-6);
+  margin-block: var(--space-6);
+  @include up(lg) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.choices {
+  display: grid;
+  gap: var(--space-3);
+  .choice {
+    text-align: left;
+    background: var(--surface);
+    color: var(--ink);
+    span {
+      display: block;
+      color: var(--ink-muted);
+      font-size: 0.9rem;
+    }
+    &[aria-pressed="true"] {
+      border-color: var(--accent);
+      outline: 1px solid var(--accent);
+    }
+  }
+}
+.preview {
+  padding: var(--space-6);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  border-radius: var(--radius);
+  ul {
+    padding-left: var(--space-6);
+    margin-block: var(--space-6);
+  }
+  > strong {
+    color: var(--accent);
+  }
+}
+.link {
+  display: block;
+  color: var(--accent);
+  margin-top: var(--space-6);
+}
+
+.introPlayer {
+  margin-block: var(--space-6);
+}
+.introWelcome {
+  display: grid;
+  align-items: center;
+  gap: var(--space-6);
+  padding: var(--space-6);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+  @include up(lg) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.spriteArea {
+  display: grid;
+  justify-items: center;
+}
+.walkSprite {
+  width: min(100%, 280px);
+  aspect-ratio: 3 / 4;
+  background: url("/images/workbook/journey/capy-backpack-walk-v4.png") 0 center / 400% 100%
+    no-repeat;
+  image-rendering: pixelated;
+  animation: introWalk 900ms steps(1, end) infinite;
+  &[data-paused="true"] {
+    animation-play-state: paused;
+  }
+}
+@keyframes introWalk {
+  0% {
+    background-position-x: 0%;
+  }
+  25% {
+    background-position-x: 33.3333%;
+  }
+  50% {
+    background-position-x: 66.6667%;
+  }
+  75% {
+    background-position-x: 100%;
+  }
+}
+.cutscene {
+  display: grid;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--surface-2);
+  @include up(lg) {
+    grid-template-columns: 1.15fr 1fr;
+  }
+}
+.sceneArt {
+  aspect-ratio: 1;
+  background: url("/images/workbook/journey/intro-story-v2.png") 0 center / 300% 100% no-repeat;
+  image-rendering: pixelated;
+}
+.dialogueBox {
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  .speech {
+    color: var(--ink);
+    font-size: clamp(1.1rem, 2vw, 1.5rem);
+    line-height: 1.9;
+    min-height: 6em;
+  }
+}
+.dialogueActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+@media (prefers-reduced-motion: reduce) {
+  .walkSprite {
+    animation: none;
+  }
+}
+
+.deviceNote {
+  border-left: 2px solid var(--accent);
+  padding-left: var(--space-4);
+  font-size: 0.9rem;
+}
+.curriculum {
+  list-style: none;
+  padding: 0;
+  margin-block: var(--space-6);
+  li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: var(--space-4);
+    padding-block: var(--space-4);
+    border-bottom: 1px solid var(--line);
+    > button {
+      grid-column: 2;
+      justify-self: start;
+    }
+    @include up(md) {
+      grid-template-columns: auto 1fr auto;
+      > button {
+        grid-column: 3;
+      }
+    }
+  }
+}
+.lesson {
+  max-width: 860px;
+  margin-inline: auto;
+  ul {
+    padding-left: var(--space-6);
+  }
+  details {
+    margin-block: var(--space-6);
+  }
+  summary {
+    cursor: pointer;
+  }
+}
+.lessonActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-block: var(--space-6);
+  button[aria-pressed="true"] {
+    border-color: var(--accent);
+    outline: 1px solid var(--accent);
+  }
+}
+.exampleImage {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+}
+.modelDiagram {
+  margin-block: var(--space-6);
+  div {
+    padding: var(--space-4);
+    border: 1px solid var(--line);
+    background: var(--surface);
+  }
+  [data-active="true"] {
+    border-color: var(--accent);
+  }
+}
+.lessonContext {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  max-width: 860px;
+  margin-inline: auto;
+}
+.companion {
+  flex: 0 0 60px;
+  aspect-ratio: 3 / 4;
+  background: url("/images/workbook/journey/capy-backpack-walk-v4.png") 0 0 / 400% 100%;
+  image-rendering: pixelated;
+}
+
+.lesson {
+  --quiz-correct-ink: #91e3b1;
+  --quiz-correct-surface: #142b20;
+  --quiz-incorrect-ink: #ffb4b4;
+  --quiz-incorrect-surface: #351c20;
+  [data-answer="correct"] {
+    --answer-ink: var(--quiz-correct-ink);
+    --answer-surface: var(--quiz-correct-surface);
+  }
+  [data-answer="incorrect"] {
+    --answer-ink: var(--quiz-incorrect-ink);
+    --answer-surface: var(--quiz-incorrect-surface);
+  }
+  button[data-answer],
+  .quizFeedback[data-answer] {
+    color: var(--answer-ink);
+    background: var(--answer-surface);
+    border: 1px solid var(--answer-ink);
+    outline: none;
+  }
+  button[data-answer]:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 4px;
+  }
+  .answerMark {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-left: var(--space-3);
+    color: inherit;
+    font-weight: 700;
+    svg {
+      flex-shrink: 0;
+    }
+  }
+  .quizFeedback[data-answer] {
+    padding: var(--space-4);
+    border-radius: var(--radius);
+    .answerMark {
+      display: flex;
+      margin: 0 0 var(--space-2);
+    }
+  }
+}
+.revealBlock {
+  animation: revealText 120ms ease-out;
+}
+@keyframes revealText {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .revealBlock {
+    animation: none;
+  }
+}
+.lesson {
+  padding-bottom: calc(var(--space-8) * 3);
+  @include up(lg) {
+    margin-right: 180px;
+  }
+}
+.lessonNavigation {
+  position: fixed;
+  z-index: 20;
+  bottom: var(--space-3);
+  right: var(--space-3);
+  left: var(--space-3);
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  @include up(lg) {
+    left: auto;
+    right: var(--space-6);
+    bottom: var(--space-8);
+    width: 156px;
+    flex-direction: column;
+  }
+}
+.page[data-learning="true"] {
+  height: 100%;
+  max-width: none;
+  padding: 0;
+  overflow: hidden;
+  > .top,
+  > .notice {
+    display: none;
+  }
+  .lesson {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    height: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    overflow: hidden;
+    @include up(lg) {
+      grid-template-columns: minmax(0, 1fr) 250px;
+      grid-template-rows: auto minmax(0, 1fr);
+    }
+  }
+}
+.lessonHeader {
+  grid-column: 1 / -1;
+  padding: var(--space-3) var(--space-6);
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+  h1 {
+    font-size: clamp(1.3rem, 2.5vw, 2rem);
+    margin-block: var(--space-2);
+  }
+}
+.location {
+  font-size: 0.8rem;
+  color: var(--ink-muted);
+}
+.lessonBody {
+  overflow-y: auto;
+  min-height: 0;
+  min-width: 0;
+  overscroll-behavior: contain;
+  padding: var(--space-6);
+  scroll-padding-block: var(--space-4);
+  &:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+  }
+  .exampleImage {
+    max-height: 28dvh;
+    object-fit: contain;
+  }
+  @include up(lg) {
+    padding: var(--space-8);
+  }
+}
+.lessonPanel {
+  background: var(--surface);
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  .panelNotes {
+    display: none;
+  }
+  .lessonNavigation {
+    position: static;
+    width: auto;
+    padding: 0;
+    border: 0;
+    margin-top: auto;
+    display: flex;
+    flex-direction: row;
+    button {
+      flex: 1;
+    }
+  }
+  @include up(lg) {
+    grid-column: 2;
+    grid-row: 2;
+    border-top: 0;
+    border-left: 1px solid var(--line);
+    padding: var(--space-6);
+    overflow-y: auto;
+    .panelNotes {
+      display: block;
+      .companion {
+        display: block;
+        width: 60px;
+        margin-bottom: var(--space-4);
+      }
+    }
+    .lessonNavigation {
+      flex-direction: column;
+    }
+  }
+}
+.lessonBody {
+  > p,
+  > blockquote,
+  > ul,
+  > .revealBlock {
+    max-width: 70ch;
+  }
+}
+
+.lessonPanel h2 {
+  word-break: keep-all;
+}
+.lessonBody {
+  scrollbar-width: thin;
+  p {
+    margin-block: var(--space-3);
+  }
+  blockquote {
+    margin-block: var(--space-3);
+    padding: var(--space-3);
+  }
+  .preview {
+    padding: var(--space-4);
+  }
+  .choices {
+    gap: var(--space-2);
+  }
+}

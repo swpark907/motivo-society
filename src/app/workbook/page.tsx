@@ -1,13 +1,9 @@
 import type { Metadata } from "next";
-import styles from "@/app/page.module.scss";
-
-export const metadata: Metadata = { title: "Workbook" };
-
+import { WorkbookHome } from "@/components/WorkbookHome/WorkbookHome";
+export const metadata: Metadata = {
+  title: "Workbook",
+  description: "작은 실천을 나만의 배움으로. 모쏘와 함께 배우고 만들고 기록하는 공간.",
+};
 export default function WorkbookPage() {
-  return (
-    <main className={styles.main}>
-      <h1 className={`display ${styles.title}`}>Workbook</h1>
-      <p className={styles.lead}>커리큘럼을 따라가며 공부하는 공간. 준비 중입니다.</p>
-    </main>
-  );
+  return <WorkbookHome />;
 }

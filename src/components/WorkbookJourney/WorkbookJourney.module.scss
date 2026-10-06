@@ -1,0 +1,512 @@
+.page {
+  --map-path: #e2ba83;
+  --sample-paper: #f4ead6;
+  --sample-ink: #453c32;
+  --sample-card: #e4d4b7;
+  padding: var(--space-6) var(--space-4) var(--space-12);
+  max-width: 1480px;
+  margin-inline: auto;
+  h1 {
+    font-size: clamp(1.8rem, 3vw, 2.6rem);
+    letter-spacing: -0.04em;
+  }
+  h2 {
+    font-size: clamp(1.4rem, 2.4vw, 2rem);
+    margin-block: var(--space-2) var(--space-4);
+  }
+  h3 {
+    font-size: 1.15rem;
+    margin-bottom: var(--space-3);
+  }
+  p {
+    line-height: 1.8;
+  }
+  button,
+  textarea {
+    font: inherit;
+  }
+  button,
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
+  button {
+    cursor: pointer;
+  }
+  button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+  button:focus-visible,
+  a:focus-visible,
+  textarea:focus-visible,
+  summary:focus-visible,
+  [tabindex]:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 4px;
+  }
+  textarea {
+    display: block;
+    width: 100%;
+    padding: var(--space-3);
+    color: var(--ink);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    margin-block: var(--space-2) var(--space-4);
+    resize: vertical;
+    line-height: 1.7;
+  }
+  @include up(md) {
+    padding: var(--space-8);
+  }
+}
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-4);
+  align-items: end;
+  margin-bottom: var(--space-6);
+  p:last-child {
+    color: var(--ink-muted);
+  }
+  a {
+    font-size: 0.8rem;
+    color: var(--ink-muted);
+  }
+}
+.eyebrow {
+  color: var(--accent);
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  margin-block: var(--space-3);
+}
+.counter {
+  border: 1px solid var(--line);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius);
+  font-size: 0.8rem;
+}
+.map {
+  position: relative;
+  aspect-ratio: 3 / 2;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  isolation: isolate;
+  > img {
+    object-fit: cover;
+    image-rendering: pixelated;
+  }
+}
+.path {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  polyline {
+    fill: none;
+    stroke: var(--map-path);
+    stroke-width: 0.7;
+    stroke-dasharray: 1 1;
+    opacity: 0.8;
+  }
+}
+.stop {
+  position: absolute;
+  transform: translate(-50%, -15%);
+  z-index: 2;
+  border: 0;
+  color: var(--ink);
+  background: transparent;
+  display: grid;
+  justify-items: center;
+  min-width: 48px;
+  padding: var(--space-1);
+  span {
+    width: 30px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    background: var(--surface);
+    border: 2px solid var(--map-path);
+    border-radius: 50%;
+    font-size: 0.75rem;
+  }
+  strong {
+    background: var(--surface);
+    padding: var(--space-1) var(--space-2);
+    border-radius: 4px;
+    font-size: 0.65rem;
+    white-space: nowrap;
+  }
+  &[aria-current] span {
+    background: var(--accent);
+    color: var(--surface);
+  }
+  @include up(md) {
+    span {
+      width: 40px;
+      height: 40px;
+    }
+    strong {
+      font-size: 0.8rem;
+    }
+  }
+}
+.capy {
+  position: absolute;
+  width: 58px;
+  transform: translate(-50%, -95%);
+  z-index: 3;
+  pointer-events: none;
+  img {
+    width: 100%;
+    height: auto;
+    image-rendering: pixelated;
+  }
+  @include up(md) {
+    width: 90px;
+  }
+}
+.walking {
+  transition:
+    left 180ms linear,
+    top 180ms linear;
+}
+@media (prefers-reduced-motion: reduce) {
+  .walking {
+    transition: none;
+  }
+}
+.mapCaption {
+  position: absolute;
+  bottom: var(--space-2);
+  left: var(--space-2);
+  background: var(--surface);
+  padding: var(--space-1) var(--space-2);
+  font-size: 0.65rem;
+  border-radius: 4px;
+}
+.stopList {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin-block: var(--space-3) var(--space-6);
+  button {
+    text-align: left;
+    padding: var(--space-3) var(--space-2);
+    color: var(--ink);
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    font-size: 0.8rem;
+    &[aria-current] {
+      border-color: var(--accent);
+    }
+  }
+  small {
+    display: block;
+    margin-top: var(--space-2);
+    color: var(--ink-muted);
+    font-size: 0.65rem;
+  }
+}
+.activity {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+  padding: var(--space-4);
+  > p {
+    color: var(--ink-muted);
+  }
+  > button {
+    margin-top: var(--space-4);
+  }
+  @include up(md) {
+    padding: var(--space-8);
+  }
+}
+.primary,
+.secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: var(--space-3) var(--space-4);
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+.primary {
+  background: var(--accent);
+  color: var(--surface);
+  border: 1px solid var(--accent);
+  font-weight: 650;
+}
+.secondary {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--ink);
+}
+.story {
+  display: grid;
+  gap: var(--space-6);
+  margin-block: var(--space-6);
+  > img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    border-radius: var(--radius);
+  }
+  small {
+    color: var(--accent);
+  }
+  h3 {
+    margin-top: var(--space-3);
+  }
+  button {
+    margin-top: var(--space-4);
+  }
+  blockquote {
+    margin-top: var(--space-4);
+    border-left: 2px solid var(--accent);
+    padding: var(--space-3);
+    background: var(--surface);
+    line-height: 1.8;
+  }
+  @include up(lg) {
+    grid-template-columns: 1fr 1fr;
+    > img {
+      height: 100%;
+      min-height: 280px;
+    }
+  }
+}
+.note {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+  margin-block: var(--space-6);
+  p {
+    margin-bottom: var(--space-4);
+    color: var(--ink-muted);
+  }
+  label {
+    display: block;
+    margin-bottom: var(--space-3);
+  }
+  a {
+    margin-top: var(--space-4);
+  }
+}
+.lab {
+  display: grid;
+  min-width: 0;
+  gap: var(--space-6);
+  margin-top: var(--space-6);
+  > div {
+    min-width: 0;
+  }
+  @include up(xl) {
+    grid-template-columns: minmax(0, 1fr) 250px;
+  }
+}
+.segment {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+  button {
+    background: var(--surface);
+    color: var(--ink-muted);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: var(--space-2) var(--space-3);
+    min-height: 44px;
+    font-size: 0.8rem;
+    &[aria-pressed="true"] {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+  }
+}
+.previewOuter {
+  overflow-x: auto;
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding-block: var(--space-3);
+}
+.preview {
+  overflow-x: auto;
+  margin-inline: auto;
+  background: var(--sample-paper);
+  color: var(--sample-ink);
+  min-height: 380px;
+  border-radius: 8px;
+}
+.sample {
+  padding: var(--space-4);
+  h3 {
+    font-size: 1.5rem;
+    margin-top: var(--space-4);
+  }
+  > small {
+    letter-spacing: 0.15em;
+  }
+  > p {
+    font-size: 0.8rem;
+  }
+  > button {
+    background: var(--sample-ink);
+    color: var(--sample-paper);
+    border: 0;
+    padding: var(--space-3);
+    margin-top: var(--space-4);
+    border-radius: 6px;
+  }
+}
+.sampleCards {
+  display: flex;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+  article {
+    flex: 1;
+    min-width: 200px;
+    background: var(--sample-card);
+    padding: var(--space-4);
+    border-radius: 6px;
+  }
+  span {
+    font-size: 2rem;
+  }
+  h4 {
+    margin-block: var(--space-2);
+  }
+  p {
+    font-size: 0.75rem;
+  }
+}
+.settings {
+  fieldset {
+    border: 0;
+    margin-bottom: var(--space-4);
+  }
+  legend {
+    margin-bottom: var(--space-2);
+  }
+  fieldset button {
+    background: var(--surface);
+    color: var(--ink);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: var(--space-3);
+    margin: 0 var(--space-2) var(--space-2) 0;
+    font-size: 0.8rem;
+    &[aria-pressed="true"] {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+  }
+  ul {
+    list-style: none;
+    font-size: 0.8rem;
+    color: var(--ink-muted);
+    margin-block: var(--space-4);
+    line-height: 2;
+  }
+  details {
+    font-size: 0.85rem;
+    p {
+      padding-top: var(--space-3);
+    }
+  }
+  summary {
+    cursor: pointer;
+  }
+}
+.quiz {
+  display: grid;
+  gap: var(--space-3);
+  border: 0;
+  margin-block: var(--space-4);
+  legend {
+    margin-bottom: var(--space-3);
+    font-size: 0.8rem;
+    color: var(--ink-muted);
+  }
+  button {
+    text-align: left;
+    background: var(--surface);
+    color: var(--ink);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: var(--space-4);
+    line-height: 1.7;
+    &[aria-pressed="true"] {
+      border-color: var(--accent);
+    }
+  }
+}
+.feedback {
+  color: var(--accent) !important;
+  margin-top: var(--space-4);
+  min-height: 1.5em;
+}
+.muted {
+  color: var(--ink-muted);
+  font-size: 0.75rem;
+}
+.footer {
+  color: var(--ink-muted);
+  font-size: 0.75rem;
+  margin-top: var(--space-6);
+  button {
+    color: var(--ink-muted);
+    padding: var(--space-2);
+    border: 1px solid var(--line);
+    background: var(--surface);
+    margin-top: var(--space-2);
+    margin-right: var(--space-2);
+    border-radius: 6px;
+  }
+}
+
+// 4칸의 보행 시트를 이동 중에만 재생한다. 정지할 때는 발을 모은 프레임.
+.sprite {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  background: url("/images/workbook/journey/capy-walk-v3.png") 33.333% 0 / 400% 100% no-repeat;
+  image-rendering: pixelated;
+  &[data-facing="left"] {
+    transform: scaleX(-1);
+  }
+}
+.walking {
+  transition: none;
+  .sprite {
+    animation: capySteps 720ms steps(1, end) infinite;
+  }
+}
+@keyframes capySteps {
+  0% {
+    background-position: 0% 0;
+  }
+  25% {
+    background-position: 33.333% 0;
+  }
+  50% {
+    background-position: 66.667% 0;
+  }
+  75% {
+    background-position: 100% 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .walking .sprite {
+    animation: none;
+  }
+}
