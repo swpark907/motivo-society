@@ -1,0 +1,212 @@
+.content {
+  color: var(--ink);
+  min-width: 0;
+  a:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: var(--space-1);
+  }
+  h2,
+  h3,
+  p {
+    margin: 0;
+  }
+}
+.label {
+  font-size: 0.68rem;
+  font-weight: 650;
+  letter-spacing: 0.1em;
+  color: var(--ink-muted);
+}
+.story {
+  display: grid;
+  gap: var(--space-8);
+  padding-block: var(--space-12);
+  border-top: 1px solid var(--line);
+  @include up(md) {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-12);
+    padding-block: var(--space-16);
+  }
+}
+.storyCopy {
+  h2 {
+    margin-block: var(--space-4);
+    font-size: clamp(1.8rem, 3vw, 2.6rem);
+    line-height: 1.25;
+    letter-spacing: -0.05em;
+  }
+  p {
+    max-width: 26rem;
+    line-height: 1.7;
+    color: var(--ink-muted);
+  }
+}
+.status {
+  display: inline-block;
+  margin-top: var(--space-6);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--line);
+  font-size: 0.75rem;
+}
+.storySteps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  li {
+    display: flex;
+    gap: var(--space-4);
+    padding-block: var(--space-4);
+    border-top: 1px solid var(--line);
+    > span {
+      color: var(--ink-muted);
+      font-size: 0.75rem;
+    }
+    h3 {
+      font-size: 1rem;
+    }
+    p {
+      margin-top: var(--space-2);
+      font-size: 0.85rem;
+      line-height: 1.65;
+      color: var(--ink-muted);
+    }
+  }
+}
+.classEntry {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-6);
+  padding: var(--space-6);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  h2 {
+    margin-top: var(--space-2);
+    font-size: 1.2rem;
+    letter-spacing: -0.03em;
+  }
+  p {
+    margin-top: var(--space-3);
+    color: var(--ink-muted);
+    font-size: 0.85rem;
+    line-height: 1.7;
+  }
+  a {
+    flex-shrink: 0;
+    color: var(--ink);
+    font-size: 0.85rem;
+    text-underline-offset: var(--space-1);
+  }
+  @include up(md) {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+.readings {
+  padding-block: var(--space-12);
+  > header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    margin-bottom: var(--space-8);
+    h2 {
+      font-size: 1.8rem;
+      margin-top: var(--space-2);
+      letter-spacing: -0.04em;
+    }
+    p {
+      font-size: 0.8rem;
+      line-height: 1.7;
+      color: var(--ink-muted);
+    }
+    @include up(md) {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+  }
+}
+.groups {
+  display: grid;
+  gap: var(--space-8);
+}
+.group {
+  display: grid;
+  gap: var(--space-6);
+  border-top: 1px solid var(--line);
+  padding-top: var(--space-6);
+  @include up(md) {
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.6fr);
+    gap: var(--space-8);
+  }
+}
+.number {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--ink-muted);
+  margin-bottom: var(--space-3);
+}
+.groupHeading {
+  h3 {
+    font-size: 1.2rem;
+    letter-spacing: -0.035em;
+    line-height: 1.5;
+  }
+  p {
+    margin-top: var(--space-2);
+    color: var(--ink-muted);
+    font-size: 0.8rem;
+    line-height: 1.7;
+  }
+}
+.articleList {
+  min-width: 0;
+  display: grid;
+  gap: var(--space-6);
+}
+.article {
+  display: grid;
+  grid-template-columns: 6rem minmax(0, 1fr) auto;
+  align-items: start;
+  gap: var(--space-3);
+  color: var(--ink);
+  text-decoration: none;
+  @include up(md) {
+    grid-template-columns: 9rem minmax(0, 1fr) auto;
+    gap: var(--space-4);
+  }
+}
+.thumbnail {
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius);
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+.articleCopy {
+  display: grid;
+  gap: var(--space-2);
+  strong {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    letter-spacing: -0.025em;
+  }
+  > span:last-child {
+    font-size: 0.75rem;
+    color: var(--ink-muted);
+    line-height: 1.65;
+  }
+}
+.tags {
+  font-size: 0.62rem;
+  color: var(--ink-muted);
+}
+.arrow {
+  font-size: 0.9rem;
+}

@@ -1,0 +1,101 @@
+.summary {
+  flex-shrink: 0;
+  display: grid;
+  gap: var(--space-4);
+  margin-block: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  @include up(lg) {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    max-height: 29dvh;
+    overflow: auto;
+  }
+  > .learned h2 {
+    margin-block: var(--space-2);
+    font-size: 1.1rem;
+  }
+  > .result > h3 {
+    margin: 0 0 var(--space-3);
+    font-size: 0.85rem;
+  }
+  > .learned > p,
+  > .result > p {
+    margin: 0;
+    font-size: 0.85rem;
+    line-height: 1.7;
+  }
+  > .learned > small {
+    margin-block: var(--space-2) 0;
+    font-size: 0.7rem;
+    color: var(--ink-muted);
+  }
+  dl {
+    display: grid;
+    gap: var(--space-3);
+    margin: 0;
+  }
+  dt {
+    font-size: 0.7rem;
+    color: var(--ink-muted);
+  }
+  dd {
+    margin: var(--space-1) 0 0;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+  }
+}
+.result {
+  border-top: 1px solid var(--line);
+  padding-top: var(--space-4);
+  @include up(lg) {
+    border-top: 0;
+    border-left: 1px solid var(--line);
+    padding-top: 0;
+    padding-left: var(--space-4);
+  }
+}
+.summary .applied {
+  margin-top: var(--space-3);
+  border-top: 1px solid var(--line);
+  padding-top: var(--space-3);
+}
+.summary .learned p {
+  margin: 0;
+}
+.summary .result dl {
+  @include up(lg) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.summary[data-visual="true"] {
+  max-height: none;
+  overflow: visible;
+  > [data-completion-screens] {
+    min-width: 0;
+  }
+  @include up(lg) {
+    grid-template-columns: minmax(0, 2.2fr) minmax(250px, 1fr);
+    grid-template-areas: "screens learned" "screens result";
+    grid-template-rows: auto 1fr;
+    > [data-completion-screens] {
+      grid-area: screens;
+    }
+    .learned {
+      grid-area: learned;
+    }
+    .result {
+      grid-area: result;
+      border-left: 0;
+      border-top: 1px solid var(--line);
+      padding-left: 0;
+      padding-top: var(--space-3);
+      dl {
+        grid-template-columns: 1fr;
+      }
+    }
+  }
+}

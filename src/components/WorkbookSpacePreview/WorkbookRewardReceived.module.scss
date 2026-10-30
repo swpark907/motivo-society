@@ -1,0 +1,65 @@
+.dialog {
+  width: min(460px, calc(100% - 32px));
+  max-height: calc(100dvh - 32px);
+  margin: auto;
+  padding: var(--space-6);
+  border: 1px solid var(--line);
+  border-radius: var(--space-3);
+  background: var(--surface);
+  color: var(--ink);
+  overflow: auto;
+  text-align: center;
+  &::backdrop {
+    background: var(--surface);
+    opacity: 0.85;
+  }
+  h3 {
+    font-size: 1.35rem;
+    margin-block: var(--space-2);
+  }
+  p {
+    font-size: 0.8rem;
+    line-height: 1.65;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
+  button {
+    min-height: 44px;
+    padding: var(--space-3);
+    border: 1px solid var(--line);
+    border-radius: var(--space-2);
+    background: var(--surface-2);
+    color: var(--ink);
+    font: inherit;
+    font-size: 0.8rem;
+    cursor: pointer;
+    &:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+    }
+    &:first-child {
+      background: var(--accent);
+      color: var(--accent-ink);
+    }
+  }
+}
+.eyebrow,
+.unit {
+  color: var(--accent);
+}
+.art {
+  position: relative;
+  width: min(320px, 100%);
+  aspect-ratio: 1.5;
+  margin: var(--space-3) auto;
+  overflow: hidden;
+}
+.hint {
+  margin-top: var(--space-3);
+  color: var(--ink-muted);
+}
+.actions {
+  display: grid;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}

@@ -1,34 +1,47 @@
 "use client";
 
-// 설명 페이지, 예시 비교와 확인 문제의 선택을 화면 안에서 유지한다.
-import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
-import styles from "./WorkbookClass.module.scss";
+import { workbookLessonLabel } from "@/lib/workbook-course";
+import { workbookLearningExample } from "@/lib/workbook-learning-example";
+import { WorkbookAiOpening } from "./WorkbookLessonInteractions";
+import { WorkbookLessonHeader } from "./WorkbookLessonHeader";
+import { WorkbookLessonPrevious } from "./WorkbookLessonPrevious";
 
-const names = ["AI 이해하기", "AI 종류와 도구 알아보기"];
+// 설명 페이지, 예시 비교와 확인 문제의 선택을 화면 안에서 유지한다.
+import { WorkbookActionReturn } from "./WorkbookActionReturn";
+import { useWorkbookLessonState } from "./useWorkbookLessonState";
+import Image from "next/image";
+import { useEffect, useRef } from "react";
+import { useWorkbookProgress } from "./WorkbookProgressContext";
+import styles from "./WorkbookClass.module.scss";
+import system from "./WorkbookLesson.module.scss";
+
 const examples = [
   {
     name: "소개 글",
-    result: "차를 따르고, 숨을 고르고, 돌을 쌓으며 잠깐 쉬어가는 웹 경험을 만듭니다.",
-    description: "대화로 생각을 정리하고 글의 초안을 만들거나 표현을 고칠 수 있어요.",
+    format: "문장",
+    result: workbookLearningExample.firstResult,
+    feature: "초안 쓰기 · 문장 고치기",
+    check: "알려준 사실과 원하는 표현에 맞는지 읽어봐요.",
   },
   {
     name: "표지 그림",
-    result: "작업실 분위기를 담은 이미지 파일",
-    description:
-      "그림을 말로 설명받는 것과 실제 이미지 파일을 만드는 것은 달라요. 이미지 생성과 저장 기능을 확인해요.",
+    format: "이미지 파일",
+    result: "창가와 펼친 책을 담은 표지 그림",
+    feature: "이미지 생성 · 파일로 저장",
+    check: "그림을 말로 설명하는 기능과 실제 이미지 생성은 달라요.",
   },
   {
     name: "웹 화면",
-    result: "작은 쉼을 만드는 작업실",
-    description:
-      "코드를 만드는 것에 더해 파일에 반영하고, 화면에서 결과를 확인할 수 있는지도 살펴봐요.",
+    format: "브라우저에서 확인할 화면",
+    result: workbookLearningExample.title,
+    feature: "코드 작성 · 파일 반영 · 실행 확인",
+    check: "코드 답변만 받았는지, 실제 파일과 화면까지 확인했는지 구분해요.",
   },
 ];
 
 function AnswerMark({ correct }: { correct: boolean }) {
   return (
-    <span className={styles.answerMark}>
+    <span className={system.answerMark}>
       <svg
         aria-hidden="true"
         width="20"
@@ -56,385 +69,905 @@ export function WorkbookLessons({
   onBack: () => void;
   onComplete: (lesson: number) => void;
 }) {
+  const p = useWorkbookProgress();
+  const learningUnit = initialLesson === 0 ? "ai-1" : "ai-2";
+  function reviewLearning() {
+    p.dispatchProjectWorkflow({ type: "learn", unit: learningUnit, status: "in-progress" });
+  }
   const lesson = initialLesson;
-  const [step, setStep] = useState(0);
-  const [revealed, setRevealed] = useState<Record<number, number>>({});
+  const ui = system;
+  const [step, setStep] = useWorkbookLessonState(`ai-${lesson}-step`, 0);
+  const [revealed, setRevealed] = useWorkbookLessonState<Record<number, number>>(
+    `ai-${lesson}-revealed`,
+    {},
+  );
   const part = revealed[step] ?? 0;
-  const gradual = step === 0 || (lesson === 1 && step === 1);
-  const [shown, setShown] = useState(false);
-  const [answer, setAnswer] = useState<number | null>(null);
-  const [example, setExample] = useState(0);
-  const [layer, setLayer] = useState("tool");
-  const [overlap, setOverlap] = useState<boolean | null>(null);
+  const gradual = step === 0 || (lesson === 1 && (step === 1 || step === 2));
+  const lastStep = lesson === 1 ? 4 : 2;
+  // 숫자는 수업 전체의 화면 위치다. 화면 안의 예시 전환·답 선택은 세지 않는다.
+  const totalScreens = lesson === 0 ? 5 : 11;
+  const currentScreen = gradual ? step * 3 + part + 1 : lesson === 0 ? step + 3 : step + 7;
+  const [conceptAnswer, setConceptAnswer] = useWorkbookLessonState<number | null>(
+    `ai-${lesson}-conceptAnswer`,
+    null,
+  );
+  const [shown, setShown] = useWorkbookLessonState(`ai-${lesson}-shown`, false);
+  const [answer, setAnswer] = useWorkbookLessonState<number | null>(`ai-${lesson}-answer`, null);
+  const [example, setExample] = useWorkbookLessonState(`ai-${lesson}-example`, 0);
+  const [layer, setLayer] = useWorkbookLessonState(`ai-${lesson}-layer`, "tool");
+  const [overlap, setOverlap] = useWorkbookLessonState<boolean | null>(
+    `ai-${lesson}-overlap`,
+    null,
+  );
   const heading = useRef<HTMLHeadingElement>(null);
   const body = useRef<HTMLDivElement>(null);
   useEffect(() => {
     body.current?.scrollTo({ top: 0 });
+    // 설명이 펼쳐져 진행 버튼 수가 바뀌어도 현재 키보드 조작을 화면 안에 둔다.
+    const focused = document.activeElement;
+    if (
+      focused instanceof HTMLButtonElement &&
+      body.current?.parentElement?.contains(focused) &&
+      focused.closest("nav")?.getAttribute("aria-label") === "수업 진행"
+    )
+      focused.scrollIntoView({ block: "nearest", inline: "nearest" });
   }, [step, part]);
   useEffect(() => {
     heading.current?.focus();
   }, []);
   const correct = lesson === 0 ? answer === 2 : answer === 1 && overlap === true;
+  const nextAction =
+    lesson === 0
+      ? step === 0
+        ? ""
+        : step === 1
+          ? !shown
+            ? "예시 결과 보기를 눌러 소개문을 열어요."
+            : !correct
+              ? "소개문에서 요청에 없던 사실을 하나 골라요."
+              : "다음으로에서 배운 내용을 정리해요."
+          : ""
+      : "";
   function move(next: number) {
     setStep(next);
     requestAnimationFrame(() => heading.current?.focus());
   }
   return (
-    <section className={`${styles.section} ${styles.lesson}`}>
-      <header className={styles.lessonHeader}>
-        <div className={styles.top}>
-          <span className="label">
-            LESSON 0{lesson + 1} · {step + 1} / 3
-          </span>
-          <button className={styles.quiet} onClick={onBack}>
-            마을 지도로
-          </button>
-        </div>
-        <h1 ref={heading} tabIndex={-1}>
-          {names[lesson]}
-        </h1>
-        <span className={styles.location}>
-          카피바라와 함께 · {lesson === 0 ? "첫 만남의 찻집" : "도구 장터"}
-        </span>
-      </header>
-      <div ref={body} className={styles.lessonBody} tabIndex={0} aria-label="수업 내용">
+    <section className={system.lesson}>
+      <WorkbookLessonHeader
+        stage="agent"
+        point={lesson}
+        headingRef={heading}
+        onBack={onBack}
+        current={currentScreen}
+        total={totalScreens}
+      />
+      <div ref={body} className={ui.lessonBody} tabIndex={0} aria-label="수업 내용">
+        {nextAction && !(lesson === 0 && step === 1) && (
+          <p
+            className={ui.actionLead}
+            data-current-action
+            tabIndex={-1}
+            id="workbook-lesson-next-action"
+          >
+            {nextAction}
+          </p>
+        )}
+
+        {step === lastStep && (
+          <>
+            <h2 className={system.screenTitle}>
+              {lesson === 0 ? (
+                <>
+                  AI의 초안은 출발점,
+                  <br />
+                  확인은 내가 해요
+                </>
+              ) : (
+                <>
+                  만들 결과에 맞춰,
+                  <br />
+                  도구의 기능을 확인해요
+                </>
+              )}
+            </h2>
+            <section aria-labelledby="recap-key-title">
+              <h3 id="recap-key-title">배운 핵심</h3>
+              <dl className={system.recapPoints}>
+                {(lesson === 0
+                  ? [
+                      ["생성형 AI", "요청을 바탕으로 글·이미지·코드 같은 결과를 만들어요."],
+                      ["LLM", "언어를 다루는 모델로, 글 요약과 코드 작성에도 쓰여요."],
+                      ["결과 확인", "알려준 사실과 부탁한 조건에 맞는지 직접 확인해요."],
+                    ]
+                  : [
+                      ["결과와 기능", "소개 글·그림·웹 화면에 필요한 기능을 먼저 살펴봐요."],
+                      [
+                        "모델과 도구",
+                        "모델은 결과를 만드는 핵심, 도구는 그 기능을 사용하는 작업 환경이에요.",
+                      ],
+                      [
+                        "실제 파일 작업",
+                        "웹·앱의 구분이나 설치 여부만으로 판단하지 않고 기능·폴더·권한을 확인해요.",
+                      ],
+                    ]
+                ).map(([term, text]) => (
+                  <div key={term}>
+                    <dt>{term}</dt>
+                    <dd>{text}</dd>
+                  </div>
+                ))}
+              </dl>
+            </section>
+            <section className={system.nextLesson} aria-labelledby="next-lesson-title">
+              <small>다음 수업</small>
+              <h3 id="next-lesson-title">{workbookLessonLabel("agent", lesson === 0 ? 1 : 2)}</h3>
+              <p>
+                {lesson === 0
+                  ? "학습을 마친 뒤 단원 지도에서 다음 수업을 시작해요. 만들 결과에 필요한 도구 기능을 살펴볼 거예요."
+                  : "학습을 마친 뒤 단원 지도에서 다음 수업을 시작해요. 개인 컴퓨터에서 코드 에이전트의 설치·로그인·실습 폴더 연결을 준비해요."}
+              </p>
+            </section>
+            <p className={system.recapScope}>학습 예시 복습 · 다음 수업으로 이어가요.</p>
+          </>
+        )}
+
         {lesson === 0 && step === 0 && (
           <>
-            <h2>AI에게 어떤 도움을 받을 수 있을까요?</h2>
-            {part === 0 && (
-              <p>
-                AI는 인공지능을 뜻해요. 언어를 다루거나 이미지의 특징을 찾고, 다음 결과를 예측하는
-                등 여러 작업을 수행하는 기술과 시스템을 넓게 부르는 말이에요.
-              </p>
-            )}
+            <h2 id="lesson-screen-title" className={system.screenTitle}>
+              {part === 1 ? (
+                <>
+                  결과를 만드는 생성형 AI,
+                  <br />
+                  언어를 다루는 LLM
+                </>
+              ) : part === 2 ? (
+                "자연스러운 답변 ≠ 확인된 사실"
+              ) : (
+                "AI = 인공지능"
+              )}
+            </h2>
+            {part === 0 && <WorkbookAiOpening />}
             {part === 1 && (
-              <div className={styles.revealBlock}>
-                <div className={styles.preview}>
-                  <strong>이 클래스에서는 생성형 AI를 사용해요.</strong>
+              <div className={`${system.aiRelationship} ${system.aiConceptSlide}`}>
+                <section aria-labelledby="generative-ai-title">
+                  <h3 id="generative-ai-title">생성형 AI</h3>
+                  <p>요청을 바탕으로 글·이미지·코드 같은 새로운 결과를 만드는 AI예요.</p>
+                  <table className={system.aiResultTable}>
+                    <caption>생성형 AI가 만드는 결과 예시</caption>
+                    <thead>
+                      <tr>
+                        <th scope="col">글</th>
+                        <th scope="col">이미지</th>
+                        <th scope="col">코드</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>소개문 초안</td>
+                        <td>표지 그림</td>
+                        <td>웹페이지 코드</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </section>
+                <section className={system.aiLanguageModel} aria-labelledby="llm-title">
+                  <span className={system.aiConnection}>그중 언어를 다루는 모델 ↓</span>
+                  <h3 id="llm-title">LLM · 대규모 언어 모델</h3>
                   <p>
-                    요청과 주어진 정보를 바탕으로 글·이미지·코드 같은 결과를 만드는 AI예요. 소개문
-                    초안을 쓰거나 웹 화면을 만드는 데 도움을 받을 수 있어요.
+                    많은 언어 자료에서 말의 규칙성을 익혀, 입력한 글과 앞뒤 내용에 맞춰 답변을
+                    만드는 모델이에요. 이때 질문과 앞선 대화처럼 답을 이해하는 데 필요한 주변 정보를{" "}
+                    <strong>맥락</strong>이라고 해요.
                   </p>
-                </div>
+                  <p className={system.aiModelUses}>
+                    활용 <strong>글 요약 · 문장 작성 · 코드 작성</strong>
+                  </p>
+                </section>
+                <p className={system.aiKeyTakeaway}>
+                  <strong>코드를 답하는 것과 내 파일을 직접 고치는 것은 달라요.</strong>
+                </p>
               </div>
             )}
             {part === 2 && (
-              <div className={styles.revealBlock}>
-                <p>
-                  내 의도를 전부 알거나 항상 맞는 답을 주지는 않아요. 알려주지 않은 사실을
-                  그럴듯하게 덧붙일 수도 있어요. 그래서 나온 결과를 직접 확인해야 해요.
-                </p>
-                <details>
-                  <summary>코드는 무엇인가요?</summary>
+              <div className={`${system.aiRelationship} ${system.aiConceptSlide}`}>
+                <section aria-labelledby="lesson-screen-title">
                   <p>
-                    컴퓨터가 할 일을 표현한 글이에요. 웹에서는 무엇을 놓고 어떻게 보여줄지, 버튼을
-                    누르면 무엇을 할지 등을 정해요. 지금은 외울 필요 없어요.
+                    장소 소개에 갑자기 “매일 직접 구운 빵을 판매해요”가 추가됐다면 어떨까요?
+                    자연스러워도 우리가 준 정보는 아니에요. AI는 알려주지 않은 사실을 덧붙이거나
+                    요청을 잘못 이해할 수 있어요.
                   </p>
-                </details>
+                  <table
+                    className={`${system.aiResultTable} ${system.aiCheckTable}`}
+                    aria-label="AI 결과 확인 기준"
+                  >
+                    <thead>
+                      <tr>
+                        <th scope="col">확인할 것</th>
+                        <th scope="col">스스로 물어볼 질문</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <th scope="row">사실 확인</th>
+                        <td>알려주지 않은 숫자나 경험을 지어내지 않았나요?</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">요청 확인</th>
+                        <td>내가 부탁한 내용과 조건에 맞나요?</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </section>
+                <p>
+                  AI의 학습은 많은 자료에서 규칙성을 익히는 과정이에요. 답변할 때마다 모든 내용을
+                  사실 확인해 주는 것은 아니므로, 내가 준 자료와 맞는지 살펴봐야 해요.
+                </p>
+                <section className={system.aiCodeNote} aria-labelledby="first-code-title">
+                  <h3 id="first-code-title">참고 · 코드란?</h3>
+                  <p>
+                    <strong>컴퓨터가 할 일을 적은 명령</strong>이에요. 웹페이지에 제목을 보여주거나
+                    버튼에 맞춰 화면을 바꾸는 데 쓰여요.
+                  </p>
+                  <p>
+                    <strong>지금은 외우지 않아도 돼요.</strong> 뒤 수업에서 파일과 화면을 함께
+                    살펴봐요.
+                  </p>
+                </section>
               </div>
             )}
           </>
         )}
         {lesson === 0 && step === 1 && (
           <>
-            <h2>그럴듯한 문장도 확인해봐요</h2>
-            <p>카피바라: “내가 만든 작은 웹들을 소개하고 싶은데, 첫 문장이 잘 안 써져.”</p>
-            <blockquote>
-              차 따르기, 숨 고르기, 돌 쌓기를 해보는 작은 웹 경험을 만들었어. 소개문 두 문장을 써줘.
-            </blockquote>
-            <button className={styles.quiet} onClick={() => setShown(true)} disabled={shown}>
-              예시 결과 보기
-            </button>
-            {shown && (
-              <>
-                <div className={styles.preview}>
-                  <small>미리 만든 학습 예시 · 실제 AI 응답이나 이용자 수가 아니에요.</small>
+            <h2 className={system.screenTitle}>그럴듯한 문장도 확인해봐요</h2>
+            <p>
+              앞에서 본 장소 메모로 만든 소개문이에요. <strong>알려준 정보와 지어낸 사실</strong>을
+              구분해보세요.
+            </p>
+            <div className={system.exampleComparison}>
+              <section aria-labelledby="example-request-title">
+                <h3 id="example-request-title">보낸 요청</h3>
+                <p>
+                  창가 자리가 있고, 혼자 책 읽기 좋아. 주말에는 사람이 많아. 소개문 두 문장을 써줘.
+                </p>
+              </section>
+              <span className={system.exampleFlowArrow} aria-hidden="true">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M4 12h16m-6-6 6 6-6 6" />
+                </svg>
+              </span>
+              <section
+                className={system.exampleResult}
+                aria-labelledby="example-result-title"
+                aria-live="polite"
+              >
+                <h3 id="example-result-title">AI 결과 예시</h3>
+                {shown ? (
                   <p>
-                    차를 따르고, 숨을 고르고, 돌을 쌓으며 잠깐 쉬어갈 수 있는 작은 웹 경험을
-                    만듭니다. 이미 1만 명이 선택한 공간에서 오늘의 여유를 만나보세요.
+                    창가에서 혼자 책 읽기 좋은 공간입니다. 이미 1만 명이 선택한 공간에서 여유를
+                    만나보세요.
                   </p>
-                </div>
-                <h2>알려준 내용으로 확인할 수 없는 부분은?</h2>
-                <div className={styles.choices}>
+                ) : (
+                  <>
+                    <p data-current-action tabIndex={-1} id="workbook-lesson-next-action">
+                      요청을 읽었다면 결과를 열어 비교해보세요.
+                    </p>
+                    <button onClick={() => setShown(true)}>예시 결과 보기</button>
+                  </>
+                )}
+              </section>
+              <small className={system.exampleDisclosure}>
+                미리 만든 학습 예시 · 실제 AI 응답이나 이용자 수가 아니에요.
+              </small>
+            </div>
+            {shown && (
+              <section className={system.exampleQuestion} aria-labelledby="example-question-title">
+                <h3 id="example-question-title">알려준 내용으로 확인할 수 없는 부분은?</h3>
+                <p
+                  className={system.questionInstruction}
+                  data-current-action
+                  tabIndex={-1}
+                  id="workbook-lesson-next-action"
+                >
+                  하나를 골라 이유를 확인해보세요.
+                </p>
+                <div className={`${ui.choices} ${system.quizChoices}`}>
                   {[
-                    "차·호흡·돌 쌓는 웹 경험",
+                    "창가 자리와 혼자 책 읽기",
                     "잠깐 쉬어가는 소개 방향",
                     "이미 1만 명이 선택했다는 내용",
                   ].map((v, i) => (
                     <button
-                      className={styles.choice}
+                      className={ui.choice}
                       key={v}
                       aria-pressed={answer === i}
                       aria-label={v}
                       data-answer={answer === i ? (i === 2 ? "correct" : "incorrect") : undefined}
-                      onClick={() => setAnswer(i)}
+                      onClick={() => {
+                        if (answer !== i) reviewLearning();
+                        setAnswer(i);
+                      }}
                     >
-                      {v}
-                      {answer === i && <AnswerMark correct={i === 2} />}
+                      <span>{v}</span>
+                      <span className={system.choiceResult}>
+                        {answer === i && <AnswerMark correct={i === 2} />}
+                      </span>
                     </button>
                   ))}
                 </div>
-                <p role="status" className={styles.quizFeedback}>
+                <p role="status" className={ui.quizFeedback}>
                   {answer === null
-                    ? "하나를 골라 이유를 확인해보세요."
+                    ? ""
                     : answer === 2
                       ? "맞아요. 이용자 수는 알려주지 않았어요. 근거가 없다면 사실로 소개하면 안 돼요."
                       : answer === 0
-                        ? "세 가지 작업은 요청에서 알려줬어요. 새로 덧붙인 실적을 찾아볼까요?"
+                        ? "자리와 독서 정보는 요청에서 알려줬어요. 새로 덧붙인 실적을 찾아볼까요?"
                         : "소개 방향은 내 의도와 맞는지 판단할 부분이에요. 근거 없이 추가한 숫자를 찾아보세요."}
                 </p>
-              </>
+              </section>
             )}
-          </>
-        )}
-        {lesson === 0 && step === 2 && (
-          <>
-            <h2>초안을 부탁하고, 사실은 확인해요</h2>
-            <ul>
-              <li>생성형 AI는 글·이미지·코드 같은 결과를 만들 수 있어요.</li>
-              <li>문장이 마음에 드는지와 내용이 사실인지는 따로 확인해요.</li>
-              <li>직접 요청하고 수정하는 실습은 도구를 알고 준비한 다음에 해요.</li>
-            </ul>
-            <p>다음에는 하고 싶은 일에 맞는 기능을 살펴보고, 모델과 도구를 구분해볼 거예요.</p>
           </>
         )}
         {lesson === 1 && step === 0 && (
           <>
-            <h2>이름보다 만들고 싶은 결과부터</h2>
-            {part === 0 && <p>카피바라: “소개 글도 쓰고 그림도 넣고 싶은데, 어디서 시작할까?”</p>}
+            <h2 className={system.screenTitle}>
+              {part === 0 ? (
+                <>
+                  도구 이름보다,
+                  <br />
+                  만들 결과부터 정해요
+                </>
+              ) : part === 1 ? (
+                <>
+                  같은 기준으로,
+                  <br />
+                  결과와 기능을 비교해요
+                </>
+              ) : (
+                <>
+                  한 도구가 여러 결과를
+                  <br />
+                  만들 수도 있어요
+                </>
+              )}
+            </h2>
+            {part === 0 && (
+              <div className={system.aiConceptSlide}>
+                <p>
+                  AI 도구마다 제공하는 기능이 달라요. <strong>무엇을 만들지</strong> 먼저 정하면
+                  필요한 기능을 찾기 쉬워져요.
+                </p>
+                <table
+                  className={`${system.aiResultTable} ${system.aiCheckTable}`}
+                  aria-label="만들 결과와 필요한 기능"
+                >
+                  <thead>
+                    <tr>
+                      <th scope="col">만들 결과</th>
+                      <th scope="col">살펴볼 기능</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {examples.map((item) => (
+                      <tr key={item.name}>
+                        <th scope="row">{item.name}</th>
+                        <td>{item.feature}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
             {part === 1 && (
-              <div className={styles.revealBlock}>
-                <div className={styles.lessonActions} aria-label="결과 예시 선택">
-                  {examples.map((v, i) => (
+              <section className={system.resultComparison} aria-label="결과 예시 비교">
+                <p className={system.comparisonContext}>
+                  하나의 소개 페이지에 들어갈 글과 그림, 둘을 배치한 화면이에요.
+                </p>
+                <div className={system.resultTabs} role="group" aria-label="결과 예시 선택">
+                  {examples.map((item, index) => (
                     <button
-                      className={styles.quiet}
-                      key={v.name}
-                      aria-pressed={example === i}
-                      onClick={() => setExample(i)}
+                      key={item.name}
+                      aria-pressed={example === index}
+                      onClick={() => setExample(index)}
                     >
-                      {v.name}
+                      {item.name}
                     </button>
                   ))}
                 </div>
-                <div className={styles.preview} aria-live="polite">
-                  <small>사전 제작한 결과 예시</small>
-                  {example === 1 && (
-                    <Image
-                      className={styles.exampleImage}
-                      src="/images/workbook/vibe-web-cover-v1.png"
-                      alt="컴퓨터를 바라보는 카피바라의 따뜻한 작업실 그림"
-                      width={1536}
-                      height={1024}
-                    />
-                  )}
-                  <h3>{examples[example].result}</h3>
-                  {example === 2 && <p>소개 · 작업 모음 · 연락할 곳</p>}
-                  <p>{examples[example].description}</p>
+                <div className={system.resultDemo} aria-live="polite">
+                  <div className={system.resultPreview}>
+                    <small>{examples[example].format}</small>
+                    {example === 1 ? (
+                      <Image
+                        src="/images/workbook/reading-places-cover.svg"
+                        alt="창가와 펼친 책을 담은 장소 소개 페이지용 표지 그림"
+                        width={640}
+                        height={320}
+                        sizes="(min-width: 1024px) 360px, 90vw"
+                      />
+                    ) : (
+                      <>
+                        {example === 2 ? (
+                          <div className={system.webExample}>
+                            <small>장소 모음 · 소개 페이지</small>
+                            <Image
+                              src="/images/workbook/reading-places-cover.svg"
+                              alt="소개 글과 함께 배치한 창가와 책 표지"
+                              width={640}
+                              height={320}
+                              sizes="360px"
+                            />
+                            <strong>{examples[example].result}</strong>
+                            <p>{examples[0].result}</p>
+                          </div>
+                        ) : (
+                          <p>{examples[example].result}</p>
+                        )}
+                      </>
+                    )}
+                  </div>
+                  <dl className={system.resultFacts}>
+                    <div>
+                      <dt>필요한 기능</dt>
+                      <dd>{examples[example].feature}</dd>
+                    </div>
+                    <div>
+                      <dt>확인할 점</dt>
+                      <dd>{examples[example].check}</dd>
+                    </div>
+                  </dl>
                 </div>
-              </div>
+                <small className={system.resultNotice}>사전 제작한 글·그림·화면 예시예요.</small>
+              </section>
             )}
             {part === 2 && (
-              <div className={styles.revealBlock}>
+              <div className={system.aiConceptSlide}>
                 <p>
-                  한 도구가 글과 이미지를 함께 다루기도 해요. 세 가지 작업에 반드시 세 개의 도구가
-                  필요한 것은 아니에요. 음성·영상 등 다른 용도도 있지만, 여기서는 웹 제작과 연결되는
-                  것부터 살펴봐요.
+                  소개 글과 표지 그림을 한 도구에서 만들 수도 있어요. 결과 세 가지가 도구 세 개를
+                  뜻하지는 않아요.
                 </p>
+                <ol className={system.decisionSteps}>
+                  <li>
+                    <strong>만들 결과 정하기</strong>
+                    <span>소개 글인지, 이미지 파일인지, 웹 화면인지</span>
+                  </li>
+                  <li>
+                    <strong>필요한 기능 찾기</strong>
+                    <span>글 수정 · 이미지 생성과 저장 · 파일 작업과 실행</span>
+                  </li>
+                  <li>
+                    <strong>도구에서 확인하기</strong>
+                    <span>그 기능을 제공하는지, 내 이용 조건에서 쓸 수 있는지</span>
+                  </li>
+                </ol>
               </div>
             )}
           </>
         )}
         {lesson === 1 && step === 1 && (
           <>
-            <h2>모델과 도구는 어떻게 다른가요?</h2>
+            <h2 className={system.screenTitle}>
+              {part === 0 ? (
+                <>
+                  모델은 결과를 만들고,
+                  <br />
+                  도구는 작업을 연결해요
+                </>
+              ) : part === 1 ? (
+                <>
+                  도구 안에서,
+                  <br />
+                  모델의 기능을 사용해요
+                </>
+              ) : (
+                <>
+                  같은 모델이어도,
+                  <br />
+                  도구의 기능은 달라요
+                </>
+              )}
+            </h2>
             {part === 0 && (
-              <p>
-                <strong>모델</strong>은 입력을 처리하고 결과를 만들도록 학습된 AI의 핵심 부분이에요.{" "}
-                <strong>도구</strong>는 그 기능을 이용하는 웹사이트나 프로그램이에요.
-              </p>
+              <div className={system.aiConceptSlide}>
+                <table
+                  className={`${system.aiResultTable} ${system.aiCheckTable}`}
+                  aria-label="모델과 도구의 역할"
+                >
+                  <thead>
+                    <tr>
+                      <th scope="col">구분</th>
+                      <th scope="col">하는 일</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th scope="row">모델</th>
+                      <td>
+                        <strong>결과 만들기</strong>
+                        <span className={system.cellDescription}>
+                          입력을 처리하도록 학습된 AI의 핵심
+                        </span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <th scope="row">도구</th>
+                      <td>
+                        <strong>요청하고 결과 다루기</strong>
+                        <span className={system.cellDescription}>
+                          모델을 이용하는 웹사이트나 프로그램
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <p>
+                  장소 메모를 소개 문장으로 바꾸는 데 모델을 사용해요. 우리가 메모를 입력하고 답변을
+                  복사하거나 저장하는 웹사이트·앱은 도구예요.{" "}
+                  <strong>결과를 만드는 핵심과 그것을 사용하는 환경</strong>을 나눠 생각하면 됩니다.
+                </p>
+              </div>
             )}
             {part === 1 && (
-              <div className={styles.revealBlock}>
-                <div className={styles.lessonActions}>
-                  <button
-                    className={styles.quiet}
-                    aria-pressed={layer === "tool"}
-                    onClick={() => setLayer("tool")}
-                  >
+              <section className={system.resultComparison} aria-label="모델과 도구 관계 살펴보기">
+                <div className={system.resultTabs} role="group" aria-label="살펴볼 구성">
+                  <button aria-pressed={layer === "tool"} onClick={() => setLayer("tool")}>
                     도구 살펴보기
                   </button>
-                  <button
-                    className={styles.quiet}
-                    aria-pressed={layer === "model"}
-                    onClick={() => setLayer("model")}
-                  >
+                  <button aria-pressed={layer === "model"} onClick={() => setLayer("model")}>
                     모델 살펴보기
                   </button>
                 </div>
-                <div className={styles.modelDiagram}>
+                <div className={system.layerDiagram}>
                   <div data-active={layer === "tool"}>
                     <strong>도구</strong>
-                    <p>요청 입력창 · 파일 올리기 · 결과 저장</p>
+                    <p>요청 입력 · 파일 첨부 · 결과 저장</p>
                     <div data-active={layer === "model"}>
                       <strong>AI 모델</strong>
                       <p>입력을 처리하고 결과 만들기</p>
                     </div>
                   </div>
                 </div>
-                <small>관계를 단순화한 그림이에요. 제공 기능은 도구마다 달라요.</small>
-              </div>
+                <p aria-live="polite">
+                  {layer === "tool"
+                    ? "내가 요청하고 결과를 다루는 작업 환경이에요."
+                    : "도구에서 전달받은 입력을 처리하는 AI의 핵심 부분이에요."}
+                </p>
+                <small className={system.resultNotice}>
+                  관계를 단순화한 그림이에요. 실제 구성과 제공 기능은 도구마다 달라요.
+                </small>
+              </section>
             )}
             {part === 2 && (
-              <div className={styles.revealBlock}>
-                <p>
-                  한 도구에서 여러 모델을 고를 수도 있고, 같은 모델을 여러 도구에서 쓸 수도 있어요.
-                  모델 이름이 같다고 제공하는 기능까지 같지는 않아요.
+              <div className={system.aiConceptSlide}>
+                <table
+                  className={`${system.aiResultTable} ${system.aiCheckTable}`}
+                  aria-label="모델과 도구의 조합"
+                >
+                  <thead>
+                    <tr>
+                      <th scope="col">경우</th>
+                      <th scope="col">가능한 구성</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th scope="row">하나의 도구</th>
+                      <td>여러 모델 중에서 선택할 수도 있어요.</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">같은 모델</th>
+                      <td>여러 도구에서 사용할 수도 있어요.</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <p className={system.aiKeyTakeaway}>
+                  모델 이름만 보고 판단하지 말고 <strong>필요한 기능의 제공 여부</strong>를
+                  확인해요.
                 </p>
-                <details>
-                  <summary>실제 제품 예시 · 선택 읽기</summary>
-                  <p>
-                    Adobe Firefly는 텍스트 설명으로 이미지를 생성하고 모델을 선택하는 예를 보여줘요.
-                    GitHub Copilot은 코드 편집기에서 대화·편집 기능을 제공해요. 이 수업의 실습
-                    도구를 정한 것은 아니에요.
-                  </p>
-                  <a
-                    href="https://helpx.adobe.com/sg/firefly/web/work-with-images/generate-images/generate-images-from-text-descriptions.html"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Firefly 공식 안내 ↗
-                  </a>
-                  <br />
-                  <a
-                    href="https://docs.github.com/en/copilot/concepts/copilot-surfaces/copilot-in-ides"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Copilot 공식 안내 ↗
-                  </a>
-                </details>
               </div>
             )}
           </>
         )}
         {lesson === 1 && step === 2 && (
           <>
-            <h2>필요한 기능을 골라봐요</h2>
-            <p>작업실 그림을 이미지 파일로 받고 싶어요. 무엇을 먼저 확인할까요?</p>
-            <div className={styles.choices}>
-              {[
-                "그림을 말로 설명하는 기능",
-                "이미지를 생성하고 저장하는 기능",
-                "가장 최신 모델 이름",
-              ].map((v, i) => (
-                <button
-                  key={v}
-                  className={styles.choice}
-                  aria-pressed={answer === i}
-                  aria-label={v}
-                  data-answer={answer === i ? (i === 1 ? "correct" : "incorrect") : undefined}
-                  onClick={() => setAnswer(i)}
+            <h2 className={system.screenTitle}>
+              {part === 0 ? (
+                <>
+                  웹·앱은,
+                  <br />
+                  접속하는 방식이에요
+                </>
+              ) : part === 1 ? (
+                <>
+                  에이전트는 도구를 쓰며,
+                  <br />
+                  작업을 이어가요
+                </>
+              ) : (
+                <>
+                  앱 설치만으로,
+                  <br />
+                  파일을 고칠 준비가 됐을까요?
+                </>
+              )}
+            </h2>
+            {part === 0 && (
+              <div className={system.aiConceptSlide}>
+                <table
+                  className={`${system.aiResultTable} ${system.aiCheckTable}`}
+                  aria-label="웹과 데스크톱 앱의 접속 방식"
                 >
-                  {v}
-                  {answer === i && <AnswerMark correct={i === 1} />}
-                </button>
-              ))}
-            </div>
-            <p role="status" className={styles.quizFeedback}>
-              {answer === null
-                ? "필요한 결과를 생각하며 골라보세요."
-                : answer === 1
-                  ? "맞아요. 실제 이미지 파일이 필요하니 생성과 저장 기능을 확인해요."
-                  : "이름이나 글 설명만으로는 이미지 파일을 받을 수 있는지 알 수 없어요. 원하는 결과를 만드는 기능을 찾아보세요."}
-            </p>
-            <h3>한 도구가 글과 이미지를 모두 만들 수도 있을까요?</h3>
-            <div className={styles.lessonActions}>
-              <button
-                className={styles.quiet}
-                aria-pressed={overlap === true}
-                aria-label="그럴 수 있어요"
-                data-answer={overlap === true ? "correct" : undefined}
-                onClick={() => setOverlap(true)}
-              >
-                그럴 수 있어요
-                {overlap === true && <AnswerMark correct />}
-              </button>
-              <button
-                className={styles.quiet}
-                aria-pressed={overlap === false}
-                aria-label="반드시 따로 써야 해요"
-                data-answer={overlap === false ? "incorrect" : undefined}
-                onClick={() => setOverlap(false)}
-              >
-                반드시 따로 써야 해요
-                {overlap === false && <AnswerMark correct={false} />}
-              </button>
-            </div>
-            {overlap !== null && (
-              <p role="status" className={styles.quizFeedback}>
-                {overlap
-                  ? "맞아요. 용도가 겹칠 수 있어요."
-                  : "한 도구가 여러 기능을 제공하기도 해요. 작업마다 새 도구를 설치할 필요는 없어요."}
-              </p>
+                  <thead>
+                    <tr>
+                      <th scope="col">방식</th>
+                      <th scope="col">여는 방법</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th scope="row">웹</th>
+                      <td>Chrome·Safari 같은 브라우저에서 주소로 접속해요.</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">데스크톱 앱</th>
+                      <td>Windows나 Mac에 설치하고 실행해요.</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <p>
+                  웹과 앱은 어디서 여는지의 차이예요. 파일을 다룰 수 있는지는 별도로 확인해요.
+                  설치한 앱도 인터넷이 필요할 수 있어요.
+                </p>
+                <p className={system.aiKeyTakeaway}>
+                  <strong>접속 방식과 작업 기능은 다른 기준이에요.</strong>
+                </p>
+              </div>
             )}
-            <div className={styles.preview}>
-              <strong>만들 결과 → 필요한 기능 → 사용할 도구</strong>
-              <p>
-                이 순서로 살펴보세요. 다음 수업은 개인 컴퓨터에서 사용할 도구를 준비하는 단계예요.
-                현재 제작 중이며, 설치나 실습을 완료한 것으로 기록하지 않아요.
+            {part === 1 && (
+              <div className={system.aiConceptSlide}>
+                <p>
+                  <strong>LLM은 언어를 다루는 모델</strong>이에요. 에이전트는 모델을 활용해 다음
+                  행동을 정하고, 연결된 도구로 작업한 결과를 보며 목표를 향해 이어가는 시스템이에요.
+                  예를 들어 파일을 읽고 → 제목을 바꾸고 → 실행 결과를 살펴보는 작업을 이어갈 수
+                  있어요. 가능한 작업은 연결된 도구와 권한에 따라 달라요.
+                </p>
+                <table
+                  className={`${system.aiResultTable} ${system.aiCheckTable}`}
+                  aria-label="코드 답변과 실제 파일 작업"
+                >
+                  <thead>
+                    <tr>
+                      <th scope="col">작업 흐름</th>
+                      <th scope="col">페이지를 만들어달라고 요청하면</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th scope="row">코드 답변 받기</th>
+                      <td>받은 코드를 파일에 반영하고 실행하는 일은 따로 필요해요.</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">코드 에이전트로 작업</th>
+                      <td>
+                        허용된 폴더에서 파일을 만들거나 고치고 명령을 실행할 수 있어요. 연결된
+                        기능과 권한에 따라 달라요.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <p className={system.aiKeyTakeaway}>
+                  에이전트도 실수할 수 있어요.{" "}
+                  <strong>파일 변경과 실행 결과는 직접 확인해요.</strong>
+                </p>
+              </div>
+            )}
+            {part === 2 && (
+              <section className={system.exampleQuestion} aria-label="파일 작업 준비 확인 문제">
+                <p data-current-action tabIndex={-1} id="workbook-lesson-next-action">
+                  설치 여부와 실제 할 수 있는 일을 구분해서 골라보세요.
+                </p>
+                <div className={ui.choices}>
+                  {[
+                    "설치했으니 파일을 자동으로 고칠 수 있어요",
+                    "파일 작업 기능과 연결된 폴더·권한을 확인해야 해요",
+                  ].map((value, index) => (
+                    <button
+                      key={value}
+                      className={ui.choice}
+                      aria-label={value}
+                      aria-pressed={conceptAnswer === index}
+                      data-answer={
+                        conceptAnswer === index
+                          ? index === 1
+                            ? "correct"
+                            : "incorrect"
+                          : undefined
+                      }
+                      onClick={() => {
+                        if (conceptAnswer !== index) reviewLearning();
+                        setConceptAnswer(index);
+                      }}
+                    >
+                      {value}
+                      {conceptAnswer === index && <AnswerMark correct={index === 1} />}
+                    </button>
+                  ))}
+                </div>
+                <p role="status" className={ui.quizFeedback}>
+                  {conceptAnswer === null
+                    ? ""
+                    : conceptAnswer === 1
+                      ? "맞아요. 설치만으로 파일 작업이 가능해지는 것은 아니에요. 기능·연결된 폴더·권한을 함께 확인해요."
+                      : "데스크톱 앱에도 일반 채팅이 있어요. 실제 파일을 다루는 기능과 작업 범위를 확인해야 해요."}
+                </p>
+              </section>
+            )}
+          </>
+        )}
+        {lesson === 1 && step === 3 && (
+          <>
+            <h2 className={system.screenTitle}>
+              도구 이름보다,
+              <br />
+              필요한 기능을 골라봐요
+            </h2>
+            <section className={system.exampleQuestion} aria-labelledby="image-function-question">
+              <h3 id="image-function-question">표지 그림을 이미지 파일로 받고 싶어요.</h3>
+              <p
+                className={system.questionInstruction}
+                data-current-action
+                tabIndex={-1}
+                id="workbook-lesson-next-action"
+              >
+                가장 먼저 확인할 기능을 골라보세요.
               </p>
-            </div>
+              <div className={`${ui.choices} ${system.quizChoices}`}>
+                {[
+                  "그림을 말로 설명하는 기능",
+                  "이미지를 생성하고 저장하는 기능",
+                  "가장 최신 모델 이름",
+                ].map((value, index) => (
+                  <button
+                    key={value}
+                    className={ui.choice}
+                    aria-pressed={answer === index}
+                    aria-label={value}
+                    data-answer={
+                      answer === index ? (index === 1 ? "correct" : "incorrect") : undefined
+                    }
+                    onClick={() => {
+                      if (answer !== index) reviewLearning();
+                      setAnswer(index);
+                    }}
+                  >
+                    <span>{value}</span>
+                    <span className={system.choiceResult}>
+                      {answer === index && <AnswerMark correct={index === 1} />}
+                    </span>
+                  </button>
+                ))}
+              </div>
+              <p role="status" className={ui.quizFeedback}>
+                {answer === null
+                  ? ""
+                  : answer === 1
+                    ? "맞아요. 실제 이미지 파일이 필요하니 생성과 저장 기능을 확인해요."
+                    : "이름이나 글 설명만으로는 이미지 파일을 받을 수 있는지 알 수 없어요. 원하는 결과를 만드는 기능을 찾아보세요."}
+              </p>
+            </section>
+            <section
+              className={system.exampleQuestion}
+              aria-labelledby="multiple-functions-question"
+            >
+              <h3 id="multiple-functions-question">
+                한 도구가 글과 이미지를 모두 만들 수도 있을까요?
+              </h3>
+              <div className={`${ui.choices} ${system.binaryChoices}`}>
+                {[true, false].map((value) => (
+                  <button
+                    key={String(value)}
+                    className={ui.choice}
+                    aria-pressed={overlap === value}
+                    aria-label={value ? "그럴 수 있어요" : "반드시 따로 써야 해요"}
+                    data-answer={overlap === value ? (value ? "correct" : "incorrect") : undefined}
+                    onClick={() => {
+                      if (overlap !== value) reviewLearning();
+                      setOverlap(value);
+                    }}
+                  >
+                    {value ? "그럴 수 있어요" : "반드시 따로 써야 해요"}
+                    {overlap === value && <AnswerMark correct={value} />}
+                  </button>
+                ))}
+              </div>
+              <p role="status" className={ui.quizFeedback}>
+                {overlap === null
+                  ? ""
+                  : overlap
+                    ? "맞아요. 한 도구가 여러 기능을 제공하기도 해요."
+                    : "작업마다 새 도구를 설치해야 하는 것은 아니에요. 제공하는 기능을 먼저 살펴봐요."}
+              </p>
+            </section>
           </>
         )}
       </div>
-      <aside className={styles.lessonPanel} aria-label="학습 안내">
-        <div className={styles.panelNotes}>
-          <span className={styles.companion} aria-hidden="true" />
+      <aside className={ui.lessonPanel} aria-label="학습 안내">
+        <div className={ui.panelNotes}>
+          <span className={styles.companion} data-companion aria-hidden="true" />
           <span className="label">이번 수업의 목표</span>
-          <h2>{lesson === 0 ? "AI의 도움과 확인할 일 구분하기" : "만들 결과에 맞는 기능 찾기"}</h2>
+          <h2>
+            {lesson === 0 ? "AI의 도움과 확인할 일 구분하기" : "접속 방식과 AI 작업 방식 구분하기"}
+          </h2>
           <p>
             {lesson === 0
               ? "초안은 함께 만들고, 내 작업에 맞는지는 직접 확인해요."
-              : "만들 결과 → 필요한 기능 → 사용할 도구 순서로 생각해요."}
+              : "웹·앱은 접속 방식, 모델·에이전트는 일을 하는 방식과 구성으로 구분해요."}
           </p>
           <small>개인 컴퓨터에서 실습 · 모바일에서는 복습해요.</small>
         </div>
-        <small aria-label="현재 학습 단계">
-          {gradual ? `설명 ${part + 1} / 3` : step === 2 ? "핵심 정리와 확인" : "예시 살펴보기"}
-        </small>
-        <nav className={styles.lessonNavigation} aria-label="수업 진행">
-          {(step > 0 || part > 0) && (
+        <WorkbookActionReturn body={body} enabled={!gradual} />
+        <nav
+          className={ui.lessonNavigation}
+          aria-label="수업 진행"
+          aria-describedby={nextAction ? "workbook-lesson-next-action" : undefined}
+        >
+          <WorkbookLessonPrevious current={currentScreen}>
+            {(step > 0 || part > 0) && (
+              <button
+                data-action-role={lesson === 0 ? "lesson-back" : undefined}
+                className={styles.quiet}
+                onClick={() => {
+                  if (gradual && part > 0) {
+                    setRevealed((previous) => ({ ...previous, [step]: part - 1 }));
+                    if (part === 1) requestAnimationFrame(() => heading.current?.focus());
+                  } else move(step - 1);
+                }}
+              >
+                이전 설명
+              </button>
+            )}
+          </WorkbookLessonPrevious>
+          {step < lastStep ? (
             <button
-              className={styles.quiet}
-              onClick={() => {
-                if (gradual && part > 0)
-                  setRevealed((previous) => ({ ...previous, [step]: part - 1 }));
-                else move(step - 1);
-              }}
-            >
-              이전 설명
-            </button>
-          )}
-          {step < 2 ? (
-            <button
-              disabled={lesson === 0 && step === 1 && !correct}
+              data-action-role={lesson === 0 ? "lesson-next" : undefined}
+              disabled={
+                (lesson === 0 && step === 1 && !correct) ||
+                (lesson === 1 && step === 3 && !correct) ||
+                (lesson === 1 && step === 2 && part === 2 && conceptAnswer !== 1)
+              }
               onClick={() => {
                 if (gradual && part < 2)
                   setRevealed((previous) => ({ ...previous, [step]: part + 1 }));
                 else move(step + 1);
               }}
             >
-              다음으로
+              {lesson === 1 && step === 3 ? "학습 정리 보기" : "다음으로"}
             </button>
           ) : (
             <button
+              data-action-role={lesson === 0 ? "lesson-next" : undefined}
               disabled={lesson === 1 && !correct}
               onClick={() => {
+                p.dispatchProjectWorkflow({
+                  type: "learn",
+                  unit: learningUnit,
+                  status: "confirmed",
+                  source: "example",
+                });
                 onComplete(lesson);
                 onBack();
               }}
             >
-              {lesson === 0 ? "배운 내용 챙겨 마을로 →" : "배운 내용 챙겨 마을로 →"}
+              학습 마치고 단원 지도로 →
             </button>
           )}
         </nav>

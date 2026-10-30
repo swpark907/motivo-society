@@ -1,0 +1,89 @@
+.tip {
+  margin-block: var(--space-4);
+  min-width: 0;
+}
+.tip .trigger {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-2) var(--space-3);
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 120ms,
+    background-color 120ms;
+  &:hover,
+  &[aria-expanded="true"] {
+    border-color: var(--ink-muted);
+    background: var(--surface-2);
+  }
+  &:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+}
+.label {
+  grid-column: 1 / -1;
+  color: var(--ink-muted);
+  font-size: 0.75rem;
+}
+.title {
+  font-weight: 600;
+  word-break: keep-all;
+}
+.indicator {
+  align-self: center;
+  color: var(--ink-muted);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+.content {
+  margin-top: var(--space-2);
+  padding: var(--space-4);
+  border: 1px solid var(--line);
+  border-left: 2px solid var(--accent);
+  border-radius: var(--workbook-support-radius, var(--space-2));
+  background: var(--surface-2);
+  &:not([hidden]) {
+    animation: appear 120ms ease-out;
+  }
+  > :first-child {
+    margin-top: 0;
+  }
+  > :last-child {
+    margin-bottom: 0;
+  }
+}
+@keyframes appear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tip .trigger {
+    transition: none;
+  }
+  .content:not([hidden]) {
+    animation: none;
+  }
+}
+
+.tip .close {
+  display: block;
+  min-height: 44px;
+  margin-top: var(--space-4);
+  padding: var(--space-2) var(--space-3);
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  font-size: 0.8rem;
+}

@@ -72,7 +72,7 @@ export function WorkbookIntro({ onComplete }: { onComplete: () => void }) {
             </button>
           </div>
           <div>
-            <span className="label">YOUR TRAVEL COMPANION</span>
+            <span className="label">MAKING TOGETHER · 선택 이야기</span>
             <h2>작은 쉼을 만드는 친구</h2>
             <p ref={speech} tabIndex={-1}>
               안녕. 나는 잠깐 쉬어갈 수 있는 작은 웹을 만들어.
@@ -87,7 +87,9 @@ export function WorkbookIntro({ onComplete }: { onComplete: () => void }) {
               <span>숨 고르기</span>
               <span>돌 정원</span>
             </div>
-            <small>카피바라 이야기 속 작업들이에요.</small>
+            <small>
+              카피바라의 공통 제작 사례예요. 내 페이지의 주제와 콘텐츠는 기획 수업에서 정해요.
+            </small>
             <button onClick={() => move(0)}>어쩌다 시작하게 됐냐면…</button>
           </div>
         </div>
@@ -116,7 +118,7 @@ export function WorkbookIntro({ onComplete }: { onComplete: () => void }) {
               {step < dialogue.length - 1 ? (
                 <button onClick={() => move(step + 1)}>다음 대화 →</button>
               ) : (
-                <button onClick={onComplete}>한곳에 모아볼까?</button>
+                <button onClick={onComplete}>학습 지도로 돌아가기 →</button>
               )}
             </div>
           </div>
@@ -124,7 +126,7 @@ export function WorkbookIntro({ onComplete }: { onComplete: () => void }) {
       )}
       <div className={styles.dialogueActions}>
         <button className={styles.quiet} onClick={onComplete}>
-          이야기 건너뛰기
+          이야기 건너뛰고 학습 지도로 →
         </button>
         {line && (
           <button className={styles.quiet} onClick={() => move(-1)}>

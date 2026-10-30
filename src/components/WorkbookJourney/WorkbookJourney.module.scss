@@ -1,8 +1,5 @@
 .page {
   --map-path: #e2ba83;
-  --sample-paper: #f4ead6;
-  --sample-ink: #453c32;
-  --sample-card: #e4d4b7;
   padding: var(--space-6) var(--space-4) var(--space-12);
   max-width: 1480px;
   margin-inline: auto;
@@ -334,6 +331,9 @@
   }
 }
 .previewOuter {
+  --sample-paper: #f4ead6;
+  --sample-ink: #453c32;
+  --sample-card: #e4d4b7;
   overflow-x: auto;
   background: var(--surface);
   border-radius: var(--radius);
@@ -346,8 +346,15 @@
   color: var(--sample-ink);
   min-height: 380px;
   border-radius: 8px;
+  .sample {
+    p,
+    small {
+      color: var(--sample-ink);
+    }
+  }
 }
 .sample {
+  overflow-wrap: anywhere;
   padding: var(--space-4);
   h3 {
     font-size: 1.5rem;
@@ -358,6 +365,10 @@
   }
   > p {
     font-size: 0.8rem;
+  }
+  > div,
+  > section {
+    margin-top: var(--space-4);
   }
   > button {
     background: var(--sample-ink);
@@ -508,5 +519,47 @@
 @media (prefers-reduced-motion: reduce) {
   .walking .sprite {
     animation: none;
+  }
+}
+
+// 수업용 비교 예시: 같은 너비 동작을 유지하며 주변 설명과 함께 읽을 수 있는 밀도.
+.lessonPreviewOuter {
+  padding-block: 0;
+  .preview {
+    min-height: 250px;
+    max-height: 280px;
+  }
+  .sample {
+    padding: 16px;
+    h3 {
+      font-size: 18px;
+      line-height: 1.4;
+      margin: 0 0 8px;
+    }
+    > small {
+      font-size: 10px;
+    }
+    > p {
+      font-size: 14px;
+      line-height: 1.5;
+      margin: 8px 0;
+    }
+    > button {
+      margin-top: 0;
+      padding: 8px 12px;
+      font-size: 14px;
+    }
+    > div {
+      margin-top: 12px;
+    }
+    h4 {
+      font-size: 14px;
+      margin: 0 0 4px;
+    }
+    ul {
+      font-size: 14px;
+      line-height: 1.5;
+      margin: 0;
+    }
   }
 }

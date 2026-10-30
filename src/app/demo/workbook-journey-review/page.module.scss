@@ -1,0 +1,180 @@
+.page {
+  max-width: 1400px;
+  margin-inline: auto;
+  padding: var(--space-6);
+  color: var(--ink);
+  header {
+    max-width: 760px;
+  }
+  h1,
+  h2,
+  h3,
+  p {
+    margin-block: var(--space-3);
+  }
+  p {
+    line-height: 1.7;
+  }
+  a:focus-visible,
+  summary:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: var(--space-1);
+  }
+}
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-block: var(--space-6);
+  a {
+    padding: var(--space-3);
+    border: 1px solid var(--line);
+  }
+  a[aria-current] {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+}
+.stage {
+  padding: var(--space-4);
+  border: 1px solid var(--line);
+}
+.current {
+  margin-bottom: var(--space-6);
+  a {
+    color: var(--accent);
+  }
+}
+.maps {
+  display: grid;
+  gap: var(--space-4);
+}
+.card {
+  min-width: 0;
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+}
+.image img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.info {
+  padding: var(--space-4);
+  summary {
+    cursor: pointer;
+    padding-block: var(--space-2);
+  }
+}
+.a .maps {
+  @include up(md) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.b {
+  .maps {
+    max-width: 980px;
+    margin-inline: auto;
+    gap: var(--space-8);
+  }
+  .card {
+    @include up(md) {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      &:nth-child(even) {
+        margin-left: var(--space-12);
+      }
+      &:nth-child(odd) {
+        margin-right: var(--space-12);
+      }
+    }
+  }
+}
+.project {
+  padding: var(--space-6);
+  border-block: 1px solid var(--line);
+  margin-bottom: var(--space-6);
+}
+.c .card {
+  @include up(md) {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+  }
+}
+.chapter {
+  font-size: 1.25rem;
+}
+.next {
+  margin-top: var(--space-8);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--line);
+}
+
+.compact {
+  .current {
+    margin-bottom: var(--space-6);
+    h2 {
+      font-size: 1.25rem;
+    }
+  }
+  .maps {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    overflow-x: auto;
+    padding-bottom: var(--space-3);
+  }
+  .card {
+    position: relative;
+    flex: 0 0 260px;
+    border: 0;
+    background: transparent;
+    &:first-child {
+      border-top: 2px solid var(--accent);
+    }
+    &:nth-child(even) {
+      margin-top: var(--space-8);
+    }
+    @include up(lg) {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+  }
+  .journeyCard {
+    border: 1px solid var(--line);
+    background: var(--surface-2);
+  }
+  summary {
+    cursor: pointer;
+    padding: var(--space-3);
+    list-style: none;
+    &::-webkit-details-marker {
+      display: none;
+    }
+    h3 {
+      font-size: 1rem;
+    }
+    p {
+      font-size: 0.8rem;
+      line-height: 1.6;
+    }
+    .image {
+      margin-block: var(--space-3);
+    }
+  }
+  .goal {
+    color: var(--ink-muted);
+  }
+  .expandLabel {
+    font-size: 0.75rem;
+    color: var(--ink-muted);
+  }
+  .cardDetail {
+    border-top: 1px solid var(--line);
+    padding: var(--space-3);
+    font-size: 0.85rem;
+  }
+  .next {
+    margin-top: var(--space-6);
+  }
+}

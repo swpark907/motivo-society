@@ -1,0 +1,585 @@
+// 1-1-1 인트로 세 번째 장. 다섯 단원이 한 줄의 필름 띠로 놓이고,
+// 지금 단원의 칸만 크게 열려 재생된다. 지나간 단원은 썸네일로 결과가 남는다.
+// 2장면(좌측 문구 + 우측 브라우저)과 다른 구도로 진행 위치를 바로 읽히게 한다.
+$ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+$grow: 700ms;
+// 수업 페이지(.page)의 공통 h1·p·small·button 규칙이 장면 안으로 들어오지 않도록 section.journey로 범위를 높인다.
+section.journey {
+  & {
+    word-break: keep-all;
+    line-height: 1.5;
+    width: 100%;
+    // 띠 높이를 너비 기준으로 잡기 위한 기준 상자.
+    container-type: inline-size;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+
+    h1,
+    h2,
+    p,
+    small {
+      margin: 0;
+    }
+    p {
+      color: inherit;
+    }
+  }
+
+  .head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+
+    h1 {
+      // 2장면 스타일의 eyebrow 순서 값보다 뒤에 둔다.
+      order: 2;
+      font-size: clamp(1.4rem, 2vw, 1.8rem);
+      line-height: 1.25;
+      letter-spacing: -0.03em;
+      font-weight: 800;
+
+      span {
+        color: var(--ink-muted);
+      }
+    }
+  }
+
+  // ── 필름 띠 ──
+  // 모바일: 세로 목록. 지금 단원만 화면을 열고 나머지는 한 줄 머리글만 둔다.
+  .strip {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+
+    @include up(md) {
+      flex-direction: row;
+      align-items: center;
+      gap: var(--space-3);
+      // 띠 높이는 고정한다: 칸 크기가 바뀌어도 아래 조작이 움직이지 않게.
+      // --strip-h는 수업 화면의 실제 남은 높이를 재서 넣는다(JourneyGrowthReel). 없으면 화면 높이 추정값.
+      height: var(--strip-h, calc(min(34cqw, 100dvh - 520px) + 48px));
+    }
+  }
+  // 마지막(모바일): 다섯 칸을 두 줄 격자로 모아 본다.
+  .strip.finale {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3);
+
+    @include up(md) {
+      display: flex;
+    }
+  }
+
+  .frame {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+
+    @include up(md) {
+      flex: 1 1 0;
+      transition:
+        flex-grow $grow $ease,
+        flex-basis $grow $ease;
+    }
+  }
+  // 열린 칸 너비는 띠 높이에서 계산한 값(--active-w)으로 고정해 그림 비율과 높이가 맞게 한다.
+  .frame[data-state="active"] {
+    @include up(md) {
+      flex: 0 0 var(--active-w, min(calc((100dvh - 520px) * 1.6), 55%));
+    }
+  }
+  // 마지막(넓은 화면): 다섯 칸이 같은 크기로 나란히 서서 자라온 과정을 보여준다.
+  .finale .frame {
+    @include up(md) {
+      flex-grow: 1;
+    }
+  }
+
+  .frameHead {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 2px var(--space-2);
+    min-height: 32px;
+    padding: 2px 6px;
+    margin: 0 -6px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--ink-muted);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    @include workbook-button-feedback(var(--line));
+
+    b {
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+    em {
+      font-style: normal;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 4px;
+      border: 1px solid var(--line);
+    }
+    &:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+    @media (pointer: coarse) {
+      min-height: 44px;
+    }
+    // 넓은 화면: 긴 단원명이 두 줄이 되어도 칸 위치가 어긋나지 않게 두 줄 높이를 잡고 아래에 붙인다.
+    @include up(md) {
+      min-height: 3.2em;
+      align-content: flex-end;
+    }
+  }
+  .num {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+  }
+  .frame[data-state="done"] .frameHead {
+    color: var(--ink);
+  }
+  .frame[data-state="active"] .frameHead {
+    color: var(--ink);
+
+    .num,
+    em {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+  }
+  // 좁은 썸네일 칸에서는 얻는 것 표시를 숨기고, 열린 칸과 마지막 줄에서만 보여준다.
+  .frame[data-state="future"] em,
+  .frame[data-state="done"] em {
+    display: none;
+  }
+  .finale .frame[data-state="done"] em {
+    display: inline;
+  }
+
+  .screen {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    border: 1px solid var(--ink);
+    border-radius: 10px;
+    background: var(--surface-2);
+    overflow: hidden;
+  }
+  .frame[data-state="done"] .screen,
+  .frame[data-state="future"] .screen {
+    display: none;
+
+    @include up(md) {
+      display: block;
+    }
+  }
+  .finale .frame .screen {
+    display: block;
+    // 두 줄 머리글이 섞여도 같은 줄의 화면 아래선을 맞춘다.
+    margin-top: auto;
+  }
+  .frame[data-state="future"] .screen {
+    border: 1px dashed var(--line);
+    background: transparent;
+  }
+
+  // ── 칸 안의 페이지: 800×500으로 그리고 칸 너비에 맞춰 축소 ──
+  .fit {
+    position: absolute;
+    inset: 0;
+  }
+  .canvas {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 800px;
+    height: 500px;
+    transform-origin: 0 0;
+    font-size: 15px;
+  }
+
+  .browser {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    transition: right $grow $ease;
+  }
+  .browser.withPhone {
+    right: 210px;
+    border-right: 1px solid var(--line);
+  }
+  .chrome {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--line);
+    background: var(--surface);
+  }
+  .dots {
+    display: flex;
+    gap: 6px;
+
+    i {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--line);
+    }
+  }
+  .address {
+    flex: 1;
+    min-width: 0;
+    min-height: 26px;
+    padding: 4px 12px;
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    background: var(--surface-2);
+    color: var(--ink-muted);
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .webAddress {
+    color: var(--ink);
+    font-weight: 700;
+  }
+  .body {
+    position: relative;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .page {
+    position: absolute;
+    inset: 0;
+    padding: 36px 44px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+
+    h2 {
+      margin: 0;
+      // 01: 스타일 없는 첫 파일의 제목 한 줄
+      font-family: "Times New Roman", serif;
+      font-size: 26px;
+      font-weight: 700;
+    }
+  }
+  .styled h2 {
+    font-family: inherit;
+    font-size: 36px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+  }
+  .intro {
+    margin: 0 -4px;
+    padding: 2px 4px;
+    font-size: 16px;
+    color: var(--ink-muted);
+    border-radius: 4px;
+    outline: 2px solid transparent;
+    transition:
+      opacity 520ms $ease,
+      transform 520ms $ease,
+      outline-color 300ms;
+  }
+  .intro.edited {
+    color: var(--ink);
+    outline-color: var(--accent);
+  }
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-top: 6px;
+  }
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface);
+
+    b {
+      font-size: 16px;
+    }
+    small {
+      font-size: 13px;
+      color: var(--ink-muted);
+    }
+    .swatch {
+      aspect-ratio: 16 / 9;
+    }
+  }
+  .withPhone .cards {
+    gap: 10px;
+  }
+  .card.pressed {
+    border-color: var(--accent);
+  }
+
+  // 사진 대신 단색 면: 장소마다 다른 톤.
+  .swatch {
+    display: block;
+    width: 100%;
+    border-radius: 4px;
+    background: color-mix(in srgb, var(--accent) 22%, var(--surface));
+
+    &[data-tone="1"] {
+      background: color-mix(in srgb, var(--ink-muted) 28%, var(--surface));
+    }
+    &[data-tone="2"] {
+      background: var(--line);
+    }
+  }
+
+  // 04: 항목을 누르면 열리는 자세히 보기
+  .detail {
+    position: absolute;
+    inset: 26px 40px 26px 230px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px;
+    border: 1px solid var(--ink);
+    border-radius: 10px;
+    background: var(--surface);
+    z-index: 2;
+
+    small {
+      font-size: 13px;
+      color: var(--ink-muted);
+    }
+    b {
+      font-size: 24px;
+      letter-spacing: -0.02em;
+    }
+    .swatch {
+      height: 110px;
+    }
+    ul {
+      margin: 0;
+      padding-left: 20px;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+  }
+
+  // ── 03·05: 같은 페이지를 휴대폰 너비로 ──
+  .phone {
+    position: absolute;
+    top: 14px;
+    bottom: 14px;
+    right: 16px;
+    width: 178px;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--ink);
+    border-radius: 18px;
+    background: var(--surface-2);
+    overflow: hidden;
+    font-size: 12px;
+  }
+  .phoneAddress {
+    margin: 12px 12px 0;
+    padding: 3px 8px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .phonePage {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 18px 14px;
+
+    b {
+      font-size: 18px;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+    }
+    p {
+      margin: 0;
+      color: var(--ink-muted);
+    }
+  }
+  // 고치기 전: 컴퓨터 화면처럼 가로 세 칸이라 휴대폰에서 잘린다.
+  .phoneCards {
+    display: grid;
+    grid-template-columns: repeat(3, 110px);
+    gap: 8px;
+    padding: 4px;
+    margin: -4px;
+    border-radius: 6px;
+    outline: 2px dashed transparent;
+    outline-offset: 2px;
+    transition: outline-color 300ms;
+
+    span {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      padding: 7px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--surface);
+      font-weight: 700;
+    }
+    .swatch {
+      height: 34px;
+    }
+  }
+  .phoneCards.stacked {
+    grid-template-columns: 1fr;
+  }
+  // 잘리는 경계는 점선, 화면에 맞춘 경계는 실선 (완료 요약과 같은 표기).
+  .phoneCards.clipped {
+    outline-color: var(--accent);
+  }
+  .phoneCards.fitted {
+    outline-style: solid;
+    outline-color: var(--accent);
+  }
+
+  // ── 페이지 바깥의 요청·기획 메모 ──
+  .note {
+    position: absolute;
+    left: 30px;
+    bottom: 30px;
+    width: 330px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 14px 16px;
+    border: 1px solid var(--ink);
+    border-radius: 10px;
+    background: var(--surface);
+    font-size: 15px;
+    z-index: 3;
+
+    small {
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      color: var(--accent);
+    }
+    p {
+      line-height: 1.45;
+    }
+  }
+  .file {
+    align-self: flex-start;
+    padding: 2px 8px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    font-family: ui-monospace, monospace;
+    font-size: 13px;
+  }
+  .plan {
+    transform-origin: left bottom;
+
+    dl {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 4px 12px;
+      margin: 0;
+    }
+    dt {
+      color: var(--ink-muted);
+    }
+    dd {
+      margin: 0;
+      font-weight: 700;
+    }
+  }
+  // 기획이 요청으로 접힌다.
+  .plan.folded {
+    transform: scale(0.9);
+  }
+
+  .badge {
+    position: absolute;
+    bottom: 22px;
+    left: 44px;
+    padding: 5px 14px;
+    border-radius: 999px;
+    background: var(--ink);
+    color: var(--surface-2);
+    font-size: 13px;
+    font-weight: 800;
+    white-space: nowrap;
+    z-index: 3;
+  }
+
+  // ── 플레이어 바 ──
+  .player {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+
+    button {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      flex: none;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      background: transparent;
+      color: var(--ink);
+      cursor: pointer;
+      @include workbook-button-feedback(var(--line));
+    }
+    button:disabled {
+      color: var(--ink-muted);
+      opacity: 0.4;
+      cursor: default;
+    }
+    button:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+    @media (pointer: coarse) {
+      button {
+        width: 44px;
+        height: 44px;
+      }
+    }
+  }
+  // 자막은 띠 바로 아래 가운데, 플레이어 바는 그 아래에 둔다.
+  .subtitle {
+    margin-top: var(--space-2);
+    text-align: center;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::after {
+      transition: none !important;
+    }
+  }
+}

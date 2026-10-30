@@ -1,0 +1,75 @@
+import { expect, test, type Locator, type Page } from "@playwright/test";
+
+// focus()/click()으로 건너뛰지 않고 실제 Tab 순서로 목적 조작을 찾는다.
+async function tabTo(page: Page, target: Locator) {
+  for (let i = 0; i < 60; i++) {
+    if (await target.evaluate((element) => element === document.activeElement)) {
+      await expect(target).toBeInViewport({ ratio: 1 });
+      await expect(target).toBeFocused();
+      return;
+    }
+    await page.keyboard.press("Tab");
+  }
+  throw new Error("Tab으로 목적 조작에 도달하지 못했어요");
+}
+
+test("키보드만으로 지도·수업·도움 카드를 오가며 포커스를 유지한다", async ({ page }, info) => {
+  if (info.project.name === "mobile") await page.setViewportSize({ width: 320, height: 640 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/workbook/classes/vibe-web");
+  await tabTo(page, page.getByRole("button", { name: "강의 시작하기 ↗", exact: true }));
+  await page.keyboard.press("Enter");
+  await tabTo(page, page.getByRole("button", { name: /아직 모르겠어요 · 예시를 보며 시작할게요/ }));
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("heading", { name: "AI 이해하기", exact: true })).toBeFocused();
+  await tabTo(page, page.getByRole("button", { name: "단원 지도 보기", exact: true }));
+  await page.keyboard.press("Enter");
+  await tabTo(
+    page,
+    page.getByRole("button", { name: /AI 이해하기 (장소로 이동|학습 패널 열기)/, exact: true }),
+  );
+  await page.keyboard.press("Enter");
+  const start = page.getByRole("button", { name: "AI 이해하기 수업 시작", exact: true });
+  await expect(start).toBeFocused();
+  const close = page
+    .getByLabel("선택한 학습 장소")
+    .getByRole("button", { name: "선택 접기", exact: true });
+  await tabTo(page, close);
+  await page.keyboard.press("Enter");
+  const point = page.getByRole("button", { name: "AI 이해하기 학습 패널 열기", exact: true });
+  await expect(point).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(start).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("heading", { level: 1 })).toBeFocused();
+  const next = page.getByRole("button", { name: "다음으로", exact: true });
+  await tabTo(page, next);
+  await page.keyboard.press("Enter");
+  await tabTo(page, next);
+  await page.keyboard.press("Enter");
+  const tip = page.getByRole("button", { name: "도움 카드 코드는 무엇인가요?", exact: true });
+  await tabTo(page, tip);
+  await page.keyboard.press("Enter");
+  await expect(tip).toHaveAttribute("aria-expanded", "true");
+  await tabTo(page, page.getByRole("button", { name: "도움 카드 닫기 ↑", exact: true }));
+  await page.keyboard.press("Enter");
+  await expect(tip).toBeFocused();
+  await expect(tip).toHaveAttribute("aria-expanded", "false");
+  await page.keyboard.press("Space");
+  await page.keyboard.press("Escape");
+  await expect(tip).toBeFocused();
+  await expect(tip).toHaveAttribute("aria-expanded", "false");
+  const previous = page.getByRole("button", { name: "이전 설명", exact: true });
+  await tabTo(page, previous);
+  await page.keyboard.press("Enter");
+  await expect(previous).toBeFocused();
+  await expect(previous).toBeInViewport({ ratio: 1 });
+  await page.keyboard.press("Enter");
+  await expect(previous).toHaveCount(0);
+  await expect(page.getByRole("heading", { level: 1 })).toBeFocused();
+  const back = page.getByRole("button", { name: "단원 지도 보기", exact: true });
+  await tabTo(page, back);
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("heading", { name: "AI 입문", exact: true })).toBeFocused();
+  await expect(page.getByText("0 / 5 학습 확인", { exact: true })).toBeVisible();
+});

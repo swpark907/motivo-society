@@ -14,7 +14,6 @@ export const TEST_PAGE_GROUPS = [
     label: "진행 중",
     items: [
       { href: "/demo/workbook-completion", label: "단원 완료·결과물 미리보기" },
-      { href: "/demo/workbook-intro-111", label: "강의 인트로 미리보기" },
       { href: "/demo/workbook-intro-sprite", label: "인트로 카피바라 스프라이트" },
     ],
   },

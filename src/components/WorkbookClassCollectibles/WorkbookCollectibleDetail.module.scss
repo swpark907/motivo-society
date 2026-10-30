@@ -1,0 +1,85 @@
+.dialog {
+  width: min(520px, calc(100% - 32px));
+  max-height: calc(100dvh - 32px);
+  padding: 0 var(--space-6) var(--space-6);
+  margin: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--space-3);
+  background: var(--surface-2);
+  color: var(--ink);
+  overflow: auto;
+  &::backdrop {
+    background: var(--surface);
+    opacity: 0.85;
+  }
+  p {
+    margin-top: var(--space-3);
+    font-size: 0.85rem;
+    line-height: 1.7;
+    word-break: keep-all;
+  }
+  h3 {
+    margin-top: var(--space-6);
+    font-size: 1rem;
+  }
+}
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--surface-2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding-block: var(--space-4);
+  border-bottom: 1px solid var(--line);
+  h2 {
+    margin: 0;
+    font-size: 1.3rem;
+  }
+  button {
+    min-height: 44px;
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--line);
+    border-radius: var(--space-2);
+    color: var(--ink);
+    background: var(--surface);
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.8rem;
+  }
+}
+.art {
+  position: relative;
+  width: min(320px, 100%);
+  aspect-ratio: 1.5;
+  margin: var(--space-4) auto;
+  overflow: hidden;
+}
+.state {
+  color: var(--accent);
+  font-weight: 700;
+}
+.dialog .note {
+  color: var(--ink-muted);
+  font-size: 0.75rem;
+}
+.dialog .link {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  display: inline-block;
+  min-height: 44px;
+  margin-top: var(--space-4);
+  padding-block: var(--space-2);
+  color: var(--accent);
+}
+.header button,
+.link {
+  &:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+}

@@ -1,0 +1,157 @@
+.interaction {
+  display: grid;
+  gap: var(--space-4);
+  min-width: 0;
+  > :nth-child(n) {
+    margin-block: 0;
+  }
+  p,
+  li {
+    overflow-wrap: anywhere;
+  }
+  mark {
+    color: var(--ink);
+    background: transparent;
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+    font-weight: 650;
+  }
+  small {
+    color: var(--ink-muted);
+  }
+  button {
+    max-width: 100%;
+    min-height: 44px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  button:focus-visible,
+  .feedback:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+}
+.scene {
+  display: grid;
+  align-items: start;
+  gap: var(--space-3);
+  min-width: 0;
+  @include up(md) {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+.noteFlow {
+  align-items: stretch;
+  @include up(md) {
+    grid-template-columns: minmax(0, 1fr) var(--space-6) minmax(0, 1fr);
+  }
+}
+.flowArrow {
+  align-self: center;
+  justify-self: center;
+  color: var(--ink-muted);
+  font-size: 1.5rem;
+  line-height: 1;
+  transform: rotate(90deg);
+  @include up(md) {
+    transform: none;
+  }
+}
+.panel {
+  min-width: 0;
+  padding: var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--workbook-card-radius, var(--space-3));
+  background: var(--surface-2);
+  > :nth-child(n) {
+    margin-block: 0;
+  }
+  > :nth-child(n + 2) {
+    margin-top: var(--space-3);
+  }
+  h3,
+  h4 {
+    font-size: 0.875rem;
+  }
+  ul {
+    padding-left: var(--space-4);
+  }
+  // 원문 항목끼리 붙지 않게 하되 항목 이름과 문장은 가까이 둔다.
+  > div + div {
+    margin-top: var(--space-6);
+  }
+  > div > p {
+    margin: var(--space-2) 0 0;
+  }
+}
+.forwardActions,
+.supportActions,
+.selections {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  min-width: 0;
+}
+.interaction button.primaryAction {
+  --workbook-button-hover: var(--workbook-button-action-hover);
+  background: var(--accent);
+  color: var(--accent-ink);
+  border: 0;
+}
+.interaction button.secondaryAction {
+  --workbook-button-hover: var(--workbook-button-neutral-hover);
+  background: transparent;
+  color: var(--ink-muted);
+  border: 0;
+  padding-inline: var(--space-2);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.interaction .supportActions {
+  column-gap: var(--space-4);
+}
+.selectionGroup {
+  display: grid;
+  gap: var(--space-2);
+}
+.groupLabel {
+  color: var(--ink-muted);
+  font-size: 0.75rem;
+}
+.interaction button.selection {
+  --workbook-button-hover: var(--workbook-button-neutral-hover);
+  background: transparent;
+  color: var(--ink);
+  border: 0;
+  &[aria-pressed="true"] {
+    background: var(--workbook-button-selected);
+    font-weight: 650;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+}
+.preserveLines {
+  white-space: pre-wrap;
+}
+.interaction .scene .panel small {
+  display: block;
+  margin: 0 0 var(--space-1);
+}
+// 모바일은 현재 요청의 강조 원문을 중심으로 읽고 기획값 중복 표시는 줄인다.
+.bridge .scene > :first-child {
+  display: none;
+  @include up(md) {
+    display: block;
+  }
+}
+.bridge .allConnections {
+  grid-template-columns: minmax(0, 1fr);
+  > :first-child {
+    display: none;
+  }
+}

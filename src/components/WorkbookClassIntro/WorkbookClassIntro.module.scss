@@ -155,53 +155,54 @@
   letter-spacing: -0.035em;
   line-height: 1.65;
 }
-.content .fine {
-  font-size: 12px;
-  color: #7c8076;
-}
-.journey {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-  margin: 25px 0;
-}
-.journey div {
-  min-height: 150px;
-  background: #e5ebe1;
-  padding: 18px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-.journey small {
-  color: #a36a4d;
-  font-weight: 800;
-}
-.journey strong {
-  font-size: 16px;
-  line-height: 1.4;
-  word-break: keep-all;
-}
-.journey span {
-  align-self: flex-end;
-}
 .checklist {
+  list-style: none;
   margin: 10px 0 25px;
+  padding: 0;
 }
-.checklist div {
+.checklist li {
   border-bottom: 1px solid #dfdfd5;
   padding: 13px 0;
   font-weight: 700;
+}
+// 준비물 옆 보조 설명. 수업 페이지의 small 규칙(블록·위아래 여백)보다 우선한다.
+.content .checklist small {
+  display: inline;
+  margin: 0 0 0 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #7c8076;
 }
 .checklist b {
   color: #b57958;
   font-size: 11px;
   margin-right: 20px;
 }
+// 첫 수업 미리보기: 시작 버튼을 누르면 무엇부터 하는지.
 .note {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
   margin-top: 22px;
   border-top: 1px solid #dddcd3;
   padding-top: 20px;
+  font-size: 15px;
+  color: #59665c;
+
+  span {
+    color: #b57958;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+  }
+  strong {
+    color: #252923;
+    font-size: 17px;
+  }
+}
+// 수업 페이지의 p 색(--ink-muted)이 종이 위에서 너무 흐려지지 않게 직접 지정한다.
+.content .note p {
+  margin: 0;
   font-size: 15px;
   color: #59665c;
 }
@@ -211,13 +212,16 @@
   align-items: center;
   margin-top: 20px;
 }
+// 장면 이동 버튼: 수업 본문 버튼과 비슷한 무게로 줄인다(PC 높이 약 40px, 터치·좁은 화면은 44px).
 .page .footer button {
   cursor: pointer;
   border: 0;
   background: none;
   color: #555b52;
+  font-size: 14px;
   font-weight: 700;
-  padding: 12px;
+  line-height: 1.4;
+  padding: 8px 12px;
 }
 .page .footer button:disabled {
   opacity: 0.3;
@@ -227,14 +231,17 @@
   white-space: nowrap;
   background: #283d33;
   color: white;
-  border-radius: 4px;
-  padding: 16px 22px;
-  min-width: 150px;
+  border-radius: 8px;
+  padding: 10px 16px;
   text-align: left;
 }
 .next span {
-  float: right;
-  margin-left: 20px;
+  margin-left: 12px;
+}
+@media (pointer: coarse) {
+  .page .footer button {
+    min-height: 44px;
+  }
 }
 .dots {
   display: flex;
@@ -312,25 +319,13 @@
   .eyebrow {
     margin-bottom: 22px;
   }
-  .journey {
-    grid-template-columns: 1fr;
-  }
-  .journey div {
-    min-height: 60px;
-    flex-direction: row;
-    align-items: center;
-    gap: 15px;
-  }
-  .journey strong {
-    flex: 1;
-  }
   .page .footer .next {
-    min-width: 120px;
-    padding: 14px 12px;
+    min-height: 44px;
+    padding: 10px 14px;
     font-size: 13px;
   }
   .next span {
-    margin-left: 10px;
+    margin-left: 8px;
   }
   .footer > button:first-child span {
     display: none;
@@ -393,16 +388,10 @@
 .embedded .eyebrow {
   margin-bottom: 16px;
 }
-.embedded .journey {
-  margin: 12px 0;
-}
-.embedded .journey div {
-  min-height: 95px;
-}
 .embedded .checklist {
   margin: 4px 0 14px;
 }
-.embedded .checklist div {
+.embedded .checklist li {
   padding: 9px 0;
 }
 .embedded .note {
@@ -442,24 +431,10 @@
     font-size: 15px;
     line-height: 1.5;
   }
-  .embedded .content .fine {
-    font-size: 12px;
-  }
   .embedded .eyebrow {
     margin-bottom: 12px;
   }
-  .embedded .journey {
-    grid-template-columns: 1fr 1fr;
-    margin: 5px 0 10px;
-  }
-  .embedded .journey div {
-    min-height: 48px;
-    padding: 9px;
-  }
-  .embedded .journey strong {
-    font-size: 13px;
-  }
-  .embedded .checklist div {
+  .embedded .checklist li {
     padding: 6px 0;
   }
   .embedded .note {
@@ -554,8 +529,102 @@
   }
 }
 
+// ── 4장면 등장: 문구 → 준비물 하나씩 → 첫 수업 순서로 1초 남짓 안에 올라온다 ──
+// 강의 인트로 한정 모션. 준비물 밑줄은 왼쪽부터 그어지며 "하나씩 챙긴다"는 리듬만 준다(완료 체크가 아니다).
+$ready-ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+.ready > *,
+.ready .checklist li {
+  animation: ready-rise 480ms $ready-ease both;
+}
+.ready .checklist {
+  animation: none;
+}
+.ready > :nth-child(1) {
+  animation-delay: 0ms;
+}
+.ready > :nth-child(2) {
+  animation-delay: 90ms;
+}
+.ready > :nth-child(3) {
+  animation-delay: 220ms;
+}
+.ready .checklist li:nth-child(1) {
+  animation-delay: 360ms;
+}
+.ready .checklist li:nth-child(2) {
+  animation-delay: 480ms;
+}
+.ready .checklist li:nth-child(3) {
+  animation-delay: 600ms;
+}
+.ready > .note {
+  animation-delay: 820ms;
+}
+.ready .checklist li {
+  position: relative;
+  border-bottom-color: transparent;
+
+  &::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 1px;
+    background: #dfdfd5;
+    transform-origin: left;
+    animation: ready-line 560ms $ready-ease both;
+  }
+  &:nth-child(1)::after {
+    animation-delay: 460ms;
+  }
+  &:nth-child(2)::after {
+    animation-delay: 580ms;
+  }
+  &:nth-child(3)::after {
+    animation-delay: 700ms;
+  }
+}
+// 첫 수업 제목 옆 화살표가 시작 버튼 쪽을 한 번 가리키고 멈춘다.
+.ready .note strong::after {
+  content: "→";
+  display: inline-block;
+  margin-left: 6px;
+  color: #b57958;
+  animation: ready-point 900ms $ready-ease 1100ms both;
+}
+@keyframes ready-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+@keyframes ready-line {
+  from {
+    transform: scaleX(0);
+  }
+}
+@keyframes ready-point {
+  0% {
+    opacity: 0;
+    transform: translateX(-6px);
+  }
+  60% {
+    opacity: 1;
+    transform: translateX(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .caret {
+  .caret,
+  .ready > *,
+  .ready .checklist li,
+  .ready .checklist li::after,
+  .ready .note strong::after {
     animation: none;
   }
 }

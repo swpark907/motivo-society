@@ -1,0 +1,107 @@
+.page {
+  --surface: #151815;
+  --surface-2: #20251f;
+  --ink: #f4efe6;
+  --ink-muted: #b6b7a9;
+  --line: #3a4035;
+  --accent: #efa878;
+  --accent-ink: #20170f;
+  background: var(--surface);
+  color: var(--ink);
+}
+.top {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-6);
+  font-size: 0.75rem;
+  flex-wrap: wrap;
+  span {
+    color: var(--ink-muted);
+  }
+}
+.hero {
+  position: relative;
+  min-height: 430px;
+  display: flex;
+  align-items: center;
+  isolation: isolate;
+  > img {
+    object-fit: cover;
+    object-position: 65% center;
+    z-index: -2;
+  }
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--surface);
+    opacity: 0.6;
+    z-index: -1;
+  }
+  > div {
+    padding: var(--space-8) var(--space-6);
+    width: 100%;
+    max-width: 1280px;
+    margin: auto;
+  }
+  h1 {
+    font-size: clamp(2.2rem, 5vw, 4rem);
+    line-height: 1.15;
+    letter-spacing: -0.06em;
+    margin-block: var(--space-4);
+  }
+  p {
+    font-size: 0.95rem;
+    margin-bottom: var(--space-6);
+  }
+  a {
+    display: inline-block;
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: var(--space-2);
+  }
+  @include up(md) {
+    min-height: 480px;
+    > div {
+      padding: var(--space-12);
+    }
+  }
+}
+.body {
+  max-width: 1280px;
+  padding: var(--space-6) var(--space-4) var(--space-16);
+  margin: auto;
+  @include up(md) {
+    padding-inline: var(--space-8);
+  }
+}
+.notice {
+  font-size: 0.75rem;
+  color: var(--ink-muted);
+  margin-bottom: var(--space-6);
+}
+.resume {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  border-block: 1px solid var(--line);
+  padding-block: var(--space-6);
+  margin-bottom: var(--space-8);
+  h2 {
+    font-size: 1.2rem;
+    margin-block: var(--space-2);
+  }
+  p {
+    font-size: 0.8rem;
+    color: var(--ink-muted);
+  }
+  a {
+    font-size: 0.8rem;
+    padding-block: var(--space-3);
+  }
+}
+.anchor {
+  scroll-margin-top: calc(var(--gnb-height) + var(--space-4));
+}

@@ -1,4 +1,12 @@
+.practiceGuide li {
+  margin-block: var(--space-3);
+}
 .page {
+  --workbook-card-radius: var(--space-3);
+  --workbook-support-radius: var(--space-2);
+  --workbook-button-action-hover: color-mix(in srgb, var(--accent) 82%, var(--ink));
+  --workbook-button-neutral-hover: color-mix(in srgb, var(--surface-2) 88%, var(--ink));
+  --workbook-button-selected: color-mix(in srgb, var(--accent) 16%, var(--surface-2));
   padding: var(--space-6);
   max-width: 1400px;
   margin-inline: auto;
@@ -19,7 +27,7 @@
     cursor: pointer;
     background: var(--accent);
     color: var(--accent-ink);
-    border: 1px solid var(--line);
+    border: 0;
     border-radius: var(--radius);
     padding: var(--space-3) var(--space-4);
     font: inherit;
@@ -45,6 +53,7 @@
     margin-block: var(--space-6);
   }
   .quiet {
+    --workbook-button-hover: var(--workbook-button-neutral-hover);
     background: transparent;
     color: var(--ink);
   }
@@ -56,6 +65,10 @@
   gap: var(--space-4);
   font-size: 0.8rem;
   flex-wrap: wrap;
+}
+.topActions {
+  display: flex;
+  gap: var(--space-2);
 }
 .notice {
   font-size: 0.8rem;
@@ -530,6 +543,7 @@
 }
 .lessonBody {
   scrollbar-width: thin;
+  overflow-wrap: anywhere;
   p {
     margin-block: var(--space-3);
   }
@@ -542,5 +556,1600 @@
   }
   .choices {
     gap: var(--space-2);
+  }
+}
+
+.lessonBody strong {
+  font-weight: 700;
+  color: var(--ink);
+}
+.setupChecks {
+  display: grid;
+  gap: var(--space-3);
+  margin-block: var(--space-4);
+  label {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+  }
+  input {
+    flex-shrink: 0;
+    accent-color: var(--accent);
+    margin-top: var(--space-1);
+  }
+}
+
+.practiceField {
+  display: grid;
+  gap: var(--space-2);
+  margin-block: var(--space-4);
+  font-weight: 700;
+  textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: var(--space-3);
+    background: var(--surface);
+    color: var(--ink);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    font: inherit;
+    font-weight: 400;
+    resize: vertical;
+    &:focus-visible {
+      outline: 2px solid var(--accent);
+    }
+  }
+}
+.practicePreview {
+  margin-top: var(--space-4);
+  border: 1px solid var(--line);
+  padding: var(--space-4);
+  > div {
+    margin-top: var(--space-6);
+  }
+}
+
+.journeyHeading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  h1 {
+    font-size: clamp(1.6rem, 3vw, 2.4rem);
+    margin-block: var(--space-2);
+    scroll-margin-top: var(--space-16);
+  }
+  .learningCount {
+    font-size: 0.8rem;
+    margin: 0;
+  }
+}
+.journey {
+  flex-basis: 100%;
+  summary {
+    cursor: pointer;
+    font-size: 0.85rem;
+    padding-block: var(--space-2);
+    width: fit-content;
+  }
+  nav {
+    margin-block: var(--space-3);
+    border-block: 1px solid var(--line);
+    padding-block: var(--space-3);
+  }
+  nav > p {
+    font-size: 0.85rem;
+    margin-top: 0;
+  }
+  ol {
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: var(--space-2);
+  }
+  @include up(md) {
+    summary {
+      margin-left: auto;
+    }
+  }
+}
+.page .journeyChoice {
+  display: flex;
+  width: 100%;
+  gap: var(--space-3);
+  align-items: center;
+  text-align: left;
+  background: transparent;
+  color: var(--ink);
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  &[aria-pressed="true"] {
+    border-left: 2px solid var(--accent);
+  }
+  &:disabled {
+    opacity: 0.7;
+  }
+  img {
+    width: 72px;
+    height: 48px;
+    object-fit: cover;
+    flex-shrink: 0;
+    border-radius: var(--radius);
+  }
+  > span {
+    min-width: 0;
+    display: grid;
+    gap: var(--space-1);
+  }
+  strong {
+    font-size: 0.9rem;
+  }
+  span span {
+    color: var(--ink-muted);
+    font-size: 0.75rem;
+    line-height: 1.5;
+  }
+}
+
+.mapWorkspace {
+  display: grid;
+  gap: var(--space-4);
+  align-items: start;
+  @include up(lg) {
+    grid-template-columns: minmax(0, 1fr) 300px;
+  }
+}
+.mapSurface {
+  min-width: 0;
+}
+.mapSidebar {
+  min-width: 0;
+  padding: var(--space-4);
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+
+  h2 {
+    font-size: 1.1rem;
+  }
+  p {
+    font-size: 0.85rem;
+  }
+  details {
+    margin-top: var(--space-3);
+  }
+  summary {
+    cursor: pointer;
+    font-size: 0.85rem;
+  }
+}
+
+.mapSurface {
+  display: block;
+  order: 1;
+}
+@include up(lg) {
+  .mapSidebar {
+    grid-column: 2;
+    grid-row: 1;
+  }
+}
+.journey ol {
+  display: flex;
+  align-items: stretch;
+  overflow-x: auto;
+  padding-bottom: var(--space-2);
+  > li {
+    flex: 0 0 210px;
+  }
+  @include up(lg) {
+    > li {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+  }
+}
+.page .journeyChoice {
+  display: grid;
+  height: 100%;
+  align-content: start;
+  border: 1px solid var(--line);
+  img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 3 / 2;
+  }
+}
+.journey {
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+}
+.page .journeyChoice {
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr);
+  overflow: hidden;
+  img {
+    min-width: 0;
+    max-width: 100%;
+  }
+}
+.lessonPanel .lessonNavigation {
+  flex-wrap: wrap;
+  > p {
+    flex-basis: 100%;
+    margin: 0;
+    font-size: 0.8rem;
+    line-height: 1.6;
+  }
+  @include up(lg) {
+    > p {
+      flex-basis: auto;
+    }
+  }
+}
+
+.planBridge {
+  overflow-wrap: anywhere;
+}
+
+// 지도 화면 머리: "WEB CLASS · n단원 / 단원 제목 / 클래스 소개 보기"를 한 줄로.
+.page[data-map-view="true"] > .top {
+  display: none;
+}
+.unitLabel {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--ink-muted);
+  white-space: nowrap;
+}
+.page .unitSwitch {
+  min-height: 28px;
+  padding: 2px 8px;
+  margin-left: 2px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+  @include workbook-button-feedback(var(--surface-2));
+
+  > span {
+    margin-left: 2px;
+    color: var(--ink-muted);
+  }
+  &:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  @media (pointer: coarse) {
+    min-height: 44px;
+  }
+}
+.page[data-map-view="true"] {
+  .mapSection {
+    margin-block: var(--space-2) var(--space-3);
+  }
+  .journeyHeading > button {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .journeyHeading {
+    align-items: center;
+    flex-wrap: nowrap;
+  }
+  .journeyHeading h1 {
+    margin-block: var(--space-1);
+    font-size: clamp(1.3rem, 2.5vw, 2rem);
+  }
+  .mapWorkspace {
+    margin-top: var(--space-3);
+  }
+  button:not([data-next]):not([data-map-control]) {
+    font-size: 0.85rem;
+    line-height: 1.5;
+    min-height: 40px;
+    padding: var(--space-2) var(--space-3);
+  }
+
+  @include up(lg) {
+    height: calc(100dvh - var(--gnb-height));
+    max-width: none;
+    padding: var(--space-3) var(--space-4);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    > .top {
+      flex-shrink: 0;
+    }
+    > .notice {
+      display: none;
+    }
+    > .top + .top {
+      margin-top: var(--space-2);
+    }
+    .mapSection {
+      flex: 1;
+      min-height: 0;
+      padding: var(--space-3);
+      display: flex;
+      flex-direction: column;
+    }
+    .mapSection[hidden] {
+      display: none;
+    }
+    .mapWorkspace {
+      flex: 1;
+      min-height: 0;
+      align-items: stretch;
+      grid-template-columns: minmax(0, 1fr) 280px;
+    }
+    .mapSurface {
+      display: block;
+      min-width: 0;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .mapSidebar {
+      grid-row: auto;
+      grid-column: auto;
+      min-height: 0;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+    }
+  }
+}
+.journeyOverlay {
+  inset: 0;
+  width: 100%;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: var(--space-6);
+  border: 0;
+  background: var(--black);
+  color: var(--ink);
+  overflow-y: auto;
+  &::backdrop {
+    background: var(--black);
+  }
+  &[open] {
+    animation: journeyAppear 120ms ease-out;
+  }
+  > header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-4);
+    margin-bottom: var(--space-6);
+  }
+  header h2 {
+    word-break: keep-all;
+  }
+  header p {
+    max-width: 65ch;
+    font-size: 0.9rem;
+  }
+  header button {
+    flex-shrink: 0;
+  }
+  .roadmap {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: var(--space-4);
+  }
+  @include up(lg) {
+    padding: var(--space-8);
+    .roadmap {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      align-items: start;
+    }
+  }
+}
+.journeyCard {
+  display: grid;
+  gap: var(--space-3);
+  border-top: 1px solid var(--line);
+  padding-top: var(--space-4);
+  min-width: 0;
+  > :is(h3, p) {
+    margin: 0;
+  }
+  img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
+    border-radius: var(--radius);
+  }
+  h3 {
+    font-size: 1.1rem;
+  }
+  > button {
+    width: 100%;
+    min-height: 44px;
+  }
+  &[data-current="true"] {
+    border-color: var(--accent);
+  }
+  &[data-available="false"] {
+    img {
+      opacity: 0.45;
+    }
+    > button {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+  }
+}
+.journeyStatus {
+  color: var(--ink-muted);
+  font-size: 0.8rem;
+  line-height: 1.6;
+}
+@keyframes journeyAppear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .journeyOverlay[open] {
+    animation: none;
+  }
+}
+
+// 홈의 탐색 카드와 달리, 선택한 한 클래스의 제목·결과·시작에 집중한다.
+.classHeading {
+  margin-top: var(--space-8);
+  padding-bottom: var(--space-6);
+  border-bottom: 1px solid var(--line);
+  h1 {
+    font-size: clamp(2.2rem, 5vw, 4.5rem);
+    line-height: 1.08;
+    letter-spacing: -0.04em;
+  }
+  p {
+    max-width: 48ch;
+  }
+}
+.cover {
+  align-items: stretch;
+  > img {
+    align-self: center;
+  }
+  > div {
+    order: -1;
+  }
+  @include up(lg) {
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+    > div {
+      order: 0;
+    }
+  }
+  button {
+    margin-top: var(--space-4);
+  }
+}
+.classStart {
+  padding: var(--space-6);
+  border-left: 2px solid var(--accent);
+  background: var(--surface-2);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  h2 {
+    margin-top: var(--space-3);
+    line-height: 1.4;
+  }
+  button {
+    align-self: flex-start;
+  }
+}
+.methodGrid {
+  display: grid;
+  gap: var(--space-6);
+  margin-top: var(--space-6);
+  article {
+    min-width: 0;
+  }
+  img {
+    width: 100%;
+    height: auto;
+    display: block;
+    margin-bottom: var(--space-4);
+  }
+  h3 {
+    font-size: 1rem;
+  }
+  p,
+  strong {
+    font-size: 0.85rem;
+  }
+  @include up(lg) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+.methodText {
+  border-top: 1px solid var(--line);
+  padding-top: var(--space-4);
+}
+.preparation {
+  padding-left: var(--space-6);
+  margin-top: var(--space-4);
+  li {
+    margin-block: var(--space-3);
+  }
+}
+.startSection {
+  padding-block: var(--space-8);
+  border-top: 1px solid var(--line);
+}
+.purposeSection {
+  max-width: 1120px;
+  margin: var(--space-3) auto;
+}
+.purposeHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+  > :global(.label) {
+    min-width: 0;
+  }
+}
+.page .purposeBack {
+  flex-shrink: 0;
+  border: 0;
+  padding: var(--space-2) var(--space-3);
+  background: transparent;
+  color: var(--ink-muted);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  &:hover {
+    color: var(--ink);
+    background: var(--surface-2);
+  }
+}
+
+.purposeLayout {
+  display: grid;
+  gap: var(--space-6);
+  margin-top: var(--space-4);
+  align-items: start;
+  @include up(lg) {
+    grid-template-columns: 1fr 1.2fr;
+  }
+}
+.purposePreview {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  min-width: 0;
+  h2 {
+    font-size: 1.3rem;
+  }
+  small {
+    color: var(--ink-muted);
+  }
+  > button:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
+}
+.purposeThumbnail {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  max-height: 28dvh;
+  object-fit: cover;
+  object-position: top;
+  border-radius: var(--radius);
+}
+.purposeEmpty {
+  display: grid;
+  align-content: center;
+  gap: var(--space-4);
+  min-height: 180px;
+}
+
+.page[data-map-view="true"] {
+  @include up(lg) {
+    .mapSection {
+      padding: 0;
+      border: 0;
+      background: transparent;
+      margin-bottom: 0;
+    }
+    .journeyHeading > div {
+      display: flex;
+      align-items: baseline;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+    }
+    .journeyHeading > div > :global(.label) {
+      display: none;
+    }
+    .mapWorkspace {
+      display: flex;
+      justify-content: center;
+      container-type: size;
+    }
+    .mapSurface {
+      order: 0;
+      flex: 0 1 auto;
+      width: min(calc(100% - 280px - var(--space-4)), 150cqh);
+    }
+    .mapSidebar {
+      order: 1;
+      flex: 0 0 280px;
+      padding: var(--space-3);
+    }
+  }
+}
+
+.cover .tokens {
+  gap: var(--space-2);
+  span {
+    font-size: 0.75rem;
+    padding: var(--space-2);
+  }
+}
+
+.purposeConnection {
+  margin-bottom: var(--space-6);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--line);
+  h2 {
+    font-size: 1rem;
+    margin-top: var(--space-2);
+  }
+  p {
+    font-size: 0.85rem;
+  }
+}
+.purposeExample {
+  margin-block: var(--space-6);
+  summary {
+    cursor: pointer;
+  }
+  p {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+}
+
+.page .purposeConnection {
+  margin-bottom: var(--space-4);
+  padding-bottom: var(--space-3);
+  p {
+    margin-block: var(--space-2);
+  }
+}
+
+.pageReview {
+  border-block: 1px solid var(--line);
+  padding-block: var(--space-4);
+  margin-bottom: var(--space-6);
+  h2 {
+    margin-block: var(--space-2);
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
+  ul {
+    padding-left: var(--space-6);
+  }
+  details {
+    margin-top: var(--space-3);
+  }
+  summary {
+    cursor: pointer;
+  }
+}
+.requestExample {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.outcome {
+  margin-bottom: var(--space-6);
+  border-bottom: 1px solid var(--line);
+  padding-bottom: var(--space-4);
+  > h2 {
+    margin-top: var(--space-3);
+  }
+  summary {
+    cursor: pointer;
+  }
+}
+.outcomeGrid {
+  display: grid;
+  gap: var(--space-6);
+  margin-block: var(--space-6);
+  @include up(lg) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.outcomePage {
+  border: 1px solid var(--line);
+  padding: var(--space-4);
+  align-self: start;
+  h3 {
+    margin-block: var(--space-4);
+  }
+  ul {
+    padding-left: var(--space-6);
+  }
+}
+.outcomeRecords {
+  min-width: 0;
+  article {
+    border-top: 1px solid var(--line);
+    padding-block: var(--space-3);
+  }
+  h3 {
+    font-size: 1rem;
+  }
+  p {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+}
+
+.page .outcomeLink {
+  display: block;
+  font-size: 0.8rem;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  margin-block: var(--space-3);
+  background: transparent;
+  color: var(--ink);
+  border: 0;
+  padding: var(--space-2) 0;
+}
+
+.outcomePage {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.purposeFeatures {
+  margin-block: var(--space-4);
+  > div {
+    padding-block: var(--space-3);
+    border-top: 1px solid var(--line);
+  }
+  dt {
+    font-weight: 650;
+  }
+  dd {
+    margin-top: var(--space-2);
+    color: var(--ink-muted);
+    font-size: 0.85rem;
+    line-height: 1.8;
+    overflow-wrap: anywhere;
+  }
+}
+
+.lessonBody h2 {
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.workStatus {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+  padding-block: var(--space-4);
+  border-block: 1px solid var(--line);
+  margin-block: var(--space-4);
+  > div {
+    min-width: 0;
+  }
+  dt {
+    color: var(--ink-muted);
+    font-size: 0.75rem;
+    word-break: keep-all;
+  }
+  dd {
+    margin: var(--space-2) 0 0;
+    font-size: 0.85rem;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
+  span {
+    display: block;
+    color: var(--ink-muted);
+    font-size: 0.75rem;
+    margin-top: var(--space-2);
+  }
+}
+.nextWork {
+  border-left: 2px solid var(--accent);
+  padding-left: var(--space-4);
+  margin-block: var(--space-6);
+}
+
+.lessonBody .actionLead {
+  margin: 0 0 var(--space-5);
+  padding: var(--space-4);
+  border-left: 2px solid var(--accent);
+  background: var(--surface-2);
+  color: var(--ink);
+  font-weight: 600;
+}
+.practiceScope {
+  margin-block: var(--space-4);
+  > p {
+    color: var(--ink-muted);
+    font-size: 0.8rem;
+  }
+}
+
+.lessonBody {
+  > h2:not(:first-child),
+  > h3 {
+    margin-top: var(--space-6);
+    margin-bottom: var(--space-3);
+  }
+  label {
+    margin-top: var(--space-5);
+  }
+  input:not([type="checkbox"]),
+  textarea {
+    margin-top: var(--space-2);
+    scroll-margin-block: var(--space-4);
+  }
+  textarea {
+    max-height: 40dvh;
+  }
+  > section,
+  > aside {
+    margin-block: var(--space-5);
+  }
+}
+.page .lessonHeader button,
+.page .lessonPanel .lessonNavigation button {
+  min-height: 44px;
+  padding: var(--space-2) var(--space-4);
+}
+.page .lessonPanel .actionReturn {
+  --workbook-button-hover: var(--workbook-button-neutral-hover);
+  align-self: flex-start;
+  background: transparent;
+  color: var(--ink-muted);
+  border: 0;
+  padding: var(--space-2) 0;
+  min-height: 44px;
+  font-size: 0.8rem;
+}
+.lessonPanel {
+  gap: var(--space-2);
+  padding-bottom: max(var(--space-3), env(safe-area-inset-bottom));
+}
+
+.lessonPanel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  > small {
+    grid-column: 1;
+    grid-row: 1;
+    margin: 0;
+    align-self: center;
+  }
+  > .actionReturn {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  > .lessonNavigation,
+  > .outcomeLink {
+    grid-column: 1 / -1;
+  }
+  @include up(lg) {
+    display: flex;
+  }
+}
+.lessonHeader .location {
+  display: none;
+  @include up(lg) {
+    display: inline;
+  }
+}
+.page .keyboardDone {
+  --workbook-button-hover: var(--workbook-button-neutral-hover);
+  display: none;
+}
+.page[data-learning="true"][data-keyboard-open="true"] {
+  position: fixed;
+  z-index: 50;
+  inset: var(--keyboard-viewport-top) 0 auto;
+  width: 100%;
+  height: var(--keyboard-viewport-height);
+  .lessonHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-2) var(--space-4);
+    h1 {
+      order: -1;
+      font-size: 1rem;
+      margin: 0;
+    }
+    .top {
+      margin: 0;
+    }
+    .top > span {
+      display: none;
+    }
+  }
+  .lessonBody {
+    padding: var(--space-4);
+  }
+  .lessonBody textarea {
+    max-height: calc(var(--keyboard-viewport-height) * 0.35);
+    font-size: 1rem;
+  }
+  .lessonPanel > small {
+    display: none;
+  }
+  .lessonPanel .keyboardDone {
+    display: block;
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: start;
+    min-height: 44px;
+    padding: var(--space-2) 0;
+    border: 0;
+    background: transparent;
+    color: var(--ink);
+    font-size: 0.8rem;
+  }
+}
+.lessonBody input:not([type="checkbox"]):not([type="radio"]),
+.lessonBody textarea {
+  font-size: 1rem;
+}
+
+.curriculum {
+  margin-block: var(--space-4);
+  details {
+    border-top: 1px solid var(--line);
+  }
+  details:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+  summary {
+    cursor: pointer;
+    font-weight: 650;
+    min-height: 44px;
+    padding-block: var(--space-2);
+    line-height: 1.6;
+    span {
+      margin-inline: var(--space-2);
+      color: var(--ink-muted);
+      font-variant-numeric: tabular-nums;
+    }
+    &:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 4px;
+    }
+  }
+  details > p {
+    margin-block: var(--space-2);
+    margin-inline-start: var(--space-4);
+    font-size: 0.875rem;
+    @include up(md) {
+      margin-inline-start: var(--space-8);
+    }
+  }
+  ol {
+    padding-left: 0;
+    list-style: none;
+    margin-block: var(--space-3) var(--space-4);
+    margin-inline-start: var(--space-4);
+    display: grid;
+    gap: 0;
+    @include up(md) {
+      margin-inline-start: var(--space-8);
+    }
+  }
+  li {
+    margin: 0;
+    padding-block: var(--space-2);
+    display: grid;
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+    column-gap: var(--space-3);
+    font-size: 0.875rem;
+    line-height: 1.7;
+  }
+}
+.curriculumNumber {
+  color: var(--ink-muted);
+  font-variant-numeric: tabular-nums;
+}
+.detailLayout {
+  display: grid;
+  gap: var(--space-8);
+  margin-top: var(--space-6);
+  padding-bottom: calc(var(--space-16) + var(--space-8) + env(safe-area-inset-bottom));
+  @include up(lg) {
+    grid-template-columns: minmax(0, 1fr) 21rem;
+    align-items: start;
+    padding-bottom: 0;
+  }
+}
+.detailMain {
+  min-width: 0;
+  summary {
+    scroll-margin-block: calc(var(--gnb-height) + var(--space-4))
+      calc(var(--space-16) + var(--space-8));
+  }
+  .classHeading {
+    margin-top: var(--space-6);
+    padding-bottom: var(--space-6);
+    h1 {
+      font-size: clamp(1.8rem, 3vw, 2.8rem);
+      margin-block: var(--space-3);
+      line-height: 1.2;
+    }
+    p {
+      margin-bottom: 0;
+    }
+  }
+  > .section {
+    margin-block: 0;
+    padding: var(--space-6) 0;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    border-radius: 0;
+    background: transparent;
+    > p {
+      margin-block: var(--space-3);
+      font-size: 0.875rem;
+    }
+    > .preparation {
+      margin-top: var(--space-3);
+      li {
+        margin-block: var(--space-2);
+        font-size: 0.875rem;
+      }
+    }
+  }
+}
+.classImage {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+}
+.detailLayout .classStart {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  padding: var(--space-3) var(--space-4) calc(var(--space-3) + env(safe-area-inset-bottom));
+  border: 0;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-3);
+  h2 {
+    font-size: 0.875rem;
+    margin: 0;
+    br {
+      display: none;
+    }
+  }
+  > .classFacts,
+  > p,
+  > small,
+  > .tokens,
+  > span {
+    display: none;
+  }
+  button {
+    flex-shrink: 0;
+    min-height: 44px;
+    margin: 0;
+    align-self: center;
+  }
+  @include up(lg) {
+    position: sticky;
+    top: calc(var(--gnb-height) + var(--space-6));
+    bottom: auto;
+    left: auto;
+    right: auto;
+    z-index: auto;
+    padding: var(--space-6);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-3);
+    h2 {
+      font-size: 1rem;
+      line-height: 1.5;
+      br {
+        display: initial;
+      }
+    }
+    > p,
+    > small,
+    > .tokens,
+    > span {
+      display: block;
+      margin: 0;
+    }
+    > .tokens {
+      display: flex;
+      span {
+        padding: var(--space-2);
+        font-size: 0.75rem;
+      }
+    }
+    > p {
+      font-size: 0.8125rem;
+      line-height: 1.65;
+    }
+    > small {
+      font-size: 0.75rem;
+    }
+    > .classFacts {
+      display: grid;
+    }
+    button {
+      align-self: stretch;
+    }
+  }
+}
+
+.detailExamples > div {
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+  @include up(md) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.classFacts {
+  margin: 0;
+  padding-block: var(--space-4);
+  border-block: 1px solid var(--line);
+  gap: var(--space-3);
+  div {
+    display: grid;
+    grid-template-columns: 4rem minmax(0, 1fr);
+    gap: var(--space-2);
+  }
+  dt,
+  dd {
+    margin: 0;
+    font-size: 0.8125rem;
+    line-height: 1.6;
+  }
+  dt {
+    color: var(--ink-muted);
+  }
+}
+.classTech {
+  color: var(--ink);
+}
+.classNote {
+  color: var(--ink-muted);
+}
+
+.lessonNavigation button {
+  scroll-margin-block: var(--space-2);
+}
+
+// 학습의 다음 행동보다 낮은 위계의 단원 완료 기념 안내.
+.completionKeepsake {
+  margin-block: var(--space-3);
+  font-size: 0.75rem;
+  line-height: 1.7;
+  color: var(--ink-muted);
+  a {
+    display: inline-block;
+    padding-block: var(--space-2);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+}
+
+// 우측은 다음 행동, 선택한 장소, 보조 정보 순서로 읽는다.
+
+// 완료한 결과를 충분한 크기로 읽고, 지도는 아래에서 이어서 살펴본다.
+@include up(lg) {
+  .page[data-map-view="true"]:has([data-unit-review][open] [data-completion-screens]) {
+    height: auto;
+    min-height: calc(100dvh - var(--gnb-height));
+    overflow: visible;
+    .mapSection {
+      display: block;
+    }
+    .mapWorkspace {
+      flex: none;
+      height: clamp(360px, 60dvh, 620px);
+    }
+  }
+}
+
+// 모바일에서 반복 진도·결과 링크는 한 행으로, 이동 버튼은 짧게 유지한다.
+.lessonHeader .top {
+  padding-left: calc(var(--space-8) + var(--space-4));
+  @include up(lg) {
+    padding-left: 0;
+  }
+}
+.lessonPanel {
+  > small {
+    display: none;
+  }
+  > .actionReturn {
+    grid-column: 1;
+    justify-self: start;
+  }
+  > .outcomeLink {
+    grid-row: 1;
+    grid-column: 2;
+    margin: 0;
+    font-size: 0.75rem;
+  }
+  @include up(lg) {
+    > small {
+      display: block;
+    }
+    > .outcomeLink {
+      font-size: 0.875rem;
+    }
+  }
+}
+
+// 짧은 PC 화면에서도 목표 설명이 이동 버튼을 아래로 밀지 않게 한다.
+.lessonPanel {
+  @include up(lg) {
+    .panelNotes {
+      min-height: 0;
+      overflow-y: auto;
+    }
+    .lessonNavigation {
+      flex-shrink: 0;
+    }
+  }
+}
+
+.exampleList {
+  display: grid;
+  gap: var(--space-4);
+}
+.page .exampleThumbnailButton {
+  display: grid;
+  gap: var(--space-2);
+  width: 100%;
+  padding: 0;
+  overflow: hidden;
+  background: transparent;
+  color: var(--ink);
+  border: 0;
+  text-align: right;
+  > span {
+    font-size: 0.8rem;
+  }
+}
+.page .purposePreview p {
+  margin-block: var(--space-2) 0;
+}
+.page .purposePreview small {
+  margin-block: 0;
+}
+.exampleDialog {
+  width: min(1440px, 96vw);
+  max-width: 96vw;
+  height: 90dvh;
+  max-height: 90dvh;
+  margin: auto;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--ink);
+  overflow: hidden;
+  &::backdrop {
+    background: rgb(0 0 0 / 75%);
+  }
+}
+.exampleDialogContent {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  > header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--line);
+    flex-shrink: 0;
+    h2 {
+      font-size: 1rem;
+    }
+    button {
+      flex-shrink: 0;
+    }
+  }
+  > iframe {
+    width: 100%;
+    flex: 1;
+    min-height: 0;
+    border: 0;
+    background: white;
+  }
+}
+.exampleImageViewer {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: var(--space-4);
+  > img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  > p {
+    font-size: 0.8rem;
+  }
+}
+
+.lessonPanel {
+  position: relative;
+  @include up(lg) {
+    > .lessonProgress {
+      position: absolute;
+      top: var(--space-6);
+      right: var(--space-6);
+      margin: 0;
+      padding: 0;
+      color: var(--ink-muted);
+      font-size: 0.8rem;
+      font-variant-numeric: tabular-nums;
+    }
+  }
+}
+
+// 강의 헤더의 보조 이동은 CTA와 구분한다.
+.page .lessonHeader .quiet {
+  border: 0;
+  background: transparent;
+  color: var(--ink-muted);
+  font-size: 0.85rem;
+  padding: var(--space-2) var(--space-3);
+  &:hover {
+    color: var(--ink);
+    background: var(--surface-2);
+  }
+}
+
+.classBreadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  font-size: 0.75rem;
+  line-height: 1.8;
+  color: var(--ink-muted);
+  margin-block: var(--space-4);
+  [aria-current] {
+    color: var(--ink);
+  }
+  a:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 4px;
+  }
+}
+.courseHero {
+  --course-surface: #143c43;
+  --course-ink: #f1f4ec;
+  --course-muted: #c2d5d3;
+  --course-line: #4c7176;
+  display: grid;
+  background: var(--course-surface);
+  color: var(--course-ink);
+  border-radius: 14px;
+  overflow: hidden;
+  @include up(lg) {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+.courseHeroCopy {
+  padding: var(--space-6);
+  @include up(xl) {
+    padding: var(--space-6) var(--space-8);
+  }
+  h1 {
+    font-size: clamp(1.9rem, 2.7vw, 2.7rem);
+    line-height: 1.25;
+    letter-spacing: -0.045em;
+    margin-block: var(--space-4);
+    word-break: keep-all;
+  }
+  > p {
+    font-size: 0.9rem;
+    line-height: 1.9;
+    color: var(--course-muted);
+  }
+}
+.heroStart {
+  margin-top: 16px;
+  min-height: 44px;
+  padding: 10px 24px;
+  border: 0;
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-radius: 8px;
+}
+.trialNotice {
+  display: block;
+  max-width: 60ch;
+  margin-top: 8px;
+  color: var(--course-muted);
+  font-size: 0.75rem;
+  line-height: 1.6;
+}
+.courseLabels {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  font-size: 0.65rem;
+  line-height: 1.7;
+  letter-spacing: 0.06em;
+  > span:last-child {
+    border: 1px solid var(--course-line);
+    padding: var(--space-1) var(--space-2);
+    letter-spacing: 0;
+  }
+}
+.courseMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  color: var(--course-muted);
+  font-size: 0.72rem;
+  line-height: 1.8;
+  margin-top: var(--space-4);
+}
+.courseHeroArt {
+  min-width: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  img {
+    width: 100%;
+    height: auto;
+    display: block;
+    flex: 1;
+    object-fit: cover;
+    object-position: 58% center;
+    min-height: 0;
+    @include up(lg) {
+      position: absolute;
+      inset: 0;
+      height: 100%;
+    }
+  }
+  > span {
+    @include up(lg) {
+      display: none;
+    }
+    display: block;
+    padding: var(--space-3) var(--space-4);
+    font-size: 0.7rem;
+    color: var(--course-muted);
+    border-top: 1px solid var(--course-line);
+  }
+}
+.courseSections {
+  display: flex;
+  gap: var(--space-2) var(--space-6);
+  flex-wrap: wrap;
+  padding-block: var(--space-4);
+  margin-top: var(--space-3);
+  border-bottom: 1px solid var(--line);
+  a {
+    font-size: 0.8rem;
+    padding-block: var(--space-2);
+    &:hover {
+      color: var(--accent);
+    }
+    &:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 4px;
+    }
+  }
+}
+
+// 소개 화면의 제목·문단은 수업 본문과 별도로 간격을 맞춘다.
+.detailMain > .section {
+  > h2 {
+    margin: var(--space-2) 0 var(--space-3);
+    line-height: 1.45;
+  }
+  > p {
+    margin: 0 0 var(--space-3);
+    line-height: 1.75;
+  }
+  > p:last-child {
+    margin-bottom: 0;
+  }
+  > small {
+    display: block;
+    margin-top: var(--space-2);
+    line-height: 1.65;
+  }
+  > .preparation {
+    margin: 0;
+    li {
+      margin: 0;
+      line-height: 1.75;
+    }
+    li + li {
+      margin-top: var(--space-2);
+    }
+  }
+}
+.detailMain .curriculum {
+  details > p {
+    margin: var(--space-2) 0;
+    line-height: 1.75;
+  }
+  + p {
+    margin-top: var(--space-4);
+  }
+}
+
+// 소개 본문은 카드 대신 연속된 배경 면과 구분선으로 나눈다.
+.detailMain > .section {
+  padding: var(--space-8) var(--space-6);
+  @include up(md) {
+    padding-inline: var(--space-8);
+  }
+}
+
+.curriculum .curriculumLessonTopics {
+  display: block;
+  margin: 4px 0 0;
+  font-size: 0.75rem;
+  line-height: 1.6;
+}
+.curriculumOptional {
+  margin: 0 0 16px 16px;
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+  font-size: 0.875rem;
+  > p {
+    margin: 4px 0;
+  }
+  > small {
+    margin: 0;
+    font-size: 0.75rem;
+  }
+  @include up(md) {
+    margin-left: 32px;
   }
 }

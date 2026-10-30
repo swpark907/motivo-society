@@ -1,8 +1,8 @@
 export const JOURNEY_KEY = "motivo.workbook.mobile-journey.v1";
 export const stops = [
-  { title: "작업실", subtitle: "친구에게 보낸 첫 페이지", x: 22, y: 60 },
-  { title: "작은 정류장", subtitle: "휴대폰에서 생긴 문제", x: 50, y: 43 },
-  { title: "마을 광장", subtitle: "내 작업으로 가져가기", x: 78, y: 60 },
+  { title: "작업실", particle: "로", subtitle: "친구에게 보낸 첫 페이지", x: 22, y: 60 },
+  { title: "작은 정류장", particle: "으로", subtitle: "휴대폰에서 생긴 문제", x: 50, y: 43 },
+  { title: "마을 광장", particle: "으로", subtitle: "내 작업으로 가져가기", x: 78, y: 60 },
 ] as const;
 export type JourneyProgress = {
   chapter: number;

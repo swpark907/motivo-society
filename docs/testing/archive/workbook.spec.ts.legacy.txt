@@ -1,0 +1,2057 @@
+import { expect, test, type Page } from "@playwright/test";
+import {
+  practicalLabs,
+  practicalMapStops,
+  type PracticalStage,
+} from "../src/lib/workbook-practical-labs";
+
+async function expectPractical(page: Page, stage: PracticalStage) {
+  await expect(
+    page.locator("summary").filter({ hasText: practicalLabs[stage].title }),
+  ).toBeVisible();
+}
+
+import {
+  workbookPurposes,
+  getWorkbookPageReview,
+  getWorkbookPurposeStages,
+} from "../src/lib/workbook-purpose";
+
+async function visitPractical(page: Page, stage: PracticalStage) {
+  const name = practicalMapStops[stage].name;
+  const mapNames = {
+    agent: "카피바라의 AI 입문 지도",
+    project: "기획과 첫 제작 지도",
+    experience: "화면과 사용 경험 지도",
+    data: "동작과 데이터 지도",
+    publish: "공개와 운영 지도",
+  };
+  const map = page.getByRole("region", { name: mapNames[stage], exact: true });
+  await expect(map.getByRole("button")).toHaveCount(stage === "agent" ? 6 : 4);
+  await expect(map.locator('polyline[data-branch="true"]')).toHaveCount(1);
+  const point = page.getByRole("button", { name: `${name} 선택`, exact: true });
+  await expect(point).toBeEnabled();
+  await point.press("Enter");
+  const panel = page.getByRole("region", { name: "선택한 심화 장소", exact: true });
+  await expect(panel.getByRole("heading")).toHaveText(name);
+  await panel.getByRole("button", { name: `${name} 수업 시작`, exact: true }).press("Enter");
+  const lesson = page.getByRole("region", { name: "실전 심화 수업", exact: true });
+  await expect(lesson.getByRole("heading", { level: 1 })).toBeFocused();
+  const situation = practicalLabs[stage].situations[0];
+  await lesson.getByRole("button", { name: `1. ${situation.name}`, exact: true }).click();
+  await lesson
+    .getByRole("button", { name: situation.options[situation.best], exact: true })
+    .click();
+  await expect(lesson).toContainText(situation.check);
+  if (stage === "data") {
+    await page.getByRole("link", { name: /^workbook$/i, exact: true }).click();
+    await expect(page).toHaveURL(/\/workbook$/);
+    await page.goBack();
+    await expect(lesson.locator('[data-result="correct"]')).toHaveAttribute("aria-pressed", "true");
+  }
+  await lesson.getByRole("button", { name: "같은 지도로 돌아가기 →", exact: true }).click();
+  await expect(point).toBeFocused();
+  await expect(panel).toContainText("1 / 3 상황 살펴봄");
+  await panel.getByRole("button", { name: `${name} 수업 시작`, exact: true }).click();
+  await expect(lesson.locator('[data-result="correct"]')).toHaveAttribute("aria-pressed", "true");
+  await lesson.getByRole("button", { name: "단원 지도 보기", exact: true }).click();
+  await panel.getByRole("button", { name: "선택 접기", exact: true }).press("Enter");
+  await expect(point).toBeFocused();
+  await openRecords(page); // 목록 왕복 후 접힌 기록 패널을 다시 열어 다음 검사를 이어간다.
+}
+
+async function openRecords(page: Page) {
+  for (const name of ["학습·제작 기록 확인"]) {
+    const summary = page.getByText(name, { exact: true });
+    if (await summary.isVisible()) {
+      const details = summary.locator("..");
+      if ((await details.getAttribute("open")) === null) await summary.click();
+    }
+  }
+}
+async function openStory(page: Page) {
+  const summary = page.getByText("학습 정보와 도구", { exact: true });
+  if ((await summary.locator("..").getAttribute("open")) === null) await summary.click();
+  await page.getByRole("button", { name: "카피바라 이야기 더 보기 · 선택", exact: true }).click();
+}
+async function openMapLesson(page: Page, name: string, key?: string) {
+  const point = page.getByRole("button", { name: `${name} 선택`, exact: true });
+  if (key) await point.press(key);
+  else await point.click();
+  await expect(
+    page
+      .getByLabel("선택한 학습 장소")
+      .locator("summary")
+      .filter({ hasText: "이곳에서 다루는 주제" }),
+  ).toBeVisible();
+  const panel = page.getByLabel("선택한 학습 장소");
+  // 지점 선택이 예약한 시작 버튼 포커스가 도착한 뒤 다음 키보드 조작을 한다.
+  await expect(panel.getByRole("button", { name: `${name} 수업 시작`, exact: true })).toBeFocused();
+  await panel.getByRole("button", { name: "선택 접기", exact: true }).press("Enter");
+  await expect(point).toBeFocused();
+  await point.press("Enter");
+  await page.getByRole("button", { name: `${name} 수업 시작`, exact: true }).click();
+}
+
+async function chooseMap(page: Page, name: string, keyboard = false) {
+  const journey = page.getByTestId("workbook-journey");
+  if ((await journey.getAttribute("open")) === null)
+    await page.getByRole("button", { name: "전체 과정 보기", exact: true }).click();
+  const button = journey.getByRole("button", { name, exact: true, includeHidden: true });
+  const card = button.locator("..").locator("..");
+  if ((await card.getAttribute("open")) === null) await card.locator("summary").click();
+  if (keyboard) await button.press("Enter");
+  else await button.click();
+}
+
+test("카피바라 맵에서 수업을 취소하고 브라우저 뒤로 가기로 클래스에 돌아온다", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/workbook/classes/vibe-web");
+  await page.getByRole("button", { name: "강의 시작하기 ↗" }).click();
+  await page.getByRole("button", { name: /아직 모르겠어요 · 예시를 보며 시작할게요/ }).click();
+  await page.getByRole("button", { name: "단원 지도 보기", exact: true }).click();
+  await page.getByRole("button", { name: /AI 이해하기 (장소로 이동|학습 패널 열기)/ }).click();
+  await page.getByRole("button", { name: "AI 이해하기 수업 시작" }).click();
+  await page.getByRole("button", { name: "다음으로", exact: true }).click();
+  await page.getByRole("button", { name: "단원 지도 보기", exact: true }).click();
+  await openRecords(page);
+  await expect(
+    page.getByRole("button", { name: "AI 종류와 도구 · 첫 수업 후 열려요" }),
+  ).toBeDisabled();
+  await expect(page.getByText("이번 방문에서 확인 완료", { exact: true })).toHaveCount(0);
+  await page.getByRole("button", { name: "AI 이해하기 수업 시작" }).click();
+  await expect(
+    page.getByText("이 클래스에서는 생성형 AI를 사용해요.", { exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "단원 지도 보기", exact: true }).click();
+  await openRecords(page);
+  await page.getByRole("link", { name: "← 클래스 목록", exact: true }).click();
+  await expect(page).toHaveURL(/\/workbook$/);
+  await page.goBack();
+  await expect(page).toHaveURL(/\/workbook\/classes\/vibe-web$/);
+  await expect(
+    page.getByRole("button", { name: "AI 이해하기 학습 패널 열기", exact: true }),
+  ).toBeVisible();
+  await page.goForward();
+  await expect(page).toHaveURL(/\/workbook$/);
+  await page.goBack();
+  await expect(
+    page.getByRole("button", { name: "AI 이해하기 학습 패널 열기", exact: true }),
+  ).toBeVisible();
+});
+
+test("현재 학습을 먼저 보고 전체 여정을 펼쳐 잠금 이유를 확인한다", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/workbook/classes/vibe-web");
+  await page.getByRole("button", { name: "강의 시작하기 ↗" }).click();
+  await page.getByRole("button", { name: /아직 모르겠어요 · 예시를 보며 시작할게요/ }).click();
+  await page.getByRole("button", { name: "단원 지도 보기", exact: true }).click();
+  const journey = page.getByTestId("workbook-journey");
+  await expect(journey).not.toHaveAttribute("open", "");
+  await expect(page.getByRole("heading", { level: 1, name: "AI 입문", exact: true })).toBeVisible();
+  await expect(page.getByText("0 / 5 학습 확인", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "전체 과정 보기", exact: true }).click();
+  await expect(
+    journey.getByText("AI 입문의 다섯 수업을 마치면 열려요", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    journey.getByRole("button", {
+      name: "기획과 첫 제작 지도로",
+      exact: true,
+      includeHidden: true,
+    }),
+  ).toHaveCount(0);
+  await chooseMap(page, "AI 입문 지도로");
+  await expect(journey).not.toHaveAttribute("open", "");
+  await expect(page.getByRole("heading", { level: 1, name: "AI 입문", exact: true })).toBeFocused();
+  await page.getByRole("button", { name: "학습 장소로 이동 →", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "AI 이해하기 수업 시작", exact: true }),
+  ).toBeVisible();
+});
+
+test("노트북 화면에서 지도 전체를 보고 전체 여정을 닫아 복귀한다", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name === "mobile", "개인 컴퓨터의 지도 화면 높이를 검증한다");
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await page.goto("/workbook/classes/vibe-web");
+  await page.getByRole("button", { name: "강의 시작하기 ↗" }).click();
+  await page.getByRole("button", { name: /아직 모르겠어요 · 예시를 보며 시작할게요/ }).click();
+  await page.getByRole("button", { name: "단원 지도 보기", exact: true }).click();
+  await expect(page.getByRole("region", { name: "카피바라의 AI 입문 지도" })).toBeInViewport({
+    ratio: 1,
+  });
+  await expect(
+    page.getByRole("region", { name: "카피바라의 AI 입문 지도" }).getByRole("img"),
+  ).toBeInViewport({ ratio: 1 });
+  await expect(page.getByRole("complementary", { name: "학습 패널" })).toBeInViewport({ ratio: 1 });
+  await page.getByRole("button", { name: "전체 과정 보기", exact: true }).click();
+  const dialog = page.getByTestId("workbook-journey");
+  await expect(dialog).toBeVisible();
+  await expect(dialog.getByRole("img")).toHaveCount(5);
+  await dialog.getByText("기획과 첫 제작", { exact: true }).click();
+  await expect(
+    dialog.getByRole("button", { name: "기획과 첫 제작 지도로", exact: true }),
+  ).toHaveCount(0);
+  await page.keyboard.press("Escape");
+  await expect(dialog).not.toBeVisible();
+  await expect(page.getByRole("button", { name: "전체 과정 보기", exact: true })).toBeFocused();
+});
+
+test("홈에서 마을을 탐험하고 반응형 실험과 발견 기록을 완료한다", async ({ page }) => {
+  await page.goto("/workbook");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("만들고 싶었던 것");
+  await page.getByRole("link", { name: /휴대폰에서는 왜 잘릴까/ }).click();
+  await expect(
+    page.getByRole("button", { name: "마을 광장 · 앞 장소를 마치면 열려요", exact: true }),
+  ).toBeDisabled();
+  await page.getByRole("button", { name: "친구의 답장 보기" }).click();
+  await page.getByRole("button", { name: "이야기 확인하기" }).click();
+  await page.getByRole("button", { name: /정류장으로 걸어가기/ }).click();
+  await expect(
+    page.getByRole("heading", { name: "휴대폰에서 생긴 문제", exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "현재 화면 확인하기" }).click();
+  await expect(page.getByRole("status")).toContainText("560px로 고정");
+  await page.getByRole("button", { name: "화면에 맞추기", exact: true }).click();
+  await page.getByRole("button", { name: "좁을 때 세로", exact: true }).click();
+  await page.getByRole("button", { name: "현재 화면 확인하기" }).click();
+  await expect(page.getByRole("status")).toContainText("휴대폰에서 제목과 버튼이 모두");
+  await page.getByRole("button", { name: "넓은 화면 560px" }).click();
+  await page.getByRole("button", { name: "현재 화면 확인하기" }).click();
+  await page.getByRole("button", { name: "실험 마치기", exact: true }).click();
+  await page.getByRole("button", { name: /광장으로 걸어가기/ }).click();
+  await expect(page.getByRole("button", { name: "예제 여정 완료하기" })).toBeDisabled();
+  await page
+    .getByRole("button", { name: "긴 제목을 넣고 좁은 화면과 넓은 화면을 다시 확인해요." })
+    .click();
+  await page.getByLabel(/오늘 발견한 것 한 줄/).fill("작은 화면과 큰 화면을 함께 확인하기");
+  await page.getByRole("button", { name: "예제 여정 완료하기" }).click();
+  await page.getByRole("checkbox").check();
+  await page.reload();
+  await expect(page.getByLabel(/오늘 발견한 것 한 줄/)).toHaveValue(
+    "작은 화면과 큰 화면을 함께 확인하기",
+  );
+  await expect(page.getByRole("checkbox")).toBeChecked();
+  await page.getByRole("link", { name: /내 발견을 가지고 홈으로/ }).click();
+  await expect(
+    page.getByText("작은 화면과 큰 화면을 함께 확인하기", { exact: true }),
+  ).toBeVisible();
+  await expect(page.getByRole("link", { name: /여정 이어가기/ })).toBeVisible();
+});
+
+test("잘못된 기록에서도 시작할 수 있고 초기화는 확인을 받는다", async ({ page }) => {
+  await page.addInitScript(() =>
+    localStorage.setItem("motivo.workbook.mobile-journey.v1", "invalid"),
+  );
+  await page.goto("/workbook/journey");
+  await expect(
+    page.getByRole("heading", { name: "친구에게 보낸 첫 페이지", exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "여정 초기화", exact: true }).click();
+  await page.getByRole("button", { name: "취소", exact: true }).click();
+  await expect(page.getByRole("button", { name: "기록 지우기" })).toHaveCount(0);
+  await page.getByRole("button", { name: "여정 초기화", exact: true }).click();
+  await page.getByRole("button", { name: "기록 지우기", exact: true }).click();
+  await expect(page.getByText("0 / 3 장소 탐험", { exact: true })).toBeVisible();
+});
+
+test("저장이 막혀도 키보드로 이야기를 이어갈 수 있다", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.addInitScript(() => {
+    Storage.prototype.getItem = () => {
+      throw new Error("blocked");
+    };
+    Storage.prototype.setItem = () => {
+      throw new Error("blocked");
+    };
+  });
+  await page.goto("/workbook/journey");
+  await expect(page.getByRole("main").getByRole("alert")).toContainText("저장이 막혀");
+  await page.getByRole("button", { name: "친구의 답장 보기" }).focus();
+  await page.keyboard.press("Enter");
+  await page.getByRole("button", { name: "이야기 확인하기" }).click();
+  await page.getByRole("button", { name: /정류장으로 걸어가기/ }).focus();
+  await page.keyboard.press("Enter");
+  await expect(
+    page.getByRole("heading", { name: "휴대폰에서 생긴 문제", exact: true }),
+  ).toBeFocused();
+});
+
+for (const journeyPurpose of workbookPurposes.filter((item) => item.id !== "explore")) {
+  test(`${journeyPurpose.label}: 홈부터 클래스 마지막까지 목적과 기록을 유지한다`, async ({
+    page,
+  }, testInfo) => {
+    test.setTimeout(90000);
+    async function recordApplication(applied: boolean) {
+      const optional = page.getByText("선택 · 내 파일에서 더 해보기", { exact: true });
+      if (await optional.count()) await optional.click();
+      const own = page.getByRole("region", { name: "내 프로젝트 적용 기록", exact: true });
+      const guide = own.getByRole("region", { name: "내 파일 실습 안내", exact: true });
+      await expect(guide.getByRole("listitem")).toHaveCount(4);
+      await expect(guide).toContainText("2026-10-08");
+      const term = guide.locator("summary");
+      await term.press("Enter");
+      await expect(guide.locator("details")).toHaveAttribute("open", "");
+      await term.press("Space");
+      await expect(guide.locator("details")).not.toHaveAttribute("open", "");
+      await guide.getByRole("button").nth(0).press("Enter");
+      await expect(guide.getByRole("button").nth(0)).toHaveAttribute("aria-pressed", "true");
+      await guide.getByRole("button").nth(1).press("Space");
+      await expect(guide.getByRole("button").nth(1)).toHaveAttribute("aria-pressed", "true");
+      if (await guide.getByRole("button", { name: "배포가 실패했어요", exact: true }).count()) {
+        const feedback = guide.locator('[aria-live="polite"]');
+        const missing = guide.getByRole("button", { name: "첫 주소가 404예요", exact: true });
+        const stale = guide.getByRole("button", { name: "고친 화면이 안 보여요", exact: true });
+        const failed = guide.getByRole("button", { name: "배포가 실패했어요", exact: true });
+        await missing.press("Enter");
+        await expect(feedback).toContainText("주소나 파일 위치가 다를 수 있어요");
+        await expect(feedback).toContainText("받은 주소에서 제목·목록·버튼을 확인해요");
+        await stale.press("Space");
+        await expect(feedback).toContainText("내 파일 수정과 공개 화면 갱신은 별개예요");
+        await expect(feedback).toContainText("열어 본 주소·배포 상태");
+        await failed.press("Enter");
+        await expect(feedback).toContainText("오류 문장과 실패한 단계를 확인해요");
+        await expect(feedback).toContainText("수정 뒤 다시 배포하고 성공 상태인지 확인");
+        await expect(stale).toHaveAttribute("aria-pressed", "false");
+        await failed.click();
+        await expect(failed).toHaveAttribute("aria-pressed", "true");
+        await missing.press("Space");
+        await expect(failed).toHaveAttribute("aria-pressed", "false");
+        await expect(feedback).toContainText("계속 404라면 확인한 주소와 오류 문장");
+      }
+      await expect(own.getByRole("status")).toContainText("적용 여부 미기록");
+      const official = guide.getByRole("link").first();
+      await expect(official).toHaveAttribute("target", "_blank");
+      await expect(official).toHaveAttribute(
+        "href",
+        /https:\/\/(learn.chatgpt.com\/docs\/projects|vercel.com\/docs\/drop)/,
+      );
+      await own
+        .getByRole("button", { name: "내 기획으로 실습 요청 초안 만들기", exact: true })
+        .click();
+      await expect(own.getByLabel("내 프로젝트 실습·수정 요청", { exact: true })).toHaveValue(
+        /내 홈페이지의 목적:/,
+      );
+      await expect(own.getByLabel("내 프로젝트 실습·수정 요청", { exact: true })).toHaveValue(
+        /보여줄 내용:/,
+      );
+      const realFile = own.getByRole("region", { name: "내 파일로 이어가기", exact: true });
+      await expect(realFile).toContainText("선택 실습");
+      await expect(realFile).toContainText("복사만으로 전송되지는 않아요");
+      await realFile
+        .getByRole("button", { name: "내 파일 실습 요청 복사하기", exact: true })
+        .click();
+      await expect(realFile.getByRole("status")).toContainText(
+        /실습 요청을 복사했어요|복사하지 못했어요/,
+      );
+      const ownRequest = own.getByLabel("내 프로젝트 실습·수정 요청", { exact: true });
+      await expect(own).toContainText(
+        "다시 누르면 직접 다듬은 요청도 현재 기획의 초안으로 바뀌어요.",
+      );
+      await ownRequest.fill((await ownRequest.inputValue()) + "\n내 파일에서 직접 확인할게요.");
+      await expect(realFile.getByRole("status")).toHaveCount(0);
+      if (!applied) {
+        await own
+          .getByRole("button", { name: "아직 직접 적용하지 않았어요", exact: true })
+          .press("Space");
+        await expect(own.getByRole("status")).toContainText("아직 직접 적용 전");
+        return;
+      }
+      await own
+        .getByRole("button", { name: "내 파일에 적용한 결과 적기", exact: true })
+        .press("Enter");
+      const confirm = own.getByRole("button", { name: "직접 확인한 결과로 기록하기", exact: true });
+      await expect(own).toContainText("결과·남은 문제·다시 확인한 근거를 모두 적으면");
+      await expect(confirm).toBeDisabled();
+      const address = "https://self-record.example.invalid/" + "long-record-".repeat(25);
+      await own.getByLabel("확인한 파일명 또는 주소 (선택)", { exact: true }).fill(address);
+      await own
+        .getByLabel("내 파일에서 확인한 결과", { exact: true })
+        .fill("테스트용 본인 기록: 두 화면에서 버튼이 목록으로 이동했어요.");
+      await own
+        .getByLabel("남은 문제 또는 문제없음", { exact: true })
+        .fill("확인한 범위에서 문제를 찾지 못했어요.");
+      await expect(confirm).toBeDisabled();
+      await own
+        .getByLabel("직접 다시 확인한 근거", { exact: true })
+        .fill("index.html만 바뀌었고 브라우저를 다시 열어 같은 버튼을 눌렀어요.");
+      await confirm.dblclick();
+      await expect(own.getByRole("status")).toContainText("직접 적용·확인 · 본인 기록");
+      await own.getByRole("button", { name: "내 파일에 적용한 결과 적기", exact: true }).dblclick();
+      await expect(own.getByRole("status")).toContainText("직접 적용·확인 · 본인 기록");
+      await own
+        .getByLabel("직접 다시 확인한 근거", { exact: true })
+        .fill("두 화면에서 다시 눌러 같은 목록을 확인했어요.");
+      await expect(own.getByRole("status")).toContainText("확인 전");
+      await confirm.press("Enter");
+      await expect(own.locator(`a[href="${address}"]`)).toHaveCount(0);
+      await expect(page).toHaveURL(/\/workbook\/classes\/vibe-web$/);
+    }
+    await page.goto("/workbook");
+    await expect(page.locator("#results")).toHaveCount(0);
+    await expect(page.getByRole("link", { name: "만들 결과", exact: true })).toHaveCount(0);
+    await page.getByRole("link", { name: "웹페이지 만들기 클래스 보기 →", exact: true }).click();
+    await expect(page.locator(`#example-${journeyPurpose.id}`)).toBeVisible();
+    await page.getByRole("button", { name: "메뉴 접기" }).click();
+    await expect(page.getByRole("navigation", { name: "Workbook 메뉴" })).toBeHidden();
+    await page.getByRole("button", { name: "메뉴 펼치기" }).click();
+    await expect(page.getByRole("navigation", { name: "Workbook 메뉴" })).toBeVisible();
+    await page.getByRole("button", { name: "강의 시작하기 ↗" }).click();
+    await page.getByRole("button", { name: new RegExp(journeyPurpose.label) }).click();
+    if (await page.getByRole("heading", { name: "AI 이해하기", exact: true }).isVisible())
+      await page.getByRole("button", { name: "단원 지도 보기", exact: true }).click();
+    await expect(page.getByRole("button", { name: "메뉴 펼치기" })).toHaveAttribute(
+      "aria-expanded",
+      "false",
+    );
+    await expect(
+      page.getByRole("button", { name: "AI 종류와 도구 · 첫 수업 후 열려요" }),
+    ).toBeDisabled();
+    await expect(
+      page
+        .getByRole("complementary", { name: "학습 패널", exact: true })
+        .getByRole("heading", { name: "AI 이해하기", exact: true }),
+    ).toBeVisible();
+    await expect(page.getByRole("button", { name: "경로 움직임 멈추기" })).toHaveCount(0);
+    await expect(page.getByText("학습 장소와 확인 기록", { exact: true })).toHaveCount(0);
+    await page.getByRole("button", { name: /AI 이해하기 (장소로 이동|학습 패널 열기)/ }).click();
+    await expect(page.getByLabel("선택한 학습 장소")).toBeVisible();
+    await expect(page.getByRole("button", { name: "AI 이해하기 수업 시작" })).toBeInViewport();
+    await page.getByRole("button", { name: "AI 이해하기 수업 시작" }).click();
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("AI 이해하기");
+    await expect(page.getByText("첫 두 수업은", { exact: false })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1 })).toBeFocused();
+    await expect(
+      page.getByText("이 클래스에서는 생성형 AI를 사용해요.", { exact: true }),
+    ).toHaveCount(0);
+    await page.getByRole("button", { name: "다음으로", exact: true }).click();
+    await expect(
+      page.getByText("이 클래스에서는 생성형 AI를 사용해요.", { exact: true }),
+    ).toBeVisible();
+    await expect(page.getByText(/AI는 인공지능을 뜻해요/)).toHaveCount(0);
+    await expect(page.getByRole("navigation", { name: "수업 진행" })).toBeInViewport();
+    await page.getByRole("button", { name: "다음으로", exact: true }).click();
+    const codeExplanation = page.getByRole("button", {
+      name: "도움 카드 코드는 무엇인가요?",
+      exact: true,
+    });
+    await codeExplanation.focus();
+    await page.keyboard.press("Enter");
+    await expect(
+      page.getByText("코드는 컴퓨터가 할 일을 적은 명령", { exact: true }),
+    ).toBeVisible();
+    await expect(codeExplanation).toBeFocused();
+    await expect(codeExplanation).toHaveAttribute("aria-expanded", "true");
+    await page.keyboard.press("Escape");
+    await expect(codeExplanation).toHaveAttribute("aria-expanded", "false");
+    await page.keyboard.press("Space");
+    await expect(codeExplanation).toHaveAttribute("aria-expanded", "true");
+    await page.keyboard.press("Space");
+    await expect(page.getByText("코드는 컴퓨터가 할 일을 적은 명령", { exact: true })).toBeHidden();
+    await expect(codeExplanation).toBeFocused();
+    await page.getByRole("button", { name: "이전 설명", exact: true }).click();
+    await expect(
+      page.getByText("이 클래스에서는 생성형 AI를 사용해요.", { exact: true }),
+    ).toBeVisible();
+    await page.getByRole("button", { name: "다음으로", exact: true }).click();
+    await expect(codeExplanation).toHaveAttribute("aria-expanded", "false");
+    await page.getByRole("button", { name: "다음으로", exact: true }).click();
+    await expect(page.getByRole("button", { name: "다음으로", exact: true })).toBeDisabled();
+    await page.getByRole("button", { name: "예시 결과 보기" }).click();
+    await page.getByRole("button", { name: "차·호흡·돌 쌓는 웹 경험" }).click();
+    await expect(page.getByRole("status")).toContainText("새로 덧붙인 실적");
+    await expect(page.getByRole("status")).not.toContainText("오답");
+    await expect(page.getByRole("button", { name: "차·호흡·돌 쌓는 웹 경험" })).toContainText(
+      "오답",
+    );
+    await page.getByRole("button", { name: "이미 1만 명이 선택했다는 내용" }).click();
+    await expect(page.getByRole("button", { name: "이미 1만 명이 선택했다는 내용" })).toContainText(
+      "정답",
+    );
+    await expect(page.getByRole("button", { name: "차·호흡·돌 쌓는 웹 경험" })).not.toContainText(
+      "오답",
+    );
+    await page.getByRole("button", { name: "다음으로", exact: true }).click();
+    await page.getByRole("button", { name: "배운 내용 챙겨 마을로 →" }).click();
+    await expect(page.getByRole("button", { name: "AI 이해하기 수업 시작" })).toBeEnabled();
+    await expect(
+      page
+        .getByRole("complementary", { name: "학습 패널", exact: true })
+        .getByRole("heading", { name: "AI 종류와 도구", exact: true }),
+    ).toBeVisible();
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.getByRole("button", { name: "AI 종류와 도구 장소로 이동" }).focus();
+    await page.keyboard.press("Enter");
+    await page.getByRole("button", { name: "AI 종류와 도구 수업 시작" }).click();
+    await page.getByRole("button", { name: "다음으로", exact: true }).click();
+    await page.getByRole("button", { name: "표지 그림", exact: true }).click();
+    await page.getByRole("button", { name: "다음으로", exact: true }).click();
+    await page.getByRole("button", { name: "다음으로", exact: true }).click();
+    await page.getByRole("button", { name: "다음으로", exact: true }).click();
+    await page.getByRole("button", { name: "모델 살펴보기" }).click();
+    await page.getByRole("button", { name: "다음으로", exact: true }).click();
+    await page.getByRole("button", { name: "다음으로", exact: true }).click();
+    await expect(
+      page.getByRole("heading", { name: "웹과 데스크톱 앱 · 어디서 여나요?" }),
+    ).toBeVisible();
+    await page.getByRole("button", { name: "다음으로", exact: true }).click();
+    await expect(
+      page.getByRole("heading", { name: "LLM과 에이전트 · 무엇이 일을 하나요?" }),
+    ).toBeVisible();
+    await page.getByRole("button", { name: "다음으로", exact: true }).click();
+    await expect(page.getByRole("button", { name: "다음으로", exact: true })).toBeDisabled();
+    await page.getByRole("button", { name: "설치했으니 파일을 자동으로 고칠 수 있어요" }).click();
+    await expect(page.getByRole("button", { name: "다음으로", exact: true })).toBeDisabled();
+    await page
+      .getByRole("button", { name: "파일 작업 기능과 연결된 폴더·권한을 확인해야 해요" })
+      .click();
+    await page.getByRole("button", { name: "다음으로", exact: true }).click();
+    await expect(page.getByRole("button", { name: "배운 내용 챙겨 마을로 →" })).toBeDisabled();
+    await page.getByRole("button", { name: "이미지를 생성하고 저장하는 기능" }).click();
+    await page.getByRole("button", { name: "그럴 수 있어요" }).click();
+    await page.getByRole("button", { name: "배운 내용 챙겨 마을로 →" }).click();
+    await expect(page.getByText("2 / 5 학습 확인", { exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "도구 준비하기 장소로 이동" })).toBeEnabled();
+    await page.getByRole("button", { name: /AI 이해하기 (장소로 이동|학습 패널 열기)/ }).click();
+    await page.getByRole("button", { name: "AI 이해하기 수업 시작" }).click();
+    await page.getByRole("button", { name: "단원 지도 보기" }).click();
+    await expect(page.getByRole("button", { name: "AI 이해하기 수업 시작" })).toBeEnabled();
+    await page.getByRole("button", { name: "도구 준비하기 장소로 이동" }).click();
+    await page.getByRole("button", { name: "도구 준비하기 수업 시작" }).click();
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("코드 에이전트 준비하기");
+    await page.getByRole("button", { name: "다음으로", exact: true }).click();
+    await page.getByRole("button", { name: "다음으로", exact: true }).click();
+    await expect(page.getByRole("button", { name: "다음으로", exact: true })).toBeDisabled();
+    await page
+      .getByRole("button", {
+        name: testInfo.project.name === "mobile" ? "모바일에서 복습하기" : "컴퓨터에서 준비하기",
+        exact: true,
+      })
+      .click();
+    await page.getByRole("button", { name: "다음으로", exact: true }).click();
+    await page.getByRole("button", { name: "Mac 안내", exact: true }).click();
+    await expect(page.getByText(/설치가 끝나면 응용 프로그램에서/)).toBeVisible();
+    await page.getByRole("button", { name: "Windows 안내", exact: true }).click();
+    await expect(page.getByText(/설치가 끝나면 시작 메뉴에서/)).toBeVisible();
+    for (let i = 0; i < 6; i++)
+      await page.getByRole("button", { name: "다음으로", exact: true }).click();
+    await expect(page.getByRole("button", { name: "준비 상태 챙겨 마을로 →" })).toBeDisabled();
+    await page
+      .getByRole("button", { name: "버튼의 정확한 위치와 모든 이용 조건", exact: true })
+      .click();
+    await expect(page.getByRole("button", { name: "준비 상태 챙겨 마을로 →" })).toBeDisabled();
+    await page
+      .getByRole("button", {
+        name: "작업 폴더 → 요청 → 파일 변경 → 실행·확인 → 수정 요청",
+        exact: true,
+      })
+      .click();
+    if (testInfo.project.name === "desktop") {
+      await expect(
+        page.getByRole("button", { name: "컴퓨터 준비 확인", exact: true }),
+      ).toBeDisabled();
+      await page.getByRole("checkbox", { name: "앱에서 코드 에이전트를 사용할 수 있어요" }).check();
+      await page
+        .getByRole("checkbox", { name: "로컬 실습 폴더 my-first-web을 연결했어요" })
+        .check();
+      await expect(
+        page.getByRole("button", { name: "컴퓨터 준비 확인", exact: true }),
+      ).toBeDisabled();
+      await page.getByRole("checkbox", { name: "요청 입력창과 작업 중지 조작을 찾았어요" }).check();
+      await page.getByRole("button", { name: "컴퓨터 준비 확인", exact: true }).click();
+      await page
+        .getByRole("checkbox", { name: "요청 입력창과 작업 중지 조작을 찾았어요" })
+        .uncheck();
+      await expect(page.getByRole("button", { name: "준비 상태 챙겨 마을로 →" })).toBeDisabled();
+      await page.getByRole("checkbox", { name: "요청 입력창과 작업 중지 조작을 찾았어요" }).check();
+      await page.getByRole("button", { name: "컴퓨터 준비 확인", exact: true }).click();
+    } else {
+      await expect(page.getByRole("button", { name: "컴퓨터 준비 확인", exact: true })).toHaveCount(
+        0,
+      );
+    }
+    await page.getByRole("button", { name: "준비 상태 챙겨 마을로 →" }).click();
+    await openRecords(page);
+    await expect(
+      page.getByText(
+        testInfo.project.name === "desktop"
+          ? "컴퓨터 준비 확인 · 본인 확인"
+          : "복습 확인 · 컴퓨터 준비 필요",
+        { exact: true },
+      ),
+    ).toBeVisible();
+    await expect(page.getByRole("button", { name: "AI와 첫 대화 장소로 이동" })).toBeEnabled();
+    // 실제 1·2·3수업을 마친 상태에서 선택 이야기를 다녀와도 위치와 해금이 일치한다.
+    await openStory(page);
+    await page.getByRole("button", { name: "이야기 건너뛰고 학습 지도로 →", exact: true }).click();
+    await openRecords(page);
+    await expect(
+      page.getByRole("button", { name: "도구 준비하기 학습 패널 열기", exact: true }),
+    ).toBeEnabled();
+    await expect(
+      page
+        .getByRole("complementary", { name: "학습 패널", exact: true })
+        .getByRole("heading", { name: "AI와 첫 대화", exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "AI와 첫 대화 장소로 이동", exact: true }),
+    ).toBeEnabled();
+    await page
+      .getByRole("button", { name: "도구 준비하기 학습 패널 열기", exact: true })
+      .dblclick();
+    await page.getByRole("button", { name: "도구 준비하기 수업 시작", exact: true }).click();
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("코드 에이전트 준비하기");
+    await page.getByRole("button", { name: "단원 지도 보기", exact: true }).click();
+    await openRecords(page);
+    await openStory(page);
+    await page.getByRole("button", { name: "이야기 건너뛰고 학습 지도로 →", exact: true }).click();
+    await openRecords(page);
+    await page.getByRole("link", { name: "← 클래스 목록", exact: true }).click();
+    await expect(page).toHaveURL(/\/workbook$/);
+    await page.goBack();
+    await expect(
+      page.getByRole("button", { name: "도구 준비하기 학습 패널 열기", exact: true }),
+    ).toBeEnabled();
+    await expect(
+      page
+        .getByRole("complementary", { name: "학습 패널", exact: true })
+        .getByRole("heading", { name: "AI와 첫 대화", exact: true }),
+    ).toBeVisible();
+    await page.goForward();
+    await expect(page).toHaveURL(/\/workbook$/);
+    await page.goBack();
+    await expect(
+      page.getByRole("button", { name: "도구 준비하기 학습 패널 열기", exact: true }),
+    ).toBeEnabled();
+    async function practiceLesson(agent: boolean, computer: boolean) {
+      await chooseMap(page, "AI 입문 지도로");
+      await openRecords(page);
+      const name = agent ? "에이전트와 바이브코딩" : "AI와 첫 대화";
+      await page.getByRole("button", { name: `${name} 장소로 이동`, exact: true }).click();
+      await page.getByRole("button", { name: `${name} 수업 시작`, exact: true }).click();
+      // 완료한 실습을 다른 방식으로 다시 검증할 때만 설명 첫머리로 돌아간다.
+      for (
+        let i = 0;
+        i < 6 && (await page.getByRole("button", { name: "이전 설명", exact: true }).count());
+        i++
+      )
+        await page.getByRole("button", { name: "이전 설명", exact: true }).click();
+      await page.getByRole("button", { name: "다음으로", exact: true }).click();
+      await page.getByRole("button", { name: "다음으로", exact: true }).click();
+      await expect(
+        page.getByText(/방식을 선택하면 확인 체크와 예시 조작은 다시 시작해요/),
+      ).toBeVisible();
+      if (!computer) {
+        await expect(
+          page.getByRole("button", { name: "내 컴퓨터에서 실습하기", exact: true }),
+        ).toBeDisabled();
+      }
+      await page
+        .getByRole("button", {
+          name: computer ? "내 컴퓨터에서 실습하기" : "예시로 복습하기",
+          exact: true,
+        })
+        .click();
+      await page.getByRole("button", { name: "다음으로", exact: true }).click();
+      await expect(page.getByRole("button", { name: "다음으로", exact: true })).toBeDisabled();
+      await page.getByRole("button", { name: "이전 설명", exact: true }).click();
+      await expect(
+        page.getByRole("button", { name: "예시로 복습하기", exact: true }),
+      ).toBeVisible();
+      await page.getByRole("button", { name: "다음으로", exact: true }).click();
+      await page.getByRole("button", { name: "예시 요청 가져오기", exact: true }).click();
+      if (!computer) {
+        await page.getByRole("button", { name: "미리 만든 결과 살펴보기", exact: true }).click();
+        if (agent) await page.getByRole("button", { name: "작업 보기", exact: true }).click();
+      }
+      await page
+        .getByRole("textbox", { name: "확인한 점 하나", exact: true })
+        .fill(agent ? "제목과 버튼 동작을 확인했어요." : "첫 문장이 길어요.");
+      await expect(
+        page.getByRole("complementary", { name: "학습 중 수집 목표", exact: true }),
+      ).toHaveCount(0);
+      await expect(page.getByLabel("단원 완료 기념", { exact: true })).toHaveCount(0);
+
+      await page.getByRole("button", { name: "단원 지도 보기", exact: true }).click();
+      await page.getByRole("button", { name: `${name} 수업 시작`, exact: true }).click();
+      await expect(
+        page.getByRole("textbox", { name: "확인한 점 하나", exact: true }),
+      ).not.toHaveValue("");
+      await page.getByRole("button", { name: "지금 할 일 ↑", exact: true }).click();
+      await expect(page.locator("[data-current-action]")).toBeFocused();
+      await expect(
+        page.getByRole("navigation", { name: "수업 진행", exact: true }),
+      ).toBeInViewport();
+
+      if (testInfo.project.name === "mobile" && !agent) {
+        const request = page.getByRole("textbox", { name: "첫 요청", exact: true });
+        const original = await request.inputValue();
+        const longRequest = `${original}\n${"제목과 내용을 유지하고, 작은 화면에서 읽기 편하게 정리해줘.\n".repeat(30)}마지막 문장은 더 짧게 수정해줘.`;
+        await request.fill(longRequest);
+        // OS 키보드 대신 표시 영역만 줄어드는 상황을 재현한다.
+        await page.evaluate(() => {
+          Object.defineProperty(window.visualViewport!, "height", {
+            configurable: true,
+            value: 420,
+          });
+          Object.defineProperty(window.visualViewport!, "offsetTop", {
+            configurable: true,
+            value: 0,
+          });
+          window.visualViewport!.dispatchEvent(new Event("resize"));
+        });
+        await expect(page.locator('main[data-learning="true"]')).toHaveAttribute(
+          "data-keyboard-open",
+          "true",
+        );
+        await expect(request).toBeFocused();
+        await expect(request).toHaveValue(longRequest);
+        const navigation = page.getByRole("navigation", { name: "수업 진행", exact: true });
+        await expect
+          .poll(async () => {
+            const box = await navigation.boundingBox();
+            return !!box && box.y >= 0 && box.y + box.height <= 421;
+          })
+          .toBe(true);
+        const inputBox = await request.boundingBox();
+        const navigationBox = await navigation.boundingBox();
+        expect(inputBox!.y + inputBox!.height).toBeLessThanOrEqual(navigationBox!.y);
+        await page.getByRole("button", { name: "입력 마치기", exact: true }).click();
+        await page.evaluate(() => {
+          Reflect.deleteProperty(window.visualViewport!, "height");
+          Reflect.deleteProperty(window.visualViewport!, "offsetTop");
+          window.visualViewport!.dispatchEvent(new Event("resize"));
+        });
+        await expect(page.locator('main[data-learning="true"]')).toHaveAttribute(
+          "data-keyboard-open",
+          "false",
+        );
+        await expect(request).toHaveValue(longRequest);
+        // 표시 영역과 문서 높이가 함께 줄어드는 브라우저도 확인한다.
+        await request.focus();
+        const fullViewport = page.viewportSize()!;
+        await page.setViewportSize({ width: fullViewport.width, height: 420 });
+        await expect(page.locator('main[data-learning="true"]')).toHaveAttribute(
+          "data-keyboard-open",
+          "true",
+        );
+        await expect(navigation).toBeInViewport();
+        const editedRequest = longRequest + "\n수정한 마지막 줄도 유지해줘.";
+        await request.fill(editedRequest);
+        await expect(request).toHaveValue(editedRequest);
+        await page.setViewportSize(fullViewport);
+        await expect(page.locator('main[data-learning="true"]')).toHaveAttribute(
+          "data-keyboard-open",
+          "false",
+        );
+        await expect(request).toHaveValue(editedRequest);
+        await request.fill(original);
+      }
+      await page.getByRole("button", { name: "수정 예시 가져오기", exact: true }).click();
+      if (!computer) {
+        await page.getByRole("button", { name: "미리 만든 수정 결과 보기", exact: true }).click();
+        if (agent) {
+          await page.getByRole("button", { name: "수정된 작업 보기", exact: true }).click();
+          await expect(
+            page.getByRole("heading", { name: "잠깐 쉬어가는 작업실", exact: true }),
+          ).toBeVisible();
+        }
+      }
+      // 지도에 나갔다 돌아와도 작성 중 요청·관찰·수정 기록은 남는다.
+      if (computer && !agent) {
+        await page.getByRole("button", { name: "단원 지도 보기", exact: true }).click();
+        await openRecords(page);
+        await page.getByRole("button", { name: `${name} 수업 시작`, exact: true }).click();
+        await expect(
+          page.getByRole("button", { name: "수정 예시 가져오기", exact: true }),
+        ).toBeVisible();
+        await expect(
+          page.getByRole("textbox", { name: "확인한 점 하나", exact: true }),
+        ).toHaveValue("첫 문장이 길어요.");
+      }
+      await page.getByRole("button", { name: "다음으로", exact: true }).click();
+      if (agent) await expectPractical(page, "agent");
+      const finish = page.getByRole("button", {
+        name: agent ? "2단원 마치고 다음 학습 보기 →" : "대화 기록 챙겨 마을로 →",
+        exact: true,
+      });
+      if (!computer && testInfo.project.name === "desktop")
+        await expect(finish).toBeEnabled(); // 앞서 확인한 문제 답도 방문 중 유지한다.
+      else await expect(finish).toBeDisabled();
+      await page
+        .getByRole("button", {
+          name: agent
+            ? "완료 메시지를 받았으니 화면도 잘 동작해요"
+            : "마음에 안 들어. 알아서 다시 해줘",
+          exact: true,
+        })
+        .click();
+      await expect(finish).toBeDisabled();
+      await page
+        .getByRole("button", {
+          name: agent
+            ? "바뀐 파일과 브라우저 화면·버튼을 직접 확인해요"
+            : "첫 문장은 짧게 바꾸고 세 가지 작업은 유지해줘",
+          exact: true,
+        })
+        .click();
+      if (computer) {
+        if (agent && journeyPurpose.id === "service") {
+          await page.getByRole("checkbox").first().uncheck();
+          await expect(finish).toBeEnabled();
+          await finish.click();
+          await expect(
+            page
+              .getByRole("region", { name: "단원 완료 요약", exact: true })
+              .getByTestId("first-project-setup-status"),
+          ).toContainText("실제 확인 대기");
+          await page.getByRole("button", { name: `${name} 학습 패널 열기`, exact: true }).click();
+          await page.getByRole("button", { name: `${name} 수업 시작`, exact: true }).click();
+          await expect(
+            page
+              .getByRole("region", { name: "첫 파일 실제 적용", exact: true })
+              .getByTestId("first-project-setup-status"),
+          ).toContainText("실제 확인 대기");
+        }
+        if (!agent) await expect(finish).toBeDisabled();
+        for (const checkbox of await page.getByRole("checkbox").all()) await checkbox.check();
+      }
+      if (agent) {
+        const actual = page.getByRole("region", { name: "첫 파일 실제 적용", exact: true });
+        if (computer) {
+          await expect(actual.getByTestId("first-project-setup-status")).not.toContainText(
+            "목표 결과 확인",
+          );
+          await expect(actual).toContainText("계속하기를 누르면");
+          await expect(actual.getByRole("radio")).toHaveCount(0);
+        } else {
+          await expect(actual).toContainText("예시 복습으로");
+          if (testInfo.project.name === "mobile")
+            await expect(actual.getByTestId("first-project-setup-status")).toContainText(
+              "실제 적용 전",
+            );
+        }
+        await actual.scrollIntoViewIfNeeded();
+        await page.screenshot({
+          path: testInfo.outputPath(`first-file-${computer ? "actual" : "example"}.png`),
+        });
+      }
+      await finish.click();
+      if (agent && computer)
+        await expect(
+          page
+            .getByRole("region", { name: "단원 완료 요약", exact: true })
+            .getByTestId("first-project-setup-status"),
+        ).toContainText("목표 결과 확인");
+      await openRecords(page);
+      if (agent && journeyPurpose.id === "service") await visitPractical(page, "agent");
+    }
+    if (journeyPurpose.id === "service") {
+      await page.getByRole("button", { name: "클래스 소개 보기", exact: true }).click();
+      await page.getByText("작업실에 남는 물건 살펴보기", { exact: true }).click();
+      await page.getByRole("button", { name: "작은 라디오 크게 보기", exact: true }).click();
+      await page.getByRole("button", { name: "이 활동 하러 가기 →", exact: true }).click();
+      const required = page.getByRole("dialog").locator("details[open]");
+      await expect(required).toContainText("AI 입문 · AI와 첫 대화");
+      await required
+        .getByRole("button", { name: "먼저 할 학습 시작: AI 입문 · AI와 첫 대화", exact: true })
+        .click();
+      await expect(
+        page.getByRole("heading", { level: 1, name: "AI와 첫 대화하기", exact: true }),
+      ).toBeFocused();
+      await page.getByRole("button", { name: "단원 지도 보기", exact: true }).click();
+      await openRecords(page);
+      await page.getByRole("button", { name: "도구 준비하기 장소로 이동", exact: true }).click();
+    }
+    async function checkRewardActivity() {
+      if (journeyPurpose.id !== "service") return;
+      await page.getByRole("button", { name: "클래스 소개 보기", exact: true }).click();
+      await page.getByText("작업실에 남는 물건 살펴보기", { exact: true }).click();
+      await page.getByRole("button", { name: "첫 노트북 크게 보기", exact: true }).click();
+      await page.getByRole("button", { name: "이 활동 하러 가기 →", exact: true }).click();
+      await expect(
+        page.getByRole("heading", { level: 1, name: "기획과 첫 제작", exact: true }),
+      ).toBeFocused();
+      await expect(page.getByTestId("workbook-journey")).not.toHaveAttribute("open", "");
+      await expect(
+        page.getByRole("region", { name: "기획과 첫 제작 지도", exact: true }),
+      ).toBeVisible();
+      await chooseMap(page, "AI 입문 지도로");
+      await openRecords(page);
+    }
+    let firstPurposePlan = true;
+    let unfinishedPracticalReviewed = false;
+    let completedLinkReviewed = false;
+    async function projectLesson(computer: boolean) {
+      await chooseMap(page, "기획과 첫 제작 지도로");
+      await openRecords(page);
+      await expect(
+        page.getByRole("region", { name: "기획과 첫 제작 지도", exact: true }),
+      ).toBeVisible();
+      await expect(
+        page.getByRole("region", { name: "기획과 첫 제작 지도", exact: true }).getByRole("img"),
+      ).toHaveAttribute("src", /map\.png/);
+      await expect(
+        page.getByRole("region", { name: "카피바라의 AI 입문 지도", exact: true }),
+      ).toHaveCount(0);
+      if (
+        await page
+          .getByRole("button", { name: "제작 요청 다듬기 · 기획을 먼저 적어요", exact: true })
+          .count()
+      ) {
+        await expect(
+          page.getByRole("button", { name: "제작 요청 다듬기 · 기획을 먼저 적어요", exact: true }),
+        ).toBeDisabled();
+      }
+      await openMapLesson(page, "기획과 자료 정하기");
+      await expect(page.getByRole("heading", { level: 1 })).toBeFocused();
+      if (firstPurposePlan) {
+        await expect(page.getByLabel("홈페이지 제목", { exact: true })).toHaveAttribute(
+          "placeholder",
+          journeyPurpose.fields.title,
+        );
+      }
+      await page.getByLabel("홈페이지 제목", { exact: true }).fill("친구에게 보여줄 작은 웹");
+      if (firstPurposePlan) {
+        await page.getByRole("button", { name: "빈 항목에 구성 예시 넣기", exact: true }).click();
+        await expect(page.getByLabel("홈페이지 제목", { exact: true })).toHaveValue(
+          "친구에게 보여줄 작은 웹",
+        );
+        await expect(page.getByLabel("누가 읽나요?", { exact: true })).toHaveValue(
+          journeyPurpose.fields.audience,
+        );
+        firstPurposePlan = false;
+      }
+      await page.getByLabel("누가 읽나요?", { exact: true }).fill("내 작업이 궁금한 친구");
+      await page
+        .getByLabel("읽은 뒤 무엇을 하길 바라나요?", { exact: true })
+        .fill("내용 목록에서 내가 만든 작업 살펴보기");
+      await page
+        .getByLabel("첫 소개 문장", { exact: true })
+        .fill("작은 웹을 만들고 직접 확인한 과정을 소개해요.");
+      await page
+        .getByLabel("소개할 내용 · 한 줄에 하나", { exact: true })
+        .fill("내 첫 소개 페이지\n버튼을 고친 기록");
+      await page.getByRole("button", { name: "다음으로", exact: true }).click();
+      const bridge = page.getByTestId("workbook-plan-request-bridge");
+      await expectPractical(page, "project");
+      await expect(bridge).toContainText("내 작업이 궁금한 친구");
+      await expect(bridge).toContainText("내용 목록에서 내가 만든 작업 살펴보기");
+      if (journeyPurpose.id === "service" && !unfinishedPracticalReviewed) {
+        unfinishedPracticalReviewed = true;
+        const draft = "내가 적은 초안을 유지하고, index.html의 제목과 목록부터 만들어줘.";
+        await page.getByLabel("내 제작 요청", { exact: true }).fill(draft);
+        await page.getByRole("button", { name: "단원 지도 보기", exact: true }).click();
+        const projectMap = page.getByRole("region", { name: "기획과 첫 제작 지도", exact: true });
+        const primary = projectMap.getByRole("button", {
+          name: "제작 요청 다듬기 선택",
+          exact: true,
+        });
+        const branch = projectMap.getByRole("button", {
+          name: "기능 범위 정하기 선택",
+          exact: true,
+        });
+        const branchPanel = page.getByRole("region", { name: "선택한 심화 장소", exact: true });
+        await expect(primary).toHaveAttribute("aria-current", "step");
+        await expect(page.getByText("1 / 3 학습 확인", { exact: true })).toBeVisible();
+        await branch.press("Enter");
+        await branchPanel
+          .getByRole("button", { name: "기능 범위 정하기 수업 시작", exact: true })
+          .press("Enter");
+        const branchLesson = page.getByRole("region", { name: "실전 심화 수업", exact: true });
+        const situation = practicalLabs.project.situations[0];
+        await branchLesson
+          .getByRole("button", { name: situation.options[situation.best], exact: true })
+          .click();
+        await branchLesson
+          .getByRole("button", { name: "같은 지도로 돌아가기 →", exact: true })
+          .click();
+        await expect(branch).toHaveAttribute("aria-pressed", "true");
+        await openStory(page);
+        await page
+          .getByRole("button", { name: "이야기 건너뛰고 학습 지도로 →", exact: true })
+          .click();
+        await expect(branch).toHaveAttribute("aria-pressed", "true");
+        await expect(branchPanel).toContainText("1 / 3 상황 살펴봄");
+        await expect(primary).toHaveAttribute("aria-current", "step");
+        await chooseMap(page, "AI 입문 지도로");
+        await chooseMap(page, "기획과 첫 제작 지도로");
+        await expect(branch).toHaveAttribute("aria-pressed", "true");
+        await expect(branchPanel).toContainText("1 / 3 상황 살펴봄");
+        await expect(page.getByText("1 / 3 학습 확인", { exact: true })).toBeVisible();
+        await page
+          .getByRole("button", { name: "다음 학습 장소 보기 →", exact: true })
+          .press("Enter");
+        const primaryPanel = page.getByRole("region", { name: "선택한 학습 장소", exact: true });
+        const resume = primaryPanel.getByRole("button", {
+          name: "제작 요청 다듬기 수업 시작",
+          exact: true,
+        });
+        await expect(resume).toBeFocused();
+        await expect(branchPanel).toBeHidden();
+        await resume.press("Enter");
+        await expect(page.getByLabel("내 제작 요청", { exact: true })).toHaveValue(draft);
+        await expect(bridge).toContainText("내 작업이 궁금한 친구");
+        await expect(bridge).toContainText("내용 목록에서 내가 만든 작업 살펴보기");
+      }
+      await expect(
+        page.getByText("준비된 요청 틀에 내가 입력한 기획을 넣어요.", { exact: true }),
+      ).toBeVisible();
+      await page
+        .getByRole("button", {
+          name: /내 기획으로 요청 초안 만들기|현재 기획으로 요청 초안 바꾸기/,
+        })
+        .dblclick();
+      await expect(page.getByLabel("내 제작 요청", { exact: true })).toHaveValue(
+        /친구에게 보여줄 작은 웹/,
+      );
+      await expect(page.getByLabel("내 제작 요청", { exact: true })).toHaveValue(
+        /내 작업이 궁금한 친구/,
+      );
+      await expect(page.getByLabel("내 제작 요청", { exact: true })).toHaveValue(
+        /내용 목록에서 내가 만든 작업 살펴보기/,
+      );
+      await expect(page.getByLabel("내 제작 요청", { exact: true })).toHaveValue(
+        /작은 웹을 만들고 직접 확인한 과정을 소개해요/,
+      );
+      await expect(page.getByLabel("내 제작 요청", { exact: true })).toHaveValue(
+        /내 첫 소개 페이지\n버튼을 고친 기록/,
+      );
+      await page
+        .getByLabel("내 제작 요청", { exact: true })
+        .fill("내가 다듬은 요청을 자동으로 지우지 마. index.html만 바꿔줘.");
+      await page.getByRole("button", { name: "이전 설명", exact: true }).click();
+      await page.getByLabel("홈페이지 제목", { exact: true }).fill("친구와 함께 만든 웹");
+      await page
+        .getByLabel("읽은 뒤 무엇을 하길 바라나요?", { exact: true })
+        .fill("첫 소개를 읽고 내 작업 살펴보기");
+      await page.getByRole("button", { name: "다음으로", exact: true }).click();
+      await expect(bridge).toContainText("첫 소개를 읽고 내 작업 살펴보기");
+      await expect(page.getByRole("status")).toContainText("기획이 바뀌었어요");
+      await expect(page.getByLabel("내 제작 요청", { exact: true })).toHaveValue(
+        "내가 다듬은 요청을 자동으로 지우지 마. index.html만 바꿔줘.",
+      );
+      await page.getByRole("button", { name: "단원 지도 보기", exact: true }).click();
+      await page.getByRole("button", { name: "목적 바꾸기", exact: true }).click();
+      await page.getByRole("button", { name: /아직 모르겠어요/ }).click();
+      await page.getByRole("button", { name: "목적 바꾸기", exact: true }).click();
+      await page.getByRole("button", { name: new RegExp(journeyPurpose.label) }).click();
+      await openRecords(page);
+      await page
+        .getByRole("button", {
+          name: /내 홈페이지 (기획하고 만들기 시작|단원 다시보기)/,
+          exact: true,
+        })
+        .click();
+      await expect(page.getByLabel("홈페이지 제목", { exact: true })).toHaveValue(
+        "친구와 함께 만든 웹",
+      );
+      await page.getByRole("button", { name: "다음으로", exact: true }).click();
+      await expect(page.getByLabel("내 제작 요청", { exact: true })).toHaveValue(
+        "내가 다듬은 요청을 자동으로 지우지 마. index.html만 바꿔줘.",
+      );
+      await page
+        .getByRole("button", { name: "현재 기획으로 요청 초안 바꾸기", exact: true })
+        .click();
+      await expect(page.getByLabel("내 제작 요청", { exact: true })).toHaveValue(
+        /친구와 함께 만든 웹/,
+      );
+      await expect(page.getByLabel("내 제작 요청", { exact: true })).toHaveValue(
+        /첫 소개를 읽고 내 작업 살펴보기/,
+      );
+      if (!computer)
+        await expect(
+          page.getByRole("button", { name: "내 파일로 제작 실습하기", exact: true }),
+        ).toBeDisabled();
+      const mode = page.getByRole("button", {
+        name: computer ? "내 파일로 제작 실습하기" : "기획 미리보기로 복습하기",
+        exact: true,
+      });
+      await mode.dblclick();
+      if (computer) {
+        await expect(
+          page.getByRole("region", { name: "내 파일 제작 순서", exact: true }),
+        ).toContainText("붙여넣고 보내요");
+        await expect(
+          page.getByRole("button", { name: "제작 요청 복사하기", exact: true }),
+        ).toBeEnabled();
+        await page.getByRole("button", { name: "제작 요청 복사하기", exact: true }).click();
+        await expect(
+          page.getByRole("status").filter({ hasText: /제작 요청을 복사했어요|복사하지 못했어요/ }),
+        ).toBeVisible();
+      }
+      await page.getByRole("button", { name: "다음으로", exact: true }).click();
+      await expect(page.getByRole("heading", { level: 1 })).toBeFocused();
+      const finish = page.getByRole("button", {
+        name: "2단원 마치고 다음 학습 보기 →",
+        exact: true,
+      });
+      await expect(finish).toBeDisabled();
+      if (computer)
+        await expect(page.getByLabel("다음 행동", { exact: true })).toContainText(
+          "직접 확인한 항목",
+        );
+      else await expect(page.getByLabel("다음 행동", { exact: true })).toContainText("내용 보기");
+      if (computer) {
+        for (const checkbox of await page.getByRole("checkbox").all()) await checkbox.check();
+      } else {
+        await page.getByRole("button", { name: "내용 보기", exact: true }).focus();
+        await page.keyboard.press("Enter");
+        await page.getByRole("button", { name: "내용 보기", exact: true }).dblclick();
+        await expect(
+          page.getByRole("status").filter({ hasText: "목록으로 이동했어요" }),
+        ).toBeVisible();
+        await expect(
+          page
+            .getByRole("region", { name: "내 기획 구성 미리보기", exact: true })
+            .getByText("버튼을 고친 기록", { exact: true }),
+        ).toBeVisible();
+      }
+      await page
+        .getByLabel("내 화면에서 확인한 점", { exact: true })
+        .fill("소개에서 내가 만드는 것을 알 수 있고 목록으로 이동했어요.");
+      await page.getByRole("button", { name: "이전 설명", exact: true }).click();
+      await mode.dblclick();
+      await page.getByRole("button", { name: "다음으로", exact: true }).click();
+      await expect(finish).toBeEnabled();
+      const firstOutcome = page.getByRole("region", { name: "내 결과물과 바뀐 점", exact: true });
+      await expect(firstOutcome).toContainText("친구와 함께 만든 웹");
+      await expect(firstOutcome).toContainText(
+        "소개에서 내가 만드는 것을 알 수 있고 목록으로 이동했어요.",
+      );
+      await expect(
+        page.getByRole("region", { name: "내 목적에 맞는 화면 확인 기준", exact: true }),
+      ).toContainText(getWorkbookPageReview(journeyPurpose.id).heading);
+      const outcomeUrl = page.url();
+      await page
+        .getByRole("button", { name: "내 결과물과 바뀐 점 모아보기 ↑", exact: true })
+        .click();
+      await expect(page).toHaveURL(outcomeUrl);
+      const actualDraft = page.getByRole("region", { name: "자기 초안 실제 적용", exact: true });
+      await expect(actualDraft.getByRole("radio")).toHaveCount(0);
+      if (computer) await expect(actualDraft).toContainText("계속하기를 누르면");
+      else await expect(actualDraft).toContainText("예시 복습으로");
+      await expect(finish).toBeInViewport({ ratio: 1 });
+      await actualDraft.scrollIntoViewIfNeeded();
+      await page.screenshot({
+        path: testInfo.outputPath(`first-draft-${computer ? "actual" : "example"}.png`),
+      });
+      await finish.click();
+      const completion = page.getByRole("region", { name: "단원 완료 요약", exact: true });
+      if (computer)
+        await expect(completion.getByTestId("first-project-project-status")).toContainText(
+          "목표 결과 확인",
+        );
+      await expect(completion).toContainText("친구와 함께 만든 웹");
+      await expect(completion).toContainText(
+        computer ? "컴퓨터 제작 · 본인 확인" : "학습 예시에서 확인한 결과",
+      );
+      await completion
+        .getByRole("button", { name: "기획 미리보기 크게 보기", exact: true })
+        .click();
+      const previewDialog = page.getByRole("dialog", { name: "완료한 화면 살펴보기", exact: true });
+      await expect(
+        previewDialog.getByRole("region", { name: "완료 요약 기획 예시", exact: true }),
+      ).toContainText("친구와 함께 만든 웹");
+      await previewDialog.press("Escape");
+
+      await openRecords(page);
+      await expect(
+        page.getByRole("region", { name: "기획과 첫 제작 지도", exact: true }),
+      ).toBeVisible();
+      await expect(page.getByRole("status").filter({ hasText: "현재 위치" })).toContainText(
+        "현재 위치 · 첫 화면 확인하기",
+      );
+      if (journeyPurpose.id === "service" && !completedLinkReviewed) {
+        completedLinkReviewed = true;
+        const guidance = page.getByRole("complementary", { name: "학습 패널", exact: true });
+        await expect(
+          guidance.getByRole("heading", { name: "화면과 사용 경험에서 이어가요", exact: true }),
+        ).toBeVisible();
+        await guidance
+          .getByRole("button", { name: "다음 학습 지도 보기 →", exact: true })
+          .press("Enter");
+        await expect(
+          page.getByRole("heading", { level: 1, name: "화면과 사용 경험", exact: true }),
+        ).toBeFocused();
+        await expect(
+          page.getByRole("region", { name: "화면과 사용 경험 지도", exact: true }),
+        ).toBeVisible();
+        await expect(page.getByText("0 / 3 학습 확인", { exact: true })).toBeVisible();
+        await chooseMap(page, "기획과 첫 제작 지도로");
+        await openRecords(page);
+        await expect(page.getByText("3 / 3 학습 확인", { exact: true })).toBeVisible();
+      }
+      if (journeyPurpose.id === "service") await visitPractical(page, "project");
+      await openMapLesson(page, "제작 요청 다듬기");
+      await expect(page.getByLabel("내 제작 요청", { exact: true })).toHaveValue(
+        /친구와 함께 만든 웹/,
+      );
+      await page.getByRole("button", { name: "단원 지도 보기", exact: true }).click();
+      await openRecords(page);
+      await expect(page.getByRole("status").filter({ hasText: "현재 위치" })).toContainText(
+        "현재 위치 · 제작 요청 다듬기",
+      );
+      await chooseMap(page, "AI 입문 지도로");
+      await openRecords(page);
+      await expect(
+        page.getByRole("button", { name: "에이전트와 바이브코딩 수업 시작", exact: true }),
+      ).toBeEnabled();
+      await chooseMap(page, "기획과 첫 제작 지도로");
+      await openRecords(page);
+      await openStory(page);
+      await page
+        .getByRole("button", { name: "이야기 건너뛰고 학습 지도로 →", exact: true })
+        .click();
+      await openRecords(page);
+      await expect(page.getByRole("status").filter({ hasText: "현재 위치" })).toContainText(
+        "현재 위치 · 제작 요청 다듬기",
+      );
+      await openMapLesson(page, "첫 화면 확인하기");
+      await expect(page.getByLabel("내 화면에서 확인한 점", { exact: true })).toHaveValue(
+        /소개에서/,
+      );
+      await page.getByRole("button", { name: "단원 지도 보기", exact: true }).click();
+      await openRecords(page);
+      await expect(
+        page.getByText(
+          computer ? "내 홈페이지 · 실제 제작 본인 확인" : "내 홈페이지 · 기획 미리보기 복습",
+          { exact: true },
+        ),
+      ).toBeVisible();
+      await openRecords(page);
+      await page.getByRole("button", { name: "내 홈페이지 단원 다시보기", exact: true }).click();
+      await expect(page.getByLabel("홈페이지 제목", { exact: true })).toHaveValue(
+        "친구와 함께 만든 웹",
+      );
+      await page.getByRole("button", { name: "단원 지도 보기", exact: true }).click();
+      await openRecords(page);
+      await expect(
+        page.getByRole("button", { name: "내 홈페이지 단원 다시보기", exact: true }),
+      ).toBeVisible();
+    }
+    if (testInfo.project.name === "desktop") {
+      await practiceLesson(false, true);
+      await practiceLesson(true, true);
+      await checkRewardActivity();
+      await expect(page.getByText("실제 실습 본인 확인", { exact: false })).toHaveCount(2);
+      await expect(page.getByRole("region", { name: "단원 완료 요약", exact: true })).toBeVisible();
+      await projectLesson(true);
+      await expect(page.getByLabel("단원 완료 기념", { exact: true })).toContainText("첫 노트북");
+    }
+
+    await chooseMap(page, "AI 입문 지도로");
+    await openRecords(page);
+    if (testInfo.project.name === "desktop")
+      await page.getByRole("button", { name: "도구 준비하기 장소로 이동", exact: true }).click();
+    await page.getByRole("button", { name: "도구 준비하기 수업 시작" }).click();
+    for (
+      let i = 0;
+      i < 12 && (await page.getByRole("button", { name: "이전 설명", exact: true }).count());
+      i++
+    )
+      await page.getByRole("button", { name: "이전 설명", exact: true }).click();
+    await page.getByRole("button", { name: "다음으로", exact: true }).click();
+    await page.getByRole("button", { name: "다음으로", exact: true }).click();
+    await expect(page.getByText(/이번 방문의 이전 기록/)).toContainText(
+      testInfo.project.name === "desktop" ? "컴퓨터 준비 확인" : "복습 확인",
+    );
+    if (testInfo.project.name === "desktop") {
+      await page.getByRole("button", { name: "컴퓨터에서 준비하기", exact: true }).click();
+      for (let i = 0; i < 7; i++)
+        await page.getByRole("button", { name: "다음으로", exact: true }).click();
+      await page
+        .getByRole("button", {
+          name: "작업 폴더 → 요청 → 파일 변경 → 실행·확인 → 수정 요청",
+          exact: true,
+        })
+        .click();
+      await page.getByRole("button", { name: "아직 준비가 필요해요", exact: true }).click();
+      await page.getByRole("button", { name: "준비 상태 챙겨 마을로 →" }).click();
+      await openRecords(page);
+      await expect(page.getByText("설명 확인 · 컴퓨터 준비 필요", { exact: true })).toBeVisible();
+      await expect(page.getByRole("region", { name: "단원 완료 요약", exact: true })).toBeVisible();
+    } else {
+      await page.getByRole("button", { name: "단원 지도 보기", exact: true }).click();
+      await openRecords(page);
+    }
+    await practiceLesson(false, false);
+    await practiceLesson(true, false);
+    if (testInfo.project.name === "mobile") await checkRewardActivity();
+    await expect(page.getByRole("region", { name: "단원 완료 요약", exact: true })).toBeVisible();
+    await projectLesson(false);
+    if (journeyPurpose.id === "service") {
+      if (testInfo.project.name === "mobile") {
+        await expect(page.getByLabel("단원 완료 기념", { exact: true })).toHaveCount(0);
+      }
+      await page.getByRole("button", { name: "클래스 소개 보기", exact: true }).click();
+      await page.getByText("작업실에 남는 물건 살펴보기", { exact: true }).click();
+      await page.getByRole("button", { name: "초록 잎 포스터 크게 보기", exact: true }).click();
+      await page.getByRole("button", { name: "이 활동 하러 가기 →", exact: true }).click();
+      await page.getByRole("link", { name: "← 클래스 목록", exact: true }).click();
+      await expect(page).toHaveURL(/\/workbook$/);
+      await page.goBack();
+      await expect(page).toHaveURL(/\/workbook\/classes\/vibe-web$/);
+      await expect(
+        page.getByRole("complementary", { name: "수집품 도착 안내", exact: true }),
+      ).toHaveCount(0);
+    }
+    await chooseMap(page, "화면과 사용 경험 지도로");
+    await openRecords(page);
+    await expect(
+      page.getByRole("region", { name: "화면과 사용 경험 지도", exact: true }).getByRole("img"),
+    ).toHaveAttribute("src", /experience-river-garden-v1/);
+    await expect(
+      page.getByRole("button", { name: /개선 요청 쓰기 · 두 화면과 문제/ }),
+    ).toBeDisabled();
+    await expect(page.getByRole("button", { name: /수정 전후 확인 · 개선 요청/ })).toBeDisabled();
+    await openMapLesson(page, "두 화면에서 문제 찾기");
+    await expect(page.getByRole("heading", { level: 1 })).toBeFocused();
+    const experienceAction = page.locator("#workbook-experience-next-action");
+    await expect(experienceAction).toContainText("아직 휴대폰 화면 확인이 남았어요.");
+    const nextExperience = page.getByRole("button", { name: "다음으로", exact: true });
+    await expect(nextExperience).toBeDisabled();
+    await expect(page.getByRole("region", { name: "소개 페이지 실험 화면" })).toContainText(
+      "친구와 함께 만든 웹",
+    );
+    await page.getByRole("button", { name: "이 화면에서 확인한 점 챙기기", exact: true }).click();
+    await expect(experienceAction).toContainText("아직 넓은 화면 확인이 남았어요.");
+    await page.getByRole("button", { name: "넓은 화면 560px", exact: true }).click();
+    await page.getByRole("button", { name: "이 화면에서 확인한 점 챙기기", exact: true }).click();
+    await expect(experienceAction).toContainText("관찰한 문제를 적어요.");
+    await page
+      .getByLabel("예시의 작은 화면에서 불편한 한 가지", { exact: true })
+      .fill("휴대폰에서 제목과 내용 목록의 오른쪽이 화면 밖으로 나가요.");
+    await nextExperience.click();
+    await page
+      .getByRole("button", { name: "관찰한 점으로 수정 요청 초안 만들기", exact: true })
+      .click();
+    await expect(page.getByLabel("연습 화면의 개선 요청", { exact: true })).toHaveValue(
+      /index.html[\s\S]*휴대폰/,
+    );
+    await page
+      .getByLabel("연습 화면의 개선 요청", { exact: true })
+      .fill("index.html의 페이지 너비만 화면에 맞게 바꾸고 목록 이동을 유지해줘.");
+    await page.getByRole("button", { name: "단원 지도 보기", exact: true }).click();
+    await openRecords(page);
+    await page
+      .getByRole("button", { name: "작은 화면에서 예시 페이지 확인하기 시작", exact: true })
+      .click();
+    await expect(page.getByLabel("연습 화면의 개선 요청", { exact: true })).toHaveValue(/너비만/);
+    await page.getByLabel("연습 화면의 개선 요청", { exact: true }).fill("");
+    await expect(nextExperience).toBeDisabled();
+    await page.getByRole("button", { name: "단원 지도 보기", exact: true }).click();
+    await openRecords(page);
+    await expect(page.getByRole("button", { name: /수정 전후 확인 · 개선 요청/ })).toBeDisabled();
+    await openMapLesson(page, "개선 요청 쓰기");
+    await expectPractical(page, "experience");
+    await page
+      .getByLabel("연습 화면의 개선 요청", { exact: true })
+      .fill("index.html의 페이지 너비만 화면에 맞게 바꾸고 목록 이동을 유지해줘.");
+    await page.getByRole("button", { name: "단원 지도 보기", exact: true }).click();
+    await openRecords(page);
+    await expect(page.getByRole("status").filter({ hasText: "현재 위치" })).toContainText(
+      "현재 위치 · 개선 요청 쓰기",
+    );
+    await expect(page.getByLabel("선택한 학습 장소").getByRole("heading")).toHaveText(
+      "개선 요청 쓰기",
+    );
+    await openMapLesson(page, "두 화면에서 문제 찾기");
+    await expect(
+      page.getByLabel("예시의 작은 화면에서 불편한 한 가지", { exact: true }),
+    ).toHaveValue(/휴대폰/);
+    await page.getByRole("button", { name: "단원 지도 보기", exact: true }).click();
+    await openRecords(page);
+    await openMapLesson(page, "수정 전후 확인", "Enter");
+    const finishExperience = page.getByRole("button", {
+      name: "화면 비교 기록 챙겨 마을로 →",
+      exact: true,
+    });
+    await expect(finishExperience).toBeDisabled();
+    await expect(experienceAction).toContainText("수정한 예시를 열어요.");
+    await page
+      .getByRole("button", { name: "예시의 페이지 너비를 화면에 맞추기", exact: true })
+      .click();
+    // 지도 왕복 후에도 마지막 화면 선택이 남으므로 비교할 크기를 명시한다.
+    await page.getByRole("button", { name: "휴대폰 280px", exact: true }).click();
+    const experimentPreview = page.getByRole("region", { name: "소개 페이지 실험 화면" });
+    expect(await experimentPreview.evaluate((el) => el.scrollWidth <= el.clientWidth + 1)).toBe(
+      true,
+    );
+    await page
+      .getByRole("button", { name: "이 화면에서 확인한 점 챙기기", exact: true })
+      .dblclick();
+    await page.getByRole("button", { name: "내용 보기", exact: true }).press("Enter");
+    await expect(experienceAction).toContainText("수정한 넓은 화면에서");
+    await page.getByRole("button", { name: "넓은 화면 560px", exact: true }).click();
+    await page.getByRole("button", { name: "이 화면에서 확인한 점 챙기기", exact: true }).click();
+    await page.getByRole("button", { name: "수정 전 보기", exact: true }).click();
+    await page.getByRole("button", { name: "휴대폰 280px", exact: true }).click();
+    expect(await experimentPreview.evaluate((el) => el.scrollWidth > el.clientWidth + 1)).toBe(
+      true,
+    );
+    await page.getByRole("button", { name: "수정 후 보기", exact: true }).click();
+    await page
+      .getByLabel("예시 수정 전후 달라진 점", { exact: true })
+      .fill("수정 전에는 오른쪽이 넘쳤고 수정 후에는 화면 안에 들어오며 같은 목록으로 이동했어요.");
+    await page.getByRole("button", { name: "이전 설명", exact: true }).click();
+    await nextExperience.click();
+    await expect(finishExperience).toBeEnabled();
+    const comparedOutcome = page.getByRole("region", { name: "내 결과물과 바뀐 점", exact: true });
+    await expect(comparedOutcome).toContainText("친구와 함께 만든 웹");
+    await expect(comparedOutcome).toContainText(
+      "수정 전에는 오른쪽이 넘쳤고 수정 후에는 화면 안에 들어오며 같은 목록으로 이동했어요.",
+    );
+    await expect(comparedOutcome).toContainText(
+      "페이지 너비 비교 예시 · 실제 파일 수정 결과는 별도",
+    );
+    await page.getByRole("button", { name: "내 결과물과 바뀐 점 모아보기 ↑", exact: true }).click();
+    await expect(
+      comparedOutcome.getByRole("heading", { name: "내 결과물과 바뀐 점", exact: true }),
+    ).toBeInViewport();
+    await recordApplication(true);
+    await expect(comparedOutcome).toContainText("직접 적용·확인 · 본인 기록");
+    await finishExperience.click();
+    const completion = page.getByRole("region", { name: "단원 완료 요약", exact: true });
+    await expect(completion).toContainText("수정 전에는 오른쪽이 넘쳤고");
+    await expect(completion).toContainText("학습 예시에서 확인한 결과");
+    await page.screenshot({
+      path: `/tmp/workbook-completion-summary-${testInfo.project.name}.png`,
+    });
+    if (journeyPurpose.id === "service") {
+      const previewTrigger = completion.getByRole("button", {
+        name: "수정 전 예시 크게 보기",
+        exact: true,
+      });
+      await previewTrigger.click();
+      const screens = page.getByRole("dialog", { name: "완료한 화면 살펴보기", exact: true });
+      await expect(screens).toContainText("실제 파일이나 AI 응답을 가져온 화면은 아니에요");
+      const beforeScreen = screens.getByRole("region", {
+        name: "완료 요약 수정 전 예시",
+        exact: true,
+      });
+      const afterScreen = screens.getByRole("region", {
+        name: "완료 요약 수정 후 예시",
+        exact: true,
+      });
+      await expect(beforeScreen).toBeVisible();
+      await expect(afterScreen).toBeVisible();
+      expect(
+        await beforeScreen.evaluate((element) => element.scrollWidth > element.clientWidth),
+      ).toBe(true);
+      expect(
+        await afterScreen.evaluate((element) => element.scrollWidth <= element.clientWidth),
+      ).toBe(true);
+      const screenshot = await afterScreen.screenshot();
+      await page.screenshot({
+        path: `/tmp/workbook-completion-compare-${testInfo.project.name}.png`,
+      });
+      await screens.getByRole("button", { name: "PC 너비", exact: true }).click();
+      await expect(screens.getByRole("button", { name: "PC 너비", exact: true })).toHaveAttribute(
+        "aria-pressed",
+        "true",
+      );
+      await screens.press("Escape");
+      await expect(previewTrigger).toBeFocused();
+      await previewTrigger.click();
+      await screens.getByRole("button", { name: "직접 첨부한 화면", exact: true }).click();
+      await expect(screens).toContainText("이 브라우저에 임시 저장해요");
+      const beforeInput = screens.getByLabel("내 화면 · 수정 전 스크린샷 선택", { exact: true });
+      await beforeInput.setInputFiles({
+        name: "invalid.txt",
+        mimeType: "text/plain",
+        buffer: Buffer.from("not an image"),
+      });
+      await expect(screens.getByRole("alert")).toContainText("5MB 이하");
+      await beforeInput.setInputFiles({
+        name: "before.png",
+        mimeType: "image/png",
+        buffer: screenshot,
+      });
+      await expect(
+        screens.getByRole("img", { name: "내 화면 · 수정 전 · 직접 첨부한 스크린샷", exact: true }),
+      ).toBeVisible();
+      await screens
+        .getByLabel("내 화면 · 수정 후 스크린샷 선택", { exact: true })
+        .setInputFiles({ name: "after.png", mimeType: "image/png", buffer: screenshot });
+      await expect(
+        screens.getByRole("img", { name: "내 화면 · 수정 후 · 직접 첨부한 스크린샷", exact: true }),
+      ).toBeVisible();
+      await screens
+        .getByRole("button", { name: "내 화면 · 수정 전 첨부 제거", exact: true })
+        .click();
+      await expect(
+        screens.getByRole("img", { name: "내 화면 · 수정 전 · 직접 첨부한 스크린샷", exact: true }),
+      ).toHaveCount(0);
+      await beforeInput.setInputFiles({
+        name: "before.png",
+        mimeType: "image/png",
+        buffer: screenshot,
+      });
+      await expect(screens.getByRole("img")).toHaveCount(2);
+      await page.screenshot({
+        path: `/tmp/workbook-completion-actual-${testInfo.project.name}.png`,
+      });
+      await screens.getByRole("button", { name: "완료 화면 닫기", exact: true }).click();
+      await expect(
+        completion.getByRole("button", { name: "직접 첨부한 화면 2장 보기", exact: true }),
+      ).toBeFocused();
+      await expect(completion.getByRole("img")).toHaveCount(2);
+    }
+
+    if (journeyPurpose.id === "service") {
+      const notice = page.getByLabel("단원 완료 기념", { exact: true });
+      await expect(notice).toContainText("초록 잎 포스터");
+      await expect(notice.getByRole("link")).toHaveAttribute(
+        "href",
+        "/workbook#workspace-collectible-print",
+      );
+      await notice.scrollIntoViewIfNeeded();
+      await page.screenshot({
+        path: `/tmp/workbook-completion-keepsake-${testInfo.project.name}.png`,
+      });
+      await notice.getByRole("link", { name: "작업실에서 확인하기 →", exact: true }).click();
+      const item = page.getByRole("region", { name: "초록 잎 포스터 수집 안내", exact: true });
+      await expect(item).toBeFocused();
+      await expect(
+        item.getByRole("button", { name: "초록 잎 포스터 받기", exact: true }),
+      ).toBeVisible();
+      await item.getByRole("button", { name: "초록 잎 포스터 받기", exact: true }).click();
+      await expect(
+        page.getByRole("complementary", { name: "수집품 도착 안내", exact: true }),
+      ).toHaveCount(0);
+      await page.goBack();
+      await expect(page).toHaveURL(/\/workbook\/classes\/vibe-web$/);
+      await expect(
+        page.getByRole("button", { name: "직접 첨부한 화면 2장 보기", exact: true }),
+      ).toBeVisible();
+      await expect(
+        page.getByRole("complementary", { name: "학습 중 수집 목표", exact: true }),
+      ).toHaveCount(0);
+    }
+    await openRecords(page);
+    if (journeyPurpose.id === "service") await visitPractical(page, "experience");
+    await expect(
+      page.getByText("화면과 사용 경험 · 예시 비교 복습", { exact: true }),
+    ).toBeVisible();
+    await openStory(page);
+    await page.getByRole("button", { name: "이야기 건너뛰고 학습 지도로 →", exact: true }).click();
+    await openRecords(page);
+    await expect(page.getByRole("status").filter({ hasText: "현재 위치" })).toContainText(
+      "현재 위치 · 수정 전후 확인",
+    );
+    await page.getByRole("link", { name: "← 클래스 목록", exact: true }).click();
+    await expect(page).toHaveURL(/\/workbook$/);
+    await page.goBack();
+    await expect(page).toHaveURL(/\/workbook\/classes\/vibe-web$/);
+    await expect(page.getByRole("status").filter({ hasText: "현재 위치" })).toContainText(
+      "현재 위치 · 수정 전후 확인",
+    );
+    await page.goForward();
+    await expect(page).toHaveURL(/\/workbook$/);
+    await page.goBack();
+    await expect(
+      page.getByRole("button", {
+        name: "화면과 사용 경험 지도로",
+        exact: true,
+        includeHidden: true,
+      }),
+    ).toHaveAttribute("aria-pressed", "true");
+    await openRecords(page);
+    await page.getByRole("button", { name: "화면과 사용 경험 단원 다시보기", exact: true }).click();
+    await expect(page.getByLabel("예시 수정 전후 달라진 점", { exact: true })).toHaveValue(
+      /화면 안/,
+    );
+    await page.getByText("선택 · 내 파일에서 더 해보기", { exact: true }).click();
+    await expect(
+      page.getByRole("region", { name: "내 프로젝트 적용 기록", exact: true }).getByRole("status"),
+    ).toContainText("직접 적용·확인");
+    await page.getByRole("button", { name: "단원 지도 보기", exact: true }).click();
+    await openRecords(page);
+
+    await chooseMap(page, "AI 입문 지도로");
+    await openRecords(page);
+    await expect(page.getByText("AI와 첫 대화 · 예시 복습", { exact: true })).toBeVisible();
+    await page.getByText("AI와 첫 대화 · 예시 복습", { exact: true }).click();
+    await expect(page.getByRole("region", { name: "첫 맵의 학습 기록" })).toContainText(
+      "첫 문장이 길어요.",
+    );
+    // 작업실 수집 상태만 영속화하며 수업·시뮬레이션 데이터는 저장하지 않는다.
+    const storageBeforeData = await page.evaluate(() =>
+      Object.entries(localStorage).filter(([key]) => key !== "motivo.workbook.room.v1"),
+    );
+    await expect(
+      page.getByRole("button", { name: "친구에게 보여주기 전후 확인하기 시작", exact: true }),
+    ).toBeDisabled();
+    await chooseMap(page, "동작과 데이터 지도로", true);
+    await openRecords(page);
+    const dataMap = page.getByRole("region", { name: "동작과 데이터 지도", exact: true });
+    await expect(dataMap.getByRole("img")).toHaveAttribute("src", /data-alpine-archive-v1/);
+    await expect(
+      page.getByRole("button", {
+        name: /새로고침과 저장 · (메모를 입력하고 표시해요|상세 보기 판단을 먼저 남겨요)/,
+        exact: true,
+      }),
+    ).toBeDisabled();
+    await expect(
+      page.getByRole("button", {
+        name: /다른 기기와 서버 · (저장 전후 새로고침을 먼저 비교해요|저장 판단을 먼저 남겨요)/,
+        exact: true,
+      }),
+    ).toBeDisabled();
+    await openMapLesson(page, "입력과 화면 변화", "Enter");
+    await expect(page.getByRole("heading", { level: 1 })).toBeFocused();
+    await expect(
+      page.getByRole("region", { name: "내 목적에 필요한 기능과 데이터", exact: true }),
+    ).toContainText(getWorkbookPurposeStages(journeyPurpose.id).dataQuestion);
+    await expect(
+      page.getByRole("complementary", { name: "이번 단계의 실습 위치", exact: true }),
+    ).toContainText("워크북 예시");
+    await expect(page.getByLabel("다음 행동", { exact: true })).toContainText("예측해");
+    const dataNext = page.getByRole("button", { name: "다음으로", exact: true });
+    const memo = page.getByRole("region", { name: "홈페이지 메모 예시", exact: true });
+    await expect(dataNext).toBeDisabled();
+    await page
+      .getByRole("button", { name: "입력하는 즉시 페이지에 나타나요", exact: true })
+      .click();
+    await page
+      .getByLabel("예시에 표시할 한 줄", { exact: true })
+      .fill("제목과 버튼을 친구가 읽기 쉽게 고치기");
+    await expect(memo).toContainText("아직 표시한 메모가 없어요");
+    await page.getByRole("button", { name: "화면에 표시하기", exact: true }).dblclick();
+    await expect(memo).toContainText("제목과 버튼을 친구가 읽기 쉽게 고치기");
+    await dataNext.click();
+    await page
+      .getByRole("button", { name: "화면에 보였으니 새로고침해도 남아요", exact: true })
+      .click();
+    await page
+      .getByRole("button", { name: "저장 없이 새로고침 흉내 내기", exact: true })
+      .dblclick();
+    await expect(memo).toContainText("아직 표시한 메모가 없어요");
+    await expect(dataNext).toBeDisabled();
+    await expect(page.getByLabel("다음 행동", { exact: true })).toContainText("저장 흉내 내기");
+    await page
+      .getByRole("button", { name: "방금 문장을 브라우저에 저장 흉내 내기", exact: true })
+      .dblclick();
+    await page.getByRole("button", { name: "저장 후 새로고침 흉내 내기", exact: true }).dblclick();
+    await expect(memo).toContainText("제목과 버튼을 친구가 읽기 쉽게 고치기");
+    await page.getByRole("button", { name: "단원 지도 보기", exact: true }).click();
+    await openRecords(page);
+    await expect(
+      dataMap.getByRole("button", { name: "새로고침과 저장 선택", exact: true }),
+    ).toHaveAttribute("aria-current", "step");
+    await openMapLesson(page, "새로고침과 저장", "Enter");
+    await expect(memo).toContainText("제목과 버튼을 친구가 읽기 쉽게 고치기");
+    await page.getByRole("button", { name: "단원 지도 보기", exact: true }).click();
+    await openRecords(page);
+    await openMapLesson(page, "다른 기기와 서버", "Enter");
+    await expectPractical(page, "data");
+    const dataFinish = page.getByRole("button", {
+      name: "동작과 데이터 기록 챙겨 마을로 →",
+      exact: true,
+    });
+    await expect(dataFinish).toBeDisabled();
+    await page
+      .getByRole("button", { name: "다른 기기에도 같은 메모가 보여요", exact: true })
+      .click();
+    await page.getByRole("button", { name: "다른 기기 예시 보기", exact: true }).press("Enter");
+    await expect(memo).toContainText("다른 기기의 메모");
+    await expect(memo).toContainText("표시할 메모가 없어요");
+    await page
+      .getByRole("button", { name: "혼자 이 브라우저에서만 다시 읽는 메모", exact: true })
+      .click();
+    await expect(dataFinish).toBeDisabled();
+    await page
+      .getByRole("button", { name: "친구가 다른 컴퓨터에서 쓴 답장을 함께 읽기", exact: true })
+      .click();
+    await page
+      .getByLabel("표시·저장·공유가 다른 이유", { exact: true })
+      .fill(
+        "화면에 보인 값은 저장과 달랐고, 한 브라우저의 메모도 다른 기기에 없었어요. 친구의 답장을 함께 읽으려면 서버와 공유 저장소가 필요해요.",
+      );
+    await page.getByRole("button", { name: "이 브라우저 예시 보기", exact: true }).press("Space");
+    await expect(memo).toContainText("제목과 버튼을 친구가 읽기 쉽게 고치기");
+    await page.getByRole("button", { name: "이전 설명", exact: true }).click();
+    await dataNext.click();
+    await expect(dataFinish).toBeEnabled();
+    await recordApplication(false);
+    await dataFinish.click();
+    await expect(page.getByRole("region", { name: "단원 완료 요약", exact: true })).toContainText(
+      "다른 기기와 연결할 때의 판단",
+    );
+    await openRecords(page);
+    if (journeyPurpose.id === "service") await visitPractical(page, "data");
+    await expect(
+      page.getByText("동작과 데이터 · 저장 시뮬레이션 복습", { exact: true }),
+    ).toBeVisible();
+    await openStory(page);
+    await page.getByRole("button", { name: "이야기 건너뛰고 학습 지도로 →", exact: true }).click();
+    await openRecords(page);
+    await expect(
+      dataMap.getByRole("button", { name: "다른 기기와 서버 선택", exact: true }),
+    ).toHaveAttribute("aria-current", "step");
+    await page.getByRole("link", { name: "← 클래스 목록", exact: true }).click();
+    await expect(page).toHaveURL(/\/workbook$/);
+    await page.goBack();
+    await expect(page).toHaveURL(/\/workbook\/classes\/vibe-web$/);
+    await expect(
+      dataMap.getByRole("button", { name: "다른 기기와 서버 선택", exact: true }),
+    ).toHaveAttribute("aria-current", "step");
+    await page.goForward();
+    await expect(page).toHaveURL(/\/workbook$/);
+    await page.goBack();
+    await expect(page).toHaveURL(/\/workbook\/classes\/vibe-web$/);
+    await expect(dataMap).toBeVisible();
+    await expect(page.getByText("학습·제작 기록 확인", { exact: true })).toBeVisible();
+    await openRecords(page);
+    await page.getByRole("button", { name: "동작과 데이터 단원 다시보기", exact: true }).click();
+    await page.getByRole("button", { name: "다른 기기 예시 보기", exact: true }).dblclick();
+    await expect(dataFinish).toBeEnabled();
+    await expect(page.getByLabel("표시·저장·공유가 다른 이유", { exact: true })).toHaveValue(
+      /친구의 답장/,
+    );
+    await page.getByRole("button", { name: "단원 지도 보기", exact: true }).click();
+    await openRecords(page);
+    await openMapLesson(page, "입력과 화면 변화");
+    await page.getByLabel("예시에 표시할 한 줄", { exact: true }).fill("다른 메모로 다시 확인하기");
+    await page.getByRole("button", { name: "단원 지도 보기", exact: true }).click();
+    await openRecords(page);
+    await expect(
+      page.getByRole("button", {
+        name: /새로고침과 저장 · (메모를 입력하고 표시해요|상세 보기 판단을 먼저 남겨요)/,
+        exact: true,
+      }),
+    ).toBeDisabled();
+    await expect(
+      page.getByRole("button", {
+        name: /다른 기기와 서버 · (저장 전후 새로고침을 먼저 비교해요|저장 판단을 먼저 남겨요)/,
+        exact: true,
+      }),
+    ).toBeDisabled();
+    await expect(
+      page.getByRole("button", { name: "친구에게 보여주기 전후 확인하기 시작", exact: true }),
+    ).toBeEnabled();
+    await openMapLesson(page, "입력과 화면 변화");
+    await page.getByRole("button", { name: "화면에 표시하기", exact: true }).click();
+    await dataNext.click();
+    await page.getByRole("button", { name: "저장 없이 새로고침 흉내 내기", exact: true }).click();
+    await page
+      .getByRole("button", { name: "방금 문장을 브라우저에 저장 흉내 내기", exact: true })
+      .click();
+    await page.getByRole("button", { name: "저장 후 새로고침 흉내 내기", exact: true }).click();
+    await dataNext.click();
+    await page.getByRole("button", { name: "다른 기기 예시 보기", exact: true }).click();
+    await page
+      .getByRole("button", { name: "친구가 다른 컴퓨터에서 쓴 답장을 함께 읽기", exact: true })
+      .click();
+    await page
+      .getByLabel("표시·저장·공유가 다른 이유", { exact: true })
+      .fill("표시는 저장과 다르고 친구 기기에는 공유 저장소가 필요해요.");
+    await page.getByText("선택 · 내 파일에서 더 해보기", { exact: true }).click();
+    await expect(
+      page.getByRole("region", { name: "내 프로젝트 적용 기록", exact: true }).getByRole("status"),
+    ).toContainText("아직 직접 적용 전");
+    await dataFinish.click();
+    await expect(page.getByRole("region", { name: "단원 완료 요약", exact: true })).toContainText(
+      "다른 기기와 연결할 때의 판단",
+    );
+    await openRecords(page);
+    expect(
+      await page.evaluate(() =>
+        Object.entries(localStorage).filter(([key]) => key !== "motivo.workbook.room.v1"),
+      ),
+    ).toEqual(storageBeforeData);
+    await chooseMap(page, "공개와 운영 지도로");
+    await openRecords(page);
+    const publishMap = page.getByRole("region", { name: "공개와 운영 지도", exact: true });
+    await expect(publishMap.getByRole("img")).toHaveAttribute("src", /publish-harbour-v1/);
+    await expect(publishMap.getByRole("button", { name: /^주소와 배포/ })).toBeDisabled();
+    await expect(publishMap.getByRole("button", { name: /공개 후 문제 해결/ })).toBeDisabled();
+    await openMapLesson(page, "공개 전 점검", "Enter");
+    await expect(
+      page.getByRole("region", { name: "내 목적의 공개 전 확인 기준", exact: true }),
+    ).toContainText(getWorkbookPurposeStages(journeyPurpose.id).publishChecks[0]);
+    const publishNext = page.getByRole("button", { name: "다음으로", exact: true });
+    await expect(publishNext).toBeDisabled();
+    await expect(page.getByRole("heading", { level: 1 })).toBeFocused();
+    await page.getByRole("button", { name: "테스트 계정 비밀번호", exact: true }).click();
+    await page.getByRole("button", { name: "내용 보기", exact: true }).press("Enter");
+    await page
+      .getByRole("checkbox", { name: "휴대폰 예시의 제목·소개·목록을 읽었어요", exact: true })
+      .check();
+    await page.getByRole("button", { name: "넓은 화면 560px", exact: true }).click();
+    await page
+      .getByRole("checkbox", { name: "넓은 화면 예시의 제목·소개·목록을 읽었어요", exact: true })
+      .check();
+    await expect(publishNext).toBeDisabled();
+    await page
+      .getByRole("button", { name: "공개 여부를 확인한 제목·소개·작업 목록", exact: true })
+      .click();
+    await publishNext.click();
+    await page
+      .getByRole("button", { name: "내 컴퓨터 주소 · http://localhost:3211", exact: true })
+      .click();
+    await page.getByRole("button", { name: "친구 기기 접속 흉내 내기", exact: true }).dblclick();
+    const friend = page.getByRole("region", { name: "친구 접속 결과 예시", exact: true });
+    await expect(friend).toContainText("내 홈페이지를 읽을 수 없어요");
+    await expect(page.getByLabel("다음 행동", { exact: true })).toContainText("공개 서버");
+    await expect(publishNext).toBeDisabled();
+    await page
+      .getByRole("button", {
+        name: "공개 서버 주소 예시 · https://my-work.example.invalid",
+        exact: true,
+      })
+      .click();
+    await page
+      .getByRole("button", { name: "친구 기기 접속 흉내 내기", exact: true })
+      .press("Space");
+    await expect(friend).toContainText("실제 공개 주소는 없어요");
+    await page
+      .getByLabel("주소와 실제 배포가 다른 이유", { exact: true })
+      .fill(
+        "localhost는 친구의 컴퓨터를 가리켜요. 실제 파일을 공개 서버에 배포하고 다른 기기로 확인해야 해요.",
+      );
+    await page.getByRole("button", { name: "단원 지도 보기", exact: true }).click();
+    await openRecords(page);
+    await expect(
+      publishMap.getByRole("button", { name: "주소와 배포 선택", exact: true }),
+    ).toHaveAttribute("aria-current", "step");
+    await openMapLesson(page, "주소와 배포", "Space");
+    await expect(page.getByLabel("주소와 실제 배포가 다른 이유", { exact: true })).toHaveValue(
+      /공개 서버/,
+    );
+    await publishNext.click();
+    const publishFinish = page.getByRole("button", {
+      name: "공개와 운영 기록 챙겨 마을로 →",
+      exact: true,
+    });
+    await expectPractical(page, "publish");
+    const issue = page.getByRole("region", { name: "운영 오류 예시", exact: true });
+    await expect(publishFinish).toBeDisabled();
+    await page.getByRole("button", { name: "예시 버튼 눌러보러 가기", exact: true }).click();
+    await expect(page.getByRole("button", { name: "추가 작업 보기", exact: true })).toBeFocused();
+    await page.getByRole("button", { name: "추가 작업 보기", exact: true }).press("Enter");
+    await expect(issue).toContainText("추가 목록이 나타나지 않았어요");
+    await page.getByLabel("어느 화면에서 눌렀나요?", { exact: true }).fill("휴대폰 280px 예시");
+    await page
+      .getByLabel("무엇을 눌렀나요?", { exact: true })
+      .fill("추가 작업 보기 버튼을 눌렀어요");
+    await page.getByLabel("무엇이 나타나야 하나요?", { exact: true }).fill("추가 작업 목록");
+    await page
+      .getByLabel("실제로 무엇이 보였나요?", { exact: true })
+      .fill("목록이 나타나지 않았어요");
+    await page
+      .getByRole("button", { name: "문제 기록으로 수정 요청 만들기", exact: true })
+      .dblclick();
+    await expect(page.getByLabel("예시 버튼의 수정 요청", { exact: true })).toHaveValue(
+      /버튼만 고쳐줘/,
+    );
+    await page.getByRole("button", { name: "예시 버튼 수정 적용하기", exact: true }).dblclick();
+    await expect(publishFinish).toBeDisabled();
+    await page.getByRole("button", { name: "추가 작업 보기", exact: true }).press("Space");
+    await expect(issue.getByText("추가 작업 목록이 나타났어요.", { exact: true })).toBeVisible();
+    await expect(
+      issue.getByRole("heading", { name: "추가 작업 목록 · 수정한 예시", exact: true }),
+    ).toBeVisible();
+    await page
+      .getByLabel("예시 버튼을 다시 눌러 확인한 변화", { exact: true })
+      .fill("수정 전에는 그대로였고 다시 누르니 추가 목록이 보여요.");
+    await page.getByRole("button", { name: "예시 버튼 수정 적용하기", exact: true }).dblclick();
+    await expect(publishFinish).toBeEnabled();
+    await page.getByRole("button", { name: "이전 설명", exact: true }).click();
+    await publishNext.click();
+    await expect(issue.getByText("추가 작업 목록이 나타났어요.", { exact: true })).toBeVisible();
+    await expect(publishFinish).toBeEnabled();
+    const classSummary = page.getByRole("region", { name: "클래스 마무리", exact: true });
+    await expect(classSummary).toContainText("친구와 함께 만든 웹");
+    await expect(classSummary).toContainText(journeyPurpose.goal);
+    await expect(classSummary).toContainText(getWorkbookPurposeStages(journeyPurpose.id).next[0]);
+    await expect(classSummary).toContainText("실제 적용 확인이 남은 작업");
+    await expect(classSummary).toContainText("내 목적에 맞는 다음 한 걸음");
+    await recordApplication(true);
+    await expect(classSummary).toContainText("직접 적용·확인 · 본인 기록");
+    await publishFinish.click();
+    await expect(page.getByRole("region", { name: "단원 완료 요약", exact: true })).toContainText(
+      "예시에서 재현한 문제",
+    );
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+      "배운 것과 내 파일, 다음 할 일",
+    );
+    await expect(classSummary).toContainText("제작 4/4단원");
+    await page.getByRole("button", { name: "학습 지도로", exact: true }).click();
+    await openRecords(page);
+    if (journeyPurpose.id === "service") await visitPractical(page, "publish");
+    await expect(classSummary).toBeVisible();
+    await openRecords(page);
+    await expect(
+      page.getByText("공개와 운영 · 예시 점검 복습 · 실제 배포 별도", { exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "이번 방문의 제작 흐름에서 챙긴 것", exact: true }),
+    ).toBeVisible();
+    await page.getByRole("link", { name: "← 클래스 목록", exact: true }).click();
+    const resume = page.getByRole("region", { name: "클래스 이어하기", exact: true });
+    await expect(resume).toContainText(journeyPurpose.goal);
+    await expect(resume).toContainText("공개와 운영 · 3/3 학습 확인");
+    const completedApplications = testInfo.project.name === "desktop" ? 3 : 2;
+    await expect(resume.getByRole("definition").filter({ hasText: /단원 확인/ })).toContainText(
+      `${completedApplications}/4단원 확인`,
+    );
+    await resume.getByRole("link", { name: "남은 내 파일 작업 보기 →", exact: true }).click();
+    await expect(page.getByRole("heading", { level: 1 })).toContainText(
+      testInfo.project.name === "desktop" ? "동작과 데이터" : "기획과 첫 제작",
+    );
+    await expect(
+      page.getByRole("region", { name: "내 프로젝트 적용 기록", exact: true }),
+    ).toBeVisible();
+    await page.getByRole("button", { name: "마지막 정리로", exact: true }).click();
+    await expect(classSummary).toContainText(`${completedApplications}/4단원 확인`);
+    await expect(classSummary).toContainText("아직 남은 확인");
+    if (journeyPurpose.id === "service" && testInfo.project.name === "desktop") {
+      await classSummary
+        .getByRole("button", { name: "남은 내 파일 작업 이어가기 →", exact: true })
+        .click();
+      const application = page.getByRole("region", { name: "내 프로젝트 적용 기록", exact: true });
+      await application
+        .getByRole("button", { name: "내 파일에 적용한 결과 적기", exact: true })
+        .click();
+      await page.getByRole("button", { name: "마지막 정리로", exact: true }).click();
+      await expect(classSummary).toContainText("3/4단원 확인");
+      await classSummary
+        .getByRole("button", { name: "남은 내 파일 작업 이어가기 →", exact: true })
+        .click();
+      for (let i = 0; i < 1; i++) {
+        await application
+          .getByRole("button", { name: "내 파일에 적용한 결과 적기", exact: true })
+          .click();
+        await application
+          .getByLabel("내 파일에서 확인한 결과", { exact: true })
+          .fill("검증용 본인 기록: 내 파일에서 확인했어요.");
+        await application
+          .getByLabel("남은 문제 또는 문제없음", { exact: true })
+          .fill("검증용 메모: 다시 살펴볼 부분이 있어요.");
+        await application
+          .getByLabel("직접 다시 확인한 근거", { exact: true })
+          .fill("검증용 본인 확인 근거예요.");
+        await application
+          .getByRole("button", { name: "직접 확인한 결과로 기록하기", exact: true })
+          .click();
+        await page.getByRole("button", { name: "마지막 정리로", exact: true }).click();
+      }
+      await expect(classSummary).toContainText("4/4단원 확인");
+      await expect(classSummary).toContainText("남긴 문제·다음 개선");
+      await expect(
+        classSummary.getByRole("button", { name: "남은 내 파일 작업 이어가기 →", exact: true }),
+      ).toHaveCount(0);
+      await page.getByRole("link", { name: "Workbook", exact: true }).click();
+      await expect(
+        resume.getByRole("link", { name: "남은 내 파일 작업 보기 →", exact: true }),
+      ).toHaveCount(0);
+      await resume.getByRole("link", { name: "클래스 마지막 정리 보기 →", exact: true }).click();
+      await classSummary
+        .getByRole("button", { name: "동작과 데이터 · 적용 기록 다시 보기 →", exact: true })
+        .click();
+      await application
+        .getByRole("button", { name: "아직 직접 적용하지 않았어요", exact: true })
+        .click();
+      await page.getByRole("button", { name: "마지막 정리로", exact: true }).click();
+      await expect(classSummary).toContainText("3/4단원 확인");
+      await classSummary
+        .getByRole("button", { name: "기획과 첫 제작 · 적용 기록 다시 보기 →", exact: true })
+        .click();
+      await application
+        .getByRole("button", { name: "아직 직접 적용하지 않았어요", exact: true })
+        .click();
+      await page.getByRole("button", { name: "마지막 정리로", exact: true }).click();
+      await expect(classSummary).toContainText("2/4단원 확인");
+    }
+    await page.getByRole("button", { name: "학습 지도로", exact: true }).click();
+    await openStory(page);
+    await page.getByRole("button", { name: "이야기 건너뛰고 학습 지도로 →", exact: true }).click();
+    await openRecords(page);
+    await expect(
+      publishMap.getByRole("button", { name: "공개 후 문제 해결 선택", exact: true }),
+    ).toHaveAttribute("aria-current", "step");
+    await page.getByRole("link", { name: "← 클래스 목록", exact: true }).click();
+    await page.waitForURL("**/workbook");
+    await page.goBack();
+    await page.waitForURL("**/workbook/classes/vibe-web");
+    await expect(
+      publishMap.getByRole("button", { name: "공개 후 문제 해결 선택", exact: true }),
+    ).toHaveAttribute("aria-current", "step");
+    await openRecords(page);
+    await page.getByRole("button", { name: "공개와 운영 단원 다시보기", exact: true }).click();
+    await expect(publishFinish).toBeEnabled();
+    await page
+      .getByLabel("예시 버튼의 수정 요청", { exact: true })
+      .fill("추가 작업 보기 버튼만 고치고 제목과 기존 내용은 유지해줘.");
+    await expect(publishFinish).toBeDisabled();
+    await page.getByRole("button", { name: "예시 버튼 수정 적용하기", exact: true }).click();
+    await page.getByRole("button", { name: "추가 작업 보기", exact: true }).click();
+    await expect(publishFinish).toBeEnabled();
+    await publishFinish.click();
+    await expect(page.getByRole("region", { name: "단원 완료 요약", exact: true })).toContainText(
+      "예시에서 재현한 문제",
+    );
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+      "배운 것과 내 파일, 다음 할 일",
+    );
+    await expect(classSummary).toContainText("제작 4/4단원");
+    await page.getByRole("button", { name: "학습 지도로", exact: true }).click();
+    await openRecords(page);
+    expect(
+      await page.evaluate(() =>
+        Object.entries(localStorage).filter(([key]) => key !== "motivo.workbook.room.v1"),
+      ),
+    ).toEqual(storageBeforeData);
+    const applicationSummary = page.getByRole("region", {
+      name: "내 프로젝트 적용 상태",
+      exact: true,
+    });
+    await expect(applicationSummary).toContainText("화면과 사용 경험 · 직접 적용·확인 · 본인 기록");
+    await expect(applicationSummary).toContainText("동작과 데이터 · 아직 직접 적용 전");
+    await applicationSummary
+      .getByText("공개와 운영 · 직접 적용·확인 · 본인 기록", { exact: true })
+      .press("Enter");
+    await expect(
+      applicationSummary
+        .locator("details")
+        .filter({ hasText: "공개와 운영 · 직접 적용·확인 · 본인 기록" })
+        .getByText("두 화면에서 다시 눌러 같은 목록을 확인했어요.", { exact: true }),
+    ).toBeVisible();
+    await expect(applicationSummary.getByRole("link")).toHaveCount(0);
+    // 기획 초안 편집은 기존 학습·관찰·적용 기록을 지우지 않는다.
+    const priorApplications = (await applicationSummary.textContent()) ?? "";
+    await openRecords(page);
+    await page.getByRole("button", { name: "내 홈페이지 단원 다시보기", exact: true }).click();
+    await page.getByLabel("홈페이지 제목", { exact: true }).fill("다른 주제의 첫 화면");
+    await page.getByRole("button", { name: "단원 지도 보기", exact: true }).click();
+    await openRecords(page);
+    for (const name of [
+      "화면과 사용 경험 단원 다시보기",
+      "동작과 데이터 단원 다시보기",
+      "공개와 운영 단원 다시보기",
+    ]) {
+      await expect(page.getByRole("button", { name, exact: true })).toBeEnabled();
+    }
+    await expect(applicationSummary).toHaveText(priorApplications);
+    // 학습 기록을 다시 고쳐도 이미 도착한 수집품은 기념으로 남는다.
+    await expect
+      .poll(() =>
+        page.evaluate(
+          () => JSON.parse(localStorage.getItem("motivo.workbook.room.v1") ?? "{}").available,
+        ),
+      )
+      .toEqual(expect.arrayContaining(["print", "radio", "bonsai"]));
+    // 완료 뒤에도 첫 장소로 돌아가 복습할 수 있다.
+    await chooseMap(page, "AI 입문 지도로");
+    await openRecords(page);
+    await page
+      .getByRole("button", { name: /AI 이해하기 (장소로 이동|학습 패널 열기)/, exact: true })
+      .click();
+    await page.getByRole("button", { name: "AI 이해하기 수업 시작", exact: true }).click();
+    await page.getByRole("button", { name: "단원 지도 보기", exact: true }).click();
+    await openRecords(page);
+    await expect(page.getByRole("region", { name: "단원 완료 요약", exact: true })).toBeVisible();
+  });
+}

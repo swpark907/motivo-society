@@ -1,0 +1,43 @@
+// 표지·본문·편집 미리보기에서 같은 비율과 초점을 사용한다.
+@mixin frame {
+  --editorial-photo-ratio: 16 / 9;
+  --editorial-photo-focus: 50%;
+  --editorial-photo-zoom: 1;
+  position: relative;
+  display: block;
+  overflow: hidden;
+  aspect-ratio: var(--editorial-photo-ratio);
+  &[data-ratio="square"] {
+    --editorial-photo-ratio: 1;
+  }
+  &[data-ratio="portrait"] {
+    --editorial-photo-ratio: 4 / 5;
+  }
+  &[data-focus="left"] {
+    --editorial-photo-focus: 20%;
+  }
+  &[data-focus="right"] {
+    --editorial-photo-focus: 80%;
+  }
+  &[data-crop="detail"] {
+    --editorial-photo-zoom: 1.25;
+  }
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: var(--editorial-photo-focus) center;
+    transform: scale(var(--editorial-photo-zoom));
+    transform-origin: var(--editorial-photo-focus) center;
+  }
+}
+@mixin caption {
+  margin: var(--space-3) 0 0;
+  font-size: var(--editorial-type-caption);
+  font-weight: var(--editorial-weight-body);
+  line-height: var(--editorial-leading-caption);
+  color: var(--ink-muted);
+  text-align: left;
+  overflow-wrap: anywhere;
+}

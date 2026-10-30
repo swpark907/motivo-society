@@ -1,0 +1,1 @@
+export const MAX_EDITORIAL_JSON_BYTES = 16 * 1024 * 1024;

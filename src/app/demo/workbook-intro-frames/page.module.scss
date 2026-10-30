@@ -1,0 +1,32 @@
+.page {
+  padding: 24px;
+  background: #f3f0e9;
+  color: #292b28;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+}
+.grid figure {
+  margin: 0;
+  background: #fff;
+}
+.frame {
+  width: 100%;
+  aspect-ratio: 1;
+  background-size: 600% 400%;
+  background-repeat: no-repeat;
+  filter: saturate(0.78);
+  image-rendering: pixelated;
+  clip-path: inset(5% 2% 0);
+}
+.grid figcaption {
+  padding: 4px;
+  font-size: 12px;
+}
+@media (max-width: 650px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

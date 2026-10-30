@@ -1,0 +1,330 @@
+.room {
+  button {
+    min-height: 44px;
+    padding: var(--space-2) var(--space-3);
+    background: var(--surface-2);
+    color: var(--ink);
+    border: 1px solid var(--line);
+    border-radius: var(--space-2);
+    font: inherit;
+    font-size: 0.75rem;
+    cursor: pointer;
+    &[aria-pressed="true"] {
+      border-color: var(--accent);
+    }
+    &:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+    }
+    &:disabled {
+      opacity: 0.45;
+      cursor: default;
+    }
+  }
+}
+.collectionNote {
+  scroll-margin-block: 100px;
+  &:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+  margin-block: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--line);
+  font-size: 0.75rem;
+  p,
+  small {
+    font-size: 0.75rem;
+    line-height: 1.65;
+    color: var(--ink-muted);
+    margin-block: var(--space-2);
+  }
+  small,
+  a {
+    display: block;
+  }
+  a {
+    margin-top: var(--space-2);
+    text-decoration: underline;
+  }
+}
+.heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  padding-block: var(--space-6);
+  small {
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    color: var(--ink-muted);
+  }
+  h3 {
+    font-size: clamp(1.2rem, 3vw, 1.75rem);
+  }
+  p {
+    font-size: 0.8rem;
+    color: var(--ink-muted);
+  }
+}
+.layout {
+  display: grid;
+  gap: var(--space-6);
+  align-items: start;
+  @include up(lg) {
+    grid-template-columns: minmax(0, 1fr) 280px;
+  }
+}
+.environment {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+  label {
+    display: grid;
+    gap: var(--space-1);
+    font-size: 0.7rem;
+    flex: 1 1 180px;
+  }
+  select {
+    width: 100%;
+    font: inherit;
+    min-height: 44px;
+    padding: var(--space-2);
+    background: var(--surface-2);
+    color: var(--ink);
+    border: 1px solid var(--line);
+    border-radius: var(--space-2);
+  }
+  small {
+    font-size: 0.65rem;
+    color: var(--ink-muted);
+    flex-basis: 100%;
+  }
+}
+.windowView {
+  pointer-events: none;
+  clip-path: polygon(9% 18%, 41% 10%, 41% 44%, 9% 52%);
+}
+.sceneArea {
+  min-width: 0;
+  position: relative;
+  scroll-margin-top: 86px;
+  @include up(lg) {
+    position: sticky;
+    top: 76px;
+  }
+  z-index: 1;
+  background: var(--surface);
+}
+.backToRoom {
+  @include up(lg) {
+    display: none;
+  }
+}
+.scene {
+  display: block;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: var(--space-3);
+}
+.base {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.layer {
+  position: absolute;
+  max-width: none;
+  object-fit: fill;
+  pointer-events: none;
+}
+.deskSet,
+.loungeSet {
+  pointer-events: none;
+  object-fit: fill;
+}
+.deskSet {
+  // 가구 접점은 한 장으로 유지하고, 방과 만나는 바깥 경계만 부드럽게 합성한다.
+  mask-image:
+    linear-gradient(to right, transparent 44%, var(--ink) 46%, var(--ink) 74%, transparent 76%),
+    linear-gradient(to bottom, transparent 24%, var(--ink) 26%, var(--ink) 64%, transparent 66%);
+  mask-composite: intersect;
+}
+.loungeSet {
+  mask-image:
+    linear-gradient(to right, transparent 11%, var(--ink) 13%, var(--ink) 34%, transparent 36%),
+    linear-gradient(to bottom, transparent 42%, var(--ink) 44%, var(--ink) 74%, transparent 76%);
+  mask-composite: intersect;
+}
+.activities {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-2);
+  padding-top: var(--space-3);
+}
+.note {
+  font-size: 0.7rem;
+  color: var(--ink-muted);
+  margin-block: var(--space-3);
+}
+.collection {
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  h4 {
+    font-size: 1rem;
+  }
+  small {
+    color: var(--ink-muted);
+    font-size: 0.65rem;
+  }
+  h5 {
+    font-size: 0.95rem;
+    margin-top: var(--space-6);
+  }
+  > p {
+    font-size: 0.75rem;
+    color: var(--ink-muted);
+  }
+}
+.slots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  button {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+  span {
+    font-size: 0.5rem;
+    color: var(--accent);
+  }
+}
+.items {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 0;
+    gap: var(--space-1);
+  }
+  strong {
+    font-size: 0.75rem;
+  }
+}
+.swatch {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 1.5;
+  color: var(--accent);
+  font-size: 2rem;
+}
+.savebar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  padding-block: var(--space-3);
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+  margin-top: var(--space-6);
+  span {
+    flex: 1 1 120px;
+    font-size: 0.7rem;
+    color: var(--ink-muted);
+  }
+  button:last-child {
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+}
+
+.placementMark {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+  animation: placementNotice 3500ms linear forwards;
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+.placementFrame {
+  position: absolute;
+  inset: -6px;
+  border: 2px solid var(--accent);
+  border-radius: var(--space-2);
+}
+.placementLabel {
+  position: absolute;
+  top: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: var(--space-1) var(--space-2);
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--accent);
+  border-radius: var(--space-1);
+  font-size: 0.7rem;
+  line-height: 1.5;
+  white-space: nowrap;
+  [data-edge="right"] & {
+    left: auto;
+    right: 0;
+    transform: none;
+  }
+}
+@keyframes placementNotice {
+  0%,
+  96.6% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.sceneShell {
+  display: block;
+  position: relative;
+}
+.room .roomItemButton {
+  position: absolute;
+  z-index: 3;
+  transform: translate(-50%, -50%);
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 1px solid transparent;
+  background: transparent;
+  border-radius: var(--space-2);
+  cursor: pointer;
+  &:hover,
+  &:focus-visible {
+    border-color: var(--accent);
+  }
+}
+
+.infoActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}

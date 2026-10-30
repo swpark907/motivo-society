@@ -4,17 +4,21 @@
 // and reduced-motion users get the final composed frame immediately.
 import Image from "next/image";
 import { useCallback, useEffect, useState, type Ref } from "react";
+import { REEL_KEY_HINT, REEL_KEYSHORTCUTS, useReelKeyboard } from "./useReelKeyboard";
 import styles from "./WebPossibilitiesReel.module.scss";
 
 const TICK = 50;
 /** Each example shows its subtitle alone for this long before the motion starts. */
 const LEAD = 1200;
-const END = 36000 + LEAD * 3;
+const END = 45000 + LEAD * 4;
 export const WEB_REEL_END_SECONDS = END / 1000;
-/** Playback speed over the cue timeline (39.6s of cues → about 23s). */
-const SPEED = 1.7;
+/** Playback speed over the cue timeline (49.8s of cues → about 28s). */
+const SPEED = 1.8;
 
-/** Cue times (ms) for the 1-1-1 "how far can a website go" scene. */
+/**
+ * Cue times (ms) for the "how far can a website go" scene. Each example starts with its
+ * subtitle alone; its motion cues come one LEAD later.
+ */
 const CUE = {
   title: 200,
   one: 1200,
@@ -22,58 +26,80 @@ const CUE = {
   typeEnd: 2800 + LEAD,
   blocks: [3000, 3400, 3700, 4300, 4600, 4900, 5200, 5600].map((ms) => ms + LEAD),
   layerOne: 7200 + LEAD,
+  // 02 나만의 서비스 — a small tool: enter numbers, get the answer
   two: 9800 + LEAD,
-  blog: [10200, 10600, 11000, 11300, 11600].map((ms) => ms + LEAD * 2),
-  cursorIn: 12200 + LEAD * 2,
-  cursorToCard: 12700 + LEAD * 2,
-  clickCard: 13900 + LEAD * 2,
-  detail: 14200 + LEAD * 2,
-  layerTwo: 16400 + LEAD * 2,
+  tool: 10200 + LEAD * 2,
+  amountStart: 10600 + LEAD * 2,
+  amountEnd: 11300 + LEAD * 2,
+  people: 11500 + LEAD * 2,
+  toolCursorIn: 11800 + LEAD * 2,
+  toolCursorToButton: 12100 + LEAD * 2,
+  toolClick: 13200 + LEAD * 2,
+  result: 13500 + LEAD * 2,
+  shares: [13900, 14100, 14300, 14500].map((ms) => ms + LEAD * 2),
+  layerTwo: 15800 + LEAD * 2,
+  // 03 플랫폼 — many people post and browse; a new post joins the board
   three: 18800 + LEAD * 2,
-  form: [19100, 19400, 19700].map((ms) => ms + LEAD * 3),
-  cursorToButton: 20400 + LEAD * 3,
-  clickButton: 21500 + LEAD * 3,
-  duplicate: 21800 + LEAD * 3,
-  capacity: 22200 + LEAD * 3,
-  dot: 22300 + LEAD * 3,
-  row: 23100 + LEAD * 3,
-  counter: 23300 + LEAD * 3,
-  mail: 23900 + LEAD * 3,
-  manual: [26000, 26300, 26600, 26900, 27200].map((ms) => ms + LEAD * 3),
-  fold: 28700 + LEAD * 3,
-  layerThree: 29700 + LEAD * 3,
-  reveal: 31200 + LEAD * 3,
-  frame: 31700 + LEAD * 3,
-  chips: 32400 + LEAD * 3,
-  finale: 33200 + LEAD * 3,
-  finaleLine: 34000 + LEAD * 3,
+  board: [19200, 19600, 20000, 20300, 20600].map((ms) => ms + LEAD * 3),
+  boardCursorIn: 21200 + LEAD * 3,
+  boardCursorToUpload: 21700 + LEAD * 3,
+  uploadClick: 22900 + LEAD * 3,
+  newPost: 23200 + LEAD * 3,
+  boardCount: 23400 + LEAD * 3,
+  layerThree: 25400 + LEAD * 3,
+  // 04 판매와 결제 — the real class sign-up flow: apply, check, notify
+  four: 27800 + LEAD * 3,
+  form: [28100, 28400, 28700].map((ms) => ms + LEAD * 4),
+  cursorToButton: 29400 + LEAD * 4,
+  clickButton: 30500 + LEAD * 4,
+  duplicate: 30800 + LEAD * 4,
+  capacity: 31200 + LEAD * 4,
+  dot: 31300 + LEAD * 4,
+  row: 32100 + LEAD * 4,
+  counter: 32300 + LEAD * 4,
+  mail: 32900 + LEAD * 4,
+  manual: [35000, 35300, 35600, 35900, 36200].map((ms) => ms + LEAD * 4),
+  fold: 37700 + LEAD * 4,
+  layerFour: 38700 + LEAD * 4,
+  reveal: 40200 + LEAD * 4,
+  frame: 40700 + LEAD * 4,
+  chips: 41400 + LEAD * 4,
+  finale: 42200 + LEAD * 4,
+  finaleLine: 43000 + LEAD * 4,
 };
 
 const EXAMPLES = [
   {
     phase: "one",
     n: "01",
-    title: "소개 페이지",
+    title: "포트폴리오",
     layer: "화면",
-    line: (
-      <>
-        나를, 내 일을 한 화면에 보여줘요. <b>이 클래스에서 직접 만들 거예요.</b>
-      </>
-    ),
+    line: "나를 보여주는 포트폴리오를 만들어 볼 수도 있고,",
+    ours: true,
   },
   {
     phase: "two",
     n: "02",
-    title: "블로그",
+    title: "나만의 서비스",
     layer: "동작",
-    line: "글이 쌓이고, 골라 읽고, 둘러볼 수 있어요.",
+    line: "상상만 해봤던 나만의 서비스를 만들어볼 수도 있고,",
+    ours: false,
   },
   {
     phase: "three",
     n: "03",
-    title: "운영 자동화",
+    title: "플랫폼",
     layer: "데이터",
-    line: "신청이 들어오면 정리하고, 확인하고, 안내까지. 손으로 하던 일을 웹에 맡길 수 있어요.",
+    line: "여러 사람들이 즐기고 활동하는 플랫폼을 만들어볼 수도 있어요.",
+    ours: false,
+  },
+  {
+    phase: "four",
+    n: "04",
+    title: "판매와 결제",
+    layer: "운영",
+    line: "그리고 판매, 결제 시스템 등을 만들어 사업의 운영까지 웹에 맡겨볼 수도 있어요.",
+    ours: false,
   },
 ] as const;
 
@@ -88,20 +114,29 @@ const WORKS = [
 const POSTS = [
   {
     src: "/images/workbook/notes/describe-the-result-v1.png",
-    tag: "기록",
+    author: "들판",
     title: "원하는 결과를 먼저 그려보기",
   },
   {
     src: "/images/workbook/notes/check-the-source-v1.png",
-    tag: "습관",
+    author: "바다",
     title: "출처를 한 번 더 확인하는 이유",
   },
   {
     src: "/images/workbook/notes/leave-a-handoff-v1.png",
-    tag: "회고",
+    author: "하늘",
     title: "다음의 나에게 메모 남기기",
   },
 ];
+const NEW_POST = {
+  src: "/images/workbook/notes/show-the-screen-v1.png",
+  author: "모쏘",
+  title: "화면을 보여주며 부탁하기",
+};
+
+/** 02 나만의 서비스: 모임 회비 나누기. */
+const AMOUNT = "120,000";
+const MEMBERS = ["모쏘", "들판", "바다", "하늘"];
 
 const MANUAL = [
   "DM으로 온 신청 확인",
@@ -111,10 +146,11 @@ const MANUAL = [
   "기한 지난 신청 정리",
 ];
 
-type Phase = "one" | "two" | "three" | "finale";
+type Phase = "one" | "two" | "three" | "four" | "finale";
 
 function phaseAt(t: number): Phase {
   if (t >= CUE.reveal) return "finale";
+  if (t >= CUE.four) return "four";
   if (t >= CUE.three) return "three";
   if (t >= CUE.two) return "two";
   return "one";
@@ -126,6 +162,8 @@ export function WebPossibilitiesReel({
   hold = false,
   browserRef,
   inStage = false,
+  onPrev,
+  onNext,
 }: {
   /** Seconds to start from (scene 2 reopens at its end when coming back). */
   startAt?: number;
@@ -136,6 +174,9 @@ export function WebPossibilitiesReel({
   browserRef?: Ref<HTMLDivElement>;
   /** Rendered inside the class intro card instead of as a full page. */
   inStage?: boolean;
+  /** ← before the first example / → after the last one move to the neighbouring intro scene. */
+  onPrev?: () => void;
+  onNext?: () => void;
 }) {
   const [t, setT] = useState(() => Math.min(END, Math.max(0, startAt * 1000)));
   const [playing, setPlaying] = useState(!paused);
@@ -188,6 +229,23 @@ export function WebPossibilitiesReel({
     else setPlaying((p) => !p);
   }, [t, replay]);
 
+  useReelKeyboard({
+    t,
+    end: END,
+    steps: [0, CUE.two, CUE.three, CUE.four, CUE.reveal],
+    rate: SPEED,
+    disabled: hold,
+    still: reduced,
+    onPrev,
+    onNext,
+    toggle,
+    seek: (ms) => {
+      // Stepping back from the finished frame plays again; otherwise the play state stays as is.
+      if (t >= END && ms < END) setPlaying(true);
+      setT(ms);
+    },
+  });
+
   const at = (ms: number) => t >= ms;
   const show = (ms: number) => (at(ms) ? styles.in : styles.out);
   const phase = phaseAt(t);
@@ -201,27 +259,46 @@ export function WebPossibilitiesReel({
       ),
     ),
   );
+  const amount = AMOUNT.slice(
+    0,
+    Math.max(
+      0,
+      Math.min(
+        AMOUNT.length,
+        Math.ceil(((t - CUE.amountStart) / (CUE.amountEnd - CUE.amountStart)) * AMOUNT.length),
+      ),
+    ),
+  );
   const address =
     phase === "one"
       ? typed
       : phase === "two"
-        ? at(CUE.detail)
-          ? "dailynote.blog/posts/draw-the-result"
-          : "dailynote.blog"
-        : "weekend-class.kr/apply";
+        ? "split.tools/dutch"
+        : phase === "three"
+          ? "makers.board"
+          : "weekend-class.kr/apply";
   const finished = t >= END;
 
   let cursor = { x: 50, y: 96, visible: false, click: false };
-  if (phase === "two" && at(CUE.cursorIn)) {
-    const moved = at(CUE.cursorToCard) && !at(CUE.detail);
+  if (phase === "two" && at(CUE.toolCursorIn)) {
+    const moved = at(CUE.toolCursorToButton);
     cursor = {
       x: moved ? 24 : 50,
-      y: moved ? 78 : 96,
-      visible: !at(CUE.detail + 500),
-      click: at(CUE.clickCard) && !at(CUE.clickCard + 400),
+      y: moved ? 74 : 96,
+      visible: !at(CUE.result + 500),
+      click: at(CUE.toolClick) && !at(CUE.toolClick + 400),
     };
   }
-  if (phase === "three" && at(CUE.three + 600)) {
+  if (phase === "three" && at(CUE.boardCursorIn)) {
+    const moved = at(CUE.boardCursorToUpload);
+    cursor = {
+      x: moved ? 88 : 60,
+      y: moved ? 9 : 40,
+      visible: !at(CUE.newPost + 500),
+      click: at(CUE.uploadClick) && !at(CUE.uploadClick + 400),
+    };
+  }
+  if (phase === "four" && at(CUE.four + 600)) {
     const moved = at(CUE.cursorToButton);
     cursor = {
       x: moved ? 18 : 40,
@@ -235,6 +312,7 @@ export function WebPossibilitiesReel({
     <section
       className={`paper ${styles.reel} ${inStage ? styles.inStage : ""}`}
       aria-labelledby="web-reel-title"
+      aria-keyshortcuts={REEL_KEYSHORTCUTS}
     >
       <div className={styles.captions}>
         <span className={styles.eyebrow}>HOW FAR CAN THE WEB GO</span>
@@ -253,6 +331,8 @@ export function WebPossibilitiesReel({
               <span className={styles.num}>{example.n}</span>
               <b>{example.title}</b>
               <em>{example.layer}</em>
+              {/* 네 예시 중 이 클래스에서 직접 만드는 것은 01뿐이다. */}
+              {example.ours && <span className={styles.ours}>이 클래스</span>}
             </li>
           ))}
         </ol>
@@ -262,11 +342,11 @@ export function WebPossibilitiesReel({
         <div
           className={styles.viewport}
           role="img"
-          aria-label="하나의 브라우저 창이 공방 소개 페이지, 블로그, 클래스 신청 자동화 예시로 차례로 바뀌고, 마지막에 그 창이 이 강의 화면 안에 있었음을 보여주는 장면"
+          aria-label="하나의 브라우저 창이 공방 소개 페이지, 회비 나누기 도구, 여러 사람이 작업을 올리는 게시판, 클래스 신청과 입금 확인 자동화 예시로 차례로 바뀌고, 마지막에 그 창이 이 강의 화면 안에 있었음을 보여주는 장면"
         >
           <div className={`${styles.workbookFrame} ${show(CUE.frame)}`}>
             <div className={styles.frameBar}>
-              <span>1-1-1 · 강의 인트로</span>
+              <span>WEB CLASS · 클래스 인트로</span>
               <span>지금 이 화면</span>
             </div>
             <div className={styles.frameCaptions}>
@@ -351,70 +431,102 @@ export function WebPossibilitiesReel({
                 <span className={`${styles.layerTag} ${show(CUE.layerOne)}`}>화면</span>
               </div>
 
-              {/* Scene 2 — blog home → post detail */}
+              {/* Scene 2 — a small tool of my own: split a group fee */}
               <div
-                className={`${styles.scene} ${styles.blog} ${phase === "two" ? styles.in : styles.out}`}
+                className={`${styles.scene} ${styles.tool} ${phase === "two" ? styles.in : styles.out}`}
               >
-                <header className={`${styles.blogNav} ${show(CUE.blog[0])}`}>
-                  <b>daily note</b>
-                  <span>전체 · 기록 · 습관 · 회고</span>
-                </header>
-                <div className={`${styles.blogHome} ${at(CUE.detail) ? styles.dimmed : ""}`}>
-                  <article className={`${styles.featured} ${show(CUE.blog[1])}`}>
-                    <span className={styles.thumb}>
-                      <Image
-                        src="/images/workbook/notes/show-the-screen-v1.png"
-                        alt=""
-                        loading="eager"
-                        fill
-                        sizes="30vw"
-                      />
+                <div className={`${styles.toolForm} ${show(CUE.tool)}`}>
+                  <header>
+                    <b>모임 회비 나누기</b>
+                    <span>나만 쓰려고 만든 작은 도구</span>
+                  </header>
+                  <label>
+                    <span>총 금액</span>
+                    <span className={styles.toolField}>
+                      {amount}
+                      {at(CUE.amountStart) && <em>원</em>}
                     </span>
-                    <div>
-                      <small>추천 글 · 기록</small>
-                      <strong>화면을 보여주며 부탁하면 달라지는 것</strong>
-                      <p>말로만 설명하던 걸 화면 한 장으로 보여줬더니, 대화가 짧아졌어요.</p>
-                      <time>10월 28일 · 4분</time>
-                    </div>
-                  </article>
-                  <div className={styles.postGrid}>
-                    {POSTS.map((post, i) => (
-                      <article
-                        key={post.title}
-                        className={`${styles.post} ${show(CUE.blog[2 + i])} ${i === 0 && at(CUE.clickCard) ? styles.pressed : ""}`}
-                      >
-                        <span className={styles.thumb}>
-                          <Image src={post.src} alt="" loading="eager" fill sizes="15vw" />
-                        </span>
-                        <small>{post.tag}</small>
-                        <b>{post.title}</b>
-                      </article>
-                    ))}
-                  </div>
-                </div>
-                <article className={`${styles.detail} ${at(CUE.detail) ? styles.open : ""}`}>
-                  <span className={styles.detailCover}>
-                    <Image src={POSTS[0].src} alt="" loading="eager" fill sizes="40vw" />
+                  </label>
+                  <label className={show(CUE.people)}>
+                    <span>인원</span>
+                    <span className={styles.toolField}>
+                      {MEMBERS.length}
+                      <em>명</em>
+                    </span>
+                  </label>
+                  <span
+                    className={`${styles.toolButton} ${show(CUE.people)} ${at(CUE.toolClick) && !at(CUE.toolClick + 400) ? styles.pressed : ""}`}
+                  >
+                    나누기
                   </span>
-                  <div>
-                    <small>기록 · 10월 26일</small>
-                    <strong>{POSTS[0].title}</strong>
-                    <p>
-                      무엇을 만들고 싶은지보다, 다 만들어졌을 때 어떤 모습이면 좋을지를 먼저
-                      적어봤어요.
-                    </p>
-                    <p>
-                      종이에 대충 그린 화면 한 장이 긴 설명보다 많은 걸 전해줬어요. 그 뒤로는
-                      시작하기 전에 결과를 먼저 그려보는 습관이 생겼어요.
-                    </p>
-                  </div>
-                </article>
+                </div>
+                <div className={`${styles.toolResult} ${show(CUE.result)}`}>
+                  <small>한 사람에</small>
+                  <strong>30,000원</strong>
+                  <ul>
+                    {MEMBERS.map((member, i) => (
+                      <li key={member} className={show(CUE.shares[i])}>
+                        <i aria-hidden>{member[0]}</i>
+                        {member}
+                        <b>30,000원</b>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
                 <span className={`${styles.layerTag} ${show(CUE.layerTwo)}`}>동작</span>
               </div>
 
-              {/* Scene 3 — class sign-up automation (mirrors the real class sign-up flow) */}
+              {/* Scene 3 — a platform: many people post; a new post joins the board */}
               <div
-                className={`${styles.scene} ${styles.ops} ${phase === "three" || phase === "finale" ? styles.in : styles.out}`}
+                className={`${styles.scene} ${styles.blog} ${phase === "three" ? styles.in : styles.out}`}
+              >
+                <header className={`${styles.blogNav} ${show(CUE.board[0])}`}>
+                  <b>makers board</b>
+                  <span>
+                    작업 {at(CUE.boardCount) ? 129 : 128}개 · 멤버 36명
+                    <span
+                      className={`${styles.uploadButton} ${at(CUE.uploadClick) && !at(CUE.uploadClick + 400) ? styles.pressed : ""}`}
+                    >
+                      + 올리기
+                    </span>
+                  </span>
+                </header>
+                <div className={styles.boardGrid}>
+                  {/* 올린 글이 맨 앞에 들어오며 나머지가 한 칸씩 밀린다. */}
+                  {at(CUE.newPost) && (
+                    <article className={`${styles.post} ${styles.newPost}`}>
+                      <span className={styles.thumb}>
+                        <Image src={NEW_POST.src} alt="" loading="eager" fill sizes="15vw" />
+                      </span>
+                      <small>
+                        <i aria-hidden>{NEW_POST.author[0]}</i>
+                        {NEW_POST.author} · 방금
+                      </small>
+                      <b>{NEW_POST.title}</b>
+                    </article>
+                  )}
+                  {POSTS.map((post, i) => (
+                    <article
+                      key={post.title}
+                      className={`${styles.post} ${show(CUE.board[1 + i])}`}
+                    >
+                      <span className={styles.thumb}>
+                        <Image src={post.src} alt="" loading="eager" fill sizes="15vw" />
+                      </span>
+                      <small>
+                        <i aria-hidden>{post.author[0]}</i>
+                        {post.author}
+                      </small>
+                      <b>{post.title}</b>
+                    </article>
+                  ))}
+                </div>
+                <span className={`${styles.layerTag} ${show(CUE.layerThree)}`}>데이터</span>
+              </div>
+
+              {/* Scene 4 — sales & payments: the real class sign-up flow, shown in miniature */}
+              <div
+                className={`${styles.scene} ${styles.ops} ${phase === "four" || phase === "finale" ? styles.in : styles.out}`}
               >
                 <div className={styles.apply}>
                   <span className={`${styles.applyCover} ${show(CUE.form[0])}`}>
@@ -538,9 +650,9 @@ export function WebPossibilitiesReel({
                   </p>
                 </div>
                 <span
-                  className={`${styles.layerTag} ${at(CUE.layerThree) && !at(CUE.reveal) ? styles.in : styles.out}`}
+                  className={`${styles.layerTag} ${at(CUE.layerFour) && !at(CUE.reveal) ? styles.in : styles.out}`}
                 >
-                  데이터
+                  운영
                 </span>
               </div>
 
@@ -556,16 +668,48 @@ export function WebPossibilitiesReel({
             <span>화면</span>
             <span>동작</span>
             <span>데이터</span>
+            <span>운영</span>
           </div>
         </div>
-        {/* The message sits where the eye already is: right under the moving scene. */}
+        {/* Video-style player bar attached to the scene. */}
+        <div className={styles.player}>
+          <button
+            type="button"
+            onClick={toggle}
+            aria-label={finished ? "다시 보기" : playing ? "일시정지" : "재생"}
+            title={finished ? "다시 보기" : playing ? "일시정지" : "재생"}
+          >
+            <PlayerIcon kind={finished ? "replay" : playing ? "pause" : "play"} />
+          </button>
+          <div
+            className={styles.progress}
+            title={REEL_KEY_HINT}
+            role="progressbar"
+            aria-label="장면 진행"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={Math.round((t / END) * 100)}
+          >
+            <span style={{ width: `${(t / END) * 100}%` }} />
+          </div>
+          <button
+            type="button"
+            onClick={skip}
+            disabled={finished}
+            aria-label="건너뛰기"
+            title="건너뛰기"
+          >
+            <PlayerIcon kind="skip" />
+          </button>
+        </div>
+        {/* The message sits right under the scene and its player bar. */}
         <div className={styles.subtitle} aria-live="polite">
           {phase === "finale" ? (
             <div key="finale" className={styles.subtitleText}>
-              <strong>이런 것들을 만들어볼 수 있어요.</strong>
+              <strong>그 첫걸음을, 처음부터 함께 만들어봐요.</strong>
               <p className={show(CUE.finaleLine)}>
-                화면을 만들고, 반응을 더하고, 데이터를 다루는 경험은 앱, 게임을 만들 때도 유용하게
-                쓰일 겁니다.
+                나를 보여주는 포트폴리오 한 페이지에서 시작해요. 여기서 익힌 화면과 데이터 다루는
+                경험은 앱이나 게임을 만들 때도 도움이 될 거예요.
               </p>
             </div>
           ) : (
@@ -576,31 +720,23 @@ export function WebPossibilitiesReel({
             )
           )}
         </div>
-        <p className={styles.notice}>
-          예시 화면이에요. 사진은 연출용 생성 이미지이고, 신청은 실제로 전송되지 않아요.
-        </p>
-      </div>
-
-      <div className={styles.controls}>
-        <button type="button" onClick={toggle}>
-          {finished ? "다시 보기" : playing ? "일시정지" : "재생"}
-        </button>
-        <div
-          className={styles.progress}
-          role="progressbar"
-          aria-label="장면 진행"
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-valuenow={Math.round((t / END) * 100)}
-        >
-          <span style={{ width: `${(t / END) * 100}%` }} />
-        </div>
-        {!finished && (
-          <button type="button" onClick={skip}>
-            건너뛰기
-          </button>
-        )}
       </div>
     </section>
+  );
+}
+
+export function PlayerIcon({ kind }: { kind: "play" | "pause" | "replay" | "skip" }) {
+  return (
+    <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden focusable="false">
+      {kind === "play" && <path d="M4 2.5v11l9-5.5z" fill="currentColor" />}
+      {kind === "pause" && <path d="M4 2.5h3v11H4zM9 2.5h3v11H9z" fill="currentColor" />}
+      {kind === "skip" && <path d="M2.5 2.5v11l7.5-5.5zM10.5 2.5h3v11h-3z" fill="currentColor" />}
+      {kind === "replay" && (
+        <path
+          d="M8 3a5 5 0 1 1-4.6 3H1.8L4.2 3.2 6.6 6H5.1A3.4 3.4 0 1 0 8 4.6z"
+          fill="currentColor"
+        />
+      )}
+    </svg>
   );
 }

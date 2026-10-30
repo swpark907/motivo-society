@@ -106,6 +106,7 @@
   background: var(--paper);
 }
 .sheet {
+  position: relative;
   line-height: 0;
 }
 .canvas,
@@ -128,4 +129,15 @@
   input {
     width: 80px;
   }
+}
+
+.regionMarker {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--accent);
+  outline: 1px solid var(--surface);
+  border-radius: 2px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
 }

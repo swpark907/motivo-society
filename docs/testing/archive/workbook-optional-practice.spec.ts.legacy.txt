@@ -1,0 +1,86 @@
+import { expect, test } from "@playwright/test";
+
+test("3단원 기본 실습은 개선·유지 판단 없이 진행하고 추가 기록은 선택이다", async ({
+  page,
+}, info) => {
+  await page.goto("/demo/workbook-completion");
+  await page
+    .getByRole("button", { name: "3단원 수업 확인 · 독립 테스트 기록", exact: true })
+    .click();
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    "작은 화면에서 예시 페이지 확인하기",
+  );
+  await expect(page.getByLabel("개선 또는 유지 이유", { exact: true })).toHaveCount(0);
+  await page.getByRole("button", { name: "다음으로", exact: true }).click();
+  await page.getByRole("button", { name: "다음으로", exact: true }).click();
+  const finish = page.getByRole("button", { name: "화면 비교 기록 챙겨 마을로 →", exact: true });
+  await expect(finish).toBeEnabled();
+  const optional = page.getByText("선택 · 내 파일에서 더 해보기", { exact: true });
+  expect(await optional.evaluate((el) => el.parentElement!.hasAttribute("open"))).toBe(false);
+  await optional.click();
+  await expect(finish).toBeEnabled();
+  await optional.click();
+  await page.screenshot({ path: info.outputPath("basic-screen.png") });
+});
+
+test("4단원 기본 메모 실습은 상세 보기 선택·생략 이유 없이 마친다", async ({ page }, info) => {
+  await page.goto("/demo/workbook-completion");
+  await page
+    .getByRole("button", { name: "4단원 수업 확인 · 독립 테스트 기록", exact: true })
+    .click();
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    "한 줄 메모로 동작과 저장 알아보기",
+  );
+  await expect(page.getByLabel("상세 보기 적용 또는 생략 이유", { exact: true })).toHaveCount(0);
+  await expect(page.getByLabel("저장 적용 또는 생략 이유", { exact: true })).toHaveCount(0);
+  await page
+    .getByRole("button", { name: "화면에 표시하기 버튼을 눌러야 나타나요", exact: true })
+    .click();
+  await page.getByLabel("예시에 표시할 한 줄", { exact: true }).fill("UI 검수용 메모");
+  await page.getByRole("button", { name: "화면에 표시하기", exact: true }).click();
+  const next = page.getByRole("button", { name: "다음으로", exact: true });
+  await expect(next).toBeEnabled();
+  const detail = page.getByText("선택 · 항목 상세 보기 실험", { exact: true });
+  expect(await detail.evaluate((el) => el.parentElement!.hasAttribute("open"))).toBe(false);
+  await detail.click();
+  await page
+    .getByRole("button", { name: "소개 페이지 · 예시 상세 보기", exact: true })
+    .press("Enter");
+  await page.getByRole("button", { name: "예시 상세 닫기", exact: true }).press("Enter");
+  await expect(
+    page.getByRole("button", { name: "소개 페이지 · 예시 상세 보기", exact: true }),
+  ).toBeFocused();
+  await detail.click();
+  await expect(next).toBeEnabled();
+  await next.click();
+  await page
+    .getByRole("button", { name: "저장하지 않았으니 새로고침하면 사라져요", exact: true })
+    .click();
+  await page.getByRole("button", { name: "저장 없이 새로고침 흉내 내기", exact: true }).click();
+  await page
+    .getByRole("button", { name: "방금 문장을 브라우저에 저장 흉내 내기", exact: true })
+    .click();
+  await page.getByRole("button", { name: "저장 후 새로고침 흉내 내기", exact: true }).click();
+  await next.click();
+  await page
+    .getByRole("button", { name: "그 브라우저에만 있어서 다른 기기에는 없어요", exact: true })
+    .click();
+  await page.getByRole("button", { name: "다른 기기 예시 보기", exact: true }).click();
+  await page
+    .getByRole("button", { name: "친구가 다른 컴퓨터에서 쓴 답장을 함께 읽기", exact: true })
+    .click();
+  await page
+    .getByLabel("표시·저장·공유가 다른 이유", { exact: true })
+    .fill("기본 원리: 표시와 저장은 다르고 다른 기기와 함께 읽기에는 공유 저장소가 필요함");
+  const finish = page.getByRole("button", {
+    name: "동작과 데이터 기록 챙겨 마을로 →",
+    exact: true,
+  });
+  await expect(finish).toBeEnabled();
+  const optional = page.getByText("선택 · 내 파일에서 더 해보기", { exact: true });
+  expect(await optional.evaluate((el) => el.parentElement!.hasAttribute("open"))).toBe(false);
+  await optional.click();
+  await expect(finish).toBeEnabled();
+  await optional.click();
+  await page.screenshot({ path: info.outputPath("basic-data.png") });
+});

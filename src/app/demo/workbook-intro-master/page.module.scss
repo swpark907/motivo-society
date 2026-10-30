@@ -1,0 +1,156 @@
+.page {
+  background: #f3f0e9;
+  color: #252922;
+  min-height: 100vh;
+  padding: 48px 5%;
+}
+.top {
+  max-width: 1300px;
+  margin: 0 auto 18px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #7c8074;
+}
+.stage {
+  max-width: 1300px;
+  min-height: 600px;
+  margin: auto;
+  display: grid;
+  grid-template-columns: 40% 60%;
+  background: #faf9f5;
+  border: 1px solid #e0ded6;
+  border-radius: 14px;
+  overflow: hidden;
+}
+.scene {
+  background: #fdfcf9;
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 600px;
+}
+.frameStack {
+  width: 72%;
+  max-width: 380px;
+  aspect-ratio: 1;
+  position: relative;
+  image-rendering: pixelated;
+  filter: saturate(0.78);
+}
+.firstFrame,
+.loopFrame,
+.stillFrame {
+  position: absolute;
+  inset: 0;
+  background-repeat: no-repeat;
+  opacity: 0;
+}
+.firstFrame {
+  animation: one-frame 400ms steps(1, end);
+}
+.loopFrame {
+  animation: loop-frame 7.2s steps(1, end) infinite;
+}
+@keyframes one-frame {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes loop-frame {
+  0% {
+    opacity: 1;
+  }
+  5.5556%,
+  100% {
+    opacity: 0;
+  }
+}
+.scene button {
+  position: absolute;
+  bottom: 28px;
+  left: 30px;
+  padding: 9px 12px;
+  border: 1px solid #b7baaf;
+  background: none;
+  color: #536156;
+  cursor: pointer;
+}
+.stopped .firstFrame,
+.stopped .loopFrame {
+  display: none;
+}
+.stopped .stillFrame {
+  opacity: 1;
+}
+.copy {
+  padding: clamp(40px, 7vw, 90px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.copy span {
+  color: #a86646;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+}
+.copy h1 {
+  font-size: clamp(36px, 4vw, 62px);
+  letter-spacing: -0.06em;
+  line-height: 1.2;
+}
+.copy em {
+  color: #a76543;
+  font-style: normal;
+}
+.copy p {
+  font-size: 16px;
+  line-height: 1.8;
+  word-break: keep-all;
+}
+.copy .note {
+  color: #777b70;
+  font-size: 13px;
+}
+.copy a {
+  color: #345343;
+  margin-top: 20px;
+  font-size: 14px;
+  font-weight: 700;
+}
+@media (prefers-reduced-motion: reduce) {
+  .firstFrame,
+  .loopFrame {
+    display: none;
+  }
+  .stillFrame {
+    opacity: 1;
+  }
+}
+@media (max-width: 760px) {
+  .page {
+    padding: 20px 16px;
+  }
+  .stage {
+    display: flex;
+    flex-direction: column;
+  }
+  .scene {
+    min-height: 260px;
+  }
+  .frameStack {
+    height: 220px;
+    width: auto;
+  }
+  .copy {
+    padding: 35px 24px;
+  }
+  .scene button {
+    bottom: 12px;
+    left: 20px;
+  }
+}

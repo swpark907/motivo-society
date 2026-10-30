@@ -16,7 +16,10 @@
     "check": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm test",
     "prepare": "git config core.hooksPath .githooks",
     "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui"
+    "test:e2e:ui": "playwright test --ui",
+    "content:editorial-schema": "node --experimental-strip-types scripts/generate-workbook-editorial-schema.mjs",
+    "room:check": "vitest run src/lib/workbook-room-catalog.test.ts",
+    "room:export": "node scripts/export-workbook-room-assets.mjs && prettier --write src/lib/workbook-room-assets.generated.json"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",

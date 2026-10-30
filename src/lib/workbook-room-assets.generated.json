@@ -1,0 +1,138 @@
+{
+  "/images/workbook/room/slots/base.png": {
+    "src": "/images/workbook/room/optimized/dd56d347057bd268.webp",
+    "rect": [0, 0, 1536, 1024]
+  },
+  "/images/workbook/room/slots/bonsai.png": {
+    "src": "/images/workbook/room/optimized/55e16a712ab4f857.webp",
+    "rect": [218, 0, 1074, 1004]
+  },
+  "/images/workbook/room/slots/cup.png": {
+    "src": "/images/workbook/room/optimized/f5d9fcd7c72dc5e8.webp",
+    "rect": [952, 345, 370, 221]
+  },
+  "/images/workbook/room/slots/cushion.png": {
+    "src": "/images/workbook/room/optimized/85aae3d56ecd1b0c.webp",
+    "rect": [223, 355, 715, 465]
+  },
+  "/images/workbook/room/slots/laptop.png": {
+    "src": "/images/workbook/room/optimized/944ce484c339f883.webp",
+    "rect": [589, 262, 496, 354]
+  },
+  "/images/workbook/room/slots/notebook.png": {
+    "src": "/images/workbook/room/optimized/91512c5502dd8b07.webp",
+    "rect": [505, 316, 823, 462]
+  },
+  "/images/workbook/room/slots/plant.png": {
+    "src": "/images/workbook/room/optimized/43c0253956360871.webp",
+    "rect": [1089, 373, 375, 483]
+  },
+  "/images/workbook/room/slots/poster.png": {
+    "src": "/images/workbook/room/optimized/f44c25b424c27ca9.webp",
+    "rect": [830, 81, 532, 462]
+  },
+  "/images/workbook/room/slots/print.png": {
+    "src": "/images/workbook/room/optimized/d365737a52e5991b.webp",
+    "rect": [698, 77, 439, 654]
+  },
+  "/images/workbook/room/slots/radio.png": {
+    "src": "/images/workbook/room/optimized/a0407f54033cdfbc.webp",
+    "rect": [212, 31, 1234, 953]
+  },
+  "/images/workbook/room/slots/read.png": {
+    "src": "/images/workbook/room/optimized/2780507f14ca0d4a.webp",
+    "rect": [349, 186, 780, 753]
+  },
+  "/images/workbook/room/slots/rest.png": {
+    "src": "/images/workbook/room/optimized/c281ccbc22e477eb.webp",
+    "rect": [501, 264, 525, 604]
+  },
+  "/images/workbook/room/slots/sets/desk-idle-empty.png": {
+    "src": "/images/workbook/room/optimized/dd56d347057bd268.webp",
+    "rect": [0, 0, 1536, 1024]
+  },
+  "/images/workbook/room/slots/sets/desk-idle-laptop.png": {
+    "src": "/images/workbook/room/optimized/746683bfe067ce01.webp",
+    "rect": [675, 245, 493, 431]
+  },
+  "/images/workbook/room/slots/sets/desk-idle-notebook.png": {
+    "src": "/images/workbook/room/optimized/b12de01a3b3be9e9.webp",
+    "rect": [675, 245, 493, 431]
+  },
+  "/images/workbook/room/slots/sets/desk-work-empty.png": {
+    "src": "/images/workbook/room/optimized/a4deddb996dc8088.webp",
+    "rect": [675, 245, 493, 431]
+  },
+  "/images/workbook/room/slots/sets/desk-work-laptop.png": {
+    "src": "/images/workbook/room/optimized/d326fb20168b59ef.webp",
+    "rect": [675, 245, 493, 431]
+  },
+  "/images/workbook/room/slots/sets/desk-work-notebook.png": {
+    "src": "/images/workbook/room/optimized/357b5acb3e10ad50.webp",
+    "rect": [675, 245, 493, 431]
+  },
+  "/images/workbook/room/slots/sets/lounge-idle-cushion.png": {
+    "src": "/images/workbook/room/optimized/81fba040faf4e8a0.webp",
+    "rect": [168, 430, 385, 349]
+  },
+  "/images/workbook/room/slots/sets/lounge-idle-plain.png": {
+    "src": "/images/workbook/room/optimized/dd56d347057bd268.webp",
+    "rect": [0, 0, 1536, 1024]
+  },
+  "/images/workbook/room/slots/sets/lounge-read-cushion.png": {
+    "src": "/images/workbook/room/optimized/1f098d60fc4d427a.webp",
+    "rect": [168, 430, 385, 349]
+  },
+  "/images/workbook/room/slots/sets/lounge-read-plain.png": {
+    "src": "/images/workbook/room/optimized/5c582cdf20d14a29.webp",
+    "rect": [168, 430, 385, 349]
+  },
+  "/images/workbook/room/slots/work.png": {
+    "src": "/images/workbook/room/optimized/9883786dbe589459.webp",
+    "rect": [475, 84, 625, 773]
+  },
+  "/images/workbook/room/themes/city/base.png": {
+    "src": "/images/workbook/room/optimized/4f97c1058c3649f2.webp",
+    "rect": [0, 0, 1536, 1024]
+  },
+  "/images/workbook/room/themes/city/sets/desk-idle-laptop.png": {
+    "src": "/images/workbook/room/optimized/99541099d0cbc290.webp",
+    "rect": [675, 245, 493, 431]
+  },
+  "/images/workbook/room/themes/city/sets/desk-idle-notebook.png": {
+    "src": "/images/workbook/room/optimized/d014444ebf550c87.webp",
+    "rect": [675, 245, 493, 431]
+  },
+  "/images/workbook/room/themes/city/sets/desk-work-empty.png": {
+    "src": "/images/workbook/room/optimized/ab141549079b0f24.webp",
+    "rect": [675, 245, 493, 431]
+  },
+  "/images/workbook/room/themes/city/sets/desk-work-laptop.png": {
+    "src": "/images/workbook/room/optimized/b710172fcd0bef62.webp",
+    "rect": [675, 245, 493, 431]
+  },
+  "/images/workbook/room/themes/city/sets/desk-work-notebook.png": {
+    "src": "/images/workbook/room/optimized/e1024517a42b6314.webp",
+    "rect": [675, 245, 493, 431]
+  },
+  "/images/workbook/room/themes/city/sets/lounge-idle-cushion.png": {
+    "src": "/images/workbook/room/optimized/a81e47cc8da2a9b3.webp",
+    "rect": [168, 430, 385, 349]
+  },
+  "/images/workbook/room/themes/city/sets/lounge-read-cushion.png": {
+    "src": "/images/workbook/room/optimized/bf9fa3718a483564.webp",
+    "rect": [168, 430, 385, 349]
+  },
+  "/images/workbook/room/themes/city/sets/lounge-read-plain.png": {
+    "src": "/images/workbook/room/optimized/0ab7adea71bc8372.webp",
+    "rect": [168, 430, 385, 349]
+  },
+  "/images/workbook/room/views/coast.png": {
+    "src": "/images/workbook/room/optimized/569647688b2808b4.webp",
+    "rect": [138, 102, 493, 431]
+  },
+  "/images/workbook/room/views/garden.png": {
+    "src": "/images/workbook/room/optimized/290b9a473a0c2508.webp",
+    "rect": [138, 102, 493, 431]
+  }
+}

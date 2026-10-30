@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { initialProgress, stops } from "@/lib/workbook-journey";
 import { useJourneyProgress } from "./useJourneyProgress";
 import styles from "./WorkbookJourney.module.scss";
+import { ResponsivePagePreview } from "./ResponsivePagePreview";
 
 const route = [
   [22, 60],
@@ -142,7 +143,7 @@ export function WorkbookJourney() {
       <header className={styles.header}>
         <div>
           <Link href="/workbook">← 나의 워크북</Link>
-          <p className={styles.eyebrow}>WORLD 01 · 작은 웹의 마을</p>
+          <p className={styles.eyebrow}>화면 배치를 바꿔보는 짧은 실험</p>
           <h1>작은 화면, 새로운 발견</h1>
           <p>카피바라가 보낸 첫 페이지. 휴대폰에서는 무슨 일이 생겼을까요?</p>
         </div>
@@ -172,7 +173,7 @@ export function WorkbookJourney() {
             disabled={moving || i > progress.completed}
             aria-current={i === progress.chapter ? "step" : undefined}
             onClick={() => travel(i)}
-            aria-label={`${stop.title}${i > progress.completed ? " · 앞 장소를 마치면 열려요" : "로 이동"}`}
+            aria-label={`${stop.title}${i > progress.completed ? " · 앞 장소를 마치면 열려요" : `${stop.particle} 이동`}`}
           >
             <span>{i < progress.completed ? "✓" : `0${i + 1}`}</span>
             <strong>{stop.title}</strong>
@@ -285,51 +286,17 @@ export function WorkbookJourney() {
                     </button>
                   ))}
                 </div>
-                <div className={styles.previewOuter}>
-                  <div
-                    ref={preview}
-                    className={styles.preview}
-                    style={{ width: screen === "mobile" ? 280 : 560 }}
-                    tabIndex={0}
-                    role="region"
-                    aria-label="소개 페이지 실험 화면"
-                  >
-                    <div className={styles.sample} style={{ width: fluid ? "100%" : 560 }}>
-                      <small>CAPY STUDIO</small>
-                      <h3>
-                        작은 작업실에서
-                        <br />
-                        만드는 다정한 것들.
-                      </h3>
-                      <p>차 한 잔과 함께, 우리만의 작업을 나눠요.</p>
-                      <div
-                        className={styles.sampleCards}
-                        style={{ flexDirection: screen === "mobile" && stack ? "column" : "row" }}
-                      >
-                        {["작업 이야기", "함께 만드는 시간"].map((title, i) => (
-                          <article key={title}>
-                            <span aria-hidden="true">{i === 0 ? "✳" : "☕"}</span>
-                            <h4>{title}</h4>
-                            <p>
-                              {i === 0
-                                ? "작은 생각을 하나씩 완성해요."
-                                : "처음이어도 함께 시작해요."}
-                            </p>
-                          </article>
-                        ))}
-                      </div>
-                      <button
-                        onClick={() =>
-                          setMessage(
-                            "문의 버튼까지 확인했어요. 실제 서비스라면 이동한 화면도 확인해야 해요.",
-                          )
-                        }
-                      >
-                        작업실에 문의하기 ↗
-                      </button>
-                    </div>
-                  </div>
-                </div>
+                <ResponsivePagePreview
+                  screen={screen}
+                  fluid={fluid}
+                  stack={stack}
+                  previewRef={preview}
+                  onButton={() =>
+                    setMessage(
+                      "문의 버튼까지 확인했어요. 실제 서비스라면 이동한 화면도 확인해야 해요.",
+                    )
+                  }
+                />
                 <small className={styles.muted}>
                   넓은 화면이 기기보다 크면 바깥 영역을 좌우로 밀어 확인하세요.
                 </small>

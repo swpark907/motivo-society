@@ -9,9 +9,53 @@
   }
 }
 .hero {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 29rem;
   position: relative;
   overflow: hidden;
   background: var(--surface);
+}
+.heroControls {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-4);
+  padding: 0 var(--space-6) var(--space-6);
+  @include up(md) {
+    padding-inline: var(--space-12);
+  }
+  > div {
+    display: flex;
+    gap: var(--space-6);
+  }
+  button {
+    padding-block: var(--space-2);
+    border: 0;
+    border-top: 1px solid var(--line);
+    background: transparent;
+    color: var(--ink-muted);
+    font: inherit;
+    font-size: 0.7rem;
+    cursor: pointer;
+    span {
+      margin-left: var(--space-2);
+    }
+    &[aria-pressed="true"] {
+      color: var(--ink);
+      border-color: currentColor;
+    }
+    &:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 4px;
+    }
+  }
+  > button {
+    width: var(--space-12);
+    font-size: 1.25rem;
+  }
 }
 .heroImage {
   object-fit: cover;
@@ -41,6 +85,12 @@
   @include up(md) {
     padding-left: var(--space-12);
   }
+}
+.heroCopy small {
+  display: block;
+  margin-top: var(--space-3);
+  color: var(--ink-muted);
+  font-size: 0.75rem;
 }
 .cta {
   display: inline-block;
@@ -92,61 +142,6 @@
   font-size: 0.8rem;
   line-height: 1.8;
   margin-block: var(--space-4);
-}
-.cards {
-  display: grid;
-  gap: var(--space-4);
-  @include up(lg) {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-.card {
-  overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: var(--surface-2);
-  min-width: 0;
-  img {
-    display: block;
-    width: 100%;
-    height: auto;
-    aspect-ratio: 16 / 9;
-    object-fit: cover;
-  }
-  > div {
-    padding: var(--space-4);
-  }
-  h3 {
-    font-size: 1.05rem;
-    margin-block: var(--space-3);
-  }
-  p {
-    color: var(--ink-muted);
-    font-size: 0.85rem;
-    line-height: 1.8;
-  }
-  small {
-    display: block;
-    color: var(--ink-muted);
-    font-size: 0.7rem;
-    margin-top: var(--space-4);
-  }
-  strong,
-  .pending {
-    display: block;
-    margin-top: var(--space-4);
-    font-size: 0.8rem;
-  }
-  strong {
-    color: var(--accent);
-  }
-}
-.tag {
-  font-size: 0.65rem;
-  color: var(--ink-muted);
-}
-.pending {
-  color: var(--ink-muted);
 }
 .experiments {
   display: grid;
@@ -255,5 +250,99 @@
   }
   .cta {
     margin: 0;
+  }
+}
+
+.classResume {
+  margin: var(--space-4) var(--space-6);
+  padding: var(--space-2) var(--space-4);
+  border-color: #604331;
+  background: #35261f;
+  gap: var(--space-2) var(--space-4);
+  > div:first-child {
+    display: flex;
+    align-items: baseline;
+    flex: 1;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-3);
+    min-width: 0;
+  }
+  h2 {
+    margin: 0;
+    font-size: 0.95rem;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
+  p {
+    color: #d4b9a7;
+  }
+  .cta {
+    padding: var(--space-2) var(--space-3);
+    border: 0;
+    background: transparent;
+    color: var(--ink);
+    transition: background-color 120ms;
+    &:hover,
+    &:focus-visible {
+      background: #654632;
+    }
+    &:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+  }
+}
+
+.resumeActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.readingList .reading {
+  display: flex;
+  align-items: start;
+  gap: var(--space-4);
+  > div {
+    flex: 1;
+    min-width: 0;
+  }
+  > span:last-child {
+    color: var(--ink-muted);
+    font-size: 0.8rem;
+  }
+}
+.readingList .readingThumbnail {
+  display: block;
+  flex: 0 0 6rem;
+  aspect-ratio: 1;
+  overflow: hidden;
+  @include up(md) {
+    flex-basis: 9rem;
+    aspect-ratio: 4 / 3;
+  }
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.homeColumns {
+  display: grid;
+  gap: var(--space-8);
+  @include up(xl) {
+    grid-template-columns: minmax(0, 1fr) 336px;
+  }
+}
+.homeContent {
+  min-width: 0;
+}
+
+.homeColumns .lower {
+  @include up(xl) {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
   }
 }

@@ -1,0 +1,118 @@
+{
+  "version": 1,
+  "title": "새 대화에서 이어 만들려면, 이 네 가지를 남겨보세요",
+  "summary": "작업의 목표·현재 상태·지킬 결정·다음 행동을 짧게 묶는 인계 메모.",
+  "slug": "leave-a-handoff",
+  "thumbnail": "/images/workbook/notes/leave-a-handoff-v1.png",
+  "thumbnailAlt": "작업 상태를 정리한 메모를 노트북 옆으로 건네는 손",
+  "visualCaption": "다음 작업을 위해 남기는 짧은 메모 한 장.",
+  "tags": ["AI 활용", "바이브코딩", "작업 기록"],
+  "sources": ["https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents"],
+  "layout": "note",
+  "nextTry": "지금 하던 작업을 목표·현재 상태·지킬 결정·다음 행동으로 남겨보세요.",
+  "related": [
+    {
+      "slug": "describe-the-result",
+      "reason": "다음 대화에서 원하는 결과부터 다시 맞추고 싶다면."
+    },
+    {
+      "slug": "report-the-error",
+      "reason": "인계 메모에 아직 풀지 못한 오류를 남길 때 참고해보세요."
+    }
+  ],
+  "cover": {
+    "layout": "compact",
+    "align": "left",
+    "focus": "center"
+  },
+  "content": [
+    {
+      "type": "text",
+      "id": "block-1",
+      "text": "어제 만들던 페이지를 새 대화에서 이어가려는데 처음부터 설명해야 하나요? **대화 전체를 복사하기 전에 현재 작업의 짧은 인계 메모**를 만들어보세요.",
+      "tone": "lead",
+      "width": "wide"
+    },
+    {
+      "type": "heading",
+      "id": "section-1",
+      "text": "과거 이야기보다, 지금 필요한 상태"
+    },
+    {
+      "type": "text",
+      "id": "block-2",
+      "text": "다음 네 항목은 모쏘가 제안하는 메모 형식입니다. 특정 도구의 자동 저장 기능이 아닙니다.",
+      "tone": "body",
+      "width": "reading"
+    },
+    {
+      "type": "list",
+      "id": "block-3",
+      "items": [
+        {
+          "title": "목표",
+          "body": "동네 산책 모임을 소개하는 한 페이지를 만든다."
+        },
+        {
+          "title": "현재 상태",
+          "body": "제목과 소개는 완성했고, 휴대폰에서 신청 버튼이 잘린다."
+        },
+        {
+          "title": "지킬 결정",
+          "body": "문구와 사진은 유지한다. 신청 폼과 결제 기능은 아직 만들지 않는다."
+        },
+        {
+          "title": "다음 행동",
+          "body": "실제 파일을 확인하고, 버튼이 화면 안에 보이도록 너비를 고친다."
+        }
+      ],
+      "layout": "grid",
+      "width": "wide"
+    },
+    {
+      "type": "text",
+      "id": "block-4",
+      "text": "파일을 다루는 에이전트라면 작업 폴더와 관련 파일 위치도 함께 알려주세요. 파일을 볼 권한이 없는 채팅에 경로만 적는다고 파일 내용이 전달되지는 않습니다.",
+      "tone": "body",
+      "width": "reading"
+    },
+    {
+      "type": "image",
+      "id": "handoff-photo",
+      "image": {
+        "src": "/images/workbook/notes/leave-a-handoff-v1.png",
+        "alt": "작업 상태를 정리한 메모를 노트북 옆으로 건네는 손",
+        "caption": "인계 메모를 주고받는 모습을 연출한 AI 생성 사진 · 실제 작업 기록이 아니에요.",
+        "ratio": "wide",
+        "focus": "center"
+      },
+      "width": "wide"
+    },
+    {
+      "type": "heading",
+      "id": "section-2",
+      "text": "요약도 확인하고 넘겨요"
+    },
+    {
+      "type": "text",
+      "id": "block-5",
+      "text": "AI에게 인계 메모 초안을 정리해달라고 할 수는 있어요. 하지만 빠진 결정이나 완료하지 않은 작업이 섞였는지 **본인이 확인**해야 합니다.",
+      "tone": "body",
+      "width": "reading"
+    },
+    {
+      "type": "text",
+      "id": "block-6",
+      "text": "새 대화에서는 바로 수정하기 전에, 전달한 메모와 실제 파일 상태가 일치하는지 살펴보도록 요청해보세요. 사용할 수 있는 파일·도구·대화 기록은 제품과 설정에 따라 다릅니다. 새 대화가 이전 작업을 자동으로 모두 기억한다고 전제하지 마세요.",
+      "tone": "body",
+      "width": "reading"
+    },
+    {
+      "type": "text",
+      "id": "block-7",
+      "text": "**참고한 자료**\n\nAnthropic의 [컨텍스트 설계 글](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)은 작업에 필요한 정보를 골라 관리하고 장기 작업에 요약과 메모를 활용하는 접근을 설명합니다. 이 글의 네 항목 메모는 독자가 직접 작성하는 편집 제안입니다.",
+      "tone": "small",
+      "width": "reading"
+    }
+  ]
+}

@@ -1,0 +1,115 @@
+{
+  "version": 1,
+  "title": "‘알아서 잘’ 대신, 원하는 결과를 보여주세요",
+  "summary": "AI가 만든 글이 자꾸 내 취향과 멀어질 때, 요청에 덧붙일 세 가지.",
+  "slug": "describe-the-result",
+  "thumbnail": "/images/workbook/notes/describe-the-result-v1.png",
+  "thumbnailAlt": "원하는 결과를 구체화하며 인쇄 시안과 요청 메모를 정리하는 손",
+  "visualCaption": "원하는 결과를 설명하는 일. 요청도 하나의 작은 브리프가 됩니다.",
+  "tags": ["AI 활용", "요청"],
+  "sources": ["https://ai.google.dev/gemini-api/docs/prompting-strategies"],
+  "layout": "note",
+  "nextTry": "내가 원하는 결과를 독자·형식·남길 내용 세 가지로 적어보세요.",
+  "related": [
+    {
+      "slug": "show-the-screen",
+      "reason": "말로 설명하기 어려운 부분은 화면으로 함께 짚어보세요."
+    },
+    {
+      "slug": "check-the-source",
+      "reason": "원하는 모양을 얻었다면, 내용의 근거도 확인해보세요."
+    }
+  ],
+  "cover": {
+    "layout": "title-first",
+    "align": "left",
+    "focus": "center"
+  },
+  "content": [
+    {
+      "type": "text",
+      "id": "block-1",
+      "text": "글을 부탁했는데 너무 거창해요. 줄여달라고 했더니 필요한 설명까지 사라지고요. 이럴 때 ‘더 잘 써줘’를 반복하기 전에 **누가 읽는지, 어떤 모양인지, 무엇을 남길지**를 적어보세요.",
+      "tone": "lead",
+      "width": "wide"
+    },
+    {
+      "type": "heading",
+      "id": "section-1",
+      "text": "요청에 결과의 모양을 붙여요"
+    },
+    {
+      "type": "text",
+      "id": "block-2",
+      "text": "아래는 직접 바꿔 써볼 수 있는 설명용 예시입니다. 실제 생성 결과를 비교한 실험은 아닙니다.",
+      "tone": "body",
+      "width": "reading"
+    },
+    {
+      "type": "compare",
+      "id": "block-3",
+      "layout": "contrast",
+      "width": "full",
+      "items": [
+        {
+          "label": "처음의 요청",
+          "text": "이번 모임을 소개하는 글을 써줘."
+        },
+        {
+          "label": "조건을 더한 요청",
+          "text": "AI 도구를 처음 써보는 사람이 읽을 모임 소개글이야. 제목 하나와 짧은 두 문단으로 써줘. 함께 직접 만들어보는 자리라는 점을 담고, 확정되지 않은 일정과 가격은 넣지 마."
+        }
+      ],
+      "caption": "설명용 요청 비교 · 실제 생성 결과를 비교한 실험은 아니에요."
+    },
+    {
+      "type": "text",
+      "id": "block-4",
+      "text": "원하는 말투가 있다면 **짧은 예문 하나**도 붙여보세요. 다른 사람의 긴 글을 그대로 가져오기보다, 내가 좋아하는 표현을 직접 써보는 식입니다.",
+      "tone": "body",
+      "width": "reading"
+    },
+    {
+      "type": "heading",
+      "id": "section-2",
+      "text": "한 번에 한 기준씩 확인해요"
+    },
+    {
+      "type": "text",
+      "id": "block-5",
+      "text": "결과를 받으면 ‘좋다/별로다’ 대신 지금 정한 조건을 봅니다. 처음 보는 사람이 무엇을 하는 모임인지 아는지, 두 문단인지, 없는 정보가 붙지 않았는지 확인해요.",
+      "tone": "body",
+      "width": "reading"
+    },
+    {
+      "type": "text",
+      "id": "block-6",
+      "text": "수정도 기준을 좁힙니다.",
+      "tone": "body",
+      "width": "reading"
+    },
+    {
+      "type": "quote",
+      "id": "block-7",
+      "text": "첫 문단의 활동 설명은 유지하고, 마지막 문장의 과장된 표현만 담백하게 바꿔줘.",
+      "layout": "rule",
+      "width": "reading",
+      "align": "left",
+      "label": "직접 써볼 요청 · 설명용 예문"
+    },
+    {
+      "type": "text",
+      "id": "block-8",
+      "text": "이 요청이 항상 같은 품질을 보장하지는 않습니다. **원하는 결과를 설명하고 실제 답을 확인하는 것**이 한 쌍이에요.",
+      "tone": "body",
+      "width": "reading"
+    },
+    {
+      "type": "text",
+      "id": "block-9",
+      "text": "**참고한 자료**\n\nGoogle의 [프롬프트 설계 안내](https://ai.google.dev/gemini-api/docs/prompting-strategies)는 구체적인 지시·제약·결과 형식·예시를 제시하고, 실제 결과에 맞춰 반복해서 조정하도록 안내합니다. 이 글의 모임 소개 예문은 이를 바탕으로 만든 편집 예시입니다.",
+      "tone": "small",
+      "width": "reading"
+    }
+  ]
+}

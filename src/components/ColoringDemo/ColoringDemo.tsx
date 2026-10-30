@@ -2,6 +2,7 @@
 
 // Canvas interaction and local progress live entirely in the browser.
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { findColoringRegions, type ColoringMap } from "@/lib/coloring";
 import styles from "./ColoringDemo.module.scss";
@@ -36,6 +37,27 @@ export function ColoringDemo() {
   const [reference, setReference] = useState(false);
   const [moving, setMoving] = useState(false);
   const [region, setRegion] = useState(0);
+  const [showSelection, setShowSelection] = useState(false);
+  const seed = map?.seeds[region];
+  const selectedPosition =
+    map && seed !== undefined ? { x: seed % map.width, y: Math.floor(seed / map.width) } : null;
+  function showSelectedPosition() {
+    if (!map || !selectedPosition) return;
+    setReference(false);
+    setShowSelection(true);
+    requestAnimationFrame(() => {
+      const area = viewport.current;
+      const drawing = canvas.current;
+      if (!area || !drawing) return;
+      area.scrollTo({
+        left: (selectedPosition.x / map.width) * drawing.clientWidth - area.clientWidth / 2,
+        top: (selectedPosition.y / map.height) * drawing.clientHeight - area.clientHeight / 2,
+        behavior: "instant",
+      });
+      area.scrollIntoView({ block: "center", behavior: "instant" });
+      area.focus({ preventScroll: true });
+    });
+  }
   const [message, setMessage] = useState("도안의 작은 칸을 준비하고 있어요.");
 
   useEffect(() => {
@@ -124,6 +146,7 @@ export function ColoringDemo() {
   return (
     <main className={styles.root}>
       <header className={styles.header}>
+        <Link href="/workbook">← 워크북 홈</Link>
         <p className="label">WORKBOOK / COLORING EXPERIMENT 01</p>
         <h1>비밀 정원</h1>
         <p>꽃잎 하나부터, 나만의 풍경으로.</p>
@@ -196,12 +219,16 @@ export function ColoringDemo() {
             <br />
             완성 시간은 아직 검증하지 않은 실험 도안이에요.
           </p>
-          <details className={styles.keyboard}>
+          <details
+            className={styles.keyboard}
+            onToggle={(event) => setShowSelection(event.currentTarget.open)}
+          >
             <summary>키보드로 색칠하기</summary>
             <label>
               칸 번호{" "}
               <input
                 type="number"
+                disabled={!map}
                 min={1}
                 max={map?.seeds.length ?? 1}
                 value={region + 1}
@@ -209,12 +236,23 @@ export function ColoringDemo() {
                   setRegion(
                     Math.max(
                       0,
-                      Math.min((map?.seeds.length ?? 1) - 1, Number(event.target.value) - 1),
+                      Math.min(
+                        (map?.seeds.length ?? 1) - 1,
+                        Math.trunc(Number(event.target.value) || 1) - 1,
+                      ),
                     ),
                   )
                 }
               />
             </label>
+            <p aria-live="polite" aria-label="선택한 칸 위치">
+              {map && selectedPosition
+                ? `선택 칸 ${region + 1} · 도안 ${selectedPosition.y / map.height < 1 / 3 ? "위쪽" : selectedPosition.y / map.height < 2 / 3 ? "가운데" : "아래쪽"} ${selectedPosition.x / map.width < 1 / 3 ? "왼쪽" : selectedPosition.x / map.width < 2 / 3 ? "가운데" : "오른쪽"}`
+                : "도안이 준비되면 칸을 선택할 수 있어요."}
+            </p>
+            <button disabled={!map} onClick={showSelectedPosition}>
+              선택 위치 보기
+            </button>
             <button disabled={!map} onClick={() => paint(region)}>
               선택한 칸 채우기
             </button>
@@ -252,7 +290,12 @@ export function ColoringDemo() {
               전체 보기
             </button>
           </div>
-          <div ref={viewport} className={styles.viewport}>
+          <div
+            ref={viewport}
+            className={styles.viewport}
+            tabIndex={0}
+            aria-label="색칠 도안 보기 영역"
+          >
             <div style={{ width: `${zoom * 100}%` }} className={styles.sheet}>
               {reference && (
                 <Image
@@ -311,6 +354,19 @@ export function ColoringDemo() {
                     paint(map.ids[y * map.width + x]);
                 }}
               />
+              {showSelection && !reference && map && selectedPosition && (
+                <span
+                  className={styles.regionMarker}
+                  role="img"
+                  aria-label={`선택한 칸 ${region + 1}의 위치`}
+                  data-x={selectedPosition.x}
+                  data-y={selectedPosition.y}
+                  style={{
+                    left: `${((selectedPosition.x + 0.5) / map.width) * 100}%`,
+                    top: `${((selectedPosition.y + 0.5) / map.height) * 100}%`,
+                  }}
+                />
+              )}
             </div>
           </div>
           <p role="status" className={styles.status}>

@@ -17,9 +17,7 @@ $fade: 520ms;
   @include up(lg) {
     display: grid;
     grid-template-columns: minmax(300px, 420px) 1fr;
-    grid-template-areas:
-      "captions viewport"
-      "controls controls";
+    grid-template-areas: "captions viewport";
     align-items: center;
     gap: var(--space-8) var(--space-12);
     padding: var(--space-12) 5% var(--space-8);
@@ -74,19 +72,6 @@ section.reel {
 .steps {
   order: 4;
 }
-.finale {
-  order: 5;
-}
-.controls {
-  order: 6;
-}
-// 아직 나오지 않은 문구가 모바일에서 자리를 차지하지 않게 한다.
-@media (max-width: 1023px) {
-  .steps li.out,
-  .finale.out {
-    display: none;
-  }
-}
 .eyebrow {
   font-size: 11px;
   font-weight: 800;
@@ -103,31 +88,42 @@ section.reel .captions h1 {
     color: var(--ink-muted);
   }
 }
+
+// 왼쪽은 설명 대신 목차: 지금 어느 예시인지만 알려준다.
 .steps {
   list-style: none;
   padding: 0;
   display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+
+  @include up(lg) {
+    flex-direction: column;
+    gap: var(--space-3);
+  }
 
   li {
-    display: grid;
-    grid-template-columns: 2rem 1fr;
+    display: flex;
+    align-items: center;
     gap: var(--space-2);
     color: var(--ink-muted);
+    opacity: 0.45;
     transition:
       opacity $fade $ease,
-      transform $fade $ease,
       color $fade $ease;
+  }
+  li.seen {
+    opacity: 1;
   }
   li.active {
     color: var(--ink);
   }
   b {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-    font-size: 1.05rem;
+    font-size: 0.95rem;
+
+    @include up(lg) {
+      font-size: 1.05rem;
+    }
   }
   em {
     font-style: normal;
@@ -136,48 +132,70 @@ section.reel .captions h1 {
     padding: 1px 6px;
     border-radius: 4px;
     border: 1px solid var(--line);
-    color: var(--ink-muted);
   }
   li.active em {
     border-color: var(--accent);
     color: var(--accent);
   }
-  p {
-    margin-top: 2px;
-    font-size: 0.95rem;
-    line-height: 1.6;
-  }
+}
+.ours {
+  font-size: 11px;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--ink);
+  color: var(--surface-2);
 }
 .num {
   font-size: 12px;
   font-weight: 800;
-  padding-top: 4px;
   letter-spacing: 0.05em;
 }
 .active .num {
   color: var(--accent);
 }
-.finale {
-  border-top: 1px solid var(--line);
-  padding-top: var(--space-4);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
 
+// 장면·플레이어 바 아래 자막: 시선이 장면에서 바로 내려오도록 붙이되, 바와는 숨 쉴 간격을 둔다.
+.subtitle {
+  // 두 줄 자리를 미리 잡아 문장이 바뀌어도 아래 안내가 흔들리지 않게 한다.
+  min-height: 2.9em;
+  margin-top: var(--space-6);
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.45;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+
+  @include up(lg) {
+    font-size: clamp(1.1rem, 1.4vw, 1.3rem);
+  }
+
+  // 마지막 장면의 둘째 줄만 작고 가늘게.
+  .subtitleText p {
+    margin-top: var(--space-1);
+    font-size: 0.85em;
+    font-weight: 400;
+    line-height: 1.55;
+  }
+}
+.subtitleText {
+  animation: subtitle-in 420ms $ease both;
+
+  b,
+  strong {
+    font-weight: 800;
+  }
+  strong {
+    display: block;
+  }
   p {
-    font-size: 0.95rem;
-    line-height: 1.6;
     color: var(--ink-muted);
   }
 }
-.finale .finaleTitle {
-  font-size: 1.2rem;
-  font-weight: 800;
-  color: var(--ink);
-  line-height: 1.45;
-
-  span {
-    display: block;
+@keyframes subtitle-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
   }
 }
 
@@ -185,16 +203,19 @@ section.reel .captions h1 {
 .stageColumn {
   grid-area: viewport;
   min-width: 0;
+  // 높이 때문에 너비가 줄어도 오른쪽 칸의 가운데에 둔다.
+  width: 100%;
+  margin-inline: auto;
 }
 .viewport {
   position: relative;
   width: 100%;
   // 장면 안의 글자는 창 폭에 비례해 이미지처럼 줄어든다.
   container-type: inline-size;
-  aspect-ratio: 4 / 3.6;
+  aspect-ratio: 4 / 3.2;
 
   @include up(md) {
-    aspect-ratio: 16 / 11;
+    aspect-ratio: 16 / 10;
   }
 }
 .workbookFrame {
@@ -250,7 +271,7 @@ section.reel .captions h1 {
 
 .browser {
   position: absolute;
-  inset: 3% 2% 12%;
+  inset: 1.5% 1%;
   display: flex;
   flex-direction: column;
   border: 1px solid var(--ink);
@@ -261,7 +282,7 @@ section.reel .captions h1 {
   transition: transform 900ms $ease;
 
   @include up(md) {
-    inset: 2% 2% 11%;
+    inset: 1.5% 1%;
   }
 }
 .browser.shrunk {
@@ -459,7 +480,7 @@ section.reel .captions h1 {
   z-index: 5;
 }
 
-// Scene 2 — 블로그
+// Scene 3 — 플랫폼 게시판의 머리글·카드(이전 블로그 장면의 틀)
 .blog {
   display: flex;
   flex-direction: column;
@@ -482,57 +503,11 @@ section.reel .captions h1 {
     color: var(--ink-muted);
   }
 }
-.blogHome {
-  display: flex;
-  flex-direction: column;
-  gap: 4%;
-  flex: 1;
-  min-height: 0;
-  transition: opacity 400ms $ease;
-}
-.blogHome.dimmed {
-  opacity: 0.15;
-}
 .thumb {
   position: relative;
   display: block;
   border-radius: 6px;
   overflow: hidden;
-}
-.featured {
-  display: grid;
-  grid-template-columns: 1.15fr 1fr;
-  gap: 5%;
-  align-items: center;
-
-  .thumb {
-    aspect-ratio: 21 / 9;
-  }
-  > div {
-    display: flex;
-    flex-direction: column;
-    gap: 0.45em;
-  }
-  small,
-  time {
-    font-size: 0.72em;
-    color: var(--ink-muted);
-  }
-  strong {
-    font-size: 1.25em;
-    line-height: 1.3;
-    letter-spacing: -0.02em;
-  }
-  p {
-    font-size: 0.85em;
-    line-height: 1.55;
-    color: var(--ink-muted);
-  }
-}
-.postGrid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 4%;
 }
 .post {
   display: flex;
@@ -559,57 +534,168 @@ section.reel .captions h1 {
     line-height: 1.35;
   }
 }
-.post.pressed {
-  outline-color: var(--ink);
-  transform: scale(0.97);
-}
-.detail {
-  position: absolute;
-  inset: 15% 5% 4%;
+// Scene 2 — 나만의 서비스(회비 나누기 도구)
+.tool {
   display: grid;
-  grid-template-columns: 0.9fr 1.1fr;
-  grid-template-rows: minmax(0, 1fr);
-  gap: 5%;
-  background: var(--surface-2);
-  opacity: 0;
-  transform: scale(0.3);
-  transform-origin: 18% 85%;
-  transition:
-    opacity 450ms $ease,
-    transform 650ms $ease;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 6%;
+  padding: 5% 7%;
+}
+.toolForm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9em;
+  padding: 1.2em;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
 
-  > div {
+  header {
     display: flex;
     flex-direction: column;
-    gap: 0.6em;
+    gap: 0.2em;
+    margin-bottom: 0.3em;
   }
+  header b {
+    font-size: 1.3em;
+    letter-spacing: -0.03em;
+  }
+  header span {
+    font-size: 0.75em;
+    color: var(--ink-muted);
+  }
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3em;
+    font-size: 0.8em;
+    color: var(--ink-muted);
+  }
+}
+.toolField {
+  min-height: 2.2em;
+  padding: 0.45em 0.7em;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface-2);
+  color: var(--ink);
+  font-size: 1.15em;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+
+  em {
+    margin-left: 0.2em;
+    font-style: normal;
+    font-weight: 500;
+    color: var(--ink-muted);
+  }
+}
+.toolButton {
+  align-self: stretch;
+  padding: 0.6em;
+  border-radius: 6px;
+  background: var(--ink);
+  color: var(--surface-2);
+  text-align: center;
+  font-weight: 700;
+}
+.toolButton.pressed {
+  transform: scale(0.97);
+}
+.toolResult {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4em;
+
   small {
-    font-size: 0.72em;
+    font-size: 0.85em;
     color: var(--ink-muted);
   }
   strong {
-    font-size: 1.5em;
-    line-height: 1.25;
-    letter-spacing: -0.03em;
+    font-size: 2.4em;
+    letter-spacing: -0.04em;
+    line-height: 1.1;
   }
-  p {
-    font-size: 0.88em;
-    line-height: 1.7;
+  ul {
+    list-style: none;
+    margin: 0.6em 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45em;
+  }
+  li {
+    display: flex;
+    align-items: center;
+    gap: 0.6em;
+    padding-bottom: 0.45em;
+    border-bottom: 1px solid var(--line);
+    font-size: 0.9em;
+  }
+  li b {
+    margin-left: auto;
+    font-variant-numeric: tabular-nums;
   }
 }
-.detailCover {
-  position: relative;
-  display: block;
-  height: 100%;
-  border-radius: 6px;
-  overflow: hidden;
-}
-.detail.open {
-  opacity: 1;
-  transform: none;
+// 사람 이름 첫 글자 동그라미(도구·게시판 공통)
+.tool i,
+.blog i {
+  display: inline-grid;
+  place-items: center;
+  width: 1.7em;
+  height: 1.7em;
+  border-radius: 50%;
+  background: var(--line);
+  color: var(--ink);
+  font-size: 0.8em;
+  font-style: normal;
+  font-weight: 800;
 }
 
-// Scene 3 — 클래스 신청 자동화
+// Scene 3 — 플랫폼(여러 사람이 작업을 올리는 게시판)
+.uploadButton {
+  margin-left: 1em;
+  padding: 0.3em 0.8em;
+  border-radius: 4px;
+  background: var(--ink);
+  color: var(--surface-2);
+  font-weight: 700;
+  transition: transform 200ms;
+}
+.uploadButton.pressed {
+  transform: scale(0.94);
+}
+// 한 줄 4칸: 새 글이 맨 앞에 들어오면 나머지가 한 칸씩 밀린다.
+.boardGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  align-content: start;
+  gap: 3%;
+  flex: 1;
+  min-height: 0;
+
+  .post small {
+    display: flex;
+    align-items: center;
+    gap: 0.4em;
+  }
+  .post .thumb {
+    aspect-ratio: 4 / 5;
+  }
+}
+.newPost {
+  outline-color: var(--accent);
+  animation: post-in 520ms $ease both;
+}
+@keyframes post-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+// Scene 4 — 판매와 예약(클래스 신청 자동화)
 .ops {
   display: grid;
   grid-template-columns: 28% 1fr;
@@ -862,11 +948,6 @@ section.reel .captions h1 {
     }
   }
 }
-section.reel .notice {
-  margin-top: var(--space-2);
-  font-size: 12px;
-  color: var(--ink-muted);
-}
 
 // 시연 커서
 .cursor {
@@ -895,7 +976,7 @@ section.reel .notice {
 .chips {
   position: absolute;
   left: 50%;
-  bottom: 1%;
+  bottom: 4%;
   translate: -50% 0;
   display: flex;
   gap: var(--space-2);
@@ -915,29 +996,42 @@ section.reel .notice {
   }
 }
 
-// ── 조작 ─────────────────────────────────
-section.reel .controls {
-  grid-area: controls;
+// ── 플레이어 바: 영상처럼 장면 바로 아래에 붙는 작은 아이콘 조작 ──
+// section.reel: 수업 페이지의 공통 button 규칙(주황 배경)보다 우선한다.
+section.reel .player {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  padding: 0 1%;
 
   button {
-    min-height: 40px;
-    padding: 0 var(--space-4);
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    flex: none;
+    padding: 0;
     border: 0;
-    border-radius: 8px;
-    background: var(--ink);
-    color: var(--surface-2);
-    font: inherit;
-    font-size: 14px;
-    font-weight: 700;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--ink);
     cursor: pointer;
-    @include workbook-button-feedback(var(--grey-1));
+    @include workbook-button-feedback(var(--line));
+  }
+  button:disabled {
+    color: var(--ink-muted);
+    opacity: 0.4;
+    cursor: default;
+  }
+  button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
   }
   @media (pointer: coarse) {
     button {
-      min-height: 44px;
+      width: 44px;
+      height: 44px;
     }
   }
 }
@@ -956,6 +1050,10 @@ section.reel .controls {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .subtitleText,
+  .newPost {
+    animation: none;
+  }
   .reel *,
   .reel *::after {
     transition: none !important;
@@ -971,13 +1069,9 @@ section.reel .controls {
   background: transparent;
 
   @include up(lg) {
-    grid-template-columns: minmax(260px, 360px) 1fr;
-    // 조작 버튼은 문구 칸 아래에 둬서 카드 한 화면 안에 들어오게 한다.
-    grid-template-rows: 1fr auto;
-    grid-template-areas:
-      "captions viewport"
-      "controls viewport";
-    align-items: start;
+    grid-template-columns: minmax(240px, 320px) 1fr;
+    grid-template-areas: "captions viewport";
+    align-items: center;
     gap: var(--space-4) var(--space-8);
     padding: 0;
   }
@@ -985,26 +1079,14 @@ section.reel .controls {
 .inStage {
   .captions {
     @include up(lg) {
-      gap: var(--space-4);
+      gap: var(--space-6);
     }
   }
-  .steps {
-    gap: var(--space-3);
+}
 
-    p {
-      font-size: 0.9rem;
-      line-height: 1.55;
-    }
-  }
-  .finale {
-    padding-top: var(--space-3);
-
-    p {
-      font-size: 0.9rem;
-      line-height: 1.55;
-    }
-  }
-  .finale .finaleTitle {
-    font-size: 1.05rem;
+// 넓은 화면에서 창이 너무 커져 창·플레이어 바·자막·안내가 한 화면을 넘지 않도록 높이 기준으로 너비를 제한한다.
+.inStage .stageColumn {
+  @include up(lg) {
+    max-width: calc((100dvh - 430px) * 16 / 10);
   }
 }

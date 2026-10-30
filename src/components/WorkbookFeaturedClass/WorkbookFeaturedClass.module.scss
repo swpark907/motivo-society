@@ -1,0 +1,469 @@
+.feature.feature {
+  margin-top: 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+  min-width: 0;
+  h2,
+  h3,
+  h4 {
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
+  h3 {
+    font-size: clamp(1.3rem, 2.3vw, 1.8rem);
+    line-height: 1.45;
+    margin-block: var(--space-2) var(--space-3);
+    letter-spacing: -0.035em;
+  }
+  h4 {
+    font-size: 1rem;
+    line-height: 1.5;
+    margin: 0 0 var(--space-2);
+  }
+  p,
+  li,
+  blockquote {
+    font-size: 0.9rem;
+    line-height: 1.75;
+    margin: 0;
+    color: var(--ink-muted);
+    overflow-wrap: anywhere;
+  }
+}
+.coverCopy {
+  padding: var(--space-6);
+  h2 {
+    font-size: clamp(1.5rem, 2.6vw, 2.3rem);
+    line-height: 1.35;
+    letter-spacing: -0.04em;
+    margin: var(--space-3) 0 0;
+  }
+  p {
+    color: var(--ink);
+  }
+}
+.content {
+  padding: var(--space-6);
+  @include up(md) {
+    padding: var(--space-8);
+  }
+}
+.lead {
+  max-width: 42rem;
+}
+.block {
+  padding-top: var(--space-8);
+  margin-top: var(--space-8);
+  border-top: 1px solid var(--line);
+}
+.outcomes {
+  display: grid;
+  gap: var(--space-6);
+  @include up(md) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.number {
+  display: block;
+  font:
+    1.6rem Georgia,
+    serif;
+  color: var(--ink-muted);
+  margin-bottom: var(--space-2);
+}
+.audiences {
+  display: grid;
+  gap: var(--space-6);
+  > div {
+    padding-left: var(--space-4);
+    border-left: 2px solid var(--line);
+  }
+}
+.feature p.note {
+  font-size: 0.78rem;
+  margin-top: var(--space-4);
+}
+.reviews {
+  min-width: 0;
+}
+.reviewGrid {
+  display: grid;
+  gap: var(--space-6);
+  margin-top: var(--space-6);
+  @include up(lg) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  figure {
+    margin: 0;
+    padding: var(--space-4) 0 0;
+    border: 0;
+    border-top: 1px solid var(--line);
+  }
+  blockquote {
+    margin: var(--space-4) 0;
+    font-size: 0.82rem;
+  }
+  figcaption {
+    font-size: 0.7rem;
+    color: var(--ink-muted);
+  }
+}
+.exampleBadge {
+  display: inline-block;
+  padding: var(--space-1) var(--space-2);
+  background: var(--surface-2);
+  font-size: 0.7rem;
+}
+
+// 이 클래스 소개에만 사용하는 색. 워크북과 다른 페이지의 브랜드 토큰은 바꾸지 않는다.
+.introduction {
+  --surface: #f2eee4;
+  --surface-2: #d9e9df;
+  --ink: #242c2b;
+  --ink-muted: #505c59;
+  --line: #c8cec3;
+  --lesson-teal: #d9e9df;
+  background: var(--surface);
+  color: var(--ink);
+  .coverCopy {
+    padding: var(--space-8) var(--space-6) 0;
+    @include up(md) {
+      padding-inline: var(--space-8);
+    }
+  }
+  .content {
+    padding: 0;
+  }
+  p.lead {
+    max-width: none;
+    padding: var(--space-4) var(--space-6) var(--space-8);
+    @include up(md) {
+      padding-inline: var(--space-8);
+    }
+  }
+  .block {
+    margin: 0;
+    padding: var(--space-8) var(--space-6);
+    border-top: 1px solid var(--line);
+    @include up(md) {
+      padding-inline: var(--space-8);
+    }
+  }
+  p.lead {
+    font-size: 1rem;
+    line-height: 1.8;
+  }
+  strong {
+    color: var(--ink);
+  }
+  .journey,
+  .method,
+  .caseStudy {
+    border-radius: 0;
+  }
+}
+.journey {
+  background: var(--lesson-teal);
+}
+.method {
+  background: var(--surface);
+}
+.learningSpaces {
+  display: grid;
+  gap: var(--space-6);
+  margin-top: var(--space-6);
+  @include up(md) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  h4 {
+    margin-top: var(--space-3);
+  }
+  p {
+    font-size: 0.85rem;
+  }
+}
+.spaceTag {
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+.workbookSpace,
+.computerSpace {
+  min-width: 0;
+}
+.caseStudy {
+  background: var(--lesson-teal);
+}
+.requestSteps {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: var(--space-4);
+  margin-top: var(--space-6);
+  li {
+    background: transparent;
+    border: 0;
+    border-top: 1px solid var(--line);
+    padding: var(--space-4) 0 0;
+  }
+  span {
+    font-size: 0.7rem;
+    font-weight: 700;
+  }
+  p {
+    margin-top: var(--space-2);
+    font-size: 0.9rem;
+  }
+}
+.checkBack {
+  margin-top: var(--space-6);
+  border-left: 2px solid var(--ink-muted);
+  padding-left: var(--space-4);
+  strong {
+    font-size: 0.9rem;
+  }
+  p {
+    font-size: 0.8rem;
+    margin-top: var(--space-2);
+  }
+}
+.faq {
+  padding: var(--space-8) var(--space-6);
+  @include up(md) {
+    padding-inline: var(--space-8);
+  }
+  background: var(--surface-2);
+  h2 {
+    font-size: 1.5rem;
+    margin-block: var(--space-3) var(--space-6);
+  }
+  details {
+    border-top: 1px solid var(--line);
+    padding-block: var(--space-4);
+  }
+  summary {
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 650;
+    line-height: 1.7;
+    &:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 4px;
+    }
+  }
+  details p {
+    margin-top: var(--space-3);
+    font-size: 0.85rem;
+  }
+}
+
+// 페이지 공통 문단 여백 대신 설명 묶음별로 간격을 지정한다.
+.feature:not(.introduction) .content {
+  padding-block: var(--space-8);
+}
+.feature .learningSpaces {
+  h4 {
+    margin: var(--space-2) 0 0;
+  }
+  p {
+    margin: 0;
+  }
+}
+.feature .requestSteps p {
+  margin: var(--space-2) 0 0;
+}
+.feature .checkBack p {
+  margin: var(--space-2) 0 0;
+}
+.feature .audiences h4 {
+  margin: 0 0 var(--space-2);
+}
+.feature .reviewGrid {
+  blockquote {
+    margin: var(--space-3) 0;
+    line-height: 1.75;
+  }
+  figcaption {
+    line-height: 1.6;
+  }
+}
+.feature.faq {
+  h2 {
+    margin: var(--space-2) 0 var(--space-4);
+  }
+  details:last-child {
+    padding-bottom: 0;
+  }
+  details p {
+    margin: var(--space-2) 0 0;
+  }
+}
+
+.diagramImage {
+  margin: var(--space-6) 0 0;
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  figcaption {
+    margin-top: var(--space-2);
+    color: var(--ink-muted);
+    font-size: 0.7rem;
+    line-height: 1.6;
+  }
+}
+.journeySummary {
+  list-style: none;
+  padding: 0;
+  margin-top: var(--space-4);
+  display: grid;
+  gap: var(--space-3);
+  li {
+    display: grid;
+    gap: var(--space-1);
+    border-top: 1px solid var(--line);
+    padding-top: var(--space-3);
+  }
+  strong {
+    font-size: 0.85rem;
+  }
+  span {
+    font-size: 0.8rem;
+    line-height: 1.7;
+  }
+  @include up(md) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.reviewGrid {
+  align-items: start;
+}
+.feature .reviewRating {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  > span {
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+  strong {
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--space-1);
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+  strong > span {
+    color: var(--ink-muted);
+    font-weight: 400;
+    font-size: 0.7rem;
+  }
+}
+.reviewText {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  height: 5.25em;
+  overflow: hidden;
+}
+.feature .reviewGrid .reviewToggle {
+  display: block;
+  padding: var(--space-1) 0;
+  margin: 0;
+  min-height: 44px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--ink);
+  font-size: 0.78rem;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.feature .reviewGrid blockquote {
+  font-size: 0.82rem;
+  line-height: 1.75;
+}
+.reviewActionSlot {
+  height: 44px;
+  margin-top: var(--space-2);
+}
+.feature .reviewGrid figcaption {
+  min-height: 3.2em;
+}
+.reviewDialog {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  width: min(32rem, calc(100vw - 2rem));
+  max-height: min(80dvh, 42rem);
+  padding: var(--space-6);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-2);
+  color: var(--ink);
+  &::backdrop {
+    background: rgb(0 0 0 / 65%);
+  }
+  h2 {
+    font-size: 1.2rem;
+    line-height: 1.5;
+    margin: var(--space-4) 0 var(--space-2);
+    word-break: keep-all;
+  }
+  button {
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.8rem;
+    color: var(--ink);
+    border: 1px solid var(--line);
+    background: transparent;
+    padding: var(--space-2) var(--space-3);
+    min-height: 44px;
+  }
+  button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+}
+.reviewDialogHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.dialogRating {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  span {
+    color: var(--accent);
+    letter-spacing: 0.08em;
+  }
+  strong {
+    font-size: 0.85rem;
+  }
+}
+.fullReview {
+  margin: var(--space-4) 0;
+  font-size: 0.9rem;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+.dialogNote {
+  margin: 0;
+  border-top: 1px solid var(--line);
+  padding-top: var(--space-3);
+  color: var(--ink-muted);
+  font-size: 0.75rem;
+  line-height: 1.7;
+}

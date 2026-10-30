@@ -1,6 +1,19 @@
 @use "sass:map";
 @use "./tokens" as *;
 
+// 마우스가 있는 환경의 배경 피드백. 비활성·터치에는 hover 상태를 남기지 않는다.
+@mixin workbook-button-feedback($background) {
+  transition: background-color 120ms;
+  @media (hover: hover) {
+    &:hover:not(:disabled):not([aria-disabled="true"]) {
+      background-color: $background;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
 // Mobile-first: @include up(md) { ... }
 @mixin up($key) {
   $bp: map.get($breakpoints, $key);

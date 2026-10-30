@@ -1,0 +1,193 @@
+.catalog {
+  --class-card-width: 17rem;
+  a:focus-visible,
+  button:focus-visible,
+  ul:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+  }
+}
+.cards {
+  list-style: none;
+  gap: var(--space-2);
+  > li {
+    min-width: 0;
+  }
+}
+.carousel {
+  --class-card-width: 15rem;
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) var(--surface);
+  > li {
+    flex: 0 0 min(78vw, var(--class-card-width));
+    scroll-snap-align: start;
+  }
+  // 이미지에 24px를 더하고 본문 패딩/제목 여백에서 같은 높이를 돌려준다.
+  .cardImage {
+    &::before {
+      content: "";
+      display: block;
+      padding-top: calc(56.25% + var(--space-6));
+    }
+    img {
+      position: absolute;
+      inset: 0;
+      height: 100%;
+      aspect-ratio: auto;
+    }
+  }
+  .card > .cardCopy {
+    padding-block: var(--space-2);
+  }
+  .card h3 {
+    margin-block: var(--space-2);
+  }
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--class-card-width)), 1fr));
+  gap: var(--space-6);
+}
+.controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-4);
+  margin-top: var(--space-3);
+  color: var(--ink-muted);
+  font-size: 0.75rem;
+  > div {
+    display: flex;
+    gap: var(--space-2);
+  }
+  button {
+    display: grid;
+    place-items: center;
+    width: var(--space-12);
+    height: var(--space-12);
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    background: var(--surface-2);
+    color: var(--ink);
+    font: inherit;
+    font-size: 1rem;
+    cursor: pointer;
+    &:disabled {
+      opacity: 0.35;
+      cursor: default;
+    }
+    &:hover:not(:disabled) {
+      border-color: var(--ink);
+    }
+  }
+}
+.page {
+  max-width: var(--max-width);
+  margin-inline: auto;
+  padding: var(--space-6);
+  @include up(lg) {
+    padding: var(--space-8);
+  }
+}
+.header {
+  margin-bottom: var(--space-8);
+  > a {
+    display: inline-block;
+    font-size: 0.8rem;
+    color: var(--ink-muted);
+    margin-bottom: var(--space-6);
+  }
+  h1 {
+    font-size: clamp(1.6rem, 3vw, 2.3rem);
+    margin-block: var(--space-2) var(--space-4);
+  }
+  p {
+    font-size: 0.85rem;
+    color: var(--ink-muted);
+    line-height: 1.8;
+  }
+}
+.card {
+  display: block;
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+  min-width: 0;
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+  }
+  > .cardCopy {
+    padding: var(--space-4);
+  }
+  h2,
+  h3 {
+    word-break: keep-all;
+    font-size: 0.95rem;
+    margin-block: var(--space-3);
+  }
+  p {
+    color: var(--ink-muted);
+    font-size: 0.8rem;
+    line-height: 1.8;
+  }
+  small {
+    display: block;
+    color: var(--ink-muted);
+    font-size: 0.7rem;
+    margin-top: var(--space-4);
+  }
+  strong,
+  .pending {
+    display: block;
+    margin-top: var(--space-4);
+    font-size: 0.8rem;
+  }
+  strong {
+    color: var(--accent);
+  }
+}
+.cardImage {
+  position: relative;
+  background: var(--surface);
+}
+.comingSoon {
+  .cardImage img {
+    opacity: 0.56;
+  }
+}
+.comingSoonMark {
+  position: absolute;
+  inset: var(--space-3) var(--space-3) auto auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--ink);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  &::before {
+    content: "";
+    width: var(--space-4);
+    height: 1px;
+    background: currentColor;
+  }
+}
+.tag {
+  font-size: 0.65rem;
+  color: var(--ink-muted);
+}
+.pending {
+  color: var(--ink-muted);
+}

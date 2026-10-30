@@ -1,0 +1,530 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "version": { "type": "number", "const": 1 },
+    "title": { "type": "string", "minLength": 1 },
+    "summary": { "type": "string", "minLength": 1 },
+    "slug": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "thumbnail": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^\\/images\\/workbook\\/notes\\/[a-z0-9-]+\\.(png|jpe?g|webp)$"
+        },
+        {
+          "type": "string",
+          "maxLength": 900000,
+          "pattern": "^data:image\\/jpeg;base64,\\/9j\\/[A-Za-z0-9+/]+={0,2}$"
+        }
+      ],
+      "description": "제공 사진 경로 또는 편집기에서 생성한 1600px 이하·900000자 이하 JPEG 데이터 URL. 업로드는 편집기에서 처리한다."
+    },
+    "thumbnailAlt": { "type": "string", "minLength": 1 },
+    "visualCaption": { "type": "string", "minLength": 1 },
+    "tags": { "minItems": 1, "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "sources": { "type": "array", "items": { "type": "string", "format": "uri" } },
+    "layout": { "default": "note", "type": "string", "enum": ["note", "feature", "guide"] },
+    "cover": {
+      "type": "object",
+      "properties": {
+        "layout": { "type": "string", "enum": ["title-first", "image-first", "split", "compact"] },
+        "align": { "default": "left", "type": "string", "enum": ["left", "center"] },
+        "focus": { "default": "center", "type": "string", "enum": ["left", "center", "right"] }
+      },
+      "required": ["layout", "align", "focus"],
+      "additionalProperties": false
+    },
+    "displayTitle": {
+      "minItems": 1,
+      "maxItems": 3,
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "deck": { "type": "string", "minLength": 1 },
+    "nextTry": { "type": "string", "minLength": 1 },
+    "related": {
+      "maxItems": 2,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "slug": { "type": "string", "minLength": 1 },
+          "reason": { "type": "string", "minLength": 1 }
+        },
+        "required": ["slug", "reason"],
+        "additionalProperties": false
+      }
+    },
+    "content": {
+      "minItems": 1,
+      "maxItems": 80,
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "type": { "type": "string", "const": "text" },
+              "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+              "text": { "type": "string", "minLength": 1 },
+              "tone": {
+                "default": "body",
+                "description": "body: 기본 설명; lead: 큰 도입; small: 보조; columns: 긴 설명의 잡지 2단; dropcap: 첫 글자 강조",
+                "type": "string",
+                "enum": ["body", "lead", "small", "columns", "dropcap"]
+              },
+              "width": {
+                "default": "reading",
+                "type": "string",
+                "enum": ["reading", "wide", "full"]
+              },
+              "align": { "default": "left", "type": "string", "enum": ["left", "center"] }
+            },
+            "required": ["type", "id", "text", "tone", "width", "align"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": { "type": "string", "const": "heading" },
+              "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+              "text": { "type": "string", "minLength": 1 }
+            },
+            "required": ["type", "id", "text"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": { "type": "string", "const": "quote" },
+              "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+              "text": { "type": "string", "minLength": 1 },
+              "label": { "type": "string", "minLength": 1 },
+              "layout": {
+                "default": "rule",
+                "description": "실제 인용 또는 명시한 요청 예문. rule: 선; statement: 큰 문장; pull: 큰 따옴표; margin: 좁은 여백 인용",
+                "type": "string",
+                "enum": ["rule", "statement", "pull", "margin"]
+              },
+              "width": {
+                "default": "reading",
+                "type": "string",
+                "enum": ["reading", "wide", "full"]
+              },
+              "align": { "default": "left", "type": "string", "enum": ["left", "center"] }
+            },
+            "required": ["type", "id", "text", "layout", "width", "align"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": { "type": "string", "const": "list" },
+              "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+              "items": {
+                "minItems": 2,
+                "maxItems": 8,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "title": { "type": "string", "minLength": 1 },
+                    "body": { "type": "string", "minLength": 1 }
+                  },
+                  "required": ["title", "body"],
+                  "additionalProperties": false
+                }
+              },
+              "layout": {
+                "default": "rows",
+                "description": "rows: 행; grid: 2열; steps: 번호; timeline: 순서가 있는 흐름; checklist: 읽기용 확인 목록",
+                "type": "string",
+                "enum": ["rows", "grid", "steps", "timeline", "checklist"]
+              },
+              "width": {
+                "default": "reading",
+                "type": "string",
+                "enum": ["reading", "wide", "full"]
+              }
+            },
+            "required": ["type", "id", "items", "layout", "width"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": { "type": "string", "const": "split" },
+              "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+              "image": {
+                "type": "object",
+                "properties": {
+                  "src": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "pattern": "^\\/images\\/workbook\\/notes\\/[a-z0-9-]+\\.(png|jpe?g|webp)$"
+                      },
+                      {
+                        "type": "string",
+                        "maxLength": 900000,
+                        "pattern": "^data:image\\/jpeg;base64,\\/9j\\/[A-Za-z0-9+/]+={0,2}$"
+                      }
+                    ],
+                    "description": "제공 사진 경로 또는 편집기에서 생성한 1600px 이하·900000자 이하 JPEG 데이터 URL. 업로드는 편집기에서 처리한다."
+                  },
+                  "alt": { "type": "string", "minLength": 1 },
+                  "caption": { "type": "string", "minLength": 1 },
+                  "ratio": {
+                    "default": "wide",
+                    "type": "string",
+                    "enum": ["wide", "square", "portrait"]
+                  },
+                  "focus": {
+                    "default": "center",
+                    "type": "string",
+                    "enum": ["left", "center", "right"]
+                  },
+                  "crop": { "default": "scene", "type": "string", "enum": ["scene", "detail"] }
+                },
+                "required": ["src", "alt", "caption", "ratio", "focus", "crop"],
+                "additionalProperties": false
+              },
+              "content": {
+                "minItems": 1,
+                "maxItems": 6,
+                "type": "array",
+                "items": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "type": { "type": "string", "const": "text" },
+                        "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+                        "text": { "type": "string", "minLength": 1 },
+                        "tone": {
+                          "default": "body",
+                          "description": "body: 기본 설명; lead: 큰 도입; small: 보조; columns: 긴 설명의 잡지 2단; dropcap: 첫 글자 강조",
+                          "type": "string",
+                          "enum": ["body", "lead", "small", "columns", "dropcap"]
+                        },
+                        "width": {
+                          "default": "reading",
+                          "type": "string",
+                          "enum": ["reading", "wide", "full"]
+                        },
+                        "align": { "default": "left", "type": "string", "enum": ["left", "center"] }
+                      },
+                      "required": ["type", "id", "text", "tone", "width", "align"],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "type": { "type": "string", "const": "heading" },
+                        "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+                        "text": { "type": "string", "minLength": 1 }
+                      },
+                      "required": ["type", "id", "text"],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "type": { "type": "string", "const": "quote" },
+                        "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+                        "text": { "type": "string", "minLength": 1 },
+                        "label": { "type": "string", "minLength": 1 },
+                        "layout": {
+                          "default": "rule",
+                          "description": "실제 인용 또는 명시한 요청 예문. rule: 선; statement: 큰 문장; pull: 큰 따옴표; margin: 좁은 여백 인용",
+                          "type": "string",
+                          "enum": ["rule", "statement", "pull", "margin"]
+                        },
+                        "width": {
+                          "default": "reading",
+                          "type": "string",
+                          "enum": ["reading", "wide", "full"]
+                        },
+                        "align": { "default": "left", "type": "string", "enum": ["left", "center"] }
+                      },
+                      "required": ["type", "id", "text", "layout", "width", "align"],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "type": { "type": "string", "const": "list" },
+                        "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+                        "items": {
+                          "minItems": 2,
+                          "maxItems": 8,
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "title": { "type": "string", "minLength": 1 },
+                              "body": { "type": "string", "minLength": 1 }
+                            },
+                            "required": ["title", "body"],
+                            "additionalProperties": false
+                          }
+                        },
+                        "layout": {
+                          "default": "rows",
+                          "description": "rows: 행; grid: 2열; steps: 번호; timeline: 순서가 있는 흐름; checklist: 읽기용 확인 목록",
+                          "type": "string",
+                          "enum": ["rows", "grid", "steps", "timeline", "checklist"]
+                        },
+                        "width": {
+                          "default": "reading",
+                          "type": "string",
+                          "enum": ["reading", "wide", "full"]
+                        }
+                      },
+                      "required": ["type", "id", "items", "layout", "width"],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "type": { "type": "string", "const": "callout" },
+                        "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+                        "text": { "type": "string", "minLength": 1 },
+                        "label": { "type": "string", "minLength": 1 },
+                        "layout": {
+                          "default": "note",
+                          "description": "작성자의 요약·곁가지. note: 테두리; band: 가로 띠; aside: 옆선 메모",
+                          "type": "string",
+                          "enum": ["note", "band", "aside"]
+                        },
+                        "width": {
+                          "default": "reading",
+                          "type": "string",
+                          "enum": ["reading", "wide", "full"]
+                        },
+                        "align": { "default": "left", "type": "string", "enum": ["left", "center"] }
+                      },
+                      "required": ["type", "id", "text", "layout", "width", "align"],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "type": { "type": "string", "const": "qa" },
+                        "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+                        "items": {
+                          "minItems": 1,
+                          "maxItems": 8,
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "question": { "type": "string", "minLength": 1 },
+                              "answer": { "type": "string", "minLength": 1 }
+                            },
+                            "required": ["question", "answer"],
+                            "additionalProperties": false
+                          }
+                        },
+                        "layout": {
+                          "default": "interview",
+                          "description": "질문과 답변. 실제 인터뷰 사실을 만들지 않음. interview: 문답; columns: 좌우; ruled: 구분선",
+                          "type": "string",
+                          "enum": ["interview", "columns", "ruled"]
+                        },
+                        "width": {
+                          "default": "reading",
+                          "type": "string",
+                          "enum": ["reading", "wide", "full"]
+                        }
+                      },
+                      "required": ["type", "id", "items", "layout", "width"],
+                      "additionalProperties": false
+                    }
+                  ]
+                }
+              },
+              "imageSide": { "default": "left", "type": "string", "enum": ["left", "right"] },
+              "proportion": {
+                "default": "equal",
+                "type": "string",
+                "enum": ["equal", "image-wide", "text-wide"]
+              },
+              "verticalAlign": {
+                "default": "center",
+                "type": "string",
+                "enum": ["start", "center"]
+              },
+              "width": { "default": "full", "type": "string", "enum": ["wide", "full"] }
+            },
+            "required": [
+              "type",
+              "id",
+              "image",
+              "content",
+              "imageSide",
+              "proportion",
+              "verticalAlign",
+              "width"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": { "type": "string", "const": "compare" },
+              "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+              "items": {
+                "minItems": 2,
+                "maxItems": 3,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "label": { "type": "string", "minLength": 1 },
+                    "text": { "type": "string", "minLength": 1 }
+                  },
+                  "required": ["label", "text"],
+                  "additionalProperties": false
+                }
+              },
+              "layout": {
+                "default": "columns",
+                "description": "columns: 나란히; stack: 세로; contrast: 명암 대비; table: 라벨과 설명 대조. 명암이 우열이나 실험을 뜻하지 않음",
+                "type": "string",
+                "enum": ["columns", "stack", "contrast", "table"]
+              },
+              "caption": { "type": "string", "minLength": 1 },
+              "width": { "default": "full", "type": "string", "enum": ["wide", "full"] }
+            },
+            "required": ["type", "id", "items", "layout", "caption", "width"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": { "type": "string", "const": "image" },
+              "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+              "image": {
+                "type": "object",
+                "properties": {
+                  "src": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "pattern": "^\\/images\\/workbook\\/notes\\/[a-z0-9-]+\\.(png|jpe?g|webp)$"
+                      },
+                      {
+                        "type": "string",
+                        "maxLength": 900000,
+                        "pattern": "^data:image\\/jpeg;base64,\\/9j\\/[A-Za-z0-9+/]+={0,2}$"
+                      }
+                    ],
+                    "description": "제공 사진 경로 또는 편집기에서 생성한 1600px 이하·900000자 이하 JPEG 데이터 URL. 업로드는 편집기에서 처리한다."
+                  },
+                  "alt": { "type": "string", "minLength": 1 },
+                  "caption": { "type": "string", "minLength": 1 },
+                  "ratio": {
+                    "default": "wide",
+                    "type": "string",
+                    "enum": ["wide", "square", "portrait"]
+                  },
+                  "focus": {
+                    "default": "center",
+                    "type": "string",
+                    "enum": ["left", "center", "right"]
+                  },
+                  "crop": { "default": "scene", "type": "string", "enum": ["scene", "detail"] }
+                },
+                "required": ["src", "alt", "caption", "ratio", "focus", "crop"],
+                "additionalProperties": false
+              },
+              "width": {
+                "default": "reading",
+                "type": "string",
+                "enum": ["reading", "wide", "full"]
+              }
+            },
+            "required": ["type", "id", "image", "width"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": { "type": "string", "const": "callout" },
+              "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+              "text": { "type": "string", "minLength": 1 },
+              "label": { "type": "string", "minLength": 1 },
+              "layout": {
+                "default": "note",
+                "description": "작성자의 요약·곁가지. note: 테두리; band: 가로 띠; aside: 옆선 메모",
+                "type": "string",
+                "enum": ["note", "band", "aside"]
+              },
+              "width": {
+                "default": "reading",
+                "type": "string",
+                "enum": ["reading", "wide", "full"]
+              },
+              "align": { "default": "left", "type": "string", "enum": ["left", "center"] }
+            },
+            "required": ["type", "id", "text", "layout", "width", "align"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": { "type": "string", "const": "qa" },
+              "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+              "items": {
+                "minItems": 1,
+                "maxItems": 8,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "question": { "type": "string", "minLength": 1 },
+                    "answer": { "type": "string", "minLength": 1 }
+                  },
+                  "required": ["question", "answer"],
+                  "additionalProperties": false
+                }
+              },
+              "layout": {
+                "default": "interview",
+                "description": "질문과 답변. 실제 인터뷰 사실을 만들지 않음. interview: 문답; columns: 좌우; ruled: 구분선",
+                "type": "string",
+                "enum": ["interview", "columns", "ruled"]
+              },
+              "width": {
+                "default": "reading",
+                "type": "string",
+                "enum": ["reading", "wide", "full"]
+              }
+            },
+            "required": ["type", "id", "items", "layout", "width"],
+            "additionalProperties": false
+          }
+        ]
+      }
+    }
+  },
+  "required": [
+    "version",
+    "title",
+    "summary",
+    "slug",
+    "thumbnail",
+    "thumbnailAlt",
+    "visualCaption",
+    "tags",
+    "sources",
+    "layout",
+    "cover",
+    "nextTry",
+    "related",
+    "content"
+  ],
+  "additionalProperties": false
+}

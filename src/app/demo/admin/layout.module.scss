@@ -1,0 +1,34 @@
+.lab {
+  padding: var(--space-6);
+  width: 100%;
+  max-width: 1600px;
+  margin-inline: auto;
+  > nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-6);
+    padding-bottom: var(--space-4);
+    margin-bottom: var(--space-6);
+    border-bottom: 1px solid var(--line);
+    a {
+      font-size: 0.8rem;
+      color: var(--ink-muted);
+    }
+    a:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 4px;
+    }
+  }
+  @include up(lg) {
+    padding: var(--space-8);
+  }
+}
+
+.lab:has([data-article-editor]) {
+  height: 100dvh;
+  max-width: none;
+  padding: var(--space-2) var(--space-3);
+  > nav {
+    display: none;
+  }
+}

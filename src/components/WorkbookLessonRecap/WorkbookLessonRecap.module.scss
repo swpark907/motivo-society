@@ -1,0 +1,51 @@
+.recap {
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding-block: var(--lesson-section-gap, var(--space-6));
+  margin-bottom: var(--lesson-section-gap, var(--space-6));
+  h2 {
+    margin-block: var(--lesson-item-gap, var(--space-3)) var(--lesson-section-gap, var(--space-6));
+  }
+  h3 {
+    font-size: 1rem;
+    margin-bottom: var(--space-3);
+  }
+  ul {
+    padding-left: var(--space-6);
+  }
+  li {
+    margin-bottom: var(--space-2);
+  }
+  p,
+  li,
+  dd {
+    font-size: var(--lesson-body-size, 0.9rem);
+    line-height: var(--lesson-body-leading, 1.8);
+  }
+  details {
+    margin-block: var(--space-4);
+  }
+  summary {
+    cursor: pointer;
+  }
+  dt {
+    font-weight: 650;
+    margin-top: var(--space-4);
+  }
+  dd {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    color: var(--ink-muted);
+  }
+}
+.columns {
+  display: grid;
+  gap: var(--lesson-section-gap, var(--space-6));
+  @include up(lg) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.next {
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--line);
+}

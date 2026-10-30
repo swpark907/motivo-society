@@ -44,3 +44,9 @@ next-env.d.ts
 /test-results
 /playwright-report
 /blob-report
+
+# 에이전트 세션의 임시 출력(시안 렌더·생성 이미지 원본·검토용 HTML). 저장소에 올리지 않는다.
+/output/
+/generated_images/
+/public/preview/
+/.new
