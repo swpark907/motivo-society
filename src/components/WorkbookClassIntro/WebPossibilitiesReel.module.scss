@@ -1,0 +1,1010 @@
+// 1-1-1 인트로 두 번째 장 시안. 영상처럼 흐르는 진행은 이 장면 한정 모션 예외(검토 중)다.
+$ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+$fade: 520ms;
+
+.reel {
+  // 한글은 어절 단위로만 줄바꿈한다 ("까요?"만 다음 줄로 떨어지지 않게).
+  word-break: keep-all;
+  min-height: calc(100vh - var(--gnb-height));
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-6) var(--space-4) var(--space-6);
+
+  @include up(lg) {
+    display: grid;
+    grid-template-columns: minmax(300px, 420px) 1fr;
+    grid-template-areas:
+      "captions viewport"
+      "controls controls";
+    align-items: center;
+    gap: var(--space-8) var(--space-12);
+    padding: var(--space-12) 5% var(--space-8);
+  }
+}
+
+// 워크북 수업 페이지의 공통 h1·p 여백 규칙이 장면 안으로 들어오지 않게 막는다.
+section.reel {
+  h1,
+  p {
+    margin: 0;
+  }
+}
+
+.in,
+.out {
+  transition:
+    opacity $fade $ease,
+    transform $fade $ease;
+}
+.out {
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+}
+.in {
+  opacity: 1;
+  transform: none;
+}
+
+// ── 왼쪽 문구 ─────────────────────────────
+// 모바일: 문구 묶음을 풀어 제목 → 장면 → 지금 문구 순서로 놓는다.
+.captions {
+  display: contents;
+
+  @include up(lg) {
+    grid-area: captions;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+}
+.eyebrow {
+  order: 1;
+}
+.captions h1 {
+  order: 2;
+}
+.stageColumn {
+  order: 3;
+}
+.steps {
+  order: 4;
+}
+.finale {
+  order: 5;
+}
+.controls {
+  order: 6;
+}
+// 아직 나오지 않은 문구가 모바일에서 자리를 차지하지 않게 한다.
+@media (max-width: 1023px) {
+  .steps li.out,
+  .finale.out {
+    display: none;
+  }
+}
+.eyebrow {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  color: var(--accent);
+}
+section.reel .captions h1 {
+  font-size: clamp(1.5rem, 2.2vw, 1.9rem);
+  line-height: 1.25;
+  letter-spacing: -0.03em;
+  font-weight: 800;
+
+  span {
+    color: var(--ink-muted);
+  }
+}
+.steps {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+
+  li {
+    display: grid;
+    grid-template-columns: 2rem 1fr;
+    gap: var(--space-2);
+    color: var(--ink-muted);
+    transition:
+      opacity $fade $ease,
+      transform $fade $ease,
+      color $fade $ease;
+  }
+  li.active {
+    color: var(--ink);
+  }
+  b {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 1.05rem;
+  }
+  em {
+    font-style: normal;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--line);
+    color: var(--ink-muted);
+  }
+  li.active em {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  p {
+    margin-top: 2px;
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+}
+.num {
+  font-size: 12px;
+  font-weight: 800;
+  padding-top: 4px;
+  letter-spacing: 0.05em;
+}
+.active .num {
+  color: var(--accent);
+}
+.finale {
+  border-top: 1px solid var(--line);
+  padding-top: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+
+  p {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--ink-muted);
+  }
+}
+.finale .finaleTitle {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--ink);
+  line-height: 1.45;
+
+  span {
+    display: block;
+  }
+}
+
+// ── 오른쪽 장면 ───────────────────────────
+.stageColumn {
+  grid-area: viewport;
+  min-width: 0;
+}
+.viewport {
+  position: relative;
+  width: 100%;
+  // 장면 안의 글자는 창 폭에 비례해 이미지처럼 줄어든다.
+  container-type: inline-size;
+  aspect-ratio: 4 / 3.6;
+
+  @include up(md) {
+    aspect-ratio: 16 / 11;
+  }
+}
+.workbookFrame {
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-2);
+  overflow: hidden;
+  transform: none;
+}
+.workbookFrame.out {
+  transform: scale(1.02);
+}
+.frameBar {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 14px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink-muted);
+  border-bottom: 1px solid var(--line);
+
+  span:last-child {
+    color: var(--accent);
+  }
+}
+// 반전: 바깥 틀은 지금 이 페이지(왼쪽 문구 + 오른쪽 장면)의 축소판이다.
+.frameCaptions {
+  position: absolute;
+  left: 5%;
+  top: 22%;
+  width: 24%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  i {
+    display: block;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--line);
+  }
+  i:first-child {
+    height: 12px;
+    background: var(--ink);
+    width: 80%;
+  }
+  i.short {
+    width: 60%;
+  }
+}
+
+.browser {
+  position: absolute;
+  inset: 3% 2% 12%;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--ink);
+  border-radius: 12px;
+  background: var(--surface-2);
+  overflow: hidden;
+  transform-origin: 58% 52%;
+  transition: transform 900ms $ease;
+
+  @include up(md) {
+    inset: 2% 2% 11%;
+  }
+}
+.browser.shrunk {
+  transform: translate(14%, 4%) scale(0.62);
+}
+.chrome {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+}
+.dots {
+  display: flex;
+  gap: 5px;
+
+  i {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--line);
+  }
+}
+.address {
+  flex: 1;
+  font-size: 12px;
+  color: var(--ink-muted);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 3px 10px;
+  min-height: 22px;
+  font-variant-numeric: tabular-nums;
+}
+.caret {
+  display: inline-block;
+  width: 1px;
+  height: 12px;
+  margin-left: 1px;
+  vertical-align: -2px;
+  background: var(--ink);
+}
+
+.body {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+  font-size: clamp(7px, 1.65cqw, 15px);
+}
+.scene {
+  position: absolute;
+  inset: 0;
+  padding: 5% 6%;
+}
+
+// 장면 속 사진은 모두 프레임을 채운다.
+.body img {
+  object-fit: cover;
+}
+
+// Scene 1 — 공방 소개 페이지
+.site {
+  display: flex;
+  flex-direction: column;
+  gap: 3.5%;
+  padding: 3.5% 5%;
+  transition:
+    opacity $fade $ease,
+    gap 700ms $ease;
+}
+.site.layered {
+  gap: 5.5%;
+}
+.block {
+  border-radius: 6px;
+  outline: 1px dashed transparent;
+  outline-offset: 4px;
+  transition:
+    opacity $fade $ease,
+    transform $fade $ease,
+    outline-color 400ms $ease;
+}
+.layered .block {
+  outline-color: var(--accent);
+}
+.siteNav {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 0.85em;
+
+  b {
+    letter-spacing: 0.12em;
+  }
+  span {
+    color: var(--ink-muted);
+  }
+}
+.siteHero {
+  flex: 0 0 40%;
+  min-height: 0;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+  gap: 5%;
+}
+.heroText {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.55em;
+
+  small {
+    font-size: 0.7em;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+  }
+  strong {
+    font-size: 1.9em;
+    line-height: 1.15;
+    letter-spacing: -0.035em;
+  }
+  p {
+    font-size: 0.9em;
+    color: var(--ink-muted);
+  }
+}
+.siteButton {
+  align-self: flex-start;
+  margin-top: 0.3em;
+  padding: 0.45em 1em;
+  border-radius: 4px;
+  background: var(--ink);
+  color: var(--surface-2);
+  font-size: 0.85em;
+  font-weight: 700;
+}
+.heroImage {
+  position: relative;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.works {
+  small {
+    display: block;
+    font-size: 0.75em;
+    font-weight: 700;
+    margin-bottom: 0.5em;
+  }
+  > div {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3%;
+  }
+  figure {
+    margin: 0;
+  }
+  figure > span {
+    position: relative;
+    display: block;
+    aspect-ratio: 2 / 1;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  figcaption {
+    margin-top: 0.3em;
+    font-size: 0.75em;
+    color: var(--ink-muted);
+  }
+}
+.siteFooter {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 0.6em;
+  border-top: 1px solid var(--line);
+  font-size: 0.8em;
+
+  span {
+    color: var(--ink-muted);
+  }
+}
+
+.layerTag {
+  position: absolute;
+  right: 3%;
+  bottom: 4%;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 12px;
+  font-weight: 800;
+  z-index: 5;
+}
+
+// Scene 2 — 블로그
+.blog {
+  display: flex;
+  flex-direction: column;
+  gap: 4%;
+  padding: 3.5% 5%;
+}
+.blogNav {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-bottom: 0.5em;
+  border-bottom: 1px solid var(--line);
+
+  b {
+    font-size: 1.3em;
+    letter-spacing: -0.03em;
+  }
+  span {
+    font-size: 0.8em;
+    color: var(--ink-muted);
+  }
+}
+.blogHome {
+  display: flex;
+  flex-direction: column;
+  gap: 4%;
+  flex: 1;
+  min-height: 0;
+  transition: opacity 400ms $ease;
+}
+.blogHome.dimmed {
+  opacity: 0.15;
+}
+.thumb {
+  position: relative;
+  display: block;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.featured {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 5%;
+  align-items: center;
+
+  .thumb {
+    aspect-ratio: 21 / 9;
+  }
+  > div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45em;
+  }
+  small,
+  time {
+    font-size: 0.72em;
+    color: var(--ink-muted);
+  }
+  strong {
+    font-size: 1.25em;
+    line-height: 1.3;
+    letter-spacing: -0.02em;
+  }
+  p {
+    font-size: 0.85em;
+    line-height: 1.55;
+    color: var(--ink-muted);
+  }
+}
+.postGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4%;
+}
+.post {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3em;
+  border-radius: 6px;
+  outline: 1px solid transparent;
+  outline-offset: 3px;
+  transition:
+    opacity $fade $ease,
+    transform $fade $ease,
+    outline-color 200ms;
+
+  .thumb {
+    aspect-ratio: 5 / 2;
+    margin-bottom: 0.2em;
+  }
+  small {
+    font-size: 0.7em;
+    color: var(--ink-muted);
+  }
+  b {
+    font-size: 0.88em;
+    line-height: 1.35;
+  }
+}
+.post.pressed {
+  outline-color: var(--ink);
+  transform: scale(0.97);
+}
+.detail {
+  position: absolute;
+  inset: 15% 5% 4%;
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  grid-template-rows: minmax(0, 1fr);
+  gap: 5%;
+  background: var(--surface-2);
+  opacity: 0;
+  transform: scale(0.3);
+  transform-origin: 18% 85%;
+  transition:
+    opacity 450ms $ease,
+    transform 650ms $ease;
+
+  > div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6em;
+  }
+  small {
+    font-size: 0.72em;
+    color: var(--ink-muted);
+  }
+  strong {
+    font-size: 1.5em;
+    line-height: 1.25;
+    letter-spacing: -0.03em;
+  }
+  p {
+    font-size: 0.88em;
+    line-height: 1.7;
+  }
+}
+.detailCover {
+  position: relative;
+  display: block;
+  height: 100%;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.detail.open {
+  opacity: 1;
+  transform: none;
+}
+
+// Scene 3 — 클래스 신청 자동화
+.ops {
+  display: grid;
+  grid-template-columns: 28% 1fr;
+  gap: 4%;
+  padding: 3.5% 4%;
+}
+.apply {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55em;
+
+  small {
+    display: block;
+    font-size: 0.7em;
+    color: var(--ink-muted);
+  }
+  strong {
+    font-size: 1.05em;
+    letter-spacing: -0.02em;
+  }
+}
+.applyCover {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 10;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35em;
+
+  span {
+    font-size: 0.8em;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 0.35em 0.6em;
+  }
+}
+.submit {
+  padding: 0.5em;
+  text-align: center;
+  border-radius: 4px;
+  background: var(--ink);
+  color: var(--surface-2);
+  font-size: 0.85em;
+  font-weight: 700;
+}
+.submit.pressed {
+  transform: scale(0.95);
+}
+.pipe {
+  position: absolute;
+  left: 4%;
+  width: 28%;
+  bottom: 3%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35em;
+
+  span {
+    font-size: 0.7em;
+    padding: 0.15em 0.6em;
+    border-radius: 999px;
+    border: 1px solid var(--ink);
+    background: var(--surface-2);
+  }
+}
+.admin {
+  position: relative;
+  display: grid;
+  grid-template-columns: 20% 1fr;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.adminSide {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  padding: 8% 10%;
+  background: var(--surface);
+  border-right: 1px solid var(--line);
+  font-size: 0.78em;
+
+  b {
+    margin-bottom: 0.4em;
+  }
+  span {
+    color: var(--ink-muted);
+    padding: 0.2em 0.4em;
+    border-radius: 4px;
+  }
+  .current {
+    color: var(--surface-2);
+    background: var(--ink);
+  }
+}
+.adminMain {
+  padding: 4% 5%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8em;
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8em;
+  }
+  th {
+    text-align: left;
+    font-weight: 600;
+    color: var(--ink-muted);
+    padding-bottom: 0.3em;
+    border-bottom: 1px solid var(--line);
+  }
+  td {
+    padding: 0.45em 0;
+    border-bottom: 1px solid var(--line);
+  }
+  em {
+    font-style: normal;
+    font-size: 0.9em;
+    padding: 0.1em 0.55em;
+    border-radius: 999px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+  }
+  em.wait {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: transparent;
+  }
+}
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 3%;
+
+  div {
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 0.4em 0.6em;
+  }
+  small {
+    display: block;
+    font-size: 0.68em;
+    color: var(--ink-muted);
+  }
+  b {
+    font-size: 1.35em;
+    font-variant-numeric: tabular-nums;
+  }
+}
+.hiddenRow {
+  opacity: 0;
+}
+.newRow {
+  opacity: 1;
+  transition: opacity $fade $ease;
+
+  td {
+    background: color-mix(in srgb, var(--accent) 9%, transparent);
+  }
+}
+.toast {
+  position: absolute;
+  right: 3%;
+  bottom: 4%;
+  padding: 0.55em 0.8em;
+  border-radius: 6px;
+  background: var(--ink);
+  color: var(--surface-2);
+  font-size: 0.75em;
+  line-height: 1.45;
+
+  b {
+    display: block;
+  }
+}
+.dot {
+  position: absolute;
+  left: 18%;
+  top: 84%;
+  width: 12px;
+  height: 12px;
+  margin: -6px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0;
+  transition:
+    left 750ms $ease,
+    top 750ms $ease,
+    opacity 200ms;
+  z-index: 3;
+}
+.dot.travel {
+  left: 60%;
+  top: 46%;
+  opacity: 1;
+}
+.dot.travel.out {
+  opacity: 0;
+}
+.manual {
+  position: absolute;
+  inset: 0;
+  padding: 6% 10%;
+  background: color-mix(in srgb, var(--surface-2) 95%, transparent);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.8em;
+  z-index: 4;
+
+  small {
+    font-size: 0.8em;
+    font-weight: 700;
+    color: var(--ink-muted);
+  }
+  ol {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+    max-height: 22em;
+    overflow: hidden;
+    transition:
+      max-height 700ms $ease,
+      opacity 500ms $ease;
+  }
+  li {
+    padding: 0.5em 0.8em;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+  }
+  ol.folded {
+    max-height: 0;
+    opacity: 0;
+  }
+  p {
+    font-size: 1.6em;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+
+    b {
+      color: var(--accent);
+    }
+  }
+}
+section.reel .notice {
+  margin-top: var(--space-2);
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+
+// 시연 커서
+.cursor {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  margin: -2px 0 0 -2px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-12deg);
+  background: var(--ink);
+  border: 2px solid var(--surface-2);
+  z-index: 4;
+  transition:
+    left 1000ms $ease,
+    top 1000ms $ease,
+    opacity 300ms;
+}
+.cursor.clicking::after {
+  content: "";
+  position: absolute;
+  inset: -10px;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+}
+
+.chips {
+  position: absolute;
+  left: 50%;
+  bottom: 1%;
+  translate: -50% 0;
+  display: flex;
+  gap: var(--space-2);
+
+  span {
+    padding: 4px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--ink);
+    font-size: 12px;
+    font-weight: 800;
+    white-space: nowrap;
+    background: var(--surface-2);
+
+    @include up(md) {
+      font-size: 13px;
+    }
+  }
+}
+
+// ── 조작 ─────────────────────────────────
+section.reel .controls {
+  grid-area: controls;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+
+  button {
+    min-height: 40px;
+    padding: 0 var(--space-4);
+    border: 0;
+    border-radius: 8px;
+    background: var(--ink);
+    color: var(--surface-2);
+    font: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    @include workbook-button-feedback(var(--grey-1));
+  }
+  @media (pointer: coarse) {
+    button {
+      min-height: 44px;
+    }
+  }
+}
+.progress {
+  flex: 1;
+  height: 3px;
+  background: var(--line);
+  border-radius: 2px;
+  overflow: hidden;
+
+  span {
+    display: block;
+    height: 100%;
+    background: var(--ink);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reel *,
+  .reel *::after {
+    transition: none !important;
+  }
+}
+
+// 강의 인트로 카드 안: 페이지 높이·바깥 여백 대신 카드 안에 맞춘다.
+.inStage {
+  min-height: 0;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+
+  @include up(lg) {
+    grid-template-columns: minmax(260px, 360px) 1fr;
+    // 조작 버튼은 문구 칸 아래에 둬서 카드 한 화면 안에 들어오게 한다.
+    grid-template-rows: 1fr auto;
+    grid-template-areas:
+      "captions viewport"
+      "controls viewport";
+    align-items: start;
+    gap: var(--space-4) var(--space-8);
+    padding: 0;
+  }
+}
+.inStage {
+  .captions {
+    @include up(lg) {
+      gap: var(--space-4);
+    }
+  }
+  .steps {
+    gap: var(--space-3);
+
+    p {
+      font-size: 0.9rem;
+      line-height: 1.55;
+    }
+  }
+  .finale {
+    padding-top: var(--space-3);
+
+    p {
+      font-size: 0.9rem;
+      line-height: 1.55;
+    }
+  }
+  .finale .finaleTitle {
+    font-size: 1.05rem;
+  }
+}

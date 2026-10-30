@@ -1,0 +1,29 @@
+.page {
+  min-height: calc(100vh - var(--gnb-height));
+  padding: 32px 16px 48px;
+  display: grid;
+  align-content: start;
+  justify-items: center;
+  gap: 16px;
+
+  @include up(md) {
+    padding: 48px 24px;
+  }
+}
+
+.label {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--ink-muted);
+}
+
+.note {
+  max-width: 34rem;
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink-muted);
+  text-align: center;
+}

@@ -1,0 +1,79 @@
+.figure {
+  width: 100%;
+  margin: 0;
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+}
+
+// 장면 224×160px를 정수 배율(모바일 2배, 넓은 화면 3배)로 키워 픽셀이 고르게 보이게 한다.
+.scene {
+  display: block;
+  width: min(448px, 100%);
+  aspect-ratio: 224 / 160;
+  image-rendering: pixelated;
+
+  @include up(md) {
+    width: min(672px, 100%);
+  }
+}
+
+.fallback {
+  margin: 0;
+  padding: 48px 16px;
+  color: var(--ink-muted);
+  font-size: 14px;
+  text-align: center;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+// 놓이는 화면의 공통 버튼 규칙(예: 워크북 수업의 .page button)보다 우선하도록 figure 아래로 한정한다.
+.figure .toggle {
+  min-height: 44px;
+  padding: 4px 12px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ink-muted);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+
+  @include workbook-button-feedback(var(--line));
+
+  &:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+}
+
+// 강의 인트로 캐릭터 패널: 패널을 채우고 비율을 지킨 채 가운데 둔다. 정지 버튼은 구석에 작게.
+.fill {
+  position: absolute;
+  inset: 0;
+  display: block;
+  // 밝은 패널 위라 .paper 토큰을 쓰되, 바탕은 패널 색을 그대로 둔다.
+  background: transparent;
+
+  .scene {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .controls {
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+  }
+
+  .toggle {
+    font-size: 12px;
+  }
+}

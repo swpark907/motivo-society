@@ -7,3 +7,15 @@ export const NAV_ITEMS = [
 ] as const;
 
 export type NavHref = (typeof NAV_ITEMS)[number]["href"];
+
+// 현재 검토 중인 화면만 노출한다. 완료한 시안의 라우트는 별도로 유지한다.
+export const TEST_PAGE_GROUPS = [
+  {
+    label: "진행 중",
+    items: [
+      { href: "/demo/workbook-completion", label: "단원 완료·결과물 미리보기" },
+      { href: "/demo/workbook-intro-111", label: "강의 인트로 미리보기" },
+      { href: "/demo/workbook-intro-sprite", label: "인트로 카피바라 스프라이트" },
+    ],
+  },
+] as const;

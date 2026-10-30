@@ -1,0 +1,476 @@
+.page {
+  min-height: 100vh;
+  background: #f3f0e9;
+  color: #20221f;
+  font-family: Pretendard, sans-serif;
+}
+.header {
+  height: 68px;
+  padding: 0 5%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #d9d7cf;
+}
+.brand {
+  font-size: 21px;
+  letter-spacing: -1px;
+  font-weight: 800;
+}
+.brand b {
+  font-weight: 400;
+}
+.headerCenter,
+.preview,
+.eyebrow,
+.imageCaption {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+}
+.headerCenter {
+  color: #777970;
+}
+.preview,
+.eyebrow {
+  color: #a86646;
+}
+.shell {
+  max-width: 1500px;
+  margin: auto;
+  padding: 28px 5% 32px;
+}
+.topline {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #777970;
+  margin-bottom: 16px;
+}
+.topline i {
+  display: inline-block;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #adad9f;
+  vertical-align: middle;
+  margin: 0 8px;
+}
+.topline em {
+  font-style: normal;
+  color: #c5c4bb;
+  margin: 0 5px;
+}
+.stage {
+  min-height: 620px;
+  background: #faf9f5;
+  border: 1px solid #e0ded6;
+  border-radius: 14px;
+  overflow: hidden;
+}
+.withCharacter {
+  display: grid;
+  grid-template-columns: 44% 56%;
+}
+.character {
+  position: relative;
+  overflow: hidden;
+  min-height: 620px;
+  background: #fdfbf6;
+}
+.characterImage {
+  position: absolute;
+  inset: 0;
+  background: url("/images/workbook/intro-quiet-study.png") 0% center / auto 100% no-repeat;
+}
+.imageCaption {
+  position: absolute;
+  top: 30px;
+  left: 30px;
+  right: 30px;
+  display: flex;
+  justify-content: space-between;
+  color: #89877d;
+}
+.content {
+  padding: clamp(38px, 6vw, 90px);
+  outline: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+.wide .content {
+  min-height: 620px;
+}
+.eyebrow {
+  margin-bottom: 28px;
+}
+.content h1 {
+  font-size: clamp(34px, 3.6vw, 58px);
+  line-height: 1.22;
+  letter-spacing: -0.065em;
+  margin: 0 0 30px;
+  font-weight: 800;
+  word-break: keep-all;
+}
+.content h1 span {
+  color: #a76543;
+}
+.content p {
+  font-size: 16px;
+  line-height: 1.8;
+  color: #555951;
+  margin: 0 0 18px;
+  word-break: keep-all;
+}
+.content .lead {
+  font-size: 19px;
+  font-weight: 700;
+  color: #252923;
+  letter-spacing: -0.035em;
+  line-height: 1.65;
+}
+.questionLayout {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 50px;
+}
+.questionMark {
+  display: block;
+  color: #a76543;
+  font-family: Georgia, serif;
+  font-size: 90px;
+  line-height: 1;
+  margin-bottom: 30px;
+}
+.questionLayout h1 {
+  max-width: 900px;
+}
+.content .sideNote {
+  border-left: 1px solid #d5d6cd;
+  padding-left: 24px;
+  font-size: 14px;
+}
+.browserExamples {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 18px 0 30px;
+}
+.browserExamples > div {
+  min-height: 165px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: #e9ede5;
+  border-top: 7px solid #d8dfd4;
+}
+.browserExamples > div:nth-child(2) {
+  background: #eee8de;
+  border-color: #e2d5c5;
+}
+.browserExamples > div:nth-child(3) {
+  background: #e4e7e0;
+  border-color: #d2d8cd;
+}
+.browserExamples small,
+.concepts small {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: #868b7d;
+  font-weight: 800;
+}
+.browserExamples strong {
+  font-size: 20px;
+  line-height: 1.4;
+}
+.browserExamples span {
+  font-size: 11px;
+  color: #777c70;
+}
+.concepts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  margin: 15px 0 20px;
+}
+.concepts article {
+  border-top: 1px solid #b9beb1;
+  padding-top: 20px;
+}
+.concepts h2 {
+  font-size: 24px;
+  margin: 14px 0;
+}
+.concepts article p {
+  font-size: 14px;
+  margin: 12px 0 0;
+}
+.screenDiagram {
+  height: 110px;
+  background: #e7ebe3;
+  padding: 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 12px 1fr 12px;
+  gap: 7px;
+}
+.screenDiagram span {
+  background: #c8d1c4;
+}
+.screenDiagram span:first-child {
+  grid-column: span 2;
+  background: #aab9a9;
+}
+.screenDiagram span:last-child {
+  grid-column: span 2;
+  width: 40%;
+  background: #b77c5b;
+}
+.dataDiagram {
+  height: 110px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background: #eee9df;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 700;
+}
+.dataDiagram b {
+  color: #a76543;
+  font-size: 12px;
+  line-height: 1.8;
+}
+.content .fine {
+  font-size: 12px;
+  color: #7c8076;
+}
+.disciplines {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 20px 0 30px;
+}
+.disciplines span {
+  border: 1px solid #d1d5c9;
+  padding: 14px 20px;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: #667568;
+}
+.process {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 18px;
+  padding: 23px 0;
+  border-top: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 25px;
+  font-size: 15px;
+  font-weight: 700;
+}
+.process b {
+  color: #b66d48;
+}
+.journey {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin: 25px 0;
+}
+.journey div {
+  min-height: 150px;
+  background: #e5ebe1;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.journey small {
+  color: #a36a4d;
+  font-weight: 800;
+}
+.journey strong {
+  font-size: 16px;
+  line-height: 1.4;
+  word-break: keep-all;
+}
+.journey span {
+  align-self: flex-end;
+}
+.checklist {
+  margin: 10px 0 25px;
+}
+.checklist div {
+  border-bottom: 1px solid #dfdfd5;
+  padding: 13px 0;
+  font-weight: 700;
+}
+.checklist b {
+  color: #b57958;
+  font-size: 11px;
+  margin-right: 20px;
+}
+.note {
+  margin-top: 22px;
+  border-top: 1px solid #dddcd3;
+  padding-top: 20px;
+  font-size: 15px;
+  color: #59665c;
+}
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+}
+.footer button {
+  cursor: pointer;
+  border: 0;
+  background: none;
+  color: #555b52;
+  font-weight: 700;
+  padding: 12px;
+}
+.footer button:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+.footer .next {
+  background: #283d33;
+  color: white;
+  border-radius: 4px;
+  padding: 16px 22px;
+  min-width: 150px;
+  text-align: left;
+}
+.next span {
+  float: right;
+  margin-left: 20px;
+}
+.dots {
+  display: flex;
+  gap: 7px;
+}
+.dots button {
+  width: 10px;
+  height: 10px;
+  padding: 0;
+  border-radius: 100%;
+  background: #cdcec5;
+}
+.dots .active {
+  background: #ac6947;
+  width: 22px;
+  border-radius: 5px;
+}
+.footer button:focus-visible {
+  outline: 2px solid #ad6949;
+  outline-offset: 3px;
+}
+@media (max-width: 760px) {
+  .header {
+    height: 56px;
+  }
+  .headerCenter {
+    display: none;
+  }
+  .shell {
+    padding: 20px 16px 28px;
+  }
+  .withCharacter {
+    display: flex;
+    flex-direction: column;
+  }
+  .character {
+    min-height: 270px;
+  }
+  .imageCaption {
+    top: 18px;
+    left: 20px;
+    right: 20px;
+  }
+  .content,
+  .wide .content {
+    min-height: 420px;
+    padding: 35px 24px;
+    justify-content: flex-start;
+  }
+  .content h1 {
+    font-size: 34px;
+  }
+  .content p {
+    font-size: 15px;
+  }
+  .content .lead {
+    font-size: 17px;
+  }
+  .eyebrow {
+    margin-bottom: 22px;
+  }
+  .questionLayout {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .questionMark {
+    font-size: 65px;
+    margin-bottom: 16px;
+  }
+  .browserExamples {
+    gap: 6px;
+  }
+  .browserExamples > div {
+    min-height: 135px;
+    padding: 10px;
+  }
+  .browserExamples strong {
+    font-size: 14px;
+  }
+  .browserExamples small,
+  .browserExamples span {
+    font-size: 9px;
+  }
+  .concepts {
+    gap: 14px;
+  }
+  .concepts h2 {
+    font-size: 19px;
+  }
+  .dataDiagram {
+    font-size: 12px;
+  }
+  .process {
+    gap: 9px;
+    font-size: 13px;
+  }
+  .journey {
+    grid-template-columns: 1fr;
+  }
+  .journey div {
+    min-height: 60px;
+    flex-direction: row;
+    align-items: center;
+    gap: 15px;
+  }
+  .journey strong {
+    flex: 1;
+  }
+  .footer .next {
+    min-width: 120px;
+    padding: 14px;
+  }
+  .footer > button:first-child span {
+    display: none;
+  }
+  .dots {
+    gap: 5px;
+  }
+}

@@ -1,12 +1,17 @@
 import Link from "next/link";
 import { NAV_ITEMS } from "@/lib/nav";
+import { TestPageMenu } from "./TestPageMenu";
 import { NavLink } from "./NavLink";
 import styles from "./Gnb.module.scss";
 
 export function Gnb() {
   return (
     <header className={styles.header}>
-      <nav className={styles.nav} aria-label="주 메뉴">
+      <nav
+        className={styles.nav}
+        aria-label="주 메뉴"
+        data-test-navigation={process.env.NODE_ENV !== "production"}
+      >
         <Link href="/" className={`display ${styles.brand}`}>
           Motivo Society
         </Link>
@@ -19,6 +24,7 @@ export function Gnb() {
             </li>
           ))}
         </ul>
+        {process.env.NODE_ENV !== "production" && <TestPageMenu />}
       </nav>
     </header>
   );
