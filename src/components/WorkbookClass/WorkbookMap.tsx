@@ -35,8 +35,25 @@ const dock = { x: 15, y: 79 };
 /** 1-0: the class intro sits at the starting dock. It is not a lesson and never locks anything. */
 const INTRO = -1;
 const pointAt = (index: number) => (index === INTRO ? dock : stops[index]);
-const firstPath = [dock, { x: 19, y: 68 }, { x: 23, y: 65 }, stops[0]];
-const nextPath = [stops[0], { x: 36, y: 67 }, { x: 44, y: 68 }, stops[1]];
+// 경로 점은 그림 속 흙길의 가운데를 따라 잡았다(길 색으로 만든 마스크에서 계산, 2026-10-31).
+// 카피바라도 이 점을 따라 걷는다.
+const firstPath = [
+  dock,
+  { x: 18, y: 76 },
+  { x: 20, y: 73 },
+  { x: 21.5, y: 70 },
+  { x: 24, y: 67.5 },
+  stops[0],
+];
+const nextPath = [
+  stops[0],
+  { x: 30.6, y: 64.3 },
+  { x: 34.2, y: 67 },
+  { x: 41, y: 67 },
+  { x: 47.2, y: 69.3 },
+  { x: 49.3, y: 67 },
+  stops[1],
+];
 
 export function WorkbookMap({
   onEnter,
@@ -103,12 +120,44 @@ export function WorkbookMap({
   const paths = [
     firstPath,
     nextPath,
-    [stops[1], { x: 66, y: 69 }, { x: 70, y: 64 }, stops[2]],
-    [stops[2], { x: 69, y: 51 }, { x: 67, y: 44 }, { x: 74, y: 35 }, stops[3]],
-    [stops[3], { x: 58, y: 29 }, { x: 47, y: 28 }, stops[4]],
+    [
+      stops[1],
+      { x: 55.1, y: 67 },
+      { x: 59, y: 70.1 },
+      { x: 64.7, y: 70.1 },
+      { x: 69.1, y: 67 },
+      { x: 71.7, y: 62.3 },
+      { x: 73.3, y: 59.2 },
+      stops[2],
+    ],
+    [
+      stops[2],
+      { x: 71.5, y: 59.2 },
+      { x: 67.3, y: 52.9 },
+      { x: 67.8, y: 48.2 },
+      { x: 74.6, y: 39.3 },
+      { x: 74.6, y: 37.3 },
+      { x: 73.6, y: 35.4 },
+      { x: 69.1, y: 31.4 },
+      stops[3],
+    ],
+    [
+      stops[3],
+      { x: 64.5, y: 28.3 },
+      { x: 62.4, y: 30.7 },
+      { x: 59.5, y: 30.7 },
+      { x: 53.8, y: 28.3 },
+      { x: 44.4, y: 28.7 },
+      { x: 41.5, y: 27.5 },
+      { x: 39.7, y: 25.6 },
+      stops[4],
+    ],
   ];
   const [moving, setMoving] = useState(false);
+  // 걷는 동안 패널은 도착할 곳의 카드를 미리 보여준다(카드가 사라졌다 바뀌지 않게).
+  const [target, setTarget] = useState(currentStop);
   const current = currentStop;
+  const shown = moving ? target : current;
   const [position, setPosition] = useState(pointAt(currentStop));
   const frame = useRef<number | null>(null);
   const enter = useRef<HTMLButtonElement>(null);
@@ -126,6 +175,7 @@ export function WorkbookMap({
       requestAnimationFrame(() => enter.current?.focus());
       return;
     }
+    setTarget(index);
     setMoving(true);
     const path = [position];
     if (current < index) {
@@ -201,22 +251,23 @@ export function WorkbookMap({
                       <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor" />
                     </marker>
                   </defs>
-                  {paths.map((path, i) => (
-                    <g key={i}>
-                      {i === nextStop && (
-                        <polyline
-                          className={styles.routeBacking}
-                          points={path.map((point) => `${point.x},${point.y}`).join(" ")}
-                        />
-                      )}
-                      <polyline
-                        points={path.map((point) => `${point.x},${point.y}`).join(" ")}
-                        data-next={i === nextStop}
-                        data-future={nextStop >= 0 && i > nextStop}
-                        markerEnd={`url(#${arrowId})`}
-                      />
-                    </g>
-                  ))}
+                  {/* 그림에 흙길이 이미 있어서, 다음 목표까지 한 구간만 발자국처럼 표시한다. */}
+                  {paths.map(
+                    (path, i) =>
+                      i === nextStop && (
+                        <g key={i}>
+                          <polyline
+                            className={styles.routeBacking}
+                            points={path.map((point) => `${point.x},${point.y}`).join(" ")}
+                          />
+                          <polyline
+                            points={path.map((point) => `${point.x},${point.y}`).join(" ")}
+                            data-next
+                            markerEnd={`url(#${arrowId})`}
+                          />
+                        </g>
+                      ),
+                  )}
                 </svg>
                 <span
                   className={styles.avatar}
@@ -239,6 +290,7 @@ export function WorkbookMap({
                   <button
                     className={styles.point}
                     data-next={nextStop === INTRO}
+                    data-current={current === INTRO}
                     style={{ left: `${dock.x}%`, top: `${dock.y}%` }}
                     disabled={moving}
                     onClick={() => walk(INTRO)}
@@ -259,6 +311,8 @@ export function WorkbookMap({
                     }}
                     className={styles.point}
                     data-next={i === nextStop}
+                    data-current={current === i}
+                    data-done={completed.includes(i)}
                     aria-describedby={
                       panelTarget && i === nextStop ? "workbook-next-stop" : undefined
                     }
@@ -280,28 +334,34 @@ export function WorkbookMap({
           </div>
           {renderPanel(
             <div className={styles.mapPanel}>
-              {!moving && current === INTRO && onIntro && !practicalSelected && (
+              {shown === INTRO && onIntro && !practicalSelected && (
                 <WorkbookMapLessonCard
                   title="클래스 인트로"
-                  meta={`1-0 · ${nextStop === INTRO ? "여기서 시작해요" : "클래스 인트로"}`}
+                  meta={`1-0 · ${moving ? "가는 중…" : nextStop === INTRO ? "여기서 시작해요" : "클래스 인트로"}`}
                   description="이 클래스에서 무엇을 만들고 어떻게 배우는지 먼저 살펴봐요."
                   startLabel="인트로 보기"
+                  disabled={moving}
                   startRef={enter}
                   onStart={onIntro}
                 />
               )}
-              {!moving && current >= 0 && !practicalSelected && (
+              {shown >= 0 && !practicalSelected && (
                 <WorkbookMapLessonCard
-                  completed={completed.includes(current)}
-                  title={stops[current].name}
-                  meta={`${stops[current].number} · ${completed.includes(current) ? "학습 확인" : current === nextStop ? "다음 수업" : "선택한 수업"}`}
+                  completed={completed.includes(shown)}
+                  title={stops[shown].name}
+                  meta={`${stops[shown].number} · ${moving ? "가는 중…" : completed.includes(shown) ? "학습 확인" : shown === nextStop ? "다음 수업" : "선택한 수업"}`}
+                  disabled={moving}
                   startRef={enter}
-                  onStart={() => onEnter(current)}
+                  onStart={() => onEnter(shown)}
                 >
-                  <WorkbookMapTopics stage="agent" point={current} />
+                  <WorkbookMapTopics stage="agent" point={shown} />
                 </WorkbookMapLessonCard>
               )}
-              {moving && <p role="status">수업 위치로 이동 중…</p>}
+              <p className={styles.srStatus} role="status">
+                {moving
+                  ? `${shown === INTRO ? "클래스 인트로" : stops[shown].name}(으)로 가는 중`
+                  : ""}
+              </p>
               {setupStatus !== null && <small>{setupStatusLabels[setupStatus]}</small>}
             </div>,
           )}
