@@ -24,3 +24,95 @@
     @content;
   }
 }
+
+// ── 워크북 장면 이동 바 (클래스 인트로·수업 공통) ──
+// 인트로 하단 바를 기준으로 만든다. 이전/점/다음의 크기·색·간격을 한 곳에서 맞춘다.
+$workbook-step-ink: #555b52;
+$workbook-step-next: #283d33;
+$workbook-step-dot: #cdcec5;
+$workbook-step-dot-active: #ac6947;
+$workbook-step-focus: #ad6949;
+
+// 이전(글자 버튼)과 다음 버튼의 공통 바탕.
+@mixin workbook-step-button {
+  cursor: pointer;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: $workbook-step-ink;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.4;
+  padding: 8px 12px;
+  min-width: 0;
+  min-height: 0;
+  &:disabled {
+    opacity: 0.3;
+    cursor: default;
+  }
+  &:focus-visible {
+    outline: 2px solid $workbook-step-focus;
+    outline-offset: 3px;
+  }
+  @media (pointer: coarse) {
+    min-height: 44px;
+  }
+}
+// 다음 버튼: 짙은 초록 채운 버튼.
+@mixin workbook-step-next {
+  white-space: nowrap;
+  background: $workbook-step-next;
+  color: white;
+  border-radius: 8px;
+  padding: 10px 16px;
+  @media (max-width: 760px) {
+    min-height: 44px;
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+}
+// 점 표시. $active는 현재 점을 가리키는 선택자(인트로 .active, 수업 [data-state="current"]).
+@mixin workbook-step-dots($active) {
+  display: flex;
+  gap: 0;
+  button {
+    width: 24px;
+    height: 32px;
+    min-width: 0;
+    min-height: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+  }
+  button:disabled {
+    cursor: default;
+  }
+  button::after {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 4px;
+    background: $workbook-step-dot;
+    transition:
+      width 120ms ease,
+      background-color 120ms ease;
+  }
+  #{$active}::after {
+    background: $workbook-step-dot-active;
+    width: 15px;
+  }
+  @media (max-width: 760px) {
+    button {
+      width: 16px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    button::after {
+      transition: none;
+    }
+  }
+}

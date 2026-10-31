@@ -2153,3 +2153,72 @@
     margin-left: 32px;
   }
 }
+
+// ── 수업 공통 틀 (2026-10-30): 1-1·1-2처럼 이 모듈의 패널을 쓰는 수업도 하단 바로 ──
+.page[data-learning="true"] .lesson {
+  @include up(lg) {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr) auto;
+  }
+}
+.lessonPanel {
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  @include up(lg) {
+    grid-column: 1 / -1;
+    grid-row: auto;
+    border-left: 0;
+    border-top: 1px solid var(--line);
+    padding: 12px 32px;
+    overflow: visible;
+    .panelNotes {
+      display: none;
+    }
+    .lessonNavigation {
+      flex-direction: row;
+    }
+  }
+  .lessonNavigation {
+    flex: 1;
+    justify-content: space-between;
+    > :last-child {
+      margin-left: auto;
+    }
+    @include up(md) {
+      button {
+        flex: 0 0 auto;
+        min-width: 120px;
+      }
+    }
+  }
+}
+.lessonBody {
+  @include up(lg) {
+    padding-inline: max(32px, calc((100% - 960px) / 2));
+  }
+}
+.lessonPanel {
+  position: relative;
+}
+// 1-1·1-2처럼 이 모듈의 패널을 쓰는 수업도 인트로와 같은 하단 바 모양.
+.lessonPanel .lessonNavigation > button:not([data-step-ui]),
+.lessonPanel .lessonNavigation > button:not([data-step-ui]):not(:last-child) {
+  @include workbook-step-button;
+  flex: 0 0 auto;
+}
+.lessonPanel .lessonNavigation > button:not([data-step-ui]):last-child {
+  @include workbook-step-next;
+}
+// 이전/다음 화살표(인트로와 같은 간격). 문구에 화살표가 없을 때만 하단 바가 data-step-arrow를 붙인다.
+.lessonPanel .lessonNavigation > button[data-step-arrow="prev"]::before {
+  content: "←";
+  margin-right: 6px;
+}
+.lessonPanel .lessonNavigation > button[data-step-arrow="next"]::after {
+  content: "→";
+  margin-left: 12px;
+  @media (max-width: 760px) {
+    margin-left: 8px;
+  }
+}

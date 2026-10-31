@@ -2,7 +2,7 @@
 
 import { workbookLessonLabel } from "@/lib/workbook-course";
 import { workbookLearningExample } from "@/lib/workbook-learning-example";
-import { WorkbookAiOpening } from "./WorkbookLessonInteractions";
+import { WorkbookAiEraCollage } from "./WorkbookAiEraCollage";
 import { WorkbookLessonHeader } from "./WorkbookLessonHeader";
 import { WorkbookLessonPrevious } from "./WorkbookLessonPrevious";
 
@@ -212,7 +212,9 @@ export function WorkbookLessons({
           </>
         )}
 
-        {lesson === 0 && step === 0 && (
+        {/* 1단원 재기획(1-1 화면 1) 콜라주 시안: 제목·설명이 장면 안에 붙는다. 이전 메모→소개문 화면(WorkbookAiOpening)을 대신한다. */}
+        {lesson === 0 && step === 0 && part === 0 && <WorkbookAiEraCollage />}
+        {lesson === 0 && step === 0 && part !== 0 && (
           <>
             <h2 id="lesson-screen-title" className={system.screenTitle}>
               {part === 1 ? (
@@ -221,13 +223,10 @@ export function WorkbookLessons({
                   <br />
                   언어를 다루는 LLM
                 </>
-              ) : part === 2 ? (
-                "자연스러운 답변 ≠ 확인된 사실"
               ) : (
-                "AI = 인공지능"
+                "자연스러운 답변 ≠ 확인된 사실"
               )}
             </h2>
-            {part === 0 && <WorkbookAiOpening />}
             {part === 1 && (
               <div className={`${system.aiRelationship} ${system.aiConceptSlide}`}>
                 <section aria-labelledby="generative-ai-title">

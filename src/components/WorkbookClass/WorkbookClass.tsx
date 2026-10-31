@@ -465,10 +465,13 @@ export function WorkbookClass() {
     setScene(next);
     requestAnimationFrame(() => title.current?.focus());
   }
+  const inLesson =
+    scene === 2 && (lesson !== null || reviewView !== null || openedPractical !== null);
   return (
     <main
       ref={page}
-      className={styles.page}
+      // 수업 화면은 인트로처럼 종이 위에서 읽는다(.paper가 의미 토큰을 밝은 색으로 바꾼다).
+      className={`${styles.page} ${inLesson ? "paper" : ""}`}
       data-learning={
         scene === 3 ||
         ((lesson !== null || reviewView !== null || openedPractical !== null) && scene === 2)

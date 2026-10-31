@@ -970,3 +970,129 @@
     min-height: 44px;
   }
 }
+
+// ── 수업 공통 틀 (2026-10-30): 오른쪽 패널을 없애고 인트로처럼 하단 바로 이동한다 ──
+// 목표·카피바라 메모는 강의 시작 표지가 맡으므로 숨기고, 이전/다음은 하단 바 양 끝에 둔다.
+.lesson {
+  @include up(lg) {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr) auto;
+  }
+}
+.lesson .lessonPanel {
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  @include up(lg) {
+    grid-column: 1 / -1;
+    grid-row: auto;
+    border-left: 0;
+    border-top: 1px solid var(--line);
+    padding: 12px 32px;
+    overflow: visible;
+    .panelNotes {
+      display: none;
+    }
+  }
+}
+.lesson .lessonNavigation {
+  flex: 1;
+  justify-content: space-between;
+  > :last-child {
+    margin-left: auto;
+  }
+  @include up(md) {
+    > button {
+      flex: 0 0 auto;
+      min-width: 120px;
+    }
+  }
+  @include up(lg) {
+    flex-direction: row;
+  }
+}
+// 패널 열이 빠진 만큼 넓어진 본문은 가운데 읽기 폭(약 960px)으로 모은다.
+.lesson .lessonBody {
+  @include up(lg) {
+    padding-inline: max(32px, calc((100% - 960px) / 2));
+  }
+}
+// 화면 전체를 쓰는 연출 장면(data-wide-scene): 읽기 폭 대신 본문 영역 전체를 무대로 쓴다.
+// 본문 크기를 기준(container)으로 삼아 장면이 화면 높이·너비 안에 맞게 들어간다.
+.lesson .lessonBody:has(> [data-wide-scene]) {
+  > * {
+    max-width: none;
+  }
+  @include up(md) {
+    container-type: size;
+    padding-inline: 32px;
+  }
+}
+// ── 하단 바 가운데: 단계 점과 "n / N" (WorkbookLessonStepBar) ──
+.lesson .lessonPanel {
+  position: relative;
+}
+.stepBar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  @include up(md) {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    translate: -50% -50%;
+  }
+}
+// 다음이 막혔을 때 이유 한 줄. 누르면 지금 할 일로 스크롤한다.
+.lesson .lessonNavigation > .blockedHint {
+  flex: 0 1 auto;
+  min-width: 0;
+  min-height: 0;
+  margin-left: auto;
+  padding: 4px 8px;
+  border: 0;
+  background: transparent;
+  color: var(--accent);
+  font-size: 0.8125rem;
+  text-align: right;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.lesson .lessonNavigation > .blockedHint + button {
+  margin-left: 8px;
+}
+
+// ── 하단 바를 인트로와 같은 모양으로: 공통 믹스인(_mixins.scss workbook-step-*) ──
+.lesson .lessonNavigation > button:not([data-step-ui]),
+.lesson .lessonNavigation > button:not([data-step-ui]):not(:last-child) {
+  @include workbook-step-button;
+  flex: 0 0 auto;
+}
+.lesson .lessonNavigation > button:not([data-step-ui]):last-child {
+  @include workbook-step-next;
+}
+.lesson .stepDots {
+  @include workbook-step-dots('[data-state="current"]');
+}
+// 숫자는 화면 읽기용으로만 남긴다(인트로처럼 점만 보인다).
+.stepCount {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+// 이전/다음 화살표(인트로와 같은 간격). 문구에 화살표가 없을 때만 하단 바가 data-step-arrow를 붙인다.
+.lesson .lessonNavigation > button[data-step-arrow="prev"]::before {
+  content: "←";
+  margin-right: 6px;
+}
+.lesson .lessonNavigation > button[data-step-arrow="next"]::after {
+  content: "→";
+  margin-left: 12px;
+  @media (max-width: 760px) {
+    margin-left: 8px;
+  }
+}

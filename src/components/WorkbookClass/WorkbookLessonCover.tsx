@@ -4,6 +4,7 @@ import { createContext, useEffect, useRef, type ReactNode } from "react";
 import type { workbookCourse } from "@/lib/workbook-course";
 import { workbookLessonCovers } from "@/lib/workbook-lesson-covers";
 import { useWorkbookLessonState } from "./useWorkbookLessonState";
+import { WorkbookLessonStepsProvider } from "./WorkbookLessonSteps";
 import styles from "./WorkbookLessonCover.module.scss";
 
 export const WorkbookLessonCoverContext = createContext<(() => void) | null>(null);
@@ -32,7 +33,7 @@ export function WorkbookLessonCover({
   if (started)
     return (
       <WorkbookLessonCoverContext.Provider value={() => setStarted(false)}>
-        {children}
+        <WorkbookLessonStepsProvider>{children}</WorkbookLessonStepsProvider>
       </WorkbookLessonCoverContext.Provider>
     );
   return (

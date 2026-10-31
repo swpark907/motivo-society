@@ -212,72 +212,19 @@
   align-items: center;
   margin-top: 20px;
 }
-// 장면 이동 버튼: 수업 본문 버튼과 비슷한 무게로 줄인다(PC 높이 약 40px, 터치·좁은 화면은 44px).
+// 장면 이동 버튼·점은 수업과 같은 공통 믹스인(_mixins.scss workbook-step-*)을 쓴다.
 .page .footer button {
-  cursor: pointer;
-  border: 0;
-  background: none;
-  color: #555b52;
-  font-size: 14px;
-  font-weight: 700;
-  line-height: 1.4;
-  padding: 8px 12px;
-}
-.page .footer button:disabled {
-  opacity: 0.3;
-  cursor: default;
+  @include workbook-step-button;
 }
 .page .footer .next {
-  white-space: nowrap;
-  background: #283d33;
-  color: white;
-  border-radius: 8px;
-  padding: 10px 16px;
+  @include workbook-step-next;
   text-align: left;
 }
 .next span {
   margin-left: 12px;
 }
-@media (pointer: coarse) {
-  .page .footer button {
-    min-height: 44px;
-  }
-}
-.dots {
-  display: flex;
-  gap: 0;
-}
-.page .dots button {
-  width: 24px;
-  height: 32px;
-  padding: 0;
-  border-radius: 0;
-  background: transparent;
-  display: grid;
-  place-items: center;
-}
-.dots button::after {
-  content: "";
-  width: 6px;
-  height: 6px;
-  border-radius: 4px;
-  background: #cdcec5;
-  transition:
-    width 120ms ease,
-    background-color 120ms ease;
-}
-.dots .active::after {
-  background: #ac6947;
-  width: 15px;
-}
-@media (prefers-reduced-motion: reduce) {
-  .dots button::after {
-    transition: none;
-  }
-}
-.footer button:focus-visible {
-  outline: 2px solid #ad6949;
-  outline-offset: 3px;
+.page .dots {
+  @include workbook-step-dots(".active");
 }
 @media (max-width: 760px) {
   .header {
@@ -319,22 +266,11 @@
   .eyebrow {
     margin-bottom: 22px;
   }
-  .page .footer .next {
-    min-height: 44px;
-    padding: 10px 14px;
-    font-size: 13px;
-  }
   .next span {
     margin-left: 8px;
   }
   .footer > button:first-child span {
     display: none;
-  }
-  .dots {
-    gap: 0;
-  }
-  .page .dots button {
-    width: 16px;
   }
 }
 

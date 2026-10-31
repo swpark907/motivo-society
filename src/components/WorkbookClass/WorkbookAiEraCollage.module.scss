@@ -1,0 +1,348 @@
+// 1-1 화면 1 콜라주 시안: 진짜 종이를 오려 붙인 느낌.
+// 기법: 삐뚤빼뚤 붙이기, 두꺼운 흰 스티커 테두리, 가위로 자른 울퉁불퉁한 가장자리,
+// 신문 같은 흑백 망점 사진 + 오렌지 색 종이(한 화면 오렌지 하나), 손그림 말풍선, 종이 질감.
+// 수업 연출 예외(검토 중): 조각이 툭 붙는 짧은 움직임. 모션 줄이기에서는 완성 장면만 보인다.
+$board: #24221f;
+$paper: #f6efe2;
+$kraft: #c9a77c;
+$ink: #2b2925;
+$pop: cubic-bezier(0.3, 1.6, 0.5, 1);
+
+.board {
+  margin: 0;
+  display: grid;
+  gap: 8px;
+  // 넓은 화면: 수업 본문(container) 전체를 무대로 쓰고, 16:9 장면을 높이·너비 안에 맞춘다.
+  @include up(md) {
+    height: 100cqh;
+    grid-template-rows: minmax(0, 1fr) auto;
+    align-items: center;
+  }
+}
+.defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+// 좁은 화면은 제목 띠 → 장면 → 설명 쪽지 순서로 쌓는다.
+.scene {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  @include up(md) {
+    display: block;
+    position: relative;
+    justify-self: center;
+    width: min(100%, calc((100cqh - 40px) * 16 / 9));
+    max-width: 1280px;
+    aspect-ratio: 16 / 9;
+    container-type: inline-size;
+  }
+}
+// 제목: 신문 헤드라인을 오려 붙인 종이 띠. 실제 글(h2)이고 꾸밈은 띠 모양에만.
+.headline {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.6rem;
+  line-height: 1.1;
+  span {
+    padding: 0.18em 0.45em 0.12em;
+    background: $ink;
+    color: $paper;
+    rotate: -2deg;
+  }
+  span + span {
+    margin-left: 0.6em;
+    background: $paper;
+    color: $ink;
+    rotate: 1.5deg;
+  }
+  @include up(md) {
+    position: absolute;
+    z-index: 3;
+    left: 3.5%;
+    top: 6%;
+    font-size: 4cqw;
+  }
+}
+// 설명: 테이프로 붙인 깨끗한 종이 쪽지. 본문 글꼴로 반듯하게.
+.note {
+  position: relative;
+  margin: 0;
+  padding: 1.1em 1.2em 1em;
+  background: #fffdf8;
+  color: $ink;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  word-break: keep-all;
+  rotate: 1deg;
+  p {
+    margin: 0;
+  }
+  p + p {
+    margin-top: 0.7em;
+  }
+  .nowrap {
+    white-space: nowrap;
+  }
+  strong {
+    font-weight: 700;
+  }
+  &::before {
+    content: "";
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    width: 72px;
+    height: 20px;
+    translate: -50% 0;
+    rotate: -4deg;
+    background: rgb(201 167 124 / 75%);
+  }
+  @include up(md) {
+    position: absolute;
+    z-index: 3;
+    right: 3.5%;
+    top: 30%;
+    width: 27%;
+    font-size: clamp(0.85rem, 1.45cqw, 1.1rem);
+  }
+}
+.stage {
+  position: relative;
+  // 좁은 화면은 카드가 잘리지 않게 세로를 조금 더 준다.
+  aspect-ratio: 4 / 3;
+  @include up(md) {
+    aspect-ratio: auto;
+    height: 100%;
+  }
+  border-radius: 10px;
+  overflow: hidden;
+  isolation: isolate;
+  background-color: $board;
+  // 필름 그레인
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  container-type: inline-size;
+  font-size: clamp(11px, 1.9cqw, 18px);
+  @include up(md) {
+    font-size: clamp(12px, 1.7cqw, 20px);
+  }
+  color: $ink;
+  word-break: keep-all;
+
+  // 장면 전체에 얹는 종이 결
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+    mix-blend-mode: multiply;
+    opacity: 0.35;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.55 0 0 0 0 0.5 0 0 0 0 0.42 0 0 0 0.55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)'/%3E%3C/svg%3E");
+  }
+}
+
+// 붙었다/아직 안 붙었다
+.off {
+  opacity: 0;
+  transform: scale(1.08) rotate(var(--tilt, 0deg));
+}
+.on {
+  opacity: 1;
+  transform: scale(1) rotate(var(--tilt, 0deg));
+  transition:
+    opacity 160ms ease-out,
+    transform 260ms $pop;
+}
+
+// 가위로 자른 종이 카드 (clip-path는 컴포넌트가 붙인다)
+.card {
+  position: absolute;
+  top: 8%;
+  width: 34%;
+  padding: 1em 1em 1.1em;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  background: $paper;
+}
+.cardPick {
+  left: 6%;
+  --tilt: -3deg;
+}
+.cardMake {
+  right: 6%;
+  --tilt: 2.5deg;
+}
+// 넓은 화면: 제목(왼쪽 위) → 예전 AI(왼쪽 아래) → 요즘 AI(가운데) → 설명 쪽지(오른쪽).
+@include up(md) {
+  .card {
+    width: 25%;
+  }
+  .cardPick {
+    left: 4%;
+    top: 34%;
+  }
+  .cardMake {
+    right: auto;
+    left: 38%;
+    top: 9%;
+  }
+}
+.tag {
+  align-self: flex-start;
+  padding: 0.1em 0.6em;
+  background: $ink;
+  color: $paper;
+  font-size: 1.05em;
+  transform: rotate(-2deg);
+}
+
+// 신문 같은 흑백 망점 사진, 뒤에는 오렌지 색 종이 한 장.
+.photoWrap {
+  position: relative;
+  margin: 0.2em 0.3em;
+}
+.spot {
+  position: absolute;
+  inset: -9% -7% -7% -9%;
+  background: var(--accent);
+  rotate: 4deg;
+}
+.photo {
+  position: relative;
+  line-height: 0;
+  rotate: -2deg;
+  svg {
+    width: 100%;
+    height: auto;
+    filter: grayscale(1) contrast(1.35);
+  }
+  // 신문 망점
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle, rgb(0 0 0 / 30%) 32%, transparent 34%) 0 0 / 4px 4px;
+    mix-blend-mode: multiply;
+  }
+}
+// 오려 붙인 종이 라벨
+.answer {
+  align-self: center;
+  margin-top: 0.2em;
+  padding: 0.15em 0.9em;
+  background: white;
+  font-size: 1.5em;
+  --tilt: -4deg;
+}
+.drawing {
+  display: block;
+  line-height: 0;
+  svg {
+    width: 100%;
+    height: auto;
+  }
+}
+// 손그림 말풍선: 테두리만 흔들어 손으로 그린 선처럼
+.bubble {
+  position: relative;
+  padding: 0.5em 0.8em;
+  font-size: 1.15em;
+  line-height: 1.25;
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: white;
+    border: 3px solid $ink;
+    border-radius: 1.2em;
+    filter: var(--wobble);
+  }
+}
+.hint {
+  align-self: flex-end;
+  font-size: 1.15em;
+  color: #8a4d2b;
+}
+
+// 카피바라: 가위로 자른 골판지 위에 두꺼운 흰 테두리 스티커.
+.capy {
+  position: absolute;
+  left: 50%;
+  bottom: -4%;
+  width: 12%;
+  translate: -50% 0;
+  z-index: 2;
+  @include up(md) {
+    left: 37.5%;
+    width: 8%;
+  }
+}
+.backing {
+  position: absolute;
+  inset: 12% -35% 0 -35%;
+  z-index: -1;
+  background: $kraft;
+  rotate: -3deg;
+}
+.capyImage {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: var(--sticker);
+}
+// 뒷모습으로 첫 카드를 보며 고개를 갸웃.
+.tilted {
+  rotate: -7deg;
+  transform-origin: 50% 100%;
+}
+.thought {
+  position: absolute;
+  top: -8%;
+  right: -40%;
+  width: 48%;
+  line-height: 0;
+  svg {
+    width: 100%;
+    height: auto;
+    filter: var(--sticker);
+  }
+}
+.bulb {
+  width: 60%;
+  top: -16%;
+  right: -52%;
+}
+
+.caption {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  font-size: 0.75rem;
+  color: var(--ink-muted);
+}
+.board .replay {
+  min-height: 0;
+  padding: 2px 8px;
+  border: 0;
+  background: transparent;
+  color: var(--ink-muted);
+  font-size: 0.75rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .on {
+    transition: none;
+  }
+}
