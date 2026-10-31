@@ -1028,6 +1028,15 @@
     padding-inline: 32px;
   }
 }
+// 넓게 펼치는 수업 화면(data-lesson-wide): 읽기 폭 대신 가운데 1120px 안을 쓴다.
+.lesson .lessonBody:has(> [data-lesson-wide]) {
+  > [data-lesson-wide] {
+    max-width: none;
+  }
+  @include up(lg) {
+    padding-inline: max(32px, calc((100% - 1120px) / 2));
+  }
+}
 // ── 하단 바 가운데: 단계 점과 "n / N" (WorkbookLessonStepBar) ──
 .lesson .lessonPanel {
   position: relative;
@@ -1071,6 +1080,16 @@
 }
 .lesson .lessonNavigation > button:not([data-step-ui]):last-child {
   @include workbook-step-next;
+  // 좁은 화면에서 "학습 마치고 단원 지도로 →"처럼 긴 버튼이 화면 밖으로 나가지 않게 줄을 바꾼다.
+  @media (max-width: 420px) {
+    min-width: 0;
+    flex: 0 1 auto;
+    max-width: 34vw;
+    white-space: normal;
+    word-break: keep-all;
+    text-align: center;
+    line-height: 1.3;
+  }
 }
 .lesson .stepDots {
   @include workbook-step-dots('[data-state="current"]');

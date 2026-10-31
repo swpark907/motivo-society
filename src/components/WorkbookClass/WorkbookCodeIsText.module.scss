@@ -1,0 +1,116 @@
+// 1-1 화면 2: 문장과 HTML 한 줄을 나란히. 콜라주 장면 사이의 조용한 비교 화면이다.
+// 여는 표시와 닫는 표시를 각각 같은 형광펜 색으로 짝지어 보여준다.
+// 넓은 화면은 수업 본문의 가운데 넓은 폭(data-lesson-wide)을 쓴다.
+$open: #ffd8b0;
+$close: #c9e6d8;
+
+// 문단 사이는 수업 공통 간격을 따르고, 비교 카드 위아래만 넓게 띄운다.
+.pair {
+  margin-block: 20px;
+  display: grid;
+  gap: 12px;
+  @include up(md) {
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+}
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px 22px 22px;
+  @include up(md) {
+    padding: 24px 28px 26px;
+  }
+  border-radius: var(--workbook-card-radius, 12px);
+  background: var(--surface-2);
+  word-break: keep-all;
+}
+.pair .cardLabel {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--ink-muted);
+}
+// 수업 공통 p·ul·h3 규칙(.lesson .lessonBody p)보다 우선하도록 .pair 아래에서 지정한다.
+.pair .card .sample {
+  margin: 0;
+  font-size: 1.3rem;
+  line-height: 1.6;
+  font-weight: 600;
+  @include up(md) {
+    font-size: 1.5rem;
+  }
+}
+.code code {
+  font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  font-size: 0.92em;
+}
+.open,
+.close {
+  padding: 0 0.15em;
+  border-radius: 3px;
+  color: inherit;
+}
+.open {
+  background: $open;
+}
+.close {
+  background: $close;
+}
+.pair .card .rules {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  mark {
+    font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  }
+}
+.card .toggle {
+  align-self: flex-start;
+  margin-top: auto;
+}
+// 작은 브라우저 창: 코드가 화면에서 어떻게 보이는지
+.browser {
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+  color: #1c1b19;
+  outline: 1px solid var(--line);
+  &:not([hidden]) {
+    animation: show 120ms ease-out;
+  }
+}
+.address {
+  display: block;
+  padding: 6px 12px;
+  background: #ece8e0;
+  font-size: 0.75rem;
+  color: #6f6b66;
+}
+.pair .browser .page {
+  margin: 0;
+  padding: 18px 16px 22px;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+@keyframes show {
+  from {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .browser:not([hidden]) {
+    animation: none;
+  }
+}
+.nowrap {
+  white-space: nowrap;
+}
+// 고정폭 글꼴에서 한글 간격이 벌어지지 않게 글자 부분만 본문 글꼴로.
+.codeText {
+  font-family: var(--font-body);
+}

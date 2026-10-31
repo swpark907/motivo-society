@@ -1,0 +1,280 @@
+// 1-1 화면 5 콜라주: 대표적인 LLM 세 장을 종이 카드로 붙인다.
+// 회사 로고는 쓰지 않고 이름을 우리 글꼴로 적는다(2026-10-31 결정).
+// 수업 공통 p·ul 규칙(.lesson .lessonBody p)보다 우선하도록 .scene 아래에서 지정한다.
+$board: #24221f;
+$paper: #f6efe2;
+$kraft: #c9a77c;
+$ink: #2b2925;
+$pop: cubic-bezier(0.3, 1.6, 0.5, 1);
+
+.board {
+  margin: 0;
+  display: grid;
+  gap: 8px;
+  @include up(md) {
+    height: 100cqh;
+    grid-template-rows: minmax(0, 1fr) auto;
+    align-items: center;
+  }
+}
+.defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+// 좁은 화면: 검은 판 안에 제목 → 카드 → 쪽지를 차례로 쌓는다.
+// 넓은 화면: 16:9 판 위에 조각을 자리 잡아 붙인다.
+.scene {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px 16px 24px;
+  border-radius: 10px;
+  overflow: hidden;
+  isolation: isolate;
+  background-color: $board;
+  // 필름 그레인
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  color: $ink;
+  word-break: keep-all;
+  @include up(md) {
+    display: block;
+    padding: 0;
+    justify-self: center;
+    width: min(100%, calc((100cqh - 40px) * 16 / 9));
+    max-width: 1280px;
+    aspect-ratio: 16 / 9;
+    container-type: inline-size;
+  }
+  // 장면 전체에 얹는 종이 결
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+    mix-blend-mode: multiply;
+    opacity: 0.35;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.55 0 0 0 0 0.5 0 0 0 0 0.42 0 0 0 0.55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)'/%3E%3C/svg%3E");
+  }
+}
+
+// 붙었다/아직 안 붙었다
+.off {
+  opacity: 0;
+  transform: scale(1.08) rotate(var(--tilt, 0deg));
+}
+.on {
+  opacity: 1;
+  transform: scale(1) rotate(var(--tilt, 0deg));
+  transition:
+    opacity 160ms ease-out,
+    transform 260ms $pop;
+}
+
+// 제목: 신문 헤드라인을 오려 붙인 종이 띠
+.headline {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.6rem;
+  line-height: 1.1;
+  span {
+    padding: 0.18em 0.45em 0.12em;
+    background: $paper;
+    color: $ink;
+    rotate: -1.5deg;
+  }
+  span + span {
+    margin-left: 0.5em;
+    background: $ink;
+    color: $paper;
+    outline: 2px solid $paper;
+    rotate: 1.5deg;
+  }
+  @include up(md) {
+    position: absolute;
+    z-index: 3;
+    left: 3.5%;
+    top: 6%;
+    font-size: 4cqw;
+  }
+}
+
+// 카드 세 장
+.scene .cards {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 14px;
+  @include up(md) {
+    display: block;
+  }
+}
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6em;
+  padding: 1.6em 1.2em 1.3em;
+  background: $paper;
+  font-size: 15px;
+  // 테이프
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 34%;
+    height: 0.9em;
+    translate: -50% 0;
+    background: rgb(201 167 124 / 80%);
+  }
+  @include up(md) {
+    position: absolute;
+    width: 23%;
+    font-size: clamp(12px, 1.5cqw, 20px);
+  }
+}
+@include up(md) {
+  .card:nth-child(1) {
+    left: 4%;
+    top: 38%;
+  }
+  .card:nth-child(2) {
+    left: 27.5%;
+    top: 29%;
+  }
+  .card:nth-child(3) {
+    left: 51%;
+    top: 40%;
+  }
+}
+// 이름은 로고가 아니라 우리 글꼴로 크게
+.name {
+  font-family: var(--font-body);
+  font-weight: 800;
+  font-size: 2.6em;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+// 손글씨 메모: 만든 곳 · 처음 공개된 때
+.meta {
+  display: grid;
+  gap: 0.1em;
+  font-size: 1.45em;
+  line-height: 1.2;
+  color: #6b4a33;
+}
+
+// "이 밖에도" 작은 종이 조각 (화면의 오렌지 한 곳)
+.scene p.more {
+  align-self: flex-start;
+  margin: 0;
+  padding: 0.25em 0.9em;
+  background: var(--accent);
+  color: #fff;
+  font-size: 1.5rem;
+  --tilt: -2deg;
+  @include up(md) {
+    position: absolute;
+    left: 6%;
+    top: 82%;
+    font-size: clamp(16px, 2.6cqw, 36px);
+  }
+}
+
+// 카피바라: 뒷모습으로 카드를 둘러본다.
+.capy {
+  display: none;
+  @include up(md) {
+    display: block;
+    position: absolute;
+    z-index: 2;
+    left: 44%;
+    bottom: -4%;
+    width: 7%;
+    img {
+      display: block;
+      width: 100%;
+      height: auto;
+      filter: var(--sticker);
+    }
+  }
+}
+
+// 설명: 테이프로 붙인 깨끗한 종이 쪽지. 본문 글꼴로 반듯하게.
+.scene .note {
+  position: relative;
+  padding: 1.1em 1.2em 1em;
+  background: #fffdf8;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  --tilt: 1deg;
+  p {
+    margin: 0;
+    color: $ink;
+    font-size: inherit;
+    line-height: inherit;
+  }
+  p + p {
+    margin-top: 0.7em;
+  }
+  strong {
+    font-weight: 700;
+    color: $ink;
+  }
+  &::before {
+    content: "";
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    width: 72px;
+    height: 20px;
+    translate: -50% 0;
+    rotate: -4deg;
+    background: rgb(201 167 124 / 75%);
+  }
+  @include up(md) {
+    position: absolute;
+    z-index: 3;
+    right: 3.5%;
+    top: 26%;
+    width: 22%;
+    font-size: clamp(0.9rem, 1.55cqw, 1.15rem);
+  }
+}
+
+.caption {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.75rem;
+  color: var(--ink-muted);
+}
+.board .replay {
+  --workbook-button-hover: var(--workbook-button-neutral-hover);
+  flex: none;
+  min-height: 0;
+  padding: 2px 8px;
+  border: 0;
+  background: transparent;
+  color: var(--ink-muted);
+  font-size: 0.75rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .on {
+    transition: none;
+  }
+}

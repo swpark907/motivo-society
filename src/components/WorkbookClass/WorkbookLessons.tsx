@@ -2,6 +2,11 @@
 
 import { workbookLessonLabel } from "@/lib/workbook-course";
 import { workbookLearningExample } from "@/lib/workbook-learning-example";
+import { WorkbookChatGrowth } from "./WorkbookChatGrowth";
+import { WorkbookCodeIsText } from "./WorkbookCodeIsText";
+import { WorkbookLessonRecap } from "./WorkbookLessonRecap";
+import { WorkbookLlmCollage } from "./WorkbookLlmCollage";
+import { WorkbookLlmNested } from "./WorkbookLlmNested";
 import { WorkbookAiEraCollage } from "./WorkbookAiEraCollage";
 import { WorkbookLessonHeader } from "./WorkbookLessonHeader";
 import { WorkbookLessonPrevious } from "./WorkbookLessonPrevious";
@@ -83,15 +88,17 @@ export function WorkbookLessons({
   );
   const part = revealed[step] ?? 0;
   const gradual = step === 0 || (lesson === 1 && (step === 1 || step === 2));
-  const lastStep = lesson === 1 ? 4 : 2;
+  // 1-1은 다섯 장을 펼치는 첫 단계와 정리 화면 두 단계다.
+  const lastStep = lesson === 1 ? 4 : 1;
+  // 1-1 첫 단계는 재기획한 화면들을 차례로 펼친다(현재 다섯 장). 다른 단계는 세 장씩.
+  const lastPart = lesson === 0 && step === 0 ? 4 : 2;
   // 숫자는 수업 전체의 화면 위치다. 화면 안의 예시 전환·답 선택은 세지 않는다.
-  const totalScreens = lesson === 0 ? 5 : 11;
-  const currentScreen = gradual ? step * 3 + part + 1 : lesson === 0 ? step + 3 : step + 7;
+  const totalScreens = lesson === 0 ? 6 : 11;
+  const currentScreen = gradual ? step * 3 + part + 1 : lesson === 0 ? step + 5 : step + 7;
   const [conceptAnswer, setConceptAnswer] = useWorkbookLessonState<number | null>(
     `ai-${lesson}-conceptAnswer`,
     null,
   );
-  const [shown, setShown] = useWorkbookLessonState(`ai-${lesson}-shown`, false);
   const [answer, setAnswer] = useWorkbookLessonState<number | null>(`ai-${lesson}-answer`, null);
   const [example, setExample] = useWorkbookLessonState(`ai-${lesson}-example`, 0);
   const [layer, setLayer] = useWorkbookLessonState(`ai-${lesson}-layer`, "tool");
@@ -116,18 +123,6 @@ export function WorkbookLessons({
     heading.current?.focus();
   }, []);
   const correct = lesson === 0 ? answer === 2 : answer === 1 && overlap === true;
-  const nextAction =
-    lesson === 0
-      ? step === 0
-        ? ""
-        : step === 1
-          ? !shown
-            ? "예시 결과 보기를 눌러 소개문을 열어요."
-            : !correct
-              ? "소개문에서 요청에 없던 사실을 하나 골라요."
-              : "다음으로에서 배운 내용을 정리해요."
-          : ""
-      : "";
   function move(next: number) {
     setStep(next);
     requestAnimationFrame(() => heading.current?.focus());
@@ -143,18 +138,8 @@ export function WorkbookLessons({
         total={totalScreens}
       />
       <div ref={body} className={ui.lessonBody} tabIndex={0} aria-label="수업 내용">
-        {nextAction && !(lesson === 0 && step === 1) && (
-          <p
-            className={ui.actionLead}
-            data-current-action
-            tabIndex={-1}
-            id="workbook-lesson-next-action"
-          >
-            {nextAction}
-          </p>
-        )}
-
-        {step === lastStep && (
+        {lesson === 0 && step === lastStep && <WorkbookLessonRecap />}
+        {lesson !== 0 && step === lastStep && (
           <>
             <h2 className={system.screenTitle}>
               {lesson === 0 ? (
@@ -214,206 +199,19 @@ export function WorkbookLessons({
 
         {/* 1단원 재기획(1-1 화면 1) 콜라주 시안: 제목·설명이 장면 안에 붙는다. 이전 메모→소개문 화면(WorkbookAiOpening)을 대신한다. */}
         {lesson === 0 && step === 0 && part === 0 && <WorkbookAiEraCollage />}
-        {lesson === 0 && step === 0 && part !== 0 && (
+        {lesson === 0 && step === 0 && part === 4 && <WorkbookLlmCollage />}
+        {lesson === 0 && step === 0 && part !== 0 && part !== 4 && (
           <>
             <h2 id="lesson-screen-title" className={system.screenTitle}>
-              {part === 1 ? (
-                <>
-                  결과를 만드는 생성형 AI,
-                  <br />
-                  언어를 다루는 LLM
-                </>
-              ) : (
-                "자연스러운 답변 ≠ 확인된 사실"
-              )}
+              {part === 1
+                ? "코드도 결국 글자예요"
+                : part === 2
+                  ? "다만, 한 번에 완성되지 않아요"
+                  : "그럼 LLM은 뭘까요"}
             </h2>
-            {part === 1 && (
-              <div className={`${system.aiRelationship} ${system.aiConceptSlide}`}>
-                <section aria-labelledby="generative-ai-title">
-                  <h3 id="generative-ai-title">생성형 AI</h3>
-                  <p>요청을 바탕으로 글·이미지·코드 같은 새로운 결과를 만드는 AI예요.</p>
-                  <table className={system.aiResultTable}>
-                    <caption>생성형 AI가 만드는 결과 예시</caption>
-                    <thead>
-                      <tr>
-                        <th scope="col">글</th>
-                        <th scope="col">이미지</th>
-                        <th scope="col">코드</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>소개문 초안</td>
-                        <td>표지 그림</td>
-                        <td>웹페이지 코드</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </section>
-                <section className={system.aiLanguageModel} aria-labelledby="llm-title">
-                  <span className={system.aiConnection}>그중 언어를 다루는 모델 ↓</span>
-                  <h3 id="llm-title">LLM · 대규모 언어 모델</h3>
-                  <p>
-                    많은 언어 자료에서 말의 규칙성을 익혀, 입력한 글과 앞뒤 내용에 맞춰 답변을
-                    만드는 모델이에요. 이때 질문과 앞선 대화처럼 답을 이해하는 데 필요한 주변 정보를{" "}
-                    <strong>맥락</strong>이라고 해요.
-                  </p>
-                  <p className={system.aiModelUses}>
-                    활용 <strong>글 요약 · 문장 작성 · 코드 작성</strong>
-                  </p>
-                </section>
-                <p className={system.aiKeyTakeaway}>
-                  <strong>코드를 답하는 것과 내 파일을 직접 고치는 것은 달라요.</strong>
-                </p>
-              </div>
-            )}
-            {part === 2 && (
-              <div className={`${system.aiRelationship} ${system.aiConceptSlide}`}>
-                <section aria-labelledby="lesson-screen-title">
-                  <p>
-                    장소 소개에 갑자기 “매일 직접 구운 빵을 판매해요”가 추가됐다면 어떨까요?
-                    자연스러워도 우리가 준 정보는 아니에요. AI는 알려주지 않은 사실을 덧붙이거나
-                    요청을 잘못 이해할 수 있어요.
-                  </p>
-                  <table
-                    className={`${system.aiResultTable} ${system.aiCheckTable}`}
-                    aria-label="AI 결과 확인 기준"
-                  >
-                    <thead>
-                      <tr>
-                        <th scope="col">확인할 것</th>
-                        <th scope="col">스스로 물어볼 질문</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <th scope="row">사실 확인</th>
-                        <td>알려주지 않은 숫자나 경험을 지어내지 않았나요?</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">요청 확인</th>
-                        <td>내가 부탁한 내용과 조건에 맞나요?</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </section>
-                <p>
-                  AI의 학습은 많은 자료에서 규칙성을 익히는 과정이에요. 답변할 때마다 모든 내용을
-                  사실 확인해 주는 것은 아니므로, 내가 준 자료와 맞는지 살펴봐야 해요.
-                </p>
-                <section className={system.aiCodeNote} aria-labelledby="first-code-title">
-                  <h3 id="first-code-title">참고 · 코드란?</h3>
-                  <p>
-                    <strong>컴퓨터가 할 일을 적은 명령</strong>이에요. 웹페이지에 제목을 보여주거나
-                    버튼에 맞춰 화면을 바꾸는 데 쓰여요.
-                  </p>
-                  <p>
-                    <strong>지금은 외우지 않아도 돼요.</strong> 뒤 수업에서 파일과 화면을 함께
-                    살펴봐요.
-                  </p>
-                </section>
-              </div>
-            )}
-          </>
-        )}
-        {lesson === 0 && step === 1 && (
-          <>
-            <h2 className={system.screenTitle}>그럴듯한 문장도 확인해봐요</h2>
-            <p>
-              앞에서 본 장소 메모로 만든 소개문이에요. <strong>알려준 정보와 지어낸 사실</strong>을
-              구분해보세요.
-            </p>
-            <div className={system.exampleComparison}>
-              <section aria-labelledby="example-request-title">
-                <h3 id="example-request-title">보낸 요청</h3>
-                <p>
-                  창가 자리가 있고, 혼자 책 읽기 좋아. 주말에는 사람이 많아. 소개문 두 문장을 써줘.
-                </p>
-              </section>
-              <span className={system.exampleFlowArrow} aria-hidden="true">
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M4 12h16m-6-6 6 6-6 6" />
-                </svg>
-              </span>
-              <section
-                className={system.exampleResult}
-                aria-labelledby="example-result-title"
-                aria-live="polite"
-              >
-                <h3 id="example-result-title">AI 결과 예시</h3>
-                {shown ? (
-                  <p>
-                    창가에서 혼자 책 읽기 좋은 공간입니다. 이미 1만 명이 선택한 공간에서 여유를
-                    만나보세요.
-                  </p>
-                ) : (
-                  <>
-                    <p data-current-action tabIndex={-1} id="workbook-lesson-next-action">
-                      요청을 읽었다면 결과를 열어 비교해보세요.
-                    </p>
-                    <button onClick={() => setShown(true)}>예시 결과 보기</button>
-                  </>
-                )}
-              </section>
-              <small className={system.exampleDisclosure}>
-                미리 만든 학습 예시 · 실제 AI 응답이나 이용자 수가 아니에요.
-              </small>
-            </div>
-            {shown && (
-              <section className={system.exampleQuestion} aria-labelledby="example-question-title">
-                <h3 id="example-question-title">알려준 내용으로 확인할 수 없는 부분은?</h3>
-                <p
-                  className={system.questionInstruction}
-                  data-current-action
-                  tabIndex={-1}
-                  id="workbook-lesson-next-action"
-                >
-                  하나를 골라 이유를 확인해보세요.
-                </p>
-                <div className={`${ui.choices} ${system.quizChoices}`}>
-                  {[
-                    "창가 자리와 혼자 책 읽기",
-                    "잠깐 쉬어가는 소개 방향",
-                    "이미 1만 명이 선택했다는 내용",
-                  ].map((v, i) => (
-                    <button
-                      className={ui.choice}
-                      key={v}
-                      aria-pressed={answer === i}
-                      aria-label={v}
-                      data-answer={answer === i ? (i === 2 ? "correct" : "incorrect") : undefined}
-                      onClick={() => {
-                        if (answer !== i) reviewLearning();
-                        setAnswer(i);
-                      }}
-                    >
-                      <span>{v}</span>
-                      <span className={system.choiceResult}>
-                        {answer === i && <AnswerMark correct={i === 2} />}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-                <p role="status" className={ui.quizFeedback}>
-                  {answer === null
-                    ? ""
-                    : answer === 2
-                      ? "맞아요. 이용자 수는 알려주지 않았어요. 근거가 없다면 사실로 소개하면 안 돼요."
-                      : answer === 0
-                        ? "자리와 독서 정보는 요청에서 알려줬어요. 새로 덧붙인 실적을 찾아볼까요?"
-                        : "소개 방향은 내 의도와 맞는지 판단할 부분이에요. 근거 없이 추가한 숫자를 찾아보세요."}
-                </p>
-              </section>
-            )}
+            {part === 1 && <WorkbookCodeIsText />}
+            {part === 2 && <WorkbookChatGrowth />}
+            {part === 3 && <WorkbookLlmNested />}
           </>
         )}
         {lesson === 1 && step === 0 && (
@@ -914,11 +712,7 @@ export function WorkbookLessons({
           <small>개인 컴퓨터에서 실습 · 모바일에서는 복습해요.</small>
         </div>
         <WorkbookActionReturn body={body} enabled={!gradual} />
-        <nav
-          className={ui.lessonNavigation}
-          aria-label="수업 진행"
-          aria-describedby={nextAction ? "workbook-lesson-next-action" : undefined}
-        >
+        <nav className={ui.lessonNavigation} aria-label="수업 진행">
           <WorkbookLessonPrevious current={currentScreen}>
             {(step > 0 || part > 0) && (
               <button
@@ -939,12 +733,11 @@ export function WorkbookLessons({
             <button
               data-action-role={lesson === 0 ? "lesson-next" : undefined}
               disabled={
-                (lesson === 0 && step === 1 && !correct) ||
                 (lesson === 1 && step === 3 && !correct) ||
                 (lesson === 1 && step === 2 && part === 2 && conceptAnswer !== 1)
               }
               onClick={() => {
-                if (gradual && part < 2)
+                if (gradual && part < lastPart)
                   setRevealed((previous) => ({ ...previous, [step]: part + 1 }));
                 else move(step + 1);
               }}
