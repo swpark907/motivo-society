@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // 에이전트 작업용 git worktree의 빌드 산출물(.next 등)을 검사하지 않는다.
+    ".claude/worktrees/**",
   ]),
 ]);
 

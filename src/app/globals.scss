@@ -32,6 +32,15 @@
   --space-12: 3rem;
   --space-16: 4rem;
 
+  // 플랫폼 제품 화면(클럽·활동·내 활동·호스트 도구) 전용 — AGENTS.md "플랫폼 제품 화면 예외".
+  // 의미 색: 활동 종류를 구분할 때만 쓴다. 장식용 면으로 쓰지 않는다. 배정은 시안 단계(2026-11-05).
+  --kind-gathering: #f4dc78;
+  --kind-series: #bcd0f2;
+  --kind-challenge: #bfd394;
+  --kind-club: #f2bfd8;
+  --product-radius: 16px;
+  --product-radius-sm: 12px;
+
   --max-width: 1200px;
   --gnb-height: 60px;
   --radius: 2px;

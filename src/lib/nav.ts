@@ -15,6 +15,7 @@ export const TEST_PAGE_GROUPS = [
     items: [
       { href: "/demo/workbook-completion", label: "단원 완료·결과물 미리보기" },
       { href: "/demo/workbook-intro-sprite", label: "인트로 카피바라 스프라이트" },
+      { href: "/demo/platform", label: "플랫폼 시험장(로컬 DB)" },
     ],
   },
 ] as const;

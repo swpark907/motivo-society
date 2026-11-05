@@ -1,0 +1,426 @@
+// 회원 홈 시안 — 플랫폼 제품 화면 예외(AGENTS.md): 의미별 파스텔, 라운드 16/12px.
+// 오렌지는 행동 하나(다음 일정 카드의 "자세히 보기")에만. 그라디언트·그림자 없음.
+
+.home {
+  max-width: 880px;
+  margin: 0 auto;
+  display: grid;
+  gap: var(--space-12);
+}
+
+.hello {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.helloTitle {
+  margin: 0;
+  font-size: clamp(1.6rem, 4vw, 2.25rem);
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.helloSub {
+  margin: 0;
+  color: var(--ink-muted);
+}
+
+// ── 구역 머리: 한글 제목 + 영문 라벨
+.section {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.sectionHead {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+
+  h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 800;
+  }
+}
+
+.empty {
+  margin: 0;
+  padding: var(--space-4);
+  border-radius: var(--product-radius-sm);
+  background: var(--surface-2);
+  color: var(--ink-muted);
+
+  a {
+    color: var(--ink);
+    font-weight: 700;
+  }
+}
+
+// ── 의미 색 (활동 종류)
+.kind_gathering {
+  background: var(--kind-gathering);
+}
+
+.kind_series {
+  background: var(--kind-series);
+}
+
+.kind_challenge {
+  background: var(--kind-challenge);
+}
+
+.kind_club {
+  background: var(--kind-club);
+}
+
+// ── 오늘: 다음 일정 하나를 크게
+.nextCard {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-6);
+  border-radius: var(--product-radius);
+  color: var(--black);
+  text-decoration: none;
+
+  @include up(md) {
+    padding: var(--space-8);
+  }
+}
+
+.nextWhen {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.nextTitle {
+  font-size: clamp(1.4rem, 3.5vw, 2rem);
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.nextMeta {
+  font-size: 0.9rem;
+  opacity: 0.75;
+}
+
+.nextAction {
+  justify-self: start;
+  margin-top: var(--space-4);
+  padding: var(--space-2) var(--space-4);
+  border-radius: 999px;
+  background: var(--orange);
+  color: var(--black);
+  font-size: 0.9rem;
+  font-weight: 700;
+  transition: background-color 120ms;
+
+  .nextCard:hover & {
+    background: var(--black);
+    color: var(--white);
+  }
+}
+
+// ── 오늘: 할 일 한 줄들
+.todoList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-2);
+
+  &:empty {
+    display: none;
+  }
+}
+
+.todo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--product-radius-sm);
+  background: var(--surface-2);
+  color: var(--ink);
+  text-decoration: none;
+  transition: background-color 120ms;
+
+  > span:nth-child(2) {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &:hover {
+    background: var(--white);
+  }
+}
+
+.todoGo {
+  flex-shrink: 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.dot {
+  flex-shrink: 0;
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.dotWait {
+  border: 2px solid var(--accent);
+}
+
+.laterList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--line);
+
+  a {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--line);
+    color: var(--ink);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--accent);
+    }
+  }
+}
+
+.laterWhen {
+  flex-shrink: 0;
+  min-width: 7.5rem;
+  color: var(--ink-muted);
+  font-size: 0.875rem;
+}
+
+// ── 내 사람들
+.avatar {
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border: 2px solid var(--surface-2);
+  border-radius: 50%;
+  color: var(--black);
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.toneA {
+  background: var(--kind-gathering);
+}
+
+.toneB {
+  background: var(--kind-series);
+}
+
+.toneC {
+  background: var(--kind-challenge);
+}
+
+.toneD {
+  background: var(--kind-club);
+}
+
+.feed {
+  padding: var(--space-4);
+  border-radius: var(--product-radius);
+  background: var(--surface-2);
+
+  ul {
+    list-style: none;
+    margin: var(--space-3) 0 0;
+    padding: 0;
+    display: grid;
+    gap: var(--space-3);
+  }
+}
+
+.feedLead {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--ink-muted);
+}
+
+.feedItem {
+  display: flex;
+  gap: var(--space-3);
+
+  > div {
+    min-width: 0;
+  }
+}
+
+.feedMeta {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--ink-muted);
+
+  strong {
+    color: var(--ink);
+  }
+}
+
+.feedBody {
+  margin: 2px 0 0;
+  overflow-wrap: anywhere;
+}
+
+.clubGrid {
+  display: grid;
+  gap: var(--space-3);
+
+  @include up(md) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  &:empty {
+    display: none;
+  }
+}
+
+.clubCard {
+  display: grid;
+  align-content: start;
+  gap: var(--space-3);
+  padding: var(--space-6);
+  border-radius: var(--product-radius);
+  background: var(--surface-2);
+  color: var(--ink);
+  text-decoration: none;
+  transition: background-color 120ms;
+
+  &:hover {
+    background: var(--white);
+  }
+}
+
+.clubName {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+.clubTag {
+  padding: 1px var(--space-2);
+  border-radius: 999px;
+  color: var(--black);
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.avatarStack {
+  display: flex;
+  align-items: center;
+
+  .avatar + .avatar {
+    margin-left: -8px;
+  }
+}
+
+.memberCount {
+  margin-left: var(--space-2);
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+}
+
+.clubActs {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-1);
+  font-size: 0.9rem;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+}
+
+.clubActWhen {
+  margin-left: auto;
+  color: var(--ink-muted);
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.clubQuiet {
+  font-size: 0.875rem;
+  color: var(--ink-muted);
+}
+
+// ── 발견: 종류 색 카드
+.discoverGrid {
+  display: grid;
+  gap: var(--space-3);
+
+  @include up(md) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.discoverCard {
+  display: grid;
+  align-content: start;
+  gap: var(--space-1);
+  min-height: 200px;
+  padding: var(--space-6);
+  border: 2px solid transparent;
+  border-radius: var(--product-radius);
+  color: var(--black);
+  text-decoration: none;
+  transition: border-color 120ms;
+
+  &:hover {
+    border-color: var(--black);
+  }
+}
+
+.discoverKind {
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.discoverTitle {
+  font-size: 1.2rem;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.discoverSummary {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.discoverMeta {
+  margin-top: var(--space-2);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.discoverFoot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-top: auto;
+  padding-top: var(--space-3);
+  border-top: 1px solid rgb(11 11 11 / 15%);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
