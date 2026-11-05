@@ -8,3 +8,8 @@
 - `pnpm test:db` 추가: 로컬 Supabase에 가짜 사람으로 로그인해 정원·동시 신청·멤버 전용·입금/이용권/환불·보이는 범위·클럽 레이어·챌린지 인증 규칙 9개를 검사. 통과.
 - Playwright가 이미 떠 있는 서버를 쓰도록 `PW_BASE_URL` 지원. 시험장 연기 테스트 `e2e/platform-sandbox.spec.ts` 통과.
 - 결정: loop는 항목마다 커밋(`feat/platform-app` 브랜치, main 머지·push 없음), 정식 경로 + 이메일 매직링크, 기존 GNB 폐기 후 새로 작성, 첫 범위는 회원 여정. 정보 구조는 [제안](../platform-ia.md) 승인 대기(L00).
+
+## 2026-11-05 · L00 정보 구조 승인
+
+- 승우가 [정보 구조](../platform-ia.md)의 네 가지(메뉴 홈 · 발견 · 클럽 · 배우기 · 나, 로그인 여부에 따른 `/`, `/yard` → `/explore` 연결과 Library·Article을 배우기 아래로, 활동 `/activities/[slug]`)를 그대로 승인.
+- AGENTS.md 구조 절의 경로 표·라우팅 원칙·레이아웃을 새 구조로 교체. 다음 반복은 L01.

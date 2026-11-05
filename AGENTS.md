@@ -76,7 +76,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 ## 구조
 
-**구현 우선순위: 홈 → Library.** (Article·Yard·Workbook은 그 다음.)
+**구현 우선순위 (2026-11-05 갱신):** 새 정보 구조의 회원 여정을 [플랫폼 백로그](docs/product/platform-loop/BACKLOG.md) 순서대로 만든다. 콘텐츠(Library·Article)와 워크북은 기존 경로에서 이어간다.
 
 **주요 진입 경로 = 인스타그램 DM(ManyChat) → Library 개별 콘텐츠 링크.** 여기서 따라오는 규칙:
 
@@ -84,19 +84,22 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - 링크로 바로 들어온 화면이 **그 자체로 완결**되어야 한다 — 홈을 거치지 않은 사람이 무엇인지 알고, 다음으로 갈 곳(다른 Library 글·홈)이 한 번에 보여야 한다.
 - 모든 Library·Article 페이지는 **OG 메타(title·description·image)** 를 갖는다. DM 미리보기가 첫인상이다.
 
-**라우팅 = 콘텐츠 유형 축.** GNB 메뉴와 최상위 경로는 1:1이며, 정의는 `src/lib/nav.ts` 한 곳에만 둔다.
-"배우고·만들고·발견하고"는 URL이 아니라 슬로건·태그·큐레이션 층에서 산다.
+**라우팅 = 사람이 하러 오는 일 (2026-11-05 승우 승인).** 기존 GNB(Yard · Library · Article · Workbook)는 폐기했다. 메뉴는 콘텐츠 유형이 아니라 하러 오는 일로 나누며, 웹 GNB와 이후 앱 하단 탭이 같은 다섯 자리를 쓴다. 정의는 `src/lib/nav.ts` 한 곳에만 둔다. 상세·근거는 [정보 구조](docs/product/platform-ia.md).
 
-| 경로                           | 무엇                                                                            | 상태                         |
-| ------------------------------ | ------------------------------------------------------------------------------- | ---------------------------- |
-| `/yard`                        | 상품성 판매 — 클래스·오프라인 강의·모임                                         | 소개만. 신청·결제는 **보류** |
-| `/library`                     | 사람들이 유용하게 쓸 기술 자료 — 스킬·프롬프트 공유, 사용법. 뉴스가 아니라 기술 | 준비 중                      |
-| `/article` · `/article/[slug]` | 아티클                                                                          | MDX 파이프라인 동작          |
-| `/workbook`                    | (가칭) 커리큘럼을 따라가며 공부하는 공간. 스케줄 관리·전자 교과서               | 뼈대. 상세 메뉴 미확정       |
+| 메뉴   | 경로       | 무엇                                                                         |
+| ------ | ---------- | ---------------------------------------------------------------------------- |
+| 홈     | `/`        | 로그인: 회원 홈(오늘 → 내 사람들 → 발견). 비로그인: 모쏘 소개 + 이번 주 활동 |
+| 발견   | `/explore` | 모임·시즌·챌린지(이후 클래스) 찾기                                           |
+| 클럽   | `/clubs`   | 클럽 찾기·내 클럽 (`/clubs/[slug]`, 초대 `/invite/[code]`)                   |
+| 배우기 | `/learn`   | 워크북 클래스와 읽을거리의 입구                                              |
+| 나     | `/me`      | 내 일정 · 주문과 환불 · 프로필 · (자격이 있으면) 호스트 도구 `/host`         |
 
-**새 정보 구조로 전환 중 (2026-11-05, 승우 결정):** 위 표의 GNB(Yard · Library · Article · Workbook)는 **폐기하고 새로 짠다.** 새 구조는 [제안](docs/product/platform-ia.md)(홈 · 발견 · 클럽 · 배우기 · 나, 활동 `/activities/[slug]`)이며 **승인 전에는 구현하지 않는다.** 승인되면 이 절의 표를 새 구조로 바꾼다. 기존 콘텐츠 경로(`/workbook` · `/library` · `/article`)의 영구 주소 규칙은 유지한다.
+- 활동 상세는 `/activities/[slug]` — DM 진입의 주 주소이며 **영구**다(Library 콘텐츠와 같은 규칙: slug를 바꾸지 않고, 바꾸면 redirect를 남긴다, OG 메타 필수).
+- 기존 콘텐츠 경로 `/workbook` · `/library` · `/article`는 영구 주소 규칙대로 유지하고 "배우기"에서 들어간다. `/yard`는 `/explore`로 redirect한다.
+- 로그인 `/login`(이메일 매직링크) · `/auth/callback` · 첫 가입 `/onboarding`.
+- 구현 순서와 진행 상태는 [플랫폼 백로그](docs/product/platform-loop/BACKLOG.md).
 
-**레이아웃**: 상단 GNB(`src/components/Gnb`)가 전 페이지 공통. `/workbook`만 한 단계 아래 **좌측 레일**(`src/components/Rail`)을 가진다 — `src/app/workbook/layout.tsx`.
+**레이아웃**: 새 GNB는 넓은 화면에서 상단(로고 · 다섯 메뉴 · 계정), 좁은 화면에서는 하단 탭 바다. 플랫폼 화면은 "플랫폼 제품 화면 예외"를 쓰고, 워크북·읽을거리의 기존 화면 디자인은 유지한 채 새 GNB만 위에 얹는다. `/workbook`의 **좌측 레일**(`src/components/Rail`, `src/app/workbook/layout.tsx`)은 유지한다. 전환이 끝나기 전까지는 기존 `src/components/Gnb`가 남아 있다(L01에서 교체).
 
 **콘텐츠 저장**: 아티클은 `content/articles/*.mdx` — 레포 안 파일이 정본이고 **PR 리뷰가 검증 관문**이다.
 frontmatter 스키마는 `src/lib/content/articles.ts`(zod). `access: public | member | paid`는 자리만 있고 지금은 전부 public.
