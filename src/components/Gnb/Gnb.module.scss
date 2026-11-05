@@ -1,111 +1,156 @@
+// 전 페이지 공통 GNB — 검정 기준 띠. 넓은 화면은 상단 다섯 메뉴, 좁은 화면은 하단 탭 바.
+// 오렌지는 행동(CTA)에 아끼고, 현재 위치는 흰 글자 + 선으로 표시한다.
+
 .header {
   position: sticky;
   top: 0;
-  z-index: 10;
+  flex-shrink: 0; // body가 flex라 높이가 눌리지 않게
+  z-index: 30;
   height: var(--gnb-height);
   background: var(--black);
   color: var(--white);
   border-bottom: 1px solid var(--grey-1);
 }
 
-.nav {
+.bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-1);
+  gap: var(--space-4);
   height: 100%;
   max-width: var(--max-width);
   margin: 0 auto;
   padding: 0 var(--space-4);
-
-  @include up(md) {
-    gap: var(--space-4);
-  }
 }
 
 .brand {
-  font-size: 1rem;
+  flex-shrink: 0;
+  font-size: 1.125rem;
   line-height: 1;
   color: var(--white);
+  text-decoration: none;
 
   @include up(md) {
     font-size: 1.375rem;
   }
 
   &:hover {
-    color: var(--orange);
+    color: var(--grey-3);
+  }
+}
+
+// 상단 메뉴는 넓은 화면에서만. 좁은 화면은 하단 탭 바가 같은 메뉴를 보여 준다.
+.nav {
+  display: none;
+  flex: 1;
+
+  @include up(md) {
+    display: block;
   }
 }
 
 .menu {
   display: flex;
+  justify-content: center;
   gap: var(--space-1);
+  margin: 0;
+  padding: 0;
   list-style: none;
-  min-width: 0;
-  overflow-x: auto;
-  scrollbar-width: none;
-  flex-shrink: 1;
-  > li {
-    flex-shrink: 0;
-  }
 }
 
 .link {
-  display: inline-block;
-  padding: var(--space-2) var(--space-1);
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--grey-3);
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 var(--space-3);
   border-bottom: 2px solid transparent;
-  transition: color 120ms ease;
-
-  @include up(md) {
-    padding: var(--space-2) var(--space-3);
-    font-size: 0.8125rem;
-  }
+  color: var(--grey-3);
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 120ms;
 
   &:hover {
     color: var(--white);
   }
 
   &[aria-current="page"] {
-    color: var(--orange);
-    border-bottom-color: var(--orange);
+    color: var(--white);
+    border-bottom-color: var(--white);
   }
 }
 
-// 임시 버튼이 추가된 개발 화면에서만 좁은 GNB의 간격을 줄인다.
-.nav[data-test-navigation="true"] {
-  padding-inline: var(--space-1);
-  gap: calc(var(--space-1) / 2);
-  .brand {
-    flex: 0 0 46px;
-    font-size: 0.875rem;
-  }
-  .menu {
-    gap: 0;
-  }
-  .link {
-    padding-inline: calc(var(--space-1) / 4);
-    font-size: clamp(0.625rem, 2.82vw, 0.6875rem);
-    letter-spacing: 0.02em;
-  }
+.account {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+// ── 하단 탭 바 (좁은 화면)
+.tabBar {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 30;
+  padding-bottom: env(safe-area-inset-bottom);
+  background: var(--black);
+  border-top: 1px solid var(--grey-1);
+
   @include up(md) {
-    padding-inline: var(--space-4);
-    gap: var(--space-4);
-    .brand {
-      flex: 0 1 auto;
-      font-size: 1.375rem;
+    display: none;
+  }
+
+  ul {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+}
+
+.tab {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  min-height: 56px;
+  padding: var(--space-2) 0 var(--space-1);
+  color: var(--grey-3);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 120ms;
+
+  &[aria-current="page"] {
+    color: var(--white);
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 30%;
+      right: 30%;
+      height: 2px;
+      background: var(--white);
     }
-    .menu {
-      gap: var(--space-1);
-    }
-    .link {
-      font-size: 0.8125rem;
-      padding-inline: var(--space-3);
-      letter-spacing: 0.08em;
-    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--white);
+    outline-offset: -4px;
+  }
+}
+
+// 탭 바가 본문 마지막 줄을 가리지 않게, 탭 바가 있을 때만 body 아래를 같은 높이만큼 비운다.
+:global(body:has([data-tab-bar])) {
+  padding-bottom: calc(56px + env(safe-area-inset-bottom));
+
+  @include up(md) {
+    padding-bottom: 0;
   }
 }

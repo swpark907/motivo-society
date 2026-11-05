@@ -1,0 +1,49 @@
+.doors {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  @include up(md) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  > li {
+    display: grid;
+  }
+}
+
+.door {
+  display: grid;
+  align-content: start;
+  gap: var(--space-2);
+  min-height: 160px;
+  padding: var(--space-6);
+  border: 2px solid transparent;
+  border-radius: var(--product-radius);
+  background: var(--surface-2);
+  color: var(--ink);
+  text-decoration: none;
+  transition: border-color 120ms;
+
+  &:hover {
+    border-color: var(--ink);
+  }
+}
+
+.doorTitle {
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+.doorBody {
+  color: var(--ink-muted);
+  line-height: 1.6;
+}
+
+.doorGo {
+  margin-top: auto;
+  font-size: 1.25rem;
+  font-weight: 700;
+}

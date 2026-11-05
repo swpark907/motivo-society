@@ -1,0 +1,25 @@
+.avatar {
+  display: inline-grid;
+  flex-shrink: 0;
+  place-items: center;
+  border: 2px solid var(--surface);
+  border-radius: 50%;
+  color: var(--black);
+  font-weight: 800;
+
+  &[data-tone="gathering"] {
+    background: var(--kind-gathering);
+  }
+
+  &[data-tone="series"] {
+    background: var(--kind-series);
+  }
+
+  &[data-tone="challenge"] {
+    background: var(--kind-challenge);
+  }
+
+  &[data-tone="club"] {
+    background: var(--kind-club);
+  }
+}

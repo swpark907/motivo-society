@@ -4,12 +4,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ComponentProps } from "react";
+import { currentNav } from "@/lib/nav";
 
 type Props = Omit<ComponentProps<typeof Link>, "href"> & { href: string };
 
 export function NavLink({ href, className, ...rest }: Props) {
   const pathname = usePathname();
-  const active = pathname === href || pathname.startsWith(`${href}/`);
+  const active = currentNav(pathname) === href;
   return (
     <Link href={href} className={className} aria-current={active ? "page" : undefined} {...rest} />
   );

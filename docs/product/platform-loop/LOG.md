@@ -13,3 +13,13 @@
 
 - 승우가 [정보 구조](../platform-ia.md)의 네 가지(메뉴 홈 · 발견 · 클럽 · 배우기 · 나, 로그인 여부에 따른 `/`, `/yard` → `/explore` 연결과 Library·Article을 배우기 아래로, 활동 `/activities/[slug]`)를 그대로 승인.
 - AGENTS.md 구조 절의 경로 표·라우팅 원칙·레이아웃을 새 구조로 교체. 다음 반복은 L01.
+
+## 2026-11-06 · L01 플랫폼 화면 틀과 새 GNB (구조)
+
+- 새 메뉴 정의 `src/lib/nav.ts`(홈 · 발견 · 클럽 · 배우기 · 나, 현재 위치·별칭·탭 바 숨김 규칙), GNB 재작성: 넓은 화면 상단 메뉴, 좁은 화면 하단 탭 바(워크북·실험실에서는 숨김). 상단 바가 flex body에서 눌려 45px가 되던 것 60px로 고정.
+- 공용 UI: `StatusBadge` `Avatar` `EmptyState` `PlatformPage` `ActivityCard` `ClubCard`(+ 단위 테스트). 데이터 읽기 `src/lib/platform/queries.ts`(연결 정보가 없으면 빈 결과).
+- 경로: `/explore`(모집 중 활동) `/clubs` `/learn`(워크북·라이브러리·아티클 입구) `/me`(로그인 준비 중 안내), `/yard` → `/explore` 임시 이동. `/yard/[slug]`는 유지. 워크북은 그대로이며 "배우기"에서 들어간다(승우 확인: 워크북은 폐기 아님).
+- `devIndicators: false`: 개발 표시 버튼이 모바일 하단 탭을 가려 클릭을 막았다.
+- 확인: `pnpm check` 통과(142), 관련 e2e 23개 통과(GNB 다섯 메뉴 · 발견 · 클럽 · 배우기 · /yard 이동 · 워크북 탭 바 숨김 · 딥링크). 전체 e2e의 워크북 136건 실패는 기준 커밋에서도 같아 이전부터 있던 것으로 확인. PC 1280 · 모바일 375에서 발견·나·클럽 확인, 가로 스크롤 0.
+- 겪은 문제: 설정 변경으로 개발 서버가 다시 시작되며 `.next/dev/prerender-manifest.json` 끝에 조각이 남아 전 페이지 500 → 잘라 내 복구, LOOP.md 환경 확인에 대처법 추가. e2e는 `--workers=2` 이하.
+- 승우 피드백: 디자인이 서비스 수준이 아니다 → L01b(기준 시안)를 결정 대기로 추가하고 loop를 멈춘다.

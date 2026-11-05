@@ -95,7 +95,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 | 나     | `/me`      | 내 일정 · 주문과 환불 · 프로필 · (자격이 있으면) 호스트 도구 `/host`         |
 
 - 활동 상세는 `/activities/[slug]` — DM 진입의 주 주소이며 **영구**다(Library 콘텐츠와 같은 규칙: slug를 바꾸지 않고, 바꾸면 redirect를 남긴다, OG 메타 필수).
-- 기존 콘텐츠 경로 `/workbook` · `/library` · `/article`는 영구 주소 규칙대로 유지하고 "배우기"에서 들어간다. `/yard`는 `/explore`로 redirect한다.
+- **워크북은 폐기가 아니다(승우 확인).** 폐기한 것은 옛 메뉴 표시뿐이며 `/workbook`의 클래스·수업·지도·진도·디자인은 그대로 유지한다. 기존 콘텐츠 경로 `/workbook` · `/library` · `/article`는 영구 주소 규칙대로 유지하고 "배우기"에서 들어간다. `/yard`는 `/explore`로 redirect한다.
 - 로그인 `/login`(이메일 매직링크) · `/auth/callback` · 첫 가입 `/onboarding`.
 - 구현 순서와 진행 상태는 [플랫폼 백로그](docs/product/platform-loop/BACKLOG.md).
 

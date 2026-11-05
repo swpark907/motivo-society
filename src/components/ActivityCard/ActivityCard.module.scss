@@ -1,0 +1,74 @@
+// 종류 색 카드 — 플랫폼 제품 화면 예외. 색은 활동 종류만 뜻한다.
+
+.card {
+  display: grid;
+  align-content: start;
+  gap: var(--space-1);
+  min-height: 200px;
+  padding: var(--space-6);
+  border: 2px solid transparent;
+  border-radius: var(--product-radius);
+  color: var(--black);
+  text-decoration: none;
+  transition: border-color 120ms;
+
+  &[data-kind="gathering"] {
+    background: var(--kind-gathering);
+  }
+
+  &[data-kind="series"] {
+    background: var(--kind-series);
+  }
+
+  &[data-kind="challenge"] {
+    background: var(--kind-challenge);
+  }
+}
+
+a.card:hover {
+  border-color: var(--black);
+}
+
+a.card:focus-visible {
+  outline: 2px solid var(--black);
+  outline-offset: 2px;
+}
+
+.kind {
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.title {
+  font-size: 1.2rem;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.summary {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  opacity: 0.8;
+}
+
+.meta {
+  margin-top: var(--space-2);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-top: auto;
+  padding-top: var(--space-3);
+  border-top: 1px solid currentColor;
+  font-size: 0.8rem;
+  font-weight: 600;
+
+  // 경계선만 옅게(글자 색은 그대로)
+  border-top-color: color-mix(in srgb, currentColor 18%, transparent);
+}

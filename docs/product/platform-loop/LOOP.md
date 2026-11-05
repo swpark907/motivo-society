@@ -19,6 +19,8 @@
    - 로컬 Supabase: `supabase status`. 꺼져 있으면 `supabase start`(포트 554xx). `.env.local`이 있어야 한다.
    - 개발 서버: 승우가 띄운 `http://localhost:3000`을 먼저 쓴다. 없으면 브라우저 도구 `preview_start`의 `motivo-dev`(3100).
    - 스키마가 어긋나 보이면 `supabase db reset` 후 `pnpm test:db`.
+   - 모든 페이지가 500이고 개발 서버 로그에 `Unexpected non-whitespace character after JSON`이 보이면, `next.config.ts`를 바꿔 개발 서버가 다시 시작되며 `.next/dev/prerender-manifest.json` 끝에 이전 내용 조각이 남은 것이다. 첫 JSON 객체 뒤를 잘라 내면 바로 돌아온다(서버를 끌 필요 없음).
+   - e2e는 `--workers=2` 이하로 돌린다. 승우의 개발 서버 하나를 같이 쓰므로 병렬이 많으면 개발 서버 캐시가 꼬인다.
 3. **항목 고르기.** BACKLOG에서 위에서부터 첫 `[ ]` 항목. `선행:`이 끝나지 않았거나 `결정 대기`면 건너뛴다. 고른 항목을 `[~] (시작 날짜)`로 바꾼다.
 4. **만들기.**
    - Next.js 16은 학습 데이터와 다르다. 쓰는 API는 `node_modules/next/dist/docs/`에서 먼저 확인한다(예: 미들웨어 이름·쿠키·서버 액션).
