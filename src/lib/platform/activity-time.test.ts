@@ -7,6 +7,7 @@ import {
   kstWeekRange,
   periodWhen,
   shortDate,
+  timeLeftText,
 } from "./activity-time";
 
 // 2026-11-06(금) 22:30 KST = 13:30 UTC
@@ -52,5 +53,15 @@ describe("표시", () => {
     expect(periodWhen(new Date("2026-11-01T15:00:00Z"), new Date("2026-11-15T15:00:00Z"))).toBe(
       "11.2 (월) – 11.15 (일)",
     );
+  });
+});
+
+describe("timeLeftText", () => {
+  it("시간과 분, 지나면 null", () => {
+    const now = new Date("2026-11-06T00:00:00Z");
+    expect(timeLeftText(new Date("2026-11-06T23:05:00Z"), now)).toBe("23시간 5분 남았어요");
+    expect(timeLeftText(new Date("2026-11-06T02:00:00Z"), now)).toBe("2시간 남았어요");
+    expect(timeLeftText(new Date("2026-11-06T00:00:30Z"), now)).toBe("1분 남았어요");
+    expect(timeLeftText(new Date("2026-11-05T23:00:00Z"), now)).toBeNull();
   });
 });

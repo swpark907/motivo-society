@@ -35,7 +35,7 @@ test.describe("활동 상세", () => {
     const area = applyArea(page, isMobile);
     await expect(area.getByText("40,000원")).toBeVisible();
     await area.getByRole("link", { name: "로그인하고 신청" }).click();
-    await expect(page).toHaveURL(/\/login\?next=%2Factivities%2Fvibe-season-4w$/);
+    await expect(page).toHaveURL(/\/login\?next=%2Factivities%2Fvibe-season-4w%2Fapply$/);
   });
 
   test("OG 메타가 있고 미리보기 이미지가 만들어진다", async ({ page, request }) => {
@@ -67,7 +67,7 @@ test.describe("활동 상세", () => {
 
   test("확정된 참가자는 참가 확정과 상세 주소를 본다", async ({ page, isMobile }) => {
     await signInAs(page, "멤버하나", "/activities/capybara-cafe");
-    await expect(applyArea(page, isMobile).getByRole("status")).toHaveText("참가 확정");
+    await expect(applyArea(page, isMobile).getByRole("link", { name: /참가 확정/ })).toBeVisible();
     await expect(page.getByRole("heading", { name: "참가 정보" })).toBeVisible();
     await expect(page.getByText(/가짜 주소/)).toBeVisible();
   });

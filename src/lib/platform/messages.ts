@@ -1,7 +1,7 @@
 /** DB 함수가 올리는 오류 코드와 상태 값을 화면 문구로 바꾼다. */
 
 const ERROR_MESSAGES: Record<string, string> = {
-  auth_required: "먼저 사람을 골라 로그인해 주세요.",
+  auth_required: "로그인이 필요해요.",
   account_inactive: "이용이 멈춘 계정이에요.",
   not_found: "볼 수 없는 활동이에요.",
   session_has_no_own_apply: "회차는 따로 신청하지 않아요. 시즌에 신청해 주세요.",

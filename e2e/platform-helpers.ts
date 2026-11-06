@@ -49,3 +49,27 @@ export async function signUpByMail(
   await expect(page.getByRole("heading", { name: "메일을 보냈어요" })).toBeVisible();
   await page.goto(await magicLinkFor(request, email));
 }
+
+/** 시험장 가짜 사람으로 로그인(개발 환경 전용 로그인 영역). */
+export async function signInAs(page: Page, nickname: string, next: string) {
+  await page.goto(`/login?next=${encodeURIComponent(next)}`);
+  await page.getByText("개발용 · 시험장 사람으로 들어가기").click();
+  await page.getByRole("button", { name: new RegExp(nickname) }).click();
+  await expect(page).toHaveURL(new RegExp(`${next.replace(/[?]/g, "\\?")}$`));
+}
+
+/** 시험 데이터를 처음 상태로(로컬 Supabase 서비스 키, 개발 전용). */
+export async function reseedSandbox(request: APIRequestContext) {
+  try {
+    process.loadEnvFile(".env.local");
+  } catch {
+    // 이미 환경 변수가 있으면 그대로 쓴다.
+  }
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+  const res = await request.post(`${url}/rest/v1/rpc/sandbox_reseed`, {
+    headers: { apikey: key, Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+    data: {},
+  });
+  expect(res.ok()).toBe(true);
+}

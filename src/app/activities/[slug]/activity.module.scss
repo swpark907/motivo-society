@@ -99,7 +99,18 @@
   font-weight: 700;
 }
 
+.notice {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--product-radius-sm);
+  background: var(--ink);
+  color: var(--white);
+  font-weight: 700;
+}
+
 .statusPill {
+  text-decoration: none;
+
   display: flex;
   align-items: center;
   justify-content: center;

@@ -79,3 +79,14 @@ export function periodWhen(startsAt: Date, endsAt: Date | null): string {
     kstDayStart(endsAt).getTime() === endsAt.getTime() ? new Date(endsAt.getTime() - 1) : endsAt;
   return `${shortDate(startsAt)} – ${shortDate(lastDay)}`;
 }
+
+/** 입금 기한까지 남은 시간: "23시간 5분 남았어요" · "12분 남았어요" · null(지남). */
+export function timeLeftText(due: Date, now: Date): string | null {
+  const ms = due.getTime() - now.getTime();
+  if (ms <= 0) return null;
+  const minutes = Math.ceil(ms / 60000);
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  if (h === 0) return `${m}분 남았어요`;
+  return m === 0 ? `${h}시간 남았어요` : `${h}시간 ${m}분 남았어요`;
+}

@@ -5,7 +5,8 @@ import s from "./activity.module.scss";
 
 type Props = {
   state: ApplyState;
-  loginHref: string;
+  /** 신청 확인·내 신청 내역 주소(/activities/[slug]/apply). */
+  applyHref: string;
   price: string;
   priceSub: string;
   capacity: number | null;
@@ -15,10 +16,10 @@ type Props = {
 
 /**
  * 신청 영역. 넓은 화면은 오른쪽에 붙는 카드, 좁은 화면은 하단 탭 바 위 고정 바.
- * 실제 신청(확인 단계·입금 안내)은 백로그 L06에서 붙인다. 그 전에는 누를 수 없음을 숨기지 않는다.
+ * 버튼은 신청 확인(/apply)으로, 이미 신청했으면 내 신청 내역(같은 주소)으로 간다.
  */
-export function ApplyPanel({ state, loginHref, price, priceSub, capacity, taken, title }: Props) {
-  const action = <Action state={state} loginHref={loginHref} />;
+export function ApplyPanel({ state, applyHref, price, priceSub, capacity, taken, title }: Props) {
+  const action = <Action state={state} applyHref={applyHref} />;
   return (
     <>
       <aside className={s.side} aria-label="신청">
@@ -57,20 +58,39 @@ export function ApplyPanel({ state, loginHref, price, priceSub, capacity, taken,
   );
 }
 
-function Action({ state, loginHref }: { state: ApplyState; loginHref: string }) {
+function Action({ state, applyHref }: { state: ApplyState; applyHref: string }) {
   if (state.kind === "login") {
+    // 로그인 → (처음이면 온보딩) → 신청 확인으로 이어진다.
     return (
-      <Link href={loginHref} className={s.cta}>
+      <Link href={`/login?next=${encodeURIComponent(applyHref)}`} className={s.cta}>
         {state.label}
       </Link>
     );
   }
   if (state.kind === "apply") {
     return (
-      <button type="button" className={s.cta} disabled title="신청 기능을 준비하고 있어요">
+      <Link href={applyHref} className={s.cta}>
         {state.label}
-        <span className={s.ctaSoon}>준비 중</span>
-      </button>
+      </Link>
+    );
+  }
+  if (state.kind === "mine") {
+    if (state.status === "pending_payment") {
+      return (
+        <Link href={applyHref} className={s.cta}>
+          입금 안내 보기
+        </Link>
+      );
+    }
+    return (
+      <Link
+        href={applyHref}
+        className={s.statusPill}
+        data-kind="mine"
+        aria-label={`${state.label} · 신청 내역 보기`}
+      >
+        {state.label}
+      </Link>
     );
   }
   return (

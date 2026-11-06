@@ -38,8 +38,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function ActivityPage({ params }: Props) {
+export default async function ActivityPage({ params, searchParams }: Props) {
   const { slug } = await params;
+  const notice = (await searchParams).notice === "cancelled" ? "신청을 취소했어요." : null;
   const result = await getActivityDetail(slug);
   if (!result.found) {
     // 회차 주소로 들어오면 시즌 화면의 회차 목록으로 보낸다.
@@ -82,6 +83,12 @@ export default async function ActivityPage({ params }: Props) {
           <span aria-hidden="true">/</span>
           <span>{KIND_LABELS[a.kind]}</span>
         </nav>
+
+        {notice && (
+          <p className={s.notice} role="status">
+            {notice}
+          </p>
+        )}
 
         <article className={s.layout}>
           <div className={s.main}>
@@ -279,7 +286,7 @@ export default async function ActivityPage({ params }: Props) {
 
           <ApplyPanel
             state={state}
-            loginHref={`/login?next=${encodeURIComponent(`/activities/${a.slug}`)}`}
+            applyHref={`/activities/${a.slug}/apply`}
             price={a.price > 0 ? won(a.price) : "무료"}
             priceSub={a.kind === "series" ? `시즌 ${a.sessions.length}회` : KIND_LABELS[a.kind]}
             capacity={a.capacity}

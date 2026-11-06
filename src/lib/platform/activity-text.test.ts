@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { certFormatsText, certRuleText, dateOnly, refundText, sessionState } from "./activity-text";
+import {
+  accountNumber,
+  certFormatsText,
+  certRuleText,
+  dateOnly,
+  refundText,
+  sessionState,
+} from "./activity-text";
 
 describe("activity-text", () => {
   it("인증 규칙", () => {
@@ -27,5 +34,14 @@ describe("activity-text", () => {
 
   it("날짜만", () => {
     expect(dateOnly("2026-11-02")).toBe("11.2 (월)");
+  });
+});
+
+describe("accountNumber", () => {
+  it("문구에서 계좌번호만", () => {
+    expect(accountNumber("(가짜) 모쏘은행 000-0000-0000 예금주 오디스트웍스")).toBe(
+      "000-0000-0000",
+    );
+    expect(accountNumber("계좌 준비 중")).toBe("계좌 준비 중");
   });
 });

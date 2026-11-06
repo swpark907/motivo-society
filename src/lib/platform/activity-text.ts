@@ -49,3 +49,8 @@ export function sessionWhen(startsAt: string | null): string {
 export function dateOnly(isoDate: string): string {
   return shortDate(new Date(`${isoDate}T00:00:00+09:00`));
 }
+
+/** 계좌 안내 문구에서 계좌번호만 꺼낸다(복사 버튼용). 못 찾으면 문구 전체. */
+export function accountNumber(note: string): string {
+  return note.match(/\d[\d-]{6,}\d/)?.[0] ?? note;
+}
