@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { NAV_ITEMS } from "@/lib/nav";
+import { AccountMenu } from "./AccountMenu";
 import { NavLink } from "./NavLink";
 import { TabBar } from "./TabBar";
 import { TestPageMenu } from "./TestPageMenu";
@@ -30,6 +31,7 @@ export function Gnb() {
           </nav>
           <div className={styles.account}>
             {process.env.NODE_ENV !== "production" && <TestPageMenu />}
+            <AccountMenu />
           </div>
         </div>
       </header>

@@ -89,6 +89,58 @@
   min-width: 0;
 }
 
+// 계정: 로그인 전에는 "로그인", 로그인하면 얼굴 + 닉네임(넓은 화면)
+.accountPlaceholder {
+  display: inline-block;
+  width: 64px;
+  height: 36px;
+}
+
+.login {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--grey-2);
+  border-radius: 999px;
+  color: var(--white);
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background-color 120ms;
+
+  &:hover {
+    background: var(--grey-1);
+  }
+}
+
+.me {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  color: var(--white);
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-decoration: none;
+
+  &:hover .meName {
+    text-decoration: underline;
+  }
+}
+
+.meName {
+  display: none;
+  max-width: 8em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  @include up(md) {
+    display: inline;
+  }
+}
+
 // ── 하단 탭 바 (좁은 화면)
 .tabBar {
   position: fixed;

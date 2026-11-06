@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
-import { EmptyState } from "@/components/EmptyState/EmptyState";
+import { Avatar } from "@/components/Avatar/Avatar";
 import { PlatformPage } from "@/components/PlatformPage/PlatformPage";
+import { requireUser } from "@/lib/platform/session";
+import { signOut } from "../login/actions";
+import s from "./me.module.scss";
 
 export const metadata: Metadata = {
   title: "나",
@@ -8,15 +11,43 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-// 로그인(백로그 L02) 전까지는 무엇이 모일지만 알려 준다. 없는 기능을 있는 것처럼 보이지 않는다.
-export default function MePage() {
+// 아직 열리지 않은 메뉴는 "준비 중"으로 보여 준다. 없는 기능을 있는 것처럼 보이지 않는다.
+const SECTIONS = [
+  { title: "내 일정", body: "신청한 모임·시즌·챌린지를 날짜순으로" },
+  { title: "주문과 환불", body: "입금 안내, 결제 내역, 환불 요청" },
+  { title: "프로필", body: "닉네임과 관심사" },
+];
+
+export default async function MePage() {
+  const user = await requireUser("/me");
+  const name = user.nickname ?? user.email.split("@")[0];
+
   return (
-    <PlatformPage label="ME" title="나" lead="내 일정, 주문과 환불, 프로필이 여기에 모여요.">
-      <EmptyState
-        title="로그인 기능을 준비하고 있어요"
-        body="로그인이 열리면 신청한 활동과 주문을 여기서 볼 수 있어요. 그동안 발견에서 이번 주 활동을 둘러보세요."
-        action={{ href: "/explore", label: "발견으로" }}
-      />
+    <PlatformPage label="ME" title="나">
+      <section className={s.profile} aria-label="내 계정">
+        <Avatar name={name} size={56} />
+        <div className={s.who}>
+          <p className={s.name}>{user.nickname ?? "닉네임을 아직 정하지 않았어요"}</p>
+          <p className={s.email}>{user.email}</p>
+        </div>
+        <form action={signOut}>
+          <button type="submit" className={s.signOut}>
+            로그아웃
+          </button>
+        </form>
+      </section>
+
+      <ul className={s.sections}>
+        {SECTIONS.map((section) => (
+          <li key={section.title}>
+            <div>
+              <p className={s.sectionTitle}>{section.title}</p>
+              <p className={s.sectionBody}>{section.body}</p>
+            </div>
+            <span className={s.soon}>준비 중</span>
+          </li>
+        ))}
+      </ul>
     </PlatformPage>
   );
 }

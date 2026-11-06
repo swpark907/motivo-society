@@ -1,0 +1,247 @@
+// 로그인: 플랫폼 제품 화면 예외(종이 바탕, 라운드 12~16px, 오렌지는 주 행동 하나).
+
+.page {
+  display: grid;
+  flex: 1 0 auto;
+  place-items: start center;
+  min-height: calc(100dvh - var(--gnb-height));
+  padding: var(--space-8) var(--space-4) var(--space-16);
+
+  @include up(md) {
+    place-items: center;
+    padding-top: var(--space-12);
+  }
+}
+
+.card {
+  display: grid;
+  gap: var(--space-3);
+  width: 100%;
+  max-width: 420px;
+}
+
+.capy {
+  width: 88px;
+  height: 88px;
+  object-fit: contain;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(1.75rem, 5vw, 2.25rem);
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.lead {
+  margin: 0 0 var(--space-3);
+  color: var(--ink-muted);
+  line-height: 1.6;
+}
+
+.alert {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--product-radius-sm);
+  background: var(--white);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.form {
+  display: grid;
+  gap: var(--space-2);
+
+  label {
+    font-size: 0.875rem;
+    font-weight: 700;
+  }
+
+  input {
+    height: 52px;
+    padding: 0 var(--space-4);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--white);
+    color: var(--ink);
+    font: inherit;
+    font-size: 1rem;
+
+    &:focus-visible {
+      border-color: var(--ink);
+      outline: 2px solid var(--ink);
+      outline-offset: 1px;
+    }
+
+    &[aria-invalid="true"] {
+      border-color: var(--ink);
+    }
+  }
+}
+
+.fieldError {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  margin-top: var(--space-2);
+  padding: 0 var(--space-6);
+  border: 0;
+  border-radius: 14px;
+  background: var(--orange);
+  color: var(--black);
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 120ms;
+
+  &:hover:not(:disabled) {
+    background: var(--orange-deep);
+    color: var(--white);
+  }
+
+  &:disabled {
+    cursor: progress;
+    opacity: 0.7;
+  }
+}
+
+.ghost {
+  min-height: 44px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--white);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 120ms;
+
+  &:hover:not(:disabled) {
+    background: var(--surface);
+  }
+
+  &:disabled {
+    color: var(--ink-muted);
+    cursor: default;
+  }
+}
+
+.textButton {
+  min-height: 44px;
+  padding: 0 var(--space-2);
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+
+  .cta {
+    margin-top: 0;
+  }
+}
+
+.sent {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-6);
+  border-radius: var(--product-radius);
+  background: var(--white);
+
+  h2 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 800;
+  }
+
+  p {
+    margin: 0;
+    line-height: 1.6;
+  }
+}
+
+.signedIn {
+  display: grid;
+  gap: var(--space-4);
+
+  p {
+    margin: 0;
+    line-height: 1.6;
+  }
+}
+
+.muted {
+  color: var(--ink-muted);
+  font-size: 0.875rem;
+}
+
+.dev {
+  margin-top: var(--space-8);
+  padding: var(--space-4);
+  border: 1px dashed var(--line);
+  border-radius: var(--product-radius-sm);
+  font-size: 0.875rem;
+
+  summary {
+    min-height: 32px;
+    color: var(--ink-muted);
+    font-weight: 700;
+    cursor: pointer;
+  }
+}
+
+.devNote {
+  margin: var(--space-2) 0 var(--space-3);
+  color: var(--ink-muted);
+  line-height: 1.5;
+}
+
+.personas {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+
+  button {
+    display: grid;
+    gap: 2px;
+    min-height: 52px;
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--white);
+    color: var(--ink);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover {
+      background: var(--surface);
+    }
+
+    small {
+      color: var(--ink-muted);
+      font-size: 0.75rem;
+    }
+  }
+}
