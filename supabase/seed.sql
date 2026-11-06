@@ -91,10 +91,16 @@ begin
       jsonb_build_object('sub', r.id::text, 'email', r.handle || '@sandbox.motivo.test', 'email_verified', true),
       now(), now(), now()
     );
-    insert into public.profiles (id, nickname) values (r.id, r.nickname);
+    insert into public.profiles (id, nickname, onboarded_at) values (r.id, r.nickname, now());
   end loop;
 
   insert into public.platform_staff (user_id, role) values (u_owner, 'owner');
+
+  -- 가짜 사람들은 온보딩을 마친 상태로 둔다(관심사 두 개씩).
+  insert into public.profile_interests (user_id, interest_id)
+  select p.id, i.id from public.profiles p
+  cross join public.interests i
+  where i.slug in ('ai-tools', 'vibe-coding');
 
   -- 시험값: 수수료율 · 환불 규정은 대표 승인 전이다. 실제 값이 아니다.
   insert into public.platform_settings (fee_rate, order_due_hours, bank_account_note)
@@ -351,6 +357,20 @@ begin
   where e.user_id = p.user_id and e.activity_id = p.activity_id and e.status = 'active';
 end;
 $$;
+
+-- 관심사 목록(시안 값). 실제 목록은 소유자가 정한다. 초기화해도 지우지 않는다(참조 데이터).
+insert into public.interests (slug, name, sort_order) values
+  ('ai-tools', 'AI 도구', 10),
+  ('vibe-coding', '바이브코딩', 20),
+  ('web', '웹 만들기', 30),
+  ('design', '디자인', 40),
+  ('writing', '글쓰기', 50),
+  ('video', '영상', 60),
+  ('productivity', '일 잘하기', 70),
+  ('side-project', '사이드 프로젝트', 80),
+  ('startup', '창업', 90),
+  ('study', '함께 공부', 100)
+on conflict (slug) do nothing;
 
 revoke execute on function public.sandbox_reseed() from public, anon, authenticated;
 grant execute on function public.sandbox_reseed() to service_role;

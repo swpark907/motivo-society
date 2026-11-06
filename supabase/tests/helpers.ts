@@ -61,3 +61,17 @@ export function anon(): Client {
 export function code(error: { message: string } | null): string | null {
   return error ? error.message : null;
 }
+
+/** 프로필이 없는 새 사람(매직링크로 처음 들어온 사람과 같은 상태). */
+export async function newUser(): Promise<Client> {
+  requireEnv();
+  const admin = createClient<Database>(url, serviceKey, { auth: { persistSession: false } });
+  const email = `dbtest-${Date.now()}-${Math.floor(Math.random() * 1e6)}@example.test`;
+  const password = "dbtest-pass-2026";
+  const { error } = await admin.auth.admin.createUser({ email, password, email_confirm: true });
+  if (error) throw error;
+  const client = createClient<Database>(url, anonKey, { auth: { persistSession: false } });
+  const signIn = await client.auth.signInWithPassword({ email, password });
+  if (signIn.error) throw signIn.error;
+  return client;
+}

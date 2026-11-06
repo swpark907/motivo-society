@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { anon, as, code, ID, reseed } from "./helpers";
+import { anon, as, code, ID, newUser, reseed } from "./helpers";
 
 // 화면이 바뀌어도 지켜져야 하는 DB 규칙. 각 테스트는 가짜 데이터를 처음 상태로 되돌리고 시작한다.
 beforeEach(async () => {
@@ -163,5 +163,130 @@ describe("챌린지 인증", () => {
     const host = await as("host");
     const deny = await host.rpc("certification_submit", { p_activity: ID.challenge, p_body: "x" });
     expect(code(deny.error)).toBe("not_confirmed");
+  });
+});
+
+describe("첫 가입 온보딩", () => {
+  async function interestIds(client: Awaited<ReturnType<typeof newUser>>, count: number) {
+    const { data } = await client.from("interests").select("id").order("sort_order").limit(count);
+    return (data ?? []).map((row) => row.id);
+  }
+
+  it("닉네임은 겹칠 수 없고(대소문자 무시), 형식이 맞아야 한다", async () => {
+    const fresh = await newUser();
+    const ids = await interestIds(fresh, 1);
+    expect((await fresh.rpc("nickname_check", { p_nickname: "멤버하나" })).data).toBe(
+      "nickname_taken",
+    );
+    expect(
+      code(
+        (
+          await fresh.rpc("profile_complete_onboarding", {
+            p_nickname: "멤버하나",
+            p_interests: ids,
+          })
+        ).error,
+      ),
+    ).toBe("nickname_taken");
+    expect(
+      code(
+        (await fresh.rpc("profile_complete_onboarding", { p_nickname: "a", p_interests: ids }))
+          .error,
+      ),
+    ).toBe("nickname_invalid");
+    expect(
+      code(
+        (
+          await fresh.rpc("profile_complete_onboarding", {
+            p_nickname: "공백 있음",
+            p_interests: ids,
+          })
+        ).error,
+      ),
+    ).toBe("nickname_invalid");
+
+    const other = await newUser();
+    expect(
+      code(
+        (
+          await other.rpc("profile_complete_onboarding", {
+            p_nickname: "BaraKing",
+            p_interests: ids,
+          })
+        ).error,
+      ),
+    ).toBeNull();
+    expect((await fresh.rpc("nickname_check", { p_nickname: "baraking" })).data).toBe(
+      "nickname_taken",
+    );
+    expect(
+      code(
+        (
+          await fresh.rpc("profile_complete_onboarding", {
+            p_nickname: "baraking",
+            p_interests: ids,
+          })
+        ).error,
+      ),
+    ).toBe("nickname_taken");
+  });
+
+  it("관심사는 1~5개이고, 마치면 프로필과 관심사가 생긴다", async () => {
+    const fresh = await newUser();
+    const six = await interestIds(fresh, 6);
+    expect(
+      code(
+        (await fresh.rpc("profile_complete_onboarding", { p_nickname: "새사람", p_interests: [] }))
+          .error,
+      ),
+    ).toBe("interests_count");
+    expect(
+      code(
+        (await fresh.rpc("profile_complete_onboarding", { p_nickname: "새사람", p_interests: six }))
+          .error,
+      ),
+    ).toBe("interests_count");
+    expect(
+      code(
+        (
+          await fresh.rpc("profile_complete_onboarding", {
+            p_nickname: "새사람",
+            p_interests: ["00000000-0000-4000-ffff-000000000000"],
+          })
+        ).error,
+      ),
+    ).toBe("interest_invalid");
+
+    expect(
+      code(
+        (
+          await fresh.rpc("profile_complete_onboarding", {
+            p_nickname: " 새사람 ",
+            p_interests: six.slice(0, 3),
+          })
+        ).error,
+      ),
+    ).toBeNull();
+    const { data: user } = await fresh.auth.getUser();
+    const { data: profile } = await fresh
+      .from("profiles")
+      .select("nickname, onboarded_at")
+      .eq("id", user.user!.id)
+      .single();
+    expect(profile?.nickname).toBe("새사람");
+    expect(profile?.onboarded_at).not.toBeNull();
+    const { count } = await fresh
+      .from("profile_interests")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", user.user!.id);
+    expect(count).toBe(3);
+  });
+
+  it("로그인하지 않으면 온보딩 함수를 부를 수 없다", async () => {
+    const { error } = await anon().rpc("profile_complete_onboarding", {
+      p_nickname: "익명",
+      p_interests: [],
+    });
+    expect(error).not.toBeNull();
   });
 });

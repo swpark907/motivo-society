@@ -844,6 +844,33 @@ export type Database = {
           },
         ];
       };
+      interests: {
+        Row: {
+          created_at: string;
+          id: string;
+          is_active: boolean;
+          name: string;
+          slug: string;
+          sort_order: number;
+        };
+        Insert: {
+          created_at?: string;
+          id?: string;
+          is_active?: boolean;
+          name: string;
+          slug: string;
+          sort_order?: number;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          is_active?: boolean;
+          name?: string;
+          slug?: string;
+          sort_order?: number;
+        };
+        Relationships: [];
+      };
       orders: {
         Row: {
           activity_id: string;
@@ -1087,12 +1114,46 @@ export type Database = {
           },
         ];
       };
+      profile_interests: {
+        Row: {
+          created_at: string;
+          interest_id: string;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          interest_id: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          interest_id?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "profile_interests_interest_id_fkey";
+            columns: ["interest_id"];
+            isOneToOne: false;
+            referencedRelation: "interests";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "profile_interests_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       profiles: {
         Row: {
           bio: string | null;
           created_at: string;
           id: string;
           nickname: string;
+          onboarded_at: string | null;
           status: string;
           updated_at: string;
         };
@@ -1101,6 +1162,7 @@ export type Database = {
           created_at?: string;
           id: string;
           nickname: string;
+          onboarded_at?: string | null;
           status?: string;
           updated_at?: string;
         };
@@ -1109,6 +1171,7 @@ export type Database = {
           created_at?: string;
           id?: string;
           nickname?: string;
+          onboarded_at?: string | null;
           status?: string;
           updated_at?: string;
         };
@@ -1485,6 +1548,8 @@ export type Database = {
         Args: { p_activity: string; p_user: string };
         Returns: boolean;
       };
+      nickname_check: { Args: { p_nickname: string }; Returns: string };
+      nickname_is_valid: { Args: { p_nickname: string }; Returns: boolean };
       order_confirm_payment: { Args: { p_order: string }; Returns: undefined };
       orders_expire_overdue: { Args: never; Returns: number };
       participation_apply: {
@@ -1495,6 +1560,10 @@ export type Database = {
       participation_decide: {
         Args: { p_approve: boolean; p_participation: string; p_reason?: string };
         Returns: string;
+      };
+      profile_complete_onboarding: {
+        Args: { p_interests: string[]; p_nickname: string };
+        Returns: undefined;
       };
       refund_decide: {
         Args: { p_approve: boolean; p_note?: string; p_refund: string };

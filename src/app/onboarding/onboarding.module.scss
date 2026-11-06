@@ -1,0 +1,184 @@
+// 첫 가입: 플랫폼 제품 화면 예외. 관심사 칩은 고르면 검정 면(색은 의미에만).
+
+.page {
+  flex: 1 0 auto;
+  min-height: calc(100dvh - var(--gnb-height));
+  padding: var(--space-8) var(--space-4) var(--space-16);
+
+  @include up(md) {
+    padding-top: var(--space-12);
+  }
+}
+
+.inner {
+  display: grid;
+  gap: var(--space-3);
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(1.6rem, 5vw, 2.25rem);
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  word-break: keep-all;
+}
+
+.lead {
+  margin: 0 0 var(--space-4);
+  color: var(--ink-muted);
+  line-height: 1.6;
+}
+
+.form {
+  display: grid;
+  gap: var(--space-8);
+}
+
+.field {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+
+  > label,
+  legend {
+    padding: 0;
+    font-size: 0.95rem;
+    font-weight: 800;
+  }
+
+  legend {
+    margin-bottom: var(--space-2);
+  }
+
+  > input {
+    height: 52px;
+    padding: 0 var(--space-4);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--white);
+    color: var(--ink);
+    font: inherit;
+    font-size: 1rem;
+
+    &:focus-visible {
+      border-color: var(--ink);
+      outline: 2px solid var(--ink);
+      outline-offset: 1px;
+    }
+  }
+}
+
+.count {
+  margin-left: var(--space-1);
+  color: var(--ink-muted);
+  font-weight: 700;
+}
+
+.hint {
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 0.875rem;
+  line-height: 1.5;
+
+  &[data-tone="good"] {
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  // 오렌지는 "시작하기" 하나에만 쓴다. 문제는 굵은 글자와 문장으로 알린다.
+  &[data-tone="bad"] {
+    color: var(--ink);
+    font-weight: 700;
+  }
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--white);
+  color: var(--ink);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 120ms;
+
+  // 체크박스는 숨기되 키보드·스크린 리더는 그대로 쓴다.
+  input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+  }
+
+  &:has(input:focus-visible) {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+
+  &:hover:not([data-on]):not([data-full]) {
+    background: var(--surface);
+  }
+
+  &[data-on] {
+    border-color: var(--ink);
+    background: var(--ink);
+    color: var(--white);
+  }
+
+  &[data-full] {
+    color: var(--ink-muted);
+    cursor: not-allowed;
+  }
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  padding: 0 var(--space-6);
+  border: 0;
+  border-radius: 14px;
+  background: var(--orange);
+  color: var(--black);
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background-color 120ms;
+
+  &:hover:not(:disabled) {
+    background: var(--orange-deep);
+    color: var(--white);
+  }
+
+  &:disabled {
+    background: var(--line);
+    color: var(--ink-muted);
+    cursor: not-allowed;
+  }
+}
+
+.need {
+  margin: calc(var(--space-6) * -1) 0 0;
+  color: var(--ink-muted);
+  font-size: 0.875rem;
+  text-align: center;
+}

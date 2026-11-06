@@ -27,7 +27,7 @@ export default async function MePage() {
       <section className={s.profile} aria-label="내 계정">
         <Avatar name={name} size={56} />
         <div className={s.who}>
-          <p className={s.name}>{user.nickname ?? "닉네임을 아직 정하지 않았어요"}</p>
+          <p className={s.name}>{name}</p>
           <p className={s.email}>{user.email}</p>
         </div>
         <form action={signOut}>

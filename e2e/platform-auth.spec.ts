@@ -1,30 +1,7 @@
-import { expect, test, type APIRequestContext } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 // L02 매직링크 로그인. 로컬 Supabase의 메일은 Mailpit에 도착한다.
-const MAILPIT = "http://127.0.0.1:55424";
-
-async function magicLinkFor(request: APIRequestContext, email: string): Promise<string> {
-  let link = "";
-  await expect
-    .poll(
-      async () => {
-        const res = await request.get(`${MAILPIT}/api/v1/search`, {
-          params: { query: `to:"${email}"`, limit: "1" },
-        });
-        const body = (await res.json()) as { messages: { ID: string }[] };
-        const id = body.messages[0]?.ID;
-        if (!id) return "";
-        const message = (await (await request.get(`${MAILPIT}/api/v1/message/${id}`)).json()) as {
-          Text: string;
-        };
-        link = message.Text.match(/https?:\/\/\S+\/auth\/v1\/verify\S+/)?.[0] ?? "";
-        return link;
-      },
-      { timeout: 15_000 },
-    )
-    .not.toBe("");
-  return link.replace(/[)\]>]+$/, "");
-}
+import { magicLinkFor, testNickname } from "./platform-helpers";
 
 test.describe("매직링크 로그인", () => {
   test("로그인이 필요한 화면 → 메일 링크 → 원래 화면으로 돌아온다", async ({
@@ -44,9 +21,16 @@ test.describe("매직링크 로그인", () => {
     await expect(page.getByRole("button", { name: /다시 보내기 \(\d+초\)/ })).toBeDisabled();
 
     await page.goto(await magicLinkFor(request, email));
+    // 처음 온 사람은 온보딩을 거쳐 원래 화면으로 간다(L03).
+    await expect(page).toHaveURL(/\/onboarding\?next=%2Fme$/);
+    const nickname = testNickname();
+    await page.getByLabel("닉네임").fill(nickname);
+    await expect(page.getByText("쓸 수 있는 닉네임이에요.")).toBeVisible();
+    await page.getByText("AI 도구", { exact: true }).click();
+    await page.getByRole("button", { name: "시작하기" }).click();
     await expect(page).toHaveURL(/\/me$/);
     await expect(page.getByText(email)).toBeVisible();
-    await expect(page.getByText("닉네임을 아직 정하지 않았어요")).toBeVisible();
+    await expect(page.getByRole("main").getByText(nickname, { exact: true })).toBeVisible();
 
     await page.getByRole("button", { name: "로그아웃" }).click();
     await expect(page).toHaveURL(/\/$/);

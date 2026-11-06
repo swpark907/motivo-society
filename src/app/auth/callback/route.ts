@@ -1,7 +1,7 @@
 import type { EmailOtpType } from "@supabase/supabase-js";
 import { redirect } from "next/navigation";
 import type { NextRequest } from "next/server";
-import { safeNext } from "@/lib/platform/auth-paths";
+import { onboardingHref, safeNext } from "@/lib/platform/auth-paths";
 import { createSessionClient } from "@/lib/platform/supabase-server";
 
 /**
@@ -23,5 +23,14 @@ export async function GET(request: NextRequest) {
     ok = !(await supabase.auth.verifyOtp({ token_hash: tokenHash, type })).error;
   }
   if (!ok) redirect(`/login?error=link&next=${encodeURIComponent(next)}`);
+
+  // 처음 온 사람은 닉네임·관심사부터 정한 뒤 가려던 곳으로 간다.
+  const { data } = await supabase.auth.getUser();
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("onboarded_at")
+    .eq("id", data.user?.id ?? "")
+    .maybeSingle();
+  if (!profile?.onboarded_at) redirect(onboardingHref(next));
   redirect(next);
 }

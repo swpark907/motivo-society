@@ -7,7 +7,15 @@ export function safeNext(raw: string | null | undefined, fallback = "/"): string
   if (!raw.startsWith("/") || raw.startsWith("//") || raw.startsWith("/\\")) return fallback;
   if (/[\u0000-\u001f]/.test(raw)) return fallback;
   // 로그인 화면 자체로 돌아가면 다시 로그인 화면이 뜬다.
-  if (raw === "/login" || raw.startsWith("/login?") || raw.startsWith("/auth/")) return fallback;
+  if (
+    raw === "/login" ||
+    raw.startsWith("/login?") ||
+    raw.startsWith("/auth/") ||
+    raw === "/onboarding" ||
+    raw.startsWith("/onboarding?")
+  ) {
+    return fallback;
+  }
   return raw;
 }
 
@@ -15,6 +23,12 @@ export function safeNext(raw: string | null | undefined, fallback = "/"): string
 export function loginHref(next: string): string {
   const target = safeNext(next);
   return target === "/" ? "/login" : `/login?next=${encodeURIComponent(target)}`;
+}
+
+/** 첫 가입 온보딩 주소. 마치면 `next`로 간다. */
+export function onboardingHref(next: string): string {
+  const target = safeNext(next);
+  return target === "/" ? "/onboarding" : `/onboarding?next=${encodeURIComponent(target)}`;
 }
 
 /** 이메일 형식의 아주 기본적인 확인. 실제 확인은 메일이 도착하는지로 한다. */

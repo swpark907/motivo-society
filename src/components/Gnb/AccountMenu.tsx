@@ -10,7 +10,7 @@ import { loginHref } from "@/lib/platform/auth-paths";
 import { createBrowserSupabase } from "@/lib/platform/supabase-browser";
 import styles from "./Gnb.module.scss";
 
-type Account = { name: string } | null | undefined; // undefined = 아직 확인 전
+type Account = { name: string | null } | null | undefined; // undefined = 아직 확인 전, name null = 온보딩 전
 
 export function AccountMenu() {
   const pathname = usePathname();
@@ -34,7 +34,7 @@ export function AccountMenu() {
         .select("nickname")
         .eq("id", user.id)
         .maybeSingle();
-      if (alive) setAccount({ name: profile?.nickname ?? user.email?.split("@")[0] ?? "나" });
+      if (alive) setAccount({ name: profile?.nickname ?? null });
     })();
     return () => {
       alive = false;
@@ -48,6 +48,15 @@ export function AccountMenu() {
     return (
       <Link href={loginHref(pathname)} className={styles.login}>
         로그인
+      </Link>
+    );
+  }
+  if (account.name === null) {
+    // 메일 링크로 들어왔지만 닉네임·관심사를 아직 정하지 않았다.
+    if (pathname === "/onboarding") return null;
+    return (
+      <Link href="/onboarding" className={styles.login}>
+        가입 마무리
       </Link>
     );
   }
