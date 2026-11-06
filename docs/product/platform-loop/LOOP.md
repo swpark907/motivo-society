@@ -30,7 +30,7 @@
 5. **확인(전부 통과해야 커밋).**
    - `pnpm check`
    - `pnpm test:db`
-   - 바꾼 여정의 e2e: `PW_BASE_URL=http://localhost:3000 pnpm exec playwright test <파일>` (DB를 바꾸는 e2e는 `test.describe.configure({ mode: "serial" })`와 시작 시 초기화)
+   - 바꾼 여정의 e2e: `PW_BASE_URL=http://localhost:3000 pnpm exec playwright test <파일>`. **DB를 바꾸는 e2e는 `e2e/platform-flows.spec.ts` 한 파일에** 넣는다(순서대로 돌고 테스트마다 `reseedSandbox`로 초기화). 다른 파일에 두면 병렬 실행 중 한쪽의 초기화가 다른 쪽의 사람·신청을 지운다.
    - **디자인·사용성 체크**: 브라우저 도구로 PC 1280px와 모바일 375px를 직접 열어 아래 체크리스트를 본다. 가로 스크롤 0. 발견한 것은 고친다.
 6. **커밋.** `feat/platform-app` 브랜치에 항목 하나 = 커밋 하나. 제목 `feat(platform): <영어 요약> (Lxx)`, 마지막 줄에 `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`. `--no-verify` 금지.
 7. **기록.** BACKLOG 항목을 `[x] (날짜, 커밋 해시)`로 바꾸고, 생긴 후속 일은 백로그 맨 아래 "후속"에 한 줄로. LOG.md에 단락 하나(무엇 · 확인 방법과 결과 · 남은 것 · 스크린샷에서 본 문제).

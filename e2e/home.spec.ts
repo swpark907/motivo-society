@@ -1,13 +1,12 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("홈", () => {
-  test("히어로와 Yard·Library 섹션이 보이고 각 섹션으로 이동한다", async ({ page }) => {
+  test("비로그인 홈: 히어로 · 이번 주 활동 · Library", async ({ page }) => {
     await page.goto("/");
     await expect(page.getByRole("heading", { level: 1 })).toContainText("배우고");
 
-    const yard = page.getByRole("list", { name: "Yard" });
-    await expect(yard).toBeVisible();
-    await expect(yard.getByRole("link").first()).toBeVisible();
+    const week = page.getByRole("list", { name: "이번 주 활동" });
+    await expect(week.getByRole("link").first()).toBeVisible();
 
     const library = page.getByRole("list", { name: "Library" });
     await expect(library.getByRole("link")).toHaveCount(4);
@@ -25,7 +24,6 @@ test.describe("홈", () => {
       ["발견", "/explore"],
       ["클럽", "/clubs"],
       ["배우기", "/learn"],
-      ["나", "/me"],
       ["홈", "/"],
     ] as const) {
       await nav.getByRole("link", { name: label, exact: true }).click();
@@ -35,5 +33,8 @@ test.describe("홈", () => {
         "page",
       );
     }
+    // "나"는 로그인이 필요해서 로그인 화면으로 갔다가 돌아온다.
+    await nav.getByRole("link", { name: "나", exact: true }).click();
+    await expect(page).toHaveURL(/\/login\?next=%2Fme$/);
   });
 });
