@@ -52,7 +52,7 @@ test.describe("발견", () => {
 
   test("카드에 남은 자리·가격·주최가 보인다", async ({ page }) => {
     await page.goto("/explore?kind=gathering");
-    const card = page.locator("article", { hasText: "AI 도구 실습 워크숍" });
+    const card = page.getByRole("link", { name: /AI 도구 실습 워크숍/ });
     await expect(card).toContainText("15,000원");
     await expect(card).toContainText("바라호스트");
     await expect(card).toContainText(/자리 남음|대기 신청 가능/);

@@ -196,7 +196,7 @@ function CardRow({ items, now }: { items: ActivityCardData[]; now: Date }) {
     <ul className={styles.row}>
       {items.map((a) => (
         <li key={a.id}>
-          <ActivityCard activity={a} now={now} />
+          <ActivityCard activity={a} now={now} href={`/activities/${a.slug}`} />
         </li>
       ))}
     </ul>
@@ -208,7 +208,7 @@ function CardGrid({ items, now }: { items: ActivityCardData[]; now: Date }) {
     <ul className={styles.grid}>
       {items.map((a) => (
         <li key={a.id}>
-          <ActivityCard activity={a} now={now} />
+          <ActivityCard activity={a} now={now} href={`/activities/${a.slug}`} />
         </li>
       ))}
     </ul>
