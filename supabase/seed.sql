@@ -348,6 +348,19 @@ begin
   union all
   select a_chal_done, f4, v_kst - d, '요청문 기록 ' || d from generate_series(5, 7) d;
 
+  -- 표지(시안용 생성 이미지, docs/design-references/platform/service-draft-l01b.md). 하나는 비워 기본 표지를 본다.
+  update public.activities a set cover_path = '/images/platform/mock/' || c.file
+  from (values
+    ('tonight-mogakco', 'cover-online-mogakco.jpg'),
+    ('members-retro', 'cover-retro.jpg'),
+    ('capybara-cafe', 'cover-cafe-chat.jpg'),
+    ('ai-tools-workshop', 'cover-workshop.jpg'),
+    ('prompt-clinic', 'cover-prompt-clinic.jpg'),
+    ('vibe-season-4w', 'cover-season-studio.jpg'),
+    ('daily-build-2w', 'cover-challenge-notebook.jpg')
+  ) as c (slug, file)
+  where a.slug = c.slug;
+
   -- 무료로 확정된 참가에도 이용권을 만든다(명세 9절).
   insert into public.entitlements (user_id, activity_id, source)
   select p.user_id, p.activity_id, 'free' from public.participations p

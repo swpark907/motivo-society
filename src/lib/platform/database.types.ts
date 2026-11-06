@@ -39,6 +39,7 @@ export type Database = {
           cancelled_by: string | null;
           capacity: number | null;
           club_id: string | null;
+          cover_path: string | null;
           created_at: string;
           created_by: string;
           description: string | null;
@@ -71,6 +72,7 @@ export type Database = {
           cancelled_by?: string | null;
           capacity?: number | null;
           club_id?: string | null;
+          cover_path?: string | null;
           created_at?: string;
           created_by: string;
           description?: string | null;
@@ -103,6 +105,7 @@ export type Database = {
           cancelled_by?: string | null;
           capacity?: number | null;
           club_id?: string | null;
+          cover_path?: string | null;
           created_at?: string;
           created_by?: string;
           description?: string | null;

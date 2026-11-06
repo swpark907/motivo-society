@@ -1,74 +1,160 @@
-// 종류 색 카드 — 플랫폼 제품 화면 예외. 색은 활동 종류만 뜻한다.
+// 활동 카드 — 기준 시안(L01b). 표지가 먼저, 색은 종류 태그와 기본 표지에만.
 
 .card {
   display: grid;
   align-content: start;
-  gap: var(--space-1);
-  min-height: 200px;
-  padding: var(--space-6);
-  border: 2px solid transparent;
-  border-radius: var(--product-radius);
-  color: var(--black);
+  gap: var(--space-3);
+  min-width: 0;
+  color: var(--ink);
   text-decoration: none;
-  transition: border-color 120ms;
 
-  &[data-kind="gathering"] {
+  &:hover .cover img {
+    opacity: 0.92;
+  }
+
+  &:focus-visible {
+    border-radius: var(--product-radius);
+    outline: 2px solid var(--ink);
+    outline-offset: 4px;
+  }
+}
+
+.cover {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--product-radius);
+  background: var(--white);
+
+  img {
+    object-fit: cover;
+    transition: opacity 120ms;
+  }
+
+  // 표지가 없을 때: 종류 색 면 + 제목(호스트 이미지 보관함 전까지의 기본 표지)
+  &[data-kind="gathering"]:not(:has(img)) {
     background: var(--kind-gathering);
   }
 
-  &[data-kind="series"] {
+  &[data-kind="series"]:not(:has(img)) {
     background: var(--kind-series);
   }
 
-  &[data-kind="challenge"] {
+  &[data-kind="challenge"]:not(:has(img)) {
     background: var(--kind-challenge);
   }
 }
 
-a.card:hover {
-  border-color: var(--black);
+.fallback {
+  position: absolute;
+  right: var(--space-4);
+  bottom: var(--space-4);
+  left: var(--space-4);
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--black);
+  font-size: 1.5rem;
+  font-weight: 900;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  word-break: keep-all;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
 }
 
-a.card:focus-visible {
-  outline: 2px solid var(--black);
-  outline-offset: 2px;
+// 기본 표지에서는 종류 태그가 같은 색 면에 묻히지 않게 흰 바탕으로.
+.cover:not(:has(img)) .coverTop > :first-child {
+  background: var(--white);
 }
 
-.kind {
+.coverTop {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  left: var(--space-3);
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.day {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 var(--space-2);
+  border-radius: 999px;
+  background: var(--black);
+  color: var(--white);
   font-size: 0.75rem;
   font-weight: 800;
-  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.live {
+  composes: day;
+  background: var(--white);
+  color: var(--black);
+}
+
+.body {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.when {
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 0.8rem;
+  font-weight: 700;
 }
 
 .title {
-  font-size: 1.2rem;
+  display: -webkit-box;
+  overflow: hidden;
+  margin: 0;
+  font-size: 1.05rem;
   font-weight: 800;
   line-height: 1.35;
-}
-
-.summary {
-  font-size: 0.9rem;
-  line-height: 1.5;
-  opacity: 0.8;
+  letter-spacing: -0.01em;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .meta {
-  margin-top: var(--space-2);
-  font-size: 0.85rem;
-  font-weight: 600;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px var(--space-3);
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 0.8rem;
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
 }
 
 .foot {
   display: flex;
-  flex-wrap: wrap;
+  align-items: center;
   justify-content: space-between;
   gap: var(--space-2);
-  margin-top: auto;
-  padding-top: var(--space-3);
-  border-top: 1px solid currentColor;
+  margin: 2px 0 0;
+  color: var(--ink-muted);
   font-size: 0.8rem;
   font-weight: 600;
+}
 
-  // 경계선만 옅게(글자 색은 그대로)
-  border-top-color: color-mix(in srgb, currentColor 18%, transparent);
+.urgent {
+  color: var(--ink);
+  font-weight: 800;
+}
+
+.price {
+  color: var(--ink);
+  font-size: 0.95rem;
+  font-weight: 800;
 }

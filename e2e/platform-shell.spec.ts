@@ -5,8 +5,8 @@ test.describe("플랫폼 화면 틀", () => {
   test("발견에 모집 중인 활동 카드가 보인다", async ({ page }) => {
     await page.goto("/explore");
     await expect(page.getByRole("heading", { level: 1, name: "발견" })).toBeVisible();
-    await expect(page.getByRole("region", { name: "모집 중인 활동" })).toBeVisible();
-    await expect(page.getByText("오늘 저녁 온라인 모각코")).toBeVisible();
+    const all = page.getByRole("region", { name: "전체 활동" });
+    await expect(all.getByText("오늘 저녁 온라인 모각코")).toBeVisible();
   });
 
   test("클럽 목록과 배우기 입구가 열린다", async ({ page }) => {

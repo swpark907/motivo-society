@@ -23,8 +23,9 @@ export function AccountMenu() {
     let alive = true;
     // 서버 액션으로 로그인·로그아웃한 뒤 화면이 바뀌면 다시 확인한다(경로가 의존성).
     void (async () => {
-      const { data } = await supabase.auth.getSession();
-      const user = data.session?.user;
+      // getSession은 쿠키만 읽는다. 지워진 계정의 낡은 쿠키를 믿지 않도록 서버에 확인한다.
+      const { data } = await supabase.auth.getUser();
+      const user = data.user;
       if (!user) {
         if (alive) setAccount(null);
         return;
