@@ -73,3 +73,18 @@ export async function reseedSandbox(request: APIRequestContext) {
   });
   expect(res.ok()).toBe(true);
 }
+
+/** 시험 준비용으로 행 하나를 직접 넣는다(로컬 Supabase 서비스 키, 개발 전용). */
+export async function sandboxInsert(
+  request: APIRequestContext,
+  table: string,
+  row: Record<string, unknown>,
+) {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+  const res = await request.post(`${url}/rest/v1/${table}`, {
+    headers: { apikey: key, Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+    data: row,
+  });
+  expect(res.ok(), await res.text()).toBe(true);
+}

@@ -87,3 +87,25 @@
   font-size: 0.75rem;
   font-weight: 700;
 }
+
+.sections li:has(.sectionLink) {
+  padding: 0;
+}
+
+.sectionLink {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-height: 64px;
+  padding: var(--space-3) var(--space-6);
+  border-radius: inherit;
+  color: var(--ink);
+  text-decoration: none;
+  transition: background-color 120ms;
+
+  &:hover {
+    background: var(--surface);
+  }
+}

@@ -1,5 +1,12 @@
 import { expect, test } from "@playwright/test";
-import { reseedSandbox, signInAs, signUpByMail, testEmail, testNickname } from "./platform-helpers";
+import {
+  reseedSandbox,
+  sandboxInsert,
+  signInAs,
+  signUpByMail,
+  testEmail,
+  testNickname,
+} from "./platform-helpers";
 
 // 시험 데이터를 바꾸는 플랫폼 흐름은 모두 이 파일에서 순서대로 돈다.
 // 다른 파일과 나뉘어 있으면 병렬 실행 중 한쪽의 "처음 상태로"가 다른 쪽의 사람·신청을 지운다.
@@ -192,5 +199,66 @@ test.describe("회원 홈", () => {
     await expect(todo).toContainText("20,000원");
     await todo.click();
     await expect(page).toHaveURL(/\/activities\/prompt-clinic\/apply$/);
+  });
+});
+
+// L08 내 일정: 모임 · 시즌 회차 · 챌린지가 한 줄로 섞여 날짜순이다.
+test.describe("내 일정", () => {
+  const MEMBER = "00000000-0000-4000-a000-000000000005";
+  const SEASON = "00000000-0000-4000-c000-000000000009";
+
+  test("다가오는: 진행 중인 챌린지가 오늘 맨 앞, 회차는 회차마다, 곧 시작하는 회차는 화상 링크", async ({
+    page,
+    request,
+  }) => {
+    // 시즌 등록(시험 준비): 멤버하나를 확정 참가자로 넣는다.
+    await sandboxInsert(request, "participations", {
+      activity_id: SEASON,
+      user_id: MEMBER,
+      status: "confirmed",
+    });
+    await signInAs(page, "멤버하나", "/me/schedule");
+
+    const main = page.getByRole("main");
+    const titles = main.locator("li a[href^='/activities/']");
+    await expect(titles.first()).toHaveText("2주 매일 하나씩 만들기");
+    const order = await titles.allTextContents();
+    expect(order.slice(0, 2)).toEqual(["2주 매일 하나씩 만들기", "4주 바이브코딩 시즌"]);
+    expect(order).toContain("카피바라 카페에서 AI 수다");
+    expect(order.filter((t) => t === "4주 바이브코딩 시즌")).toHaveLength(3);
+
+    await expect(main.getByText("2회차 · 첫 화면")).toBeVisible();
+    await expect(main.getByText(/일째 · 14일 중/)).toBeVisible();
+    await expect(main.getByRole("link", { name: "화상 모임 들어가기" })).toHaveAttribute(
+      "href",
+      "https://meet.example.test/vibe-season-week-2",
+    );
+    await expect(main.getByText(/화상 링크는 .+에 열려요/).first()).toBeVisible();
+
+    // 지난: 확정 참가만, 출석 기록과 함께
+    await main.getByRole("link", { name: "지난", exact: true }).click();
+    await expect(page).toHaveURL(/view=past/);
+    const past = main.getByRole("listitem").filter({ hasText: "지난주 온라인 모각코" });
+    await expect(past.getByText("출석")).toBeVisible();
+    await expect(main.getByText("1회차 · 기획")).toBeVisible();
+
+    // 달력: 오늘 칸이 선택되고 아래에 그날 일정이 펼쳐진다
+    await main.getByRole("link", { name: "달력", exact: true }).click();
+    await expect(page).toHaveURL(/view=month/);
+    await expect(main.locator("[aria-current='date']")).toHaveCount(1);
+    await expect(main.getByRole("heading", { name: /· 오늘$/ })).toBeVisible();
+    await main.getByRole("link", { name: "다음 달" }).click();
+    await expect(main.getByRole("link", { name: "오늘", exact: true })).toBeVisible();
+  });
+
+  test("일정이 없는 회원은 발견으로 안내받고, 나에서 내 일정으로 들어간다", async ({ page }) => {
+    await signInAs(page, "처음온사람", "/me");
+    await page
+      .getByRole("main")
+      .getByRole("link", { name: /내 일정/ })
+      .click();
+    await expect(page).toHaveURL(/\/me\/schedule$/);
+    await expect(page.getByText("아직 잡힌 일정이 없어요")).toBeVisible();
+    await expect(page.getByRole("link", { name: "발견에서 찾아보기" })).toBeVisible();
   });
 });

@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Avatar } from "@/components/Avatar/Avatar";
+import { LineIcon } from "@/components/LineIcon/LineIcon";
 import { PlatformPage } from "@/components/PlatformPage/PlatformPage";
 import { requireUser } from "@/lib/platform/session";
 import { signOut } from "../login/actions";
@@ -12,8 +14,8 @@ export const metadata: Metadata = {
 };
 
 // 아직 열리지 않은 메뉴는 "준비 중"으로 보여 준다. 없는 기능을 있는 것처럼 보이지 않는다.
-const SECTIONS = [
-  { title: "내 일정", body: "신청한 모임·시즌·챌린지를 날짜순으로" },
+const SECTIONS: { title: string; body: string; href?: string }[] = [
+  { title: "내 일정", body: "신청한 모임·시즌·챌린지를 날짜순으로", href: "/me/schedule" },
   { title: "주문과 환불", body: "입금 안내, 결제 내역, 환불 요청" },
   { title: "프로필", body: "닉네임과 관심사" },
 ];
@@ -40,11 +42,23 @@ export default async function MePage() {
       <ul className={s.sections}>
         {SECTIONS.map((section) => (
           <li key={section.title}>
-            <div>
-              <p className={s.sectionTitle}>{section.title}</p>
-              <p className={s.sectionBody}>{section.body}</p>
-            </div>
-            <span className={s.soon}>준비 중</span>
+            {section.href ? (
+              <Link href={section.href} className={s.sectionLink}>
+                <div>
+                  <p className={s.sectionTitle}>{section.title}</p>
+                  <p className={s.sectionBody}>{section.body}</p>
+                </div>
+                <LineIcon name="arrow" />
+              </Link>
+            ) : (
+              <>
+                <div>
+                  <p className={s.sectionTitle}>{section.title}</p>
+                  <p className={s.sectionBody}>{section.body}</p>
+                </div>
+                <span className={s.soon}>준비 중</span>
+              </>
+            )}
           </li>
         ))}
       </ul>

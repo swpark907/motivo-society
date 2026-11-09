@@ -1,0 +1,434 @@
+// 내 일정 — 플랫폼 제품 화면 예외: 종이 바탕, 흰 카드, 종류 색은 태그·막대에만.
+
+// ── 보기 전환(다가오는 · 지난 · 달력)
+.tabs {
+  display: inline-flex;
+  justify-self: start;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--white);
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 40px;
+    padding: 0 var(--space-4);
+    border-radius: 999px;
+    color: var(--ink-muted);
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background-color 120ms;
+
+    &:hover {
+      background: var(--surface);
+    }
+
+    &[aria-current="page"] {
+      background: var(--black);
+      color: var(--white);
+    }
+
+    span {
+      font-size: 0.8rem;
+      opacity: 0.75;
+    }
+  }
+}
+
+.groups {
+  display: grid;
+  gap: var(--space-8);
+}
+
+.groupHead {
+  margin: 0 0 var(--space-3);
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.list {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+// ── 일정 한 줄
+.item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr);
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border-radius: 16px;
+  background: var(--white);
+  transition: background-color 120ms;
+
+  &:has(.title:hover) {
+    background: color-mix(in srgb, var(--white) 92%, var(--ink));
+  }
+
+  @include up(md) {
+    grid-template-columns: 96px minmax(0, 1fr);
+    padding: var(--space-4) var(--space-6);
+  }
+}
+
+.when {
+  display: grid;
+  align-content: start;
+  gap: 2px;
+  padding-top: 2px;
+
+  strong {
+    font-size: 0.95rem;
+    font-weight: 800;
+  }
+
+  span {
+    color: var(--ink-muted);
+    font-size: 0.8rem;
+  }
+}
+
+.body {
+  display: grid;
+  justify-items: start;
+  gap: 6px;
+  min-width: 0;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+// 제목 링크가 카드 전체를 덮는다. 화상 링크는 그 위에 올라온다.
+.title {
+  color: var(--ink);
+  font-size: 1.05rem;
+  font-weight: 800;
+  line-height: 1.35;
+  text-decoration: none;
+  word-break: keep-all;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+  }
+
+  &:focus-visible {
+    outline: none;
+
+    &::after {
+      outline: 2px solid var(--ink);
+      outline-offset: 2px;
+    }
+  }
+}
+
+.meta {
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 0.875rem;
+}
+
+.result,
+.resultOff {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 var(--space-2);
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.result {
+  background: var(--black);
+  color: var(--white);
+}
+
+.resultOff {
+  background: var(--surface);
+  color: var(--ink-muted);
+}
+
+// 챌린지 기간 막대
+.bar {
+  display: grid;
+  gap: 4px;
+  width: 100%;
+  max-width: 360px;
+  margin-top: 2px;
+}
+
+.track {
+  overflow: hidden;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--surface);
+
+  > span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--kind-challenge);
+  }
+}
+
+.barText {
+  color: var(--ink-muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.video,
+.videoLater {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 2px 0 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.video {
+  position: relative;
+  z-index: 1;
+  min-height: 40px;
+  padding: 0 var(--space-4);
+  border-radius: 12px;
+  background: var(--accent);
+  color: var(--white);
+  text-decoration: none;
+  transition: background-color 120ms;
+
+  &:hover {
+    background: color-mix(in srgb, var(--accent) 88%, var(--black));
+  }
+}
+
+.videoLater {
+  color: var(--ink-muted);
+}
+
+.none {
+  margin: 0;
+  padding: var(--space-6);
+  border-radius: 16px;
+  background: var(--white);
+  color: var(--ink-muted);
+}
+
+// ── 달력
+.calendar {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: 20px;
+  background: var(--white);
+
+  @include up(md) {
+    padding: var(--space-4) var(--space-6) var(--space-6);
+  }
+}
+
+.monthHead {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+
+  h2 {
+    margin: 0 var(--space-2);
+    font-size: 1.15rem;
+    font-weight: 800;
+  }
+}
+
+.monthNav,
+.todayLink {
+  display: inline-grid;
+  place-items: center;
+  min-width: 40px;
+  min-height: 40px;
+  border-radius: 12px;
+  color: var(--ink);
+  font-weight: 800;
+  text-decoration: none;
+  transition: background-color 120ms;
+
+  &:hover {
+    background: var(--surface);
+  }
+}
+
+.monthNav {
+  font-size: 1.4rem;
+}
+
+.todayLink {
+  margin-left: auto;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--line);
+  font-size: 0.85rem;
+}
+
+.grid {
+  display: grid;
+}
+
+.week {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+
+  & + & {
+    border-top: 1px solid var(--line);
+  }
+}
+
+.weekday {
+  padding: var(--space-2) 0;
+  color: var(--ink-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.cell {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 3px;
+  min-width: 0;
+  min-height: 64px;
+  padding: 6px 0 8px;
+  color: var(--ink);
+  text-decoration: none;
+  transition: background-color 120ms;
+
+  &:hover {
+    background: var(--surface);
+  }
+
+  &[data-outside] {
+    color: var(--ink-muted);
+    opacity: 0.55;
+  }
+
+  &[aria-current="date"] {
+    background: var(--surface);
+  }
+
+  @include up(md) {
+    min-height: 104px;
+    padding: var(--space-2) 0;
+  }
+}
+
+.date {
+  display: grid;
+  place-items: center;
+  align-self: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  font-size: 0.8rem;
+  font-weight: 700;
+
+  [data-today] > & {
+    background: var(--black);
+    color: var(--white);
+  }
+
+  @include up(md) {
+    align-self: flex-start;
+    margin-left: 6px;
+  }
+}
+
+// 챌린지 막대: 시작·끝에서만 둥글다. 칸 사이로 이어진다.
+.span {
+  overflow: hidden;
+  height: 6px;
+  background: var(--kind-challenge);
+
+  &[data-shape="start"],
+  &[data-shape="single"] {
+    margin-left: 4px;
+    border-top-left-radius: 999px;
+    border-bottom-left-radius: 999px;
+  }
+
+  &[data-shape="end"],
+  &[data-shape="single"] {
+    margin-right: 4px;
+    border-top-right-radius: 999px;
+    border-bottom-right-radius: 999px;
+  }
+
+  em {
+    display: none;
+  }
+
+  @include up(md) {
+    height: 20px;
+
+    em {
+      display: block;
+      overflow: hidden;
+      padding: 0 8px;
+      font-size: 0.72rem;
+      font-style: normal;
+      font-weight: 700;
+      line-height: 20px;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+  }
+}
+
+// 모임·회차: 좁은 화면은 점, 넓은 화면은 시각과 제목
+.chip {
+  align-self: center;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ink);
+
+  em {
+    display: none;
+  }
+
+  @include up(md) {
+    align-self: stretch;
+    width: auto;
+    height: auto;
+    margin: 0 4px;
+    padding: 2px 6px;
+    border-radius: 6px;
+    background: var(--kind-gathering);
+
+    &[data-kind="series"] {
+      background: var(--kind-series);
+    }
+
+    em {
+      display: block;
+      overflow: hidden;
+      font-size: 0.72rem;
+      font-style: normal;
+      font-weight: 700;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+  }
+}

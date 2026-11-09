@@ -88,6 +88,7 @@ function Next({ item, now }: { item: Data["upcoming"][number]; now: Date }) {
     <section aria-labelledby="next-h">
       <div className={s.sectionHead}>
         <h2 id="next-h">다음 일정</h2>
+        <Link href="/me/schedule">내 일정 전체</Link>
       </div>
       <article className={s.next}>
         <div className={s.nextCover} data-kind={item.kind}>
