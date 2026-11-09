@@ -327,6 +327,7 @@ export function parseDraft(json: string): Draft | null {
   }
   if (!raw || typeof raw !== "object") return null;
   const r = raw as Record<string, unknown>;
+  if (typeof r.kind !== "string") return null;
   const base = emptyDraft();
   const out = { ...base } as Record<string, unknown>;
   for (const k of DRAFT_KEYS) {
@@ -410,4 +411,9 @@ export function applyTemplate(
     });
   }
   return d;
+}
+
+/** 저장한 양식의 내용을 만들기 입력으로 읽는다. 모양이 틀리면 null(화면은 "열 수 없는 양식"으로). */
+export function templateDraft(data: unknown): Draft | null {
+  return parseDraft(JSON.stringify(data ?? null));
 }

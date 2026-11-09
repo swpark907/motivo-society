@@ -1,0 +1,247 @@
+// 내 보관함 — 플랫폼 제품 화면 예외(라운드 12~16px). 오렌지는 쓰지 않는다(주 행동이 "만들기"가 아니라 정리라서).
+
+.notice,
+.errorBox {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: 12px;
+  font-weight: 700;
+}
+
+.notice {
+  background: var(--ink);
+  color: var(--surface);
+}
+
+.errorBox {
+  border: 1px solid var(--accent);
+}
+
+.section {
+  display: grid;
+  gap: var(--space-3);
+  scroll-margin-top: calc(var(--gnb-height) + var(--space-4));
+
+  h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 800;
+  }
+}
+
+.hint {
+  max-width: 40rem;
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  word-break: keep-all;
+}
+
+.list {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 16px;
+  list-style: none;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  background: var(--white);
+
+  @include up(md) {
+    padding-inline: var(--space-6);
+  }
+}
+
+.who {
+  display: grid;
+  // 좁은 화면은 이름이 한 줄을 다 쓰고, 고치기·지우기가 아래 한 줄에 나란히.
+  flex: 1 1 100%;
+
+  @include up(md) {
+    flex: 1 1 14rem;
+  }
+
+  gap: 2px;
+  min-width: 0;
+
+  strong {
+    font-weight: 800;
+  }
+
+  small {
+    color: var(--ink-muted);
+    font-size: 0.85rem;
+    line-height: 1.5;
+    word-break: keep-all;
+  }
+}
+
+.body {
+  white-space: pre-line;
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  order: 2;
+  gap: var(--space-2);
+}
+
+// 고치기: 닫혀 있으면 지우기 옆의 버튼, 열리면 아래로 내려가 전체 폭의 양식.
+.edit {
+  order: 1;
+
+  summary {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 var(--space-4);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--white);
+    font-size: 0.9rem;
+    font-weight: 800;
+    list-style: none;
+    cursor: pointer;
+    transition: background-color 120ms;
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+
+    &:hover {
+      background: var(--surface);
+    }
+  }
+
+  &[open] {
+    flex-basis: 100%;
+    order: 3;
+
+    summary {
+      border-color: var(--ink);
+    }
+  }
+}
+
+.add {
+  flex-basis: 100%;
+
+  summary {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    color: var(--ink-muted);
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+}
+
+.add {
+  padding: 0 var(--space-4) var(--space-2);
+  border: 1px dashed var(--line);
+  border-radius: 16px;
+
+  summary {
+    color: var(--ink);
+  }
+}
+
+.form {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-2) 0 var(--space-3);
+
+  @include up(md) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  button {
+    justify-self: start;
+  }
+}
+
+.wide {
+  grid-column: 1 / -1;
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+
+  span {
+    font-size: 0.85rem;
+    font-weight: 800;
+  }
+
+  input,
+  textarea {
+    width: 100%;
+    min-height: 44px;
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--white);
+    color: var(--ink);
+    font: inherit;
+    font-size: 1rem;
+  }
+
+  textarea {
+    resize: vertical;
+    line-height: 1.5;
+  }
+}
+
+.primarySmall,
+.ghostSmall {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 var(--space-4);
+  border-radius: 12px;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 800;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 120ms;
+
+  &:disabled {
+    cursor: progress;
+    opacity: 0.6;
+  }
+}
+
+.primarySmall {
+  border: 0;
+  background: var(--ink);
+  color: var(--surface);
+
+  &:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--ink) 85%, var(--surface));
+  }
+}
+
+.ghostSmall {
+  border: 1px solid var(--line);
+  background: var(--white);
+  color: var(--ink);
+
+  &:hover:not(:disabled) {
+    background: var(--surface);
+  }
+}

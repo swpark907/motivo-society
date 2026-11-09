@@ -1086,3 +1086,97 @@ test.describe("지난 활동에서 가져오기", () => {
     await expect(page.getByRole("radio", { name: /^모임/ })).toBeChecked();
   });
 });
+
+// H05 보관함: 양식 · 장소 즐겨찾기 · 공지 문구를 모아 두고, 만들기에서 골라 쓴다.
+test.describe("호스트 보관함", () => {
+  const kstDay = (n: number) =>
+    new Date(Date.now() + 9 * 3600_000 + n * 86_400_000).toISOString().slice(0, 10);
+
+  test("보관함에서 문구를 더하고 장소를 고치고 지운다", async ({ page }) => {
+    await signInAs(page, "바라호스트", "/host");
+    await page.getByRole("link", { name: "내 보관함" }).click();
+    await expect(page).toHaveURL(/\/host\/saved$/);
+
+    const templates = page.getByRole("region", { name: "활동 양식" });
+    await expect(templates.getByRole("listitem")).toContainText("카페 수다");
+
+    const snippets = page.getByRole("region", { name: "공지 문구" });
+    await snippets.getByText("새 문구 저장").click();
+    await snippets.getByLabel("제목").last().fill("입금 안내");
+    await snippets.getByLabel("내용").last().fill("모임 이틀 전까지 입금해 주세요.");
+    await snippets.getByRole("button", { name: "문구 저장" }).click();
+    await expect(page.getByRole("status")).toHaveText("공지 문구를 저장했어요.");
+    await expect(page.getByRole("region", { name: "공지 문구" }).getByRole("listitem")).toHaveCount(
+      2,
+    );
+
+    const places = page.getByRole("region", { name: "장소 즐겨찾기" });
+    const hapjeong = places.getByRole("listitem").filter({ hasText: "합정 스터디룸" });
+    await hapjeong.getByText("고치기").click();
+    await hapjeong.getByLabel("지역 (선택)").fill("서울 마포구 합정동");
+    await hapjeong.getByRole("button", { name: "고친 내용 저장" }).click();
+    await expect(page.getByRole("status")).toHaveText("장소를 저장했어요.");
+    await expect(page.getByRole("region", { name: "장소 즐겨찾기" })).toContainText(
+      "서울 마포구 합정동",
+    );
+
+    await page
+      .getByRole("form", { name: "준비물 안내 지우기" })
+      .getByRole("button", { name: "지우기" })
+      .click();
+    await expect(page.getByRole("status")).toHaveText("지웠어요.");
+    await expect(page.getByRole("region", { name: "공지 문구" })).not.toContainText("준비물 안내");
+  });
+
+  test("양식으로 시작해 저장한 장소를 고르고, 확인 단계에서 새 양식으로 저장한다", async ({
+    page,
+  }) => {
+    await signInAs(page, "바라호스트", "/host/saved");
+    await page.getByRole("link", { name: "이 양식으로 만들기" }).click();
+    await expect(page.getByRole("main").getByRole("status")).toContainText(
+      "양식으로 시작했어요: 카페 수다",
+    );
+    await expect(page.getByRole("radio", { name: /개인 호스트/ })).toBeChecked();
+    await page.getByRole("button", { name: "다음" }).click();
+    await expect(page.getByLabel("제목")).toHaveValue("AI 수다");
+    await expect(page.getByLabel("장소 이름 (선택)")).toHaveValue("망원동 카페");
+
+    await page
+      .getByLabel("저장한 장소에서 고르기")
+      .selectOption({ label: "합정 스터디룸 · 서울 마포구" });
+    await expect(page.getByLabel("장소 이름 (선택)")).toHaveValue("합정 스터디룸");
+    await expect(page.getByLabel("상세 주소 (선택)")).toHaveValue("양화로 00, 3층 B룸 (가짜 주소)");
+    await page.getByRole("button", { name: "다음" }).click();
+    await page.getByLabel("시작", { exact: true }).fill(`${kstDay(12)}T19:00`);
+    await page.getByRole("button", { name: "다음" }).click();
+    await expect(page.getByLabel("정원 (선택)")).toHaveValue("6");
+    await page.getByRole("button", { name: "다음" }).click();
+
+    await page.getByLabel("양식으로 저장 (선택)").fill("합정 수다");
+    await page.getByRole("button", { name: "양식 저장" }).click();
+    await expect(page.getByText("양식을 저장했어요: 합정 수다")).toBeVisible();
+    await page.getByRole("button", { name: "초안으로 만들기" }).click();
+    await expect(page).toHaveURL(/\/host\/activities\/[0-9a-f-]{36}\?notice=activity_created$/, {
+      timeout: 30_000,
+    });
+
+    await page.goto("/host/new");
+    await expect(page.getByRole("navigation", { name: "내 양식으로 시작" })).toContainText(
+      "합정 수다",
+    );
+  });
+
+  test("만들기 중에 적은 장소를 즐겨찾기에 저장하면 바로 고를 수 있다", async ({ page }) => {
+    await signInAs(page, "바라호스트", "/host/new");
+    await page.getByRole("radio", { name: /개인 호스트/ }).check();
+    await page.getByRole("button", { name: "다음" }).click();
+    await page.getByLabel("장소 이름 (선택)").fill("연남 책방");
+    await page.getByLabel("지역 (선택)").fill("서울 마포구");
+    await page.getByRole("button", { name: "이 장소 즐겨찾기에 저장" }).click();
+    await expect(page.getByText("장소 즐겨찾기에 저장했어요: 연남 책방")).toBeVisible();
+    await expect(page.getByRole("button", { name: "이 장소 즐겨찾기에 저장" })).toHaveCount(0);
+    await expect(page.getByLabel("저장한 장소에서 고르기")).toContainText(
+      "연남 책방 · 서울 마포구",
+    );
+  });
+});

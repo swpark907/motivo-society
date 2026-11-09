@@ -2,7 +2,7 @@
 
 // 클라이언트 컴포넌트인 이유: 다섯 단계를 오가며 입력을 잃지 않고(useState), 단계마다 바로 검사해 알려 준다.
 // 최종 검사와 만들기는 서버 액션 → DB 함수가 다시 한다.
-import { useActionState, useEffect, useRef, useState, type ReactNode } from "react";
+import { useActionState, useEffect, useRef, useState, useTransition, type ReactNode } from "react";
 import {
   kstInputToIso,
   STEPS,
@@ -16,7 +16,13 @@ import {
 } from "@/lib/platform/activity-draft";
 import { clockTime, shortDate } from "@/lib/platform/activity-time";
 import { KIND_LABELS, won } from "@/lib/platform/messages";
-import { createAction, type CreateState } from "./actions";
+import type { SavedPlace } from "@/lib/platform/host-saved";
+import {
+  createAction,
+  quickSavePlaceAction,
+  saveTemplateAction,
+  type CreateState,
+} from "./actions";
 import s from "./new.module.scss";
 
 const KIND_HELP: Record<Draft["kind"], string> = {
@@ -41,13 +47,22 @@ export function NewActivityForm({
   choices,
   initial,
   previous,
+  places: savedPlaces,
 }: {
   choices: OrganizerChoice[];
-  /** 처음 값(지난 활동에서 가져온 것 포함) */
+  /** 처음 값(지난 활동 · 양식에서 가져온 것 포함) */
   initial: Draft;
   previous: { id: string; title: string }[];
+  /** 내 보관함의 장소 즐겨찾기 */
+  places: SavedPlace[];
 }) {
   const [draft, setDraft] = useState<Draft>(initial);
+  const [places, setPlaces] = useState(savedPlaces);
+  const [placeNote, setPlaceNote] = useState<string | null>(null);
+  const [placeSaving, startPlaceSave] = useTransition();
+  const [templateName, setTemplateName] = useState("");
+  const [templateNote, setTemplateNote] = useState<{ ok: boolean; text: string } | null>(null);
+  const [templateSaving, startTemplateSave] = useTransition();
   const [step, setStep] = useState<StepId>("kind");
   const [errors, setErrors] = useState<Errors>({});
   const [state, action, pending] = useActionState<CreateState, FormData>(createAction, {
@@ -234,6 +249,30 @@ export function NewActivityForm({
                 </fieldset>
                 {draft.format === "offline" ? (
                   <>
+                    {places.length > 0 && (
+                      <Field id="savedPlace" label="저장한 장소에서 고르기" wide>
+                        <select
+                          id="savedPlace"
+                          value=""
+                          onChange={(ev) => {
+                            const p = places.find((x) => x.id === ev.target.value);
+                            if (!p) return;
+                            set("placeName", p.name);
+                            set("area", p.area);
+                            set("addressDetail", p.addressDetail);
+                            setPlaceNote(`저장한 장소로 채웠어요: ${p.name}`);
+                          }}
+                        >
+                          <option value="">고르기</option>
+                          {places.map((p) => (
+                            <option key={p.id} value={p.id}>
+                              {p.name}
+                              {p.area ? ` · ${p.area}` : ""}
+                            </option>
+                          ))}
+                        </select>
+                      </Field>
+                    )}
                     {text("placeName", "장소 이름 (선택)", { maxLength: 40 })}
                     {text("area", "지역 (선택)", {
                       maxLength: 40,
@@ -243,6 +282,42 @@ export function NewActivityForm({
                       maxLength: 80,
                       hint: "참가가 확정된 사람에게만 보여요.",
                     })}
+                    <div className={`${s.inlineAction} ${s.wideField}`}>
+                      {draft.placeName.trim() &&
+                        !places.some(
+                          (p) =>
+                            p.name === draft.placeName.trim() &&
+                            p.area === draft.area.trim() &&
+                            p.addressDetail === draft.addressDetail.trim(),
+                        ) && (
+                          <button
+                            type="button"
+                            className={s.ghost}
+                            disabled={placeSaving}
+                            onClick={() =>
+                              startPlaceSave(async () => {
+                                const r = await quickSavePlaceAction({
+                                  name: draft.placeName,
+                                  area: draft.area,
+                                  addressDetail: draft.addressDetail,
+                                });
+                                if ("error" in r) setPlaceNote(r.error);
+                                else {
+                                  setPlaces((now) => [r.place, ...now]);
+                                  setPlaceNote(`장소 즐겨찾기에 저장했어요: ${r.place.name}`);
+                                }
+                              })
+                            }
+                          >
+                            {placeSaving ? "저장하는 중…" : "이 장소 즐겨찾기에 저장"}
+                          </button>
+                        )}
+                      {placeNote && (
+                        <p className={s.hint} role="status">
+                          {placeNote}
+                        </p>
+                      )}
+                    </div>
                   </>
                 ) : (
                   text("videoUrl", "화상 링크 (선택)", {
@@ -466,6 +541,54 @@ export function NewActivityForm({
               </div>
             ))}
           </dl>
+        )}
+
+        {step === "confirm" && (
+          <div className={s.saveTemplate}>
+            <Field
+              id="templateName"
+              label="양식으로 저장 (선택)"
+              hint="다음에 비슷한 활동을 열 때 이 내용으로 시작해요. 일정은 저장하지 않고, 같은 이름이 있으면 새 내용으로 바꿔요."
+            >
+              <input
+                id="templateName"
+                maxLength={40}
+                placeholder="예: 월례 모각코"
+                value={templateName}
+                onChange={(ev) => {
+                  setTemplateName(ev.target.value);
+                  setTemplateNote(null);
+                }}
+                aria-describedby="templateName-hint"
+              />
+            </Field>
+            <button
+              type="button"
+              className={s.ghost}
+              disabled={templateSaving || !templateName.trim()}
+              onClick={() =>
+                startTemplateSave(async () => {
+                  const name = templateName.trim();
+                  const r = await saveTemplateAction(name, JSON.stringify(draft));
+                  setTemplateNote(
+                    r.error
+                      ? { ok: false, text: r.error }
+                      : { ok: true, text: `양식을 저장했어요: ${name}` },
+                  );
+                })
+              }
+            >
+              {templateSaving ? "저장하는 중…" : "양식 저장"}
+            </button>
+            {templateNote && (
+              <p
+                className={templateNote.ok ? s.hint : s.error}
+                role={templateNote.ok ? "status" : "alert"}
+              >
+                {templateNote.text}
+              </p>
+            )}
+          </div>
         )}
 
         {state.error && (

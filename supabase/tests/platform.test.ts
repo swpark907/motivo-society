@@ -356,3 +356,65 @@ describe("호스트 도구 입구", () => {
     expect(mine).toEqual([]);
   });
 });
+
+describe("호스트 보관함", () => {
+  it("양식·장소·문구는 본인만 보고, 같은 이름의 양식은 덮어쓰며 일정은 저장하지 않는다", async () => {
+    const host = await as("host");
+    const member = await as("member");
+
+    const { data: id, error } = await host.rpc("template_save", {
+      p_name: "카페 수다",
+      p_data: { kind: "gathering", title: "새 제목", startsAt: "2026-12-01T19:00" },
+    });
+    expect(error).toBeNull();
+    const { data: rows } = await host.from("activity_templates").select("id, data");
+    expect(rows).toHaveLength(1); // seed의 같은 이름 양식을 덮어썼다
+    expect(rows?.[0].id).toBe(id);
+    expect(rows?.[0].data).toEqual({ kind: "gathering", title: "새 제목" });
+
+    expect(await member.from("activity_templates").select("id")).toMatchObject({ data: [] });
+    expect(await member.from("saved_places").select("id")).toMatchObject({ data: [] });
+    expect(await member.from("saved_snippets").select("id")).toMatchObject({ data: [] });
+
+    // 남의 것은 고치거나 지울 수 없다
+    const { data: place } = await host.from("saved_places").select("id").single();
+    expect(
+      code(
+        (
+          await member.rpc("place_save", {
+            p_id: place!.id,
+            p_name: "가로채기",
+            p_area: "",
+            p_address_detail: "",
+          })
+        ).error,
+      ),
+    ).toBe("not_found");
+    expect(
+      code((await member.rpc("saved_delete", { p_kind: "place", p_id: place!.id })).error),
+    ).toBe("not_found");
+    expect(
+      code((await host.rpc("saved_delete", { p_kind: "place", p_id: place!.id })).error),
+    ).toBeNull();
+
+    // 직접 쓰기는 막혀 있다
+    expect(
+      (await host.from("saved_snippets").insert({ owner_id: ID.host, title: "x", body: "y" }))
+        .error,
+    ).not.toBeNull();
+    expect((await anon().rpc("snippet_save", { p_title: "x", p_body: "y" })).error).not.toBeNull();
+  });
+
+  it("빈 이름·너무 긴 문구는 거절한다", async () => {
+    const host = await as("host");
+    expect(code((await host.rpc("template_save", { p_name: " ", p_data: {} })).error)).toBe(
+      "name_required",
+    );
+    expect(
+      code((await host.rpc("snippet_save", { p_title: "안내", p_body: "가".repeat(1001) })).error),
+    ).toBe("too_long");
+    expect(code((await host.rpc("template_save", { p_name: "x", p_data: [] })).error)).toBe(
+      "invalid_template",
+    );
+  });
+});

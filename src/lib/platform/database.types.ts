@@ -232,6 +232,41 @@ export type Database = {
           },
         ];
       };
+      activity_templates: {
+        Row: {
+          created_at: string;
+          data: Json;
+          id: string;
+          name: string;
+          owner_id: string;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          data: Json;
+          id?: string;
+          name: string;
+          owner_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          data?: Json;
+          id?: string;
+          name?: string;
+          owner_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "activity_templates_owner_id_fkey";
+            columns: ["owner_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       attendances: {
         Row: {
           checked_at: string;
@@ -1274,6 +1309,79 @@ export type Database = {
           },
         ];
       };
+      saved_places: {
+        Row: {
+          address_detail: string | null;
+          area: string | null;
+          created_at: string;
+          id: string;
+          name: string;
+          owner_id: string;
+          updated_at: string;
+        };
+        Insert: {
+          address_detail?: string | null;
+          area?: string | null;
+          created_at?: string;
+          id?: string;
+          name: string;
+          owner_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          address_detail?: string | null;
+          area?: string | null;
+          created_at?: string;
+          id?: string;
+          name?: string;
+          owner_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "saved_places_owner_id_fkey";
+            columns: ["owner_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      saved_snippets: {
+        Row: {
+          body: string;
+          created_at: string;
+          id: string;
+          owner_id: string;
+          title: string;
+          updated_at: string;
+        };
+        Insert: {
+          body: string;
+          created_at?: string;
+          id?: string;
+          owner_id: string;
+          title: string;
+          updated_at?: string;
+        };
+        Update: {
+          body?: string;
+          created_at?: string;
+          id?: string;
+          owner_id?: string;
+          title?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "saved_snippets_owner_id_fkey";
+            columns: ["owner_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       settlement_items: {
         Row: {
           amount: number;
@@ -1442,6 +1550,7 @@ export type Database = {
         Args: { p_participation: string; p_reason: string };
         Returns: undefined;
       };
+      _saved_limit: { Args: never; Returns: number };
       _seats_taken: { Args: { p_activity: string }; Returns: number };
       _start_payment: {
         Args: { p_depositor?: string; p_participation: string };
@@ -1567,6 +1676,15 @@ export type Database = {
         Args: { p_approve: boolean; p_participation: string; p_reason?: string };
         Returns: string;
       };
+      place_save: {
+        Args: {
+          p_address_detail: string;
+          p_area: string;
+          p_id?: string;
+          p_name: string;
+        };
+        Returns: string;
+      };
       profile_complete_onboarding: {
         Args: { p_interests: string[]; p_nickname: string };
         Returns: undefined;
@@ -1582,6 +1700,10 @@ export type Database = {
         Returns: number;
       };
       sandbox_reseed: { Args: never; Returns: undefined };
+      saved_delete: {
+        Args: { p_id: string; p_kind: string };
+        Returns: undefined;
+      };
       series_attendance: {
         Args: { p_series: string };
         Returns: {
@@ -1599,6 +1721,11 @@ export type Database = {
         Args: { p_settlement: string };
         Returns: undefined;
       };
+      snippet_save: {
+        Args: { p_body: string; p_id?: string; p_title: string };
+        Returns: string;
+      };
+      template_save: { Args: { p_data: Json; p_name: string }; Returns: string };
     };
     Enums: {
       [_ in never]: never;

@@ -76,6 +76,12 @@ const ERROR_MESSAGES: Record<string, string> = {
   not_gathering: "출석은 모임에서만 체크해요.",
   too_early_to_check: "출석은 시작 1시간 전부터 체크할 수 있어요.",
   not_confirmed: "참가가 확정된 사람만 할 수 있어요.",
+  name_too_long: "이름은 40자까지예요.",
+  invalid_template: "양식으로 저장할 수 없는 내용이에요. 새로고침한 뒤 다시 해 주세요.",
+  saved_limit: "보관함에는 종류마다 30개까지 둘 수 있어요. 안 쓰는 것을 지운 뒤 다시 해 주세요.",
+  too_long: "글자 수가 너무 많아요. 줄여서 다시 해 주세요.",
+  body_required: "내용을 적어 주세요.",
+  saved_missing: "이미 지웠거나 내 보관함에 없는 항목이에요.",
 };
 
 const NOTICE_MESSAGES: Record<string, string> = {
@@ -110,6 +116,10 @@ const NOTICE_MESSAGES: Record<string, string> = {
   cancelled: "신청을 취소했어요.",
   decided: "처리했어요.",
   marked: "출석을 기록했어요.",
+  template_saved: "양식을 저장했어요.",
+  place_saved: "장소를 저장했어요.",
+  snippet_saved: "공지 문구를 저장했어요.",
+  saved_deleted: "지웠어요.",
   reseeded: "가짜 데이터를 처음 상태로 되돌렸어요.",
   switched: "사람을 바꿨어요.",
 };

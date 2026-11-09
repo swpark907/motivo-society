@@ -368,6 +368,17 @@ begin
   update public.participations p set entitlement_id = e.id
   from public.entitlements e
   where e.user_id = p.user_id and e.activity_id = p.activity_id and e.status = 'active';
+
+  -- 호스트 보관함(H05): 바라호스트가 자주 쓰는 장소 · 공지 문구 · 양식 하나씩.
+  insert into public.saved_places (owner_id, name, area, address_detail) values
+    (u_host, '합정 스터디룸', '서울 마포구', '양화로 00, 3층 B룸 (가짜 주소)');
+  insert into public.saved_snippets (owner_id, title, body) values
+    (u_host, '준비물 안내', '노트북과 충전기를 챙겨 주세요. 와이파이는 현장에서 알려 드려요.');
+  insert into public.activity_templates (owner_id, name, data) values
+    (u_host, '카페 수다', jsonb_build_object(
+      'kind', 'gathering', 'organizer', 'host', 'title', 'AI 수다', 'summary',
+      '요즘 써 본 AI 도구 하나씩 들고 와서 이야기해요.', 'format', 'offline', 'placeName', '망원동 카페',
+      'area', '서울 마포구', 'capacity', '6', 'price', '0', 'joinMode', 'instant', 'audience', 'anyone'));
 end;
 $$;
 

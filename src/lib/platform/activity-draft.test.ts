@@ -7,6 +7,7 @@ import {
   organizerChoices,
   parseDraft,
   parseImportParts,
+  templateDraft,
   stepErrors,
   toCreatePayload,
   type Draft,
@@ -247,5 +248,18 @@ describe("지난 활동에서 가져오기", () => {
   it("지금 고를 수 없는 주최는 옮기지 않는다", () => {
     const d = applyTemplate(emptyDraft(), { ...src, organizer: "official" }, [], choices);
     expect(d.organizer).toBe("");
+  });
+});
+
+describe("양식 내용 읽기", () => {
+  it("모양이 맞으면 Draft, 아니면 null", () => {
+    expect(templateDraft({ kind: "challenge", title: "1주", threshold: "5" })).toMatchObject({
+      kind: "challenge",
+      title: "1주",
+      threshold: "5",
+      startsOn: "",
+    });
+    expect(templateDraft({ title: "종류 없음" })).toBeNull();
+    expect(templateDraft(null)).toBeNull();
   });
 });

@@ -95,9 +95,14 @@ export default async function HostPage({ searchParams }: PageProps<"/host">) {
             내가 연 활동
           </h2>
           {(access.hostTier || access.clubCreate || access.official) && (
-            <Link href="/host/new" className={s.create}>
-              활동 만들기
-            </Link>
+            <div className={s.headLinks}>
+              <Link href="/host/saved" className={s.savedLink}>
+                내 보관함
+              </Link>
+              <Link href="/host/new" className={s.create}>
+                활동 만들기
+              </Link>
+            </div>
           )}
         </div>
 
