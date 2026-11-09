@@ -270,6 +270,97 @@ export type Database = {
           },
         ];
       };
+      activity_notice_recipients: {
+        Row: {
+          notice_id: string;
+          read_at: string | null;
+          user_id: string;
+        };
+        Insert: {
+          notice_id: string;
+          read_at?: string | null;
+          user_id: string;
+        };
+        Update: {
+          notice_id?: string;
+          read_at?: string | null;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "activity_notice_recipients_notice_id_fkey";
+            columns: ["notice_id"];
+            isOneToOne: false;
+            referencedRelation: "activity_notices";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "activity_notice_recipients_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      activity_notices: {
+        Row: {
+          activity_id: string;
+          audience: string[];
+          body: string;
+          created_at: string;
+          created_by: string;
+          id: string;
+          title: string | null;
+          withdrawn_at: string | null;
+          withdrawn_by: string | null;
+        };
+        Insert: {
+          activity_id: string;
+          audience: string[];
+          body: string;
+          created_at?: string;
+          created_by: string;
+          id?: string;
+          title?: string | null;
+          withdrawn_at?: string | null;
+          withdrawn_by?: string | null;
+        };
+        Update: {
+          activity_id?: string;
+          audience?: string[];
+          body?: string;
+          created_at?: string;
+          created_by?: string;
+          id?: string;
+          title?: string | null;
+          withdrawn_at?: string | null;
+          withdrawn_by?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "activity_notices_activity_id_fkey";
+            columns: ["activity_id"];
+            isOneToOne: false;
+            referencedRelation: "activities";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "activity_notices_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "activity_notices_withdrawn_by_fkey";
+            columns: ["withdrawn_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       activity_private: {
         Row: {
           activity_id: string;
@@ -1625,6 +1716,7 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      _can_manage_notice: { Args: { p_notice: string }; Returns: boolean };
       _club_admit: {
         Args: { p_club: string; p_invite?: string; p_status: string };
         Returns: string;
@@ -1642,6 +1734,7 @@ export type Database = {
         Args: { p_order?: string; p_participation: string };
         Returns: undefined;
       };
+      _is_notice_recipient: { Args: { p_notice: string }; Returns: boolean };
       _kst_today: { Args: never; Returns: string };
       _layer_permissions: {
         Args: { p_layer: Database["public"]["Tables"]["club_layers"]["Row"] };
@@ -1820,6 +1913,17 @@ export type Database = {
       };
       nickname_check: { Args: { p_nickname: string }; Returns: string };
       nickname_is_valid: { Args: { p_nickname: string }; Returns: boolean };
+      notice_mark_read: { Args: { p_activity: string }; Returns: number };
+      notice_post: {
+        Args: {
+          p_activity: string;
+          p_audience: string[];
+          p_body: string;
+          p_title?: string;
+        };
+        Returns: string;
+      };
+      notice_withdraw: { Args: { p_id: string }; Returns: undefined };
       order_confirm_payment: { Args: { p_order: string }; Returns: undefined };
       orders_expire_overdue: { Args: never; Returns: number };
       participation_apply: {

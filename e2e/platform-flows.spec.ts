@@ -1443,3 +1443,65 @@ test.describe("명단과 빠른 출석", () => {
     await expect(page.getByText("아직 출석을 체크할 수 없어요")).toBeVisible();
   });
 });
+
+// H10 참가자 공지: 고른 상태의 참가자에게 남기고, 받은 사람은 활동 화면에서 보고, 읽음이 호스트에게 보인다.
+test.describe("참가자 공지", () => {
+  const CAFE = "/host/activities/00000000-0000-4000-c000-000000000003";
+
+  test("호스트가 저장한 문구로 확정자에게 공지를 남기면 참가자가 새 공지로 보고, 읽은 수가 올라가며, 내리면 사라진다", async ({
+    page,
+    browser,
+  }) => {
+    await signInAs(page, "바라호스트", CAFE);
+    const compose = page.getByRole("form", { name: "공지 남기기" });
+    await expect(compose.getByRole("checkbox", { name: "확정 2명" })).toBeChecked();
+    await expect(compose.getByRole("checkbox", { name: "대기 0명", exact: true })).toBeDisabled();
+    await compose.getByLabel("저장한 문구 넣기").selectOption({ label: "준비물 안내" });
+    await expect(compose.getByLabel(/^내용/)).toHaveValue(/노트북과 충전기를 챙겨 주세요/);
+    await expect(compose.getByLabel("제목 (선택)")).toHaveValue("준비물 안내");
+    await compose.getByRole("button", { name: "공지 남기기" }).click();
+    await expect(page.getByRole("status")).toHaveText(
+      "공지를 남겼어요. 받는 사람은 활동 화면에서 봐요.",
+    );
+    const sent = page.getByRole("list", { name: "보낸 공지" });
+    await expect(sent).toContainText("받은 2명 · 읽은 0명");
+
+    const member = await (await browser.newContext()).newPage();
+    await signInAs(member, "멤버하나", "/activities/capybara-cafe");
+    const box = member.getByRole("region", { name: "여는 사람의 공지" });
+    await expect(box).toContainText("새 공지");
+    await expect(box).toContainText("노트북과 충전기를 챙겨 주세요");
+
+    await expect(async () => {
+      await page.reload();
+      await expect(page.getByRole("list", { name: "보낸 공지" })).toContainText(
+        "받은 2명 · 읽은 1명",
+        { timeout: 2000 },
+      );
+    }).toPass({ timeout: 20_000 });
+
+    await page
+      .getByRole("form", { name: "준비물 안내 내리기" })
+      .getByRole("button", { name: "내리기" })
+      .click();
+    await expect(page.getByRole("status")).toHaveText(
+      "공지를 내렸어요. 참가자에게 더는 보이지 않아요.",
+    );
+    await member.reload();
+    await expect(member.getByRole("heading", { level: 1 })).toBeVisible();
+    await expect(member.getByRole("region", { name: "여는 사람의 공지" })).toHaveCount(0);
+  });
+
+  test("공지를 받지 않은 사람에게는 보이지 않는다", async ({ page, browser }) => {
+    const host = await (await browser.newContext()).newPage();
+    await signInAs(host, "바라호스트", CAFE);
+    const compose = host.getByRole("form", { name: "공지 남기기" });
+    await compose.getByLabel(/^내용/).fill("확정자만 보는 안내예요.");
+    await compose.getByRole("button", { name: "공지 남기기" }).click();
+    await expect(host.getByRole("status")).toContainText("공지를 남겼어요");
+
+    await signInAs(page, "처음온사람", "/activities/capybara-cafe");
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    await expect(page.getByText("확정자만 보는 안내예요.")).toHaveCount(0);
+  });
+});

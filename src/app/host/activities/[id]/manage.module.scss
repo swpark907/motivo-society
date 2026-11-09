@@ -690,3 +690,75 @@
   flex-wrap: wrap;
   gap: var(--space-2);
 }
+
+// ── 공지(H10)
+.noticeForm {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-2) 0 var(--space-3);
+
+  @include up(md) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  > button {
+    justify-self: start;
+  }
+
+  > .hint {
+    grid-column: 1 / -1;
+  }
+
+  textarea,
+  select {
+    width: 100%;
+    min-height: 44px;
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--white);
+    color: var(--ink);
+    font: inherit;
+    font-size: 1rem;
+  }
+
+  textarea {
+    resize: vertical;
+    line-height: 1.6;
+  }
+
+  label small {
+    color: var(--ink-muted);
+    font-weight: 700;
+  }
+
+  label[data-disabled] {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+.wideField {
+  grid-column: 1 / -1;
+}
+
+.noticeBody {
+  margin: var(--space-1) 0 0;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  white-space: pre-line;
+  word-break: keep-all;
+}
+
+.person[data-withdrawn] {
+  color: var(--ink-muted);
+
+  .noticeBody {
+    text-decoration: line-through;
+  }
+}
+
+// 장부 항목처럼 고치기 · 지우기가 함께 있는 줄은 버튼을 붙여 둔다(양 끝으로 벌어지지 않게).
+.person:has(.entryEdit) {
+  justify-content: flex-start;
+}

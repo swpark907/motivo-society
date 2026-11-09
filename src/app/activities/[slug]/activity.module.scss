@@ -696,3 +696,53 @@
     white-space: nowrap;
   }
 }
+
+// 여는 사람의 공지(H10). 새 공지 배지는 기다림(오렌지 선) 모양 하나만.
+.notices {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: grid;
+    gap: var(--space-2);
+    padding: var(--space-4);
+    border-radius: 16px;
+    background: var(--white);
+  }
+}
+
+.noticeHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px var(--space-2);
+  margin: 0;
+
+  strong {
+    font-weight: 800;
+  }
+
+  small {
+    color: var(--ink-muted);
+    font-size: 0.8rem;
+  }
+}
+
+.newBadge {
+  padding: 1px var(--space-2);
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  color: var(--accent);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.noticeText {
+  margin: 0;
+  line-height: 1.7;
+  white-space: pre-line;
+  word-break: keep-all;
+}

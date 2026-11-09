@@ -657,3 +657,84 @@ describe("명단 내보내기 기록", () => {
     ]);
   });
 });
+
+describe("참가자 공지", () => {
+  it("고른 상태의 참가자에게만 보이고, 읽음이 남고, 내리면 참가자에게서 사라진다", async () => {
+    const host = await as("host");
+    const confirmed = await as("filler4"); // 워크숍 확정
+    const pending = await as("filler5"); // 워크숍 입금 대기
+    const member = await as("member");
+
+    const { data: id, error } = await host.rpc("notice_post", {
+      p_activity: ID.workshop,
+      p_audience: ["confirmed"],
+      p_body: "노트북 충전기를 챙겨 주세요.",
+      p_title: "준비물",
+    });
+    expect(error).toBeNull();
+    expect((await confirmed.from("activity_notices").select("title")).data).toEqual([
+      { title: "준비물" },
+    ]);
+    expect((await pending.from("activity_notices").select("id")).data).toEqual([]);
+    expect((await member.from("activity_notices").select("id")).data).toEqual([]);
+
+    expect((await confirmed.rpc("notice_mark_read", { p_activity: ID.workshop })).data).toBe(1);
+    const { data: rec } = await host
+      .from("activity_notice_recipients")
+      .select("user_id, read_at")
+      .eq("notice_id", id!);
+    expect(rec).toHaveLength(1);
+    expect(rec?.[0].read_at).not.toBeNull();
+
+    expect(code((await host.rpc("notice_withdraw", { p_id: id! })).error)).toBeNull();
+    expect((await confirmed.from("activity_notices").select("id")).data).toEqual([]);
+    expect(
+      (await host.from("activity_notices").select("withdrawn_at")).data?.[0].withdrawn_at,
+    ).not.toBeNull();
+  });
+
+  it("받을 사람이 없거나, 회차거나, 관리 권한이 없으면 거절한다", async () => {
+    const host = await as("host");
+    expect(
+      code(
+        (
+          await host.rpc("notice_post", {
+            p_activity: ID.workshop,
+            p_audience: ["waitlisted"],
+            p_body: "자리가 나면 알려 드릴게요.",
+          })
+        ).error,
+      ),
+    ).toBe("no_recipients");
+    expect(
+      code(
+        (
+          await host.rpc("notice_post", {
+            p_activity: "00000000-0000-4000-c000-000000000011",
+            p_audience: ["confirmed"],
+            p_body: "회차 공지",
+          })
+        ).error,
+      ),
+    ).toBe("session_notice");
+    expect(
+      code(
+        (
+          await (
+            await as("member")
+          ).rpc("notice_post", {
+            p_activity: ID.workshop,
+            p_audience: ["confirmed"],
+            p_body: "x",
+          })
+        ).error,
+      ),
+    ).toBe("forbidden");
+    expect(
+      code(
+        (await host.rpc("notice_post", { p_activity: ID.workshop, p_audience: [], p_body: "x" }))
+          .error,
+      ),
+    ).toBe("audience_required");
+  });
+});

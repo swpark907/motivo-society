@@ -16,10 +16,12 @@ import {
   sessionState,
   sessionWhen,
 } from "@/lib/platform/activity-text";
-import { clockTime, gatheringWhen, periodWhen } from "@/lib/platform/activity-time";
+import { clockTime, gatheringWhen, periodWhen, shortDate } from "@/lib/platform/activity-time";
 import { applyState } from "@/lib/platform/apply-state";
 import { getChallengeRoom } from "@/lib/platform/challenge-room";
 import { getLedger } from "@/lib/platform/host-ledger";
+import { listMyNotices } from "@/lib/platform/host-notices";
+import { MarkNoticesRead } from "./MarkNoticesRead";
 import { entryMeta, LedgerStatement } from "@/components/LedgerStatement/LedgerStatement";
 import { KIND_LABELS, won } from "@/lib/platform/messages";
 import { listOpenActivities } from "@/lib/platform/queries";
@@ -92,6 +94,9 @@ export default async function ActivityPage({ params, searchParams }: Props) {
   const room = user ? await getChallengeRoom(a.id, user.id, now) : null;
   // 호스트가 공개한 장부는 확정된 참가자에게만 보인다(DB 함수가 정한다, 영수증은 빼고).
   const ledger = a.viewer.mine === "confirmed" ? await getLedger(a.id) : null;
+  // 호스트가 남긴 공지는 받은 사람에게만 보인다(받은 사람은 보낸 순간의 명단, H10).
+  const noticeUser = a.viewer.mine ? (user ?? (await getCurrentUser())) : null;
+  const notices = noticeUser ? await listMyNotices(a.id, noticeUser.id) : [];
 
   return (
     <main className={`paper ${s.page}`}>
@@ -190,6 +195,27 @@ export default async function ActivityPage({ params, searchParams }: Props) {
             )}
 
             {a.viewer.privateInfo && <PrivateInfo a={a} now={now} />}
+
+            {notices.length > 0 && (
+              <section className={s.block} aria-labelledby="notices-h" id="notices">
+                <h2 id="notices-h">여는 사람의 공지</h2>
+                <ul className={s.notices}>
+                  {notices.map((n) => (
+                    <li key={n.id}>
+                      <p className={s.noticeHead}>
+                        {n.unread && <span className={s.newBadge}>새 공지</span>}
+                        <strong>{n.title ?? "공지"}</strong>
+                        <small>
+                          {shortDate(new Date(n.createdAt))} {clockTime(new Date(n.createdAt))}
+                        </small>
+                      </p>
+                      <p className={s.noticeText}>{n.body}</p>
+                    </li>
+                  ))}
+                </ul>
+                {notices.some((n) => n.unread) && <MarkNoticesRead activityId={a.id} />}
+              </section>
+            )}
 
             <section className={s.block} aria-labelledby="about-h">
               <h2 id="about-h">이런 {KIND_LABELS[a.kind]}이에요</h2>

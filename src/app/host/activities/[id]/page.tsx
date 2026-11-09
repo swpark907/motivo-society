@@ -14,6 +14,9 @@ import {
   type HostActivityDetail,
 } from "@/lib/platform/host";
 import { getLedger } from "@/lib/platform/host-ledger";
+import { AUDIENCE_LABELS, listSentNotices } from "@/lib/platform/host-notices";
+import { listSaved } from "@/lib/platform/host-saved";
+import { NoticeComposer } from "./NoticeComposer";
 import { listMedia, type MediaAsset } from "@/lib/platform/host-media";
 import type { Ledger } from "@/lib/platform/ledger-view";
 import { kstDateKey } from "@/lib/platform/schedule";
@@ -50,6 +53,7 @@ import {
   deleteLedgerAction,
   ledgerPublicAction,
   saveLedgerAction,
+  withdrawNoticeAction,
   setCoverAction,
   uploadCoverAction,
 } from "./actions";
@@ -68,12 +72,14 @@ export default async function HostActivityPage({
   if (!/^[0-9a-f-]{36}$/.test(id)) notFound();
   const sp = await searchParams;
   await requireUser(`/host/activities/${id}`);
-  const [result, access, media, options, ledger] = await Promise.all([
+  const [result, access, media, options, ledger, notices, saved] = await Promise.all([
     getHostActivity(id),
     getHostAccess(),
     listMedia(),
     getCreateOptions(),
     getLedger(id),
+    listSentNotices(id),
+    listSaved(),
   ]);
   if (!result.found) notFound();
   if (!result.canManage) {
@@ -216,6 +222,57 @@ export default async function HostActivityPage({
       )}
 
       <Roster a={a} now={now} />
+
+      {!isSession && (
+        <section className={s.section} id="notices" aria-labelledby="notices-h">
+          <h2 id="notices-h">공지</h2>
+          <details className={s.ledgerAdd} open={notices.length === 0}>
+            <summary>공지 남기기</summary>
+            <NoticeComposer
+              activityId={a.id}
+              counts={{
+                confirmed: count(a.roster, "confirmed"),
+                waitlisted: count(a.roster, "waitlisted"),
+                pending_payment: count(a.roster, "pending_payment"),
+              }}
+              snippets={saved.snippets}
+            />
+          </details>
+          {notices.length > 0 && (
+            <ul className={s.people} aria-label="보낸 공지">
+              {notices.map((n) => (
+                <li key={n.id} className={s.person} data-withdrawn={n.withdrawn || undefined}>
+                  <div className={s.who}>
+                    <strong>{n.title ?? "공지"}</strong>
+                    <Meta
+                      parts={[
+                        `${shortDate(new Date(n.createdAt))} ${clockTime(new Date(n.createdAt))}`,
+                        n.audience.map((x) => AUDIENCE_LABELS[x]).join(" · "),
+                        `받은 ${n.recipients}명 · 읽은 ${n.read}명`,
+                        ...(n.withdrawn ? ["내림"] : []),
+                      ]}
+                    />
+                    <p className={s.noticeBody}>{n.body}</p>
+                  </div>
+                  {!n.withdrawn && (
+                    <form
+                      action={withdrawNoticeAction}
+                      className={s.buttons}
+                      aria-label={`${n.title ?? "공지"} 내리기`}
+                    >
+                      <input type="hidden" name="activityId" value={a.id} />
+                      <input type="hidden" name="noticeId" value={n.id} />
+                      <SubmitButton className={s.ghostSmall} pendingLabel="내리는 중…">
+                        내리기
+                      </SubmitButton>
+                    </form>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      )}
 
       {a.kind === "series" && a.sessions.length > 0 && (
         <section className={s.section} aria-labelledby="sessions-h">

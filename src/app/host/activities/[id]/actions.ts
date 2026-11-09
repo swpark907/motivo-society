@@ -9,6 +9,7 @@ import {
 } from "@/lib/platform/host";
 import { deleteLedgerEntry, saveLedgerEntry, setLedgerPublic } from "@/lib/platform/host-ledger";
 import { resolveMediaOwner, setActivityCover, uploadMedia } from "@/lib/platform/host-media";
+import { postNotice, withdrawNotice, type NoticeAudience } from "@/lib/platform/host-notices";
 
 const UUID = /^[0-9a-f-]{36}$/;
 
@@ -116,5 +117,37 @@ export async function ledgerPublicAction(formData: FormData) {
     id,
     code ? { error: code } : { notice: open ? "ledger_public" : "ledger_private" },
     "#ledger",
+  );
+}
+
+// ── 참가자 공지(H10)
+
+export async function postNoticeAction(formData: FormData) {
+  const id = uuidOf(formData, "activityId");
+  const audience = formData
+    .getAll("audience")
+    .map(String)
+    .filter(
+      (a): a is NoticeAudience =>
+        a === "confirmed" || a === "waitlisted" || a === "pending_payment",
+    );
+  const code = await postNotice(
+    id,
+    audience,
+    String(formData.get("body") ?? ""),
+    String(formData.get("title") ?? ""),
+  );
+  back(id, code ? { error: code } : { notice: "notice_posted" }, "#notices");
+}
+
+export async function withdrawNoticeAction(formData: FormData) {
+  const id = uuidOf(formData, "activityId");
+  const code = await withdrawNotice(uuidOf(formData, "noticeId"));
+  back(
+    id,
+    code
+      ? { error: code === "not_found" ? "saved_missing" : code }
+      : { notice: "notice_withdrawn" },
+    "#notices",
   );
 }
