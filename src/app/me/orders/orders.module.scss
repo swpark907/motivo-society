@@ -1,0 +1,375 @@
+// 주문과 환불 — 플랫폼 제품 화면 예외: 종이 바탕, 흰 카드. 돈을 돌려받는 행동은 오렌지가 아니라 검정 선 버튼.
+
+// ── 목록
+.list {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-6);
+  border-radius: 16px;
+  background: var(--white);
+  color: var(--ink);
+  text-decoration: none;
+  transition: background-color 120ms;
+
+  &:hover {
+    background: color-mix(in srgb, var(--white) 92%, var(--ink));
+  }
+}
+
+.rowMain {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+
+  strong {
+    font-size: 1.05rem;
+    font-weight: 800;
+    word-break: keep-all;
+  }
+
+  small {
+    color: var(--ink-muted);
+    font-size: 0.8rem;
+  }
+}
+
+.rowTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.next {
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.rowAmount {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 800;
+}
+
+// ── 상세
+.page {
+  flex: 1 0 auto;
+  min-height: calc(100dvh - var(--gnb-height));
+}
+
+.narrow {
+  display: grid;
+  gap: var(--space-6);
+  max-width: 720px;
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-4) var(--space-16);
+
+  @include up(md) {
+    padding-inline: var(--space-8);
+  }
+}
+
+.crumbs {
+  display: flex;
+  gap: var(--space-2);
+  color: var(--ink-muted);
+  font-size: 0.85rem;
+
+  a {
+    color: var(--ink);
+    font-weight: 700;
+    text-decoration: none;
+  }
+}
+
+.notice {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: 12px;
+  background: var(--ink);
+  color: var(--white);
+  font-weight: 700;
+}
+
+.head {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-2);
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 800;
+  line-height: 1.25;
+  word-break: keep-all;
+}
+
+.facts {
+  display: grid;
+  margin: 0;
+  padding: var(--space-2) var(--space-6);
+  border-radius: 16px;
+  background: var(--white);
+
+  > div {
+    display: grid;
+    grid-template-columns: 6rem minmax(0, 1fr);
+    gap: var(--space-3);
+    padding: var(--space-3) 0;
+
+    & + div {
+      border-top: 1px solid var(--line);
+    }
+  }
+
+  dt {
+    color: var(--ink-muted);
+    font-size: 0.875rem;
+  }
+
+  dd {
+    margin: 0;
+    font-weight: 700;
+
+    a {
+      color: var(--ink);
+    }
+
+    small {
+      color: var(--ink-muted);
+      font-weight: 400;
+    }
+  }
+}
+
+.card {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-3);
+  padding: var(--space-6);
+  border-radius: 16px;
+  background: var(--white);
+
+  > * {
+    justify-self: stretch;
+  }
+
+  > .ghost,
+  > .danger {
+    justify-self: start;
+  }
+
+  h2 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 800;
+  }
+}
+
+.muted {
+  margin: 0;
+  color: var(--ink-muted);
+  line-height: 1.6;
+
+  a {
+    color: var(--ink);
+    font-weight: 700;
+  }
+}
+
+.quote {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.rejected {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.ghost {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--ink);
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background-color 120ms;
+
+  &:hover {
+    background: var(--surface);
+  }
+}
+
+// ── 환불 요청 폼
+.form {
+  display: grid;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--line);
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+
+  label {
+    font-size: 0.875rem;
+    font-weight: 700;
+  }
+
+  textarea {
+    width: 100%;
+    padding: var(--space-3);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--white);
+    color: var(--ink);
+    font: inherit;
+    line-height: 1.6;
+    resize: vertical;
+
+    &:focus-visible {
+      outline: 2px solid var(--ink);
+      outline-offset: 1px;
+    }
+  }
+}
+
+.agree {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+
+  input {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--ink);
+  }
+}
+
+.error {
+  margin: 0;
+  color: var(--accent);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.danger {
+  justify-self: start;
+  min-height: 48px;
+  padding: 0 var(--space-6);
+  border: 1px solid var(--ink);
+  border-radius: 14px;
+  background: var(--white);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background-color 120ms;
+
+  &:hover:not(:disabled) {
+    background: var(--surface);
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
+}
+
+// ── 환불 진행 단계
+.steps {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    position: relative;
+    display: flex;
+    gap: var(--space-3);
+    padding-bottom: var(--space-4);
+    color: var(--ink-muted);
+
+    // 단계 사이의 세로선
+    &:not(:last-child)::before {
+      content: "";
+      position: absolute;
+      top: 28px;
+      bottom: 0;
+      left: 13px;
+      width: 2px;
+      background: var(--line);
+    }
+
+    &[data-done] {
+      color: var(--ink);
+    }
+
+    &[data-done]:not(:last-child)::before {
+      background: var(--ink);
+    }
+
+    > div {
+      display: grid;
+      gap: 2px;
+      padding-top: 3px;
+    }
+
+    p {
+      margin: 0;
+      color: var(--ink);
+      line-height: 1.5;
+    }
+
+    small {
+      color: var(--ink-muted);
+    }
+  }
+}
+
+.stepDot {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 2px solid var(--line);
+  border-radius: 50%;
+  background: var(--white);
+  font-size: 0.8rem;
+  font-weight: 800;
+
+  [data-done] > & {
+    border-color: var(--ink);
+    background: var(--ink);
+    color: var(--white);
+  }
+}

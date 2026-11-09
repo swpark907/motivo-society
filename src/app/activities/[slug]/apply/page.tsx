@@ -254,6 +254,11 @@ function Result({ a, mine }: { a: ActivityDetail; mine: MyApplication }) {
         >
           활동 화면으로
         </Link>
+        {mine.order && mine.order.status !== "pending" && (
+          <Link href={`/me/orders/${mine.order.no}`} className={s.ghost}>
+            {mine.order.status === "paid" ? "주문 보기 · 환불 요청" : "주문 보기"}
+          </Link>
+        )}
         {canCancel && (
           <details className={s.cancel}>
             <summary>{mine.status === "pending_payment" ? "입금 전 취소" : "신청 취소"}</summary>

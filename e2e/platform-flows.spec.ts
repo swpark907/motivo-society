@@ -430,3 +430,82 @@ test.describe("챌린지 참여", () => {
     await expect(page.getByLabel("오늘 한 것")).toHaveCount(0);
   });
 });
+
+// L10 주문과 환불: 결제 완료 → 지금 요청하면 얼마인지 → 요청 → (운영진) 승인 → 송금 완료.
+test.describe("주문과 환불", () => {
+  test("유료 모임을 결제한 뒤 환불을 요청하고, 운영진 처리에 따라 상태가 바뀐다", async ({
+    browser,
+  }) => {
+    const guest = await (await browser.newContext()).newPage();
+    await signInAs(guest, "처음온사람", "/activities/prompt-clinic/apply");
+    await guest.getByLabel("입금자명").fill("김처음");
+    await guest.getByText("취소·환불 규정을 확인했어요").click();
+    await guest.getByRole("button", { name: "20,000원 · 신청하기" }).click();
+    await expect(guest.getByRole("heading", { name: "입금하면 확정돼요" })).toBeVisible();
+
+    // 입금 전: 목록에 입금 대기와 남은 시간
+    await guest.goto("/me");
+    await guest
+      .getByRole("main")
+      .getByRole("link", { name: /주문과 환불/ })
+      .click();
+    await expect(guest).toHaveURL(/\/me\/orders$/);
+    const row = guest.getByRole("link", { name: /프롬프트 클리닉/ });
+    await expect(row).toContainText("입금 대기");
+    await expect(row).toContainText(/입금 기한 .*남았어요/);
+
+    const owner = await (await browser.newContext()).newPage();
+    await signInAs(owner, "모쏘운영", "/demo/platform/ops");
+    await owner
+      .getByRole("row", { name: /김처음/ })
+      .getByRole("button", { name: "입금 확인" })
+      .click();
+    await expect(owner.getByRole("row", { name: /김처음/ })).toHaveCount(0);
+
+    // 결제 완료: 신청 내역에서 주문으로, 주문에서 지금 요청하면 얼마인지
+    await guest.goto("/activities/prompt-clinic/apply");
+    await guest.getByRole("link", { name: "주문 보기 · 환불 요청" }).click();
+    await expect(guest).toHaveURL(/\/me\/orders\/MS-\d{6}-\d{4}$/);
+    await expect(guest.getByText("결제 완료", { exact: true })).toBeVisible();
+    await expect(guest.getByText("지금 요청하면 10,000원(50%)을 돌려받아요.")).toBeVisible();
+
+    const request = guest.getByRole("button", { name: "환불 요청하기" });
+    await expect(request).toBeDisabled();
+    await guest.getByLabel("사유 (선택)").fill("일정이 겹쳤어요");
+    await guest.getByText("승인되면 참가가 취소되고 되돌릴 수 없어요").click();
+    await request.click();
+    await expect(guest.getByRole("status")).toContainText("환불을 요청했어요");
+    await expect(guest.getByText("환불 요청됨", { exact: true })).toBeVisible();
+    await expect(guest.getByText("10,000원 (50%) · 사유: 일정이 겹쳤어요")).toBeVisible();
+    await expect(guest.getByText("운영진 확인을 기다려요")).toBeVisible();
+
+    // 운영진 승인 → 참가 취소, 송금 대기
+    await owner.reload();
+    const refundRow = owner.getByRole("row", { name: /처음온사람/ });
+    await refundRow.getByRole("button", { name: "승인" }).click();
+    await expect(refundRow.getByRole("button", { name: "송금 완료" })).toBeVisible();
+    await guest.reload();
+    await expect(guest.getByText("환불 승인", { exact: true })).toBeVisible();
+    await expect(guest.getByText("운영진이 승인했어요")).toBeVisible();
+    await expect(guest.getByText("송금을 기다려요")).toBeVisible();
+
+    // 송금 완료
+    await refundRow.getByRole("button", { name: "송금 완료" }).click();
+    await expect(owner.getByRole("row", { name: /처음온사람/ })).toHaveCount(0);
+    await guest.reload();
+    await expect(guest.getByText("환불 완료", { exact: true })).toBeVisible();
+    await expect(guest.getByText("돈을 보냈어요")).toBeVisible();
+
+    await guest.goto("/me/orders");
+    await expect(guest.getByRole("link", { name: /프롬프트 클리닉/ })).toContainText(
+      "환불 10,000원",
+    );
+  });
+
+  test("주문이 없으면 발견으로 안내하고, 남의 주문 번호는 열리지 않는다", async ({ page }) => {
+    await signInAs(page, "멤버하나", "/me/orders");
+    await expect(page.getByText("주문이 없어요")).toBeVisible();
+    const res = await page.goto("/me/orders/MS-000000-0001");
+    expect(res?.status()).toBe(404);
+  });
+});

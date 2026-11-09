@@ -57,7 +57,8 @@ export async function signInAs(page: Page, nickname: string, next: string) {
   await page.waitForLoadState("networkidle");
   await page.getByText("개발용 · 시험장 사람으로 들어가기").click();
   await page.getByRole("button", { name: new RegExp(nickname) }).click();
-  await expect(page).toHaveURL(new RegExp(`${next.replace(/[?]/g, "\\?")}$`));
+  // 로그인 액션(수 초) 뒤 이동할 화면을 개발 서버가 처음 컴파일하면 더 걸린다.
+  await expect(page).toHaveURL(new RegExp(`${next.replace(/[?]/g, "\\?")}$`), { timeout: 30_000 });
 }
 
 /** 시험 데이터를 처음 상태로(로컬 Supabase 서비스 키, 개발 전용). */
