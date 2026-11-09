@@ -1,0 +1,322 @@
+// 활동 관리 — 플랫폼 제품 화면 예외(라운드 12~16px, 의미에만 색). 오렌지는 "해야 할 동작" 버튼 하나에만.
+
+.notice,
+.errorBox {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: 12px;
+  font-weight: 700;
+}
+
+.notice {
+  background: var(--ink);
+  color: var(--white);
+}
+
+.errorBox {
+  border: 1px solid var(--accent);
+  background: var(--white);
+  color: var(--ink);
+}
+
+// ── 개요
+.overview {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.chip {
+  padding: 1px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--ink-muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.callout {
+  display: grid;
+  gap: var(--space-3);
+  align-items: center;
+  padding: var(--space-4);
+  border-radius: 16px;
+  background: var(--black);
+  color: var(--white);
+
+  p {
+    margin: 0;
+    line-height: 1.6;
+    word-break: keep-all;
+  }
+
+  strong {
+    font-weight: 800;
+  }
+
+  @include up(md) {
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding: var(--space-4) var(--space-6);
+  }
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+
+  @include up(md) {
+    grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  }
+}
+
+.tile {
+  display: grid;
+  gap: 2px;
+  padding: var(--space-3) var(--space-4);
+  border-radius: 12px;
+  background: var(--white);
+
+  dt {
+    color: var(--ink-muted);
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+
+  dd {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 800;
+  }
+}
+
+// ── 버튼
+.primary,
+.secondary,
+.primarySmall,
+.ghostSmall {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  font: inherit;
+  font-weight: 800;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 120ms,
+    color 120ms;
+
+  &:disabled {
+    cursor: progress;
+    opacity: 0.6;
+  }
+}
+
+.primary {
+  min-height: 48px;
+  padding: 0 var(--space-6);
+  border: 0;
+  background: var(--accent);
+  color: var(--white);
+
+  &:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--accent) 85%, var(--black));
+  }
+}
+
+.secondary {
+  justify-self: start;
+  min-height: 44px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--line);
+  color: var(--ink);
+
+  &:hover {
+    background: var(--white);
+  }
+}
+
+.primarySmall,
+.ghostSmall {
+  min-width: 56px;
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  font-size: 0.9rem;
+}
+
+.primarySmall {
+  border: 1px solid var(--black);
+  background: var(--black);
+  color: var(--white);
+
+  &:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--black) 85%, var(--white));
+  }
+}
+
+.ghostSmall {
+  border: 1px solid var(--line);
+  background: var(--white);
+  color: var(--ink);
+
+  &:hover:not(:disabled) {
+    background: var(--surface);
+  }
+}
+
+// ── 섹션 공통
+.section {
+  display: grid;
+  gap: var(--space-3);
+  scroll-margin-top: calc(var(--gnb-height) + var(--space-4));
+
+  h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 800;
+  }
+}
+
+.hint {
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+// ── 명단
+.group {
+  display: grid;
+  gap: var(--space-2);
+
+  h3 {
+    margin: var(--space-2) 0 0;
+    font-size: 0.95rem;
+    font-weight: 800;
+
+    span {
+      color: var(--ink-muted);
+      font-weight: 700;
+    }
+  }
+}
+
+.people {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 16px;
+  list-style: none;
+}
+
+.person {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+  min-height: 64px;
+  padding: var(--space-3) var(--space-4);
+  background: var(--white);
+
+  @include up(md) {
+    padding-inline: var(--space-6);
+  }
+}
+
+.who {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+
+  strong {
+    font-weight: 800;
+  }
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  color: var(--ink-muted);
+  font-size: 0.85rem;
+  line-height: 1.5;
+
+  span {
+    white-space: nowrap;
+  }
+
+  span + span::before {
+    content: "·";
+    margin: 0 0.35em;
+  }
+}
+
+.buttons {
+  display: flex;
+  gap: var(--space-2);
+  margin-left: auto;
+}
+
+// ── 시즌 회차
+.sessions {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 16px;
+  list-style: none;
+
+  a {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    min-height: 64px;
+    padding: var(--space-3) var(--space-4);
+    background: var(--white);
+    color: var(--ink);
+    text-decoration: none;
+    transition: background-color 120ms;
+
+    &:hover {
+      background: color-mix(in srgb, var(--white) 92%, var(--ink));
+    }
+
+    @include up(md) {
+      padding-inline: var(--space-6);
+    }
+  }
+}
+
+.sessionNo {
+  flex: none;
+  min-width: 3.5rem;
+  font-weight: 800;
+}
+
+.sessionBody {
+  display: grid;
+  flex: 1;
+  gap: 2px;
+  min-width: 0;
+
+  strong {
+    font-weight: 800;
+  }
+
+  small {
+    color: var(--ink-muted);
+    font-size: 0.85rem;
+  }
+}

@@ -35,7 +35,10 @@ export const HOST_TABS: { tab: HostTab; label: string }[] = [
 ];
 
 /** 끝난 시각(없으면 시작 시각)이 지났으면 상태와 상관없이 지난 활동이다. */
-export function hostTabOf(a: HostActivity, now: Date): HostTab {
+export function hostTabOf(
+  a: Pick<HostActivity, "status" | "startsAt" | "endsAt">,
+  now: Date,
+): HostTab {
   if (a.status === "cancelled") return "cancelled";
   if (a.status === "draft") return "draft";
   if (a.status === "ended") return "past";
@@ -109,7 +112,6 @@ export function countByTab(all: HostActivity[], now: Date): Record<HostTab, numb
 export type HostTodo = {
   key: string;
   activityId: string;
-  slug: string;
   /** act: 호스트가 할 일 · info: 알고만 있으면 되는 일(입금 확인은 운영진 몫) */
   tone: "act" | "info";
   title: string;
@@ -125,7 +127,6 @@ export function hostTodos(all: HostActivity[], now: Date): HostTodo[] {
       todos.push({
         key: `approve-${a.id}`,
         activityId: a.id,
-        slug: a.slug,
         tone: "act",
         title: `참가 승인 대기 ${a.pendingApproval}명`,
         detail: a.title,
@@ -137,7 +138,6 @@ export function hostTodos(all: HostActivity[], now: Date): HostTodo[] {
       todos.push({
         key: `today-${a.id}`,
         activityId: a.id,
-        slug: a.slug,
         tone: "act",
         title: `오늘 열려요 · 확정 ${a.confirmed}명`,
         detail: a.title,
@@ -148,7 +148,6 @@ export function hostTodos(all: HostActivity[], now: Date): HostTodo[] {
     todos.push({
       key: `draft-${a.id}`,
       activityId: a.id,
-      slug: a.slug,
       tone: "act",
       title: "아직 공개 전이에요",
       detail: a.title,
@@ -160,7 +159,6 @@ export function hostTodos(all: HostActivity[], now: Date): HostTodo[] {
       todos.push({
         key: `wrap-${a.id}`,
         activityId: a.id,
-        slug: a.slug,
         tone: "info",
         title:
           a.kind === "challenge" ? "기간이 끝났어요 · 완주 판정 전" : "기간이 끝났어요 · 마무리 전",
@@ -173,7 +171,6 @@ export function hostTodos(all: HostActivity[], now: Date): HostTodo[] {
       todos.push({
         key: `pay-${a.id}`,
         activityId: a.id,
-        slug: a.slug,
         tone: "info",
         title: `입금 대기 ${a.pendingPayment}명 · 운영진이 확인해요`,
         detail: a.title,
@@ -185,7 +182,7 @@ export function hostTodos(all: HostActivity[], now: Date): HostTodo[] {
 
 /** 상태 배지 글자. 기간이 지났는데 DB 상태가 아직 열려 있으면 "기간 끝남"으로 보인다. */
 export function hostStatusLabel(
-  a: HostActivity,
+  a: Pick<HostActivity, "status" | "startsAt" | "endsAt">,
   now: Date,
   labels: Record<string, string>,
 ): string {

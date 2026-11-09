@@ -76,7 +76,7 @@ export default async function HostPage({ searchParams }: PageProps<"/host">) {
           <ul>
             {todos.map((t) => (
               <li key={t.key}>
-                <Link href={`/activities/${t.slug}`} data-tone={t.tone}>
+                <Link href={`/host/activities/${t.activityId}`} data-tone={t.tone}>
                   <span>
                     <strong>{t.title}</strong>
                     <small>{t.detail}</small>
@@ -194,7 +194,7 @@ function ActivityRow({ a, now }: { a: HostActivity; now: Date }) {
         />
         {a.clubName && <span className={s.club}>{a.clubName}</span>}
       </div>
-      <Link href={`/activities/${a.slug}`} className={s.rowTitle}>
+      <Link href={`/host/activities/${a.id}`} className={s.rowTitle}>
         {a.title}
       </Link>
       <p className={s.meta}>

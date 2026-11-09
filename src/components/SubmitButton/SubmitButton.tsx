@@ -14,12 +14,15 @@ export function SubmitButton({
   className,
   name,
   value,
+  pressed,
 }: {
   children: ReactNode;
   pendingLabel?: ReactNode;
   className?: string;
   name?: string;
   value?: string;
+  /** 토글 버튼이면 지금 눌린 상태(aria-pressed) */
+  pressed?: boolean;
 }) {
   const { pending, data } = useFormStatus();
   const mine = pending && (!name || data?.get(name) === value);
@@ -31,6 +34,7 @@ export function SubmitButton({
       value={value}
       disabled={pending}
       aria-busy={mine || undefined}
+      aria-pressed={pressed}
     >
       {mine && pendingLabel ? pendingLabel : children}
     </button>

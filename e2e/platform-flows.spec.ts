@@ -785,3 +785,123 @@ test.describe("호스트 도구", () => {
     await expect(page).toHaveURL(/\/login\?next=%2Fhost%3Ftab%3Dpast$/);
   });
 });
+
+// H02 활동 관리: 한 활동의 명단 · 출석 · 받은 돈을 보고, 공개 · 승인 · 출석 · 완주 판정을 한다.
+test.describe("활동 관리", () => {
+  const WORKSHOP = "/host/activities/00000000-0000-4000-c000-000000000006";
+
+  test("호스트는 내가 연 활동에서 들어가 명단과 받은 돈을 보고, 초안을 공개한다", async ({
+    page,
+  }) => {
+    await signInAs(page, "바라호스트", "/host");
+    const acts = page.getByRole("region", { name: "내가 연 활동" });
+    await acts.getByRole("link", { name: "AI 도구 실습 워크숍" }).click();
+    await expect(page).toHaveURL(new RegExp(`${WORKSHOP}$`));
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("AI 도구 실습 워크숍");
+
+    const overview = page.getByRole("region", { name: "개요" });
+    await expect(overview.getByRole("definition").first()).toHaveText("1/3명");
+    await expect(overview.getByRole("link", { name: "참가자 화면 보기 →" })).toHaveAttribute(
+      "href",
+      "/activities/ai-tools-workshop",
+    );
+
+    const roster = page.getByRole("region", { name: "참가자 명단" });
+    await expect(roster.getByRole("heading", { name: /입금 대기/ })).toBeVisible();
+    await expect(roster.getByRole("listitem").filter({ hasText: "참가자4" })).toContainText(
+      "결제 완료",
+    );
+    // 아직 시작 1시간 전이 아니면 출석 버튼 대신 언제부터인지 알려 준다.
+    await expect(roster.getByText(/출석은 .+부터 체크할 수 있어요/)).toBeVisible();
+    await expect(roster.getByRole("button", { name: "참석" })).toHaveCount(0);
+
+    const money = page.getByRole("region", { name: "받은 돈과 환불" });
+    await expect(money.getByRole("definition").first()).toHaveText("15,000원");
+    await expect(money.getByRole("listitem")).toHaveCount(2);
+
+    // 처리할 일의 초안 → 관리 화면에서 공개
+    await page.goto("/host");
+    await page
+      .getByRole("region", { name: "지금 처리할 일" })
+      .getByRole("link", { name: /아직 공개 전이에요/ })
+      .click();
+    await page.getByRole("button", { name: "공개하기" }).click();
+    await expect(page.getByRole("status")).toHaveText("공개했어요. 이제 신청을 받아요.");
+    await expect(page.getByRole("link", { name: "참가자 화면 보기 →" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "공개하기" })).toHaveCount(0);
+  });
+
+  test("클럽장은 승인제 모임의 신청을 승인하고, 운영진은 곧 시작하는 모임의 출석을 체크한다", async ({
+    page,
+  }) => {
+    await signInAs(page, "클럽장", "/host");
+    await page
+      .getByRole("region", { name: "지금 처리할 일" })
+      .getByRole("link", { name: /참가 승인 대기 1명/ })
+      .click();
+    const roster = page.getByRole("region", { name: "참가자 명단" });
+    await roster.getByRole("button", { name: "승인" }).click();
+    await expect(page.getByRole("status")).toHaveText("처리했어요.");
+    await expect(roster.getByRole("heading", { name: /확정/ })).toBeVisible();
+    await expect(roster.getByRole("heading", { name: /승인 대기/ })).toHaveCount(0);
+
+    await signInAs(page, "클럽운영진", "/host/activities/00000000-0000-4000-c000-000000000001");
+    const tonight = page.getByRole("region", { name: "참가자 명단" });
+    await expect(tonight.getByText("출석 참석 0 · 불참 0 · 아직 3")).toBeVisible();
+    const one = tonight.getByRole("form", { name: "참가자1 출석" });
+    await one.getByRole("button", { name: "참석" }).click();
+    await expect(page.getByRole("status")).toHaveText("출석을 기록했어요.");
+    await expect(
+      page.getByRole("form", { name: "참가자1 출석" }).getByRole("button", { name: "참석" }),
+    ).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByText("출석 참석 1 · 불참 0 · 아직 2")).toBeVisible();
+  });
+
+  test("시즌은 회차별로 출석을 체크하고, 시즌 명단에 출석이 쌓인다", async ({ page }) => {
+    await signInAs(page, "바라호스트", "/host/activities/00000000-0000-4000-c000-000000000009");
+    const roster = page.getByRole("region", { name: "참가자 명단" });
+    await expect(roster.getByRole("listitem").filter({ hasText: "참가자1" })).toContainText(
+      "출석 1/1회",
+    );
+    await page.getByRole("region", { name: "회차" }).getByRole("link", { name: /2회차/ }).click();
+    await expect(page.getByRole("link", { name: "← 4주 바이브코딩 시즌" })).toBeVisible();
+    await page
+      .getByRole("form", { name: "참가자2 출석" })
+      .getByRole("button", { name: "불참" })
+      .click();
+    await expect(page.getByRole("status")).toHaveText("출석을 기록했어요.");
+    await page.getByRole("link", { name: "← 4주 바이브코딩 시즌" }).click();
+    await expect(page.getByRole("region", { name: "회차" })).toContainText("2회차");
+  });
+
+  test("기간이 끝난 챌린지는 완주를 판정하고, 판정 뒤에는 지난 활동으로 기록이 남는다", async ({
+    page,
+  }) => {
+    await signInAs(page, "바라호스트", "/host?tab=past");
+    await page
+      .getByRole("region", { name: "내가 연 활동" })
+      .getByRole("link", { name: "1주 프롬프트 일기" })
+      .click();
+    await page.getByRole("button", { name: "완주 판정하기" }).click();
+    await expect(page.getByRole("status")).toHaveText("챌린지를 종료하고 완주를 판정했어요.");
+    const roster = page.getByRole("region", { name: "참가자 명단" });
+    await expect(roster.getByRole("listitem").filter({ hasText: "참가자3" })).toContainText(
+      "인증 6/5회 · 완주",
+    );
+    await expect(roster.getByRole("listitem").filter({ hasText: "참가자4" })).toContainText(
+      "인증 3/5회 · 미완주",
+    );
+    await expect(page.getByRole("button", { name: "완주 판정하기" })).toHaveCount(0);
+    await page.getByRole("link", { name: "← 호스트 도구" }).click();
+    await expect(page.getByRole("region", { name: "지금 처리할 일" })).not.toContainText(
+      "완주 판정 전",
+    );
+  });
+
+  test("관리 권한이 없는 회원은 명단과 돈 기록을 볼 수 없다", async ({ page }) => {
+    await signInAs(page, "멤버하나", WORKSHOP);
+    await expect(page.getByText("이 활동을 관리할 권한이 없어요")).toBeVisible();
+    await expect(page.getByRole("region", { name: "참가자 명단" })).toHaveCount(0);
+    await expect(page.getByText("참가자4")).toHaveCount(0);
+  });
+});

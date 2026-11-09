@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { ReactNode } from "react";
 import styles from "./PlatformPage.module.scss";
 
@@ -9,17 +10,25 @@ export function PlatformPage({
   label,
   title,
   lead,
+  back,
   children,
 }: {
   label: string;
   title: string;
   lead?: ReactNode;
+  /** 제목 위 되돌아가기 링크(예: 호스트 도구로) */
+  back?: { href: string; label: string };
   children: ReactNode;
 }) {
   return (
     <main className={`paper ${styles.page}`}>
       <div className={styles.inner}>
         <header className={styles.head}>
+          {back && (
+            <Link href={back.href} className={styles.back}>
+              ← {back.label}
+            </Link>
+          )}
           <p className="label">{label}</p>
           <h1 className={styles.title}>{title}</h1>
           {lead && <p className={styles.lead}>{lead}</p>}
