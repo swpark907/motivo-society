@@ -505,3 +505,92 @@ describe("이미지 보관함과 표지", () => {
     expect(await host.from("media_assets").select("id")).toMatchObject({ data: [] });
   });
 });
+
+describe("활동 장부", () => {
+  it("들어온 돈은 주문에서, 나간 돈은 호스트가 적고, 고치고 지운 것은 기록이 남는다", async () => {
+    const host = await as("host");
+    const before = (await host.rpc("activity_ledger", { p_activity: ID.workshop })).data as Record<
+      string,
+      unknown
+    >;
+    // seed: 결제 완료 15,000원(수수료 10% 시험값) − 대관 30,000원
+    expect(before).toMatchObject({
+      access: "manager",
+      received: 15000,
+      refunded: 0,
+      fee: 1500,
+      expense: 30000,
+      net: -16500,
+      payout: 13500,
+    });
+
+    const { data: id, error } = await host.rpc("ledger_entry_save", {
+      p_activity: ID.workshop,
+      p_kind: "income",
+      p_amount: 5000,
+      p_memo: "남은 간식 판매",
+      p_occurred_on: "2026-11-09",
+    });
+    expect(error).toBeNull();
+    await host.rpc("ledger_entry_save", {
+      p_activity: ID.workshop,
+      p_kind: "income",
+      p_amount: 6000,
+      p_memo: "남은 간식 판매",
+      p_occurred_on: "2026-11-09",
+      p_id: id!,
+    });
+    expect(code((await host.rpc("ledger_entry_delete", { p_id: id! })).error)).toBeNull();
+
+    const after = (await host.rpc("activity_ledger", { p_activity: ID.workshop })).data as {
+      history: { action: string; detail: { before?: { amount: number } } }[];
+    };
+    expect(after.history.map((h) => h.action)).toEqual([
+      "ledger.deleted",
+      "ledger.updated",
+      "ledger.created",
+    ]);
+    expect(after.history[1].detail.before?.amount).toBe(5000);
+  });
+
+  it("공개하지 않은 장부는 참가자도 못 보고, 공개하면 확정 참가자만 영수증 없이 본다", async () => {
+    const member = await as("member");
+    const guest = await as("guest");
+    const host = await as("host");
+    // 카페 수다는 seed에서 공개, 멤버하나는 확정 참가자
+    const seen = (
+      await member.rpc("activity_ledger", { p_activity: "00000000-0000-4000-c000-000000000003" })
+    ).data as Record<string, unknown> & { entries: Record<string, unknown>[] };
+    expect(seen).toMatchObject({ access: "participant", expense: 10000 });
+    expect(seen.entries[0].receipt_path).toBeNull();
+    expect(seen).not.toHaveProperty("history");
+    expect(
+      (await guest.rpc("activity_ledger", { p_activity: "00000000-0000-4000-c000-000000000003" }))
+        .data,
+    ).toEqual({ access: "none" });
+
+    await host.rpc("activity_set_ledger_public", {
+      p_activity: "00000000-0000-4000-c000-000000000003",
+      p_public: false,
+    });
+    expect(
+      (await member.rpc("activity_ledger", { p_activity: "00000000-0000-4000-c000-000000000003" }))
+        .data,
+    ).toEqual({ access: "none" });
+    // 직접 읽기·쓰기도 막혀 있다
+    expect(await member.from("activity_ledger_entries").select("id")).toMatchObject({ data: [] });
+    expect(
+      code(
+        (
+          await member.rpc("ledger_entry_save", {
+            p_activity: ID.workshop,
+            p_kind: "expense",
+            p_amount: 1,
+            p_memo: "x",
+            p_occurred_on: "2026-11-09",
+          })
+        ).error,
+      ),
+    ).toBe("forbidden");
+  });
+});

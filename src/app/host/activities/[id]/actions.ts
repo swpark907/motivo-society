@@ -7,6 +7,7 @@ import {
   markHostAttendance,
   publishHostActivity,
 } from "@/lib/platform/host";
+import { deleteLedgerEntry, saveLedgerEntry, setLedgerPublic } from "@/lib/platform/host-ledger";
 import { resolveMediaOwner, setActivityCover, uploadMedia } from "@/lib/platform/host-media";
 
 const UUID = /^[0-9a-f-]{36}$/;
@@ -75,4 +76,45 @@ export async function uploadCoverAction(formData: FormData) {
   if ("error" in up) back(id, { error: up.error }, "#cover");
   const code = await setActivityCover(id, up.id);
   back(id, code ? { error: code } : { notice: "cover_set" }, "#cover");
+}
+
+// ── 장부(H07)
+
+export async function saveLedgerAction(formData: FormData) {
+  const id = uuidOf(formData, "activityId");
+  const entry = String(formData.get("entryId") ?? "");
+  if (entry && !UUID.test(entry)) throw new Error("invalid entryId");
+  const amount = Number(String(formData.get("amount") ?? "").replaceAll(",", ""));
+  const file = formData.get("receipt");
+  const code = await saveLedgerEntry(
+    id,
+    {
+      kind: formData.get("kind") === "income" ? "income" : "expense",
+      amount: Number.isInteger(amount) ? amount : 0,
+      memo: String(formData.get("memo") ?? ""),
+      occurredOn: /^\d{4}-\d{2}-\d{2}$/.test(String(formData.get("occurredOn")))
+        ? String(formData.get("occurredOn"))
+        : "",
+      receipt: file instanceof File && file.size > 0 ? file : null,
+    },
+    entry || undefined,
+  );
+  back(id, code ? { error: code } : { notice: "ledger_saved" }, "#ledger");
+}
+
+export async function deleteLedgerAction(formData: FormData) {
+  const id = uuidOf(formData, "activityId");
+  const code = await deleteLedgerEntry(uuidOf(formData, "entryId"));
+  back(id, code ? { error: code } : { notice: "ledger_deleted" }, "#ledger");
+}
+
+export async function ledgerPublicAction(formData: FormData) {
+  const id = uuidOf(formData, "activityId");
+  const open = formData.get("public") === "true";
+  const code = await setLedgerPublic(id, open);
+  back(
+    id,
+    code ? { error: code } : { notice: open ? "ledger_public" : "ledger_private" },
+    "#ledger",
+  );
 }

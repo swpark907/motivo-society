@@ -1,0 +1,48 @@
+// 장부 요약 — 영수증처럼 줄을 세우고, 남은 돈만 굵게. 색은 쓰지 않고 부호로 말한다.
+.statement {
+  display: grid;
+  margin: 0;
+  padding: var(--space-2) var(--space-4);
+  border-radius: 16px;
+  background: var(--white);
+
+  @include up(md) {
+    padding-inline: var(--space-6);
+  }
+
+  > div {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-4);
+    min-height: 44px;
+    align-items: center;
+    border-bottom: 1px solid var(--line);
+  }
+
+  dt {
+    color: var(--ink-muted);
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+
+  dd {
+    margin: 0;
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+}
+
+.total {
+  border-bottom: 0 !important;
+
+  dt {
+    color: var(--ink) !important;
+    font-weight: 800;
+  }
+
+  dd {
+    font-size: 1.15rem;
+    font-weight: 900 !important;
+  }
+}

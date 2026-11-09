@@ -369,6 +369,12 @@ begin
   from public.entitlements e
   where e.user_id = p.user_id and e.activity_id = p.activity_id and e.status = 'active';
 
+  -- 활동 장부(H07): 워크숍은 대관료 지출(호스트만 봄), 카페 수다는 장부를 참가자에게 공개.
+  insert into public.activity_ledger_entries (activity_id, kind, amount, memo, occurred_on, created_by) values
+    (a_workshop, 'expense', 30000, '스터디룸 대관 (가짜 예시)', v_kst, u_host),
+    (a_cafe, 'expense', 10000, '자리 예약 보증금 (가짜 예시)', v_kst, u_host);
+  update public.activities set ledger_public = true where id = a_cafe;
+
   -- 호스트 보관함(H05): 바라호스트가 자주 쓰는 장소 · 공지 문구 · 양식 하나씩.
   insert into public.saved_places (owner_id, name, area, address_detail) values
     (u_host, '합정 스터디룸', '서울 마포구', '양화로 00, 3층 B룸 (가짜 주소)');

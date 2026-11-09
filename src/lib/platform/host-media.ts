@@ -30,6 +30,8 @@ export async function listMedia(): Promise<MediaAsset[]> {
   const { data } = await supabase
     .from("media_assets")
     .select("id, path, alt, club_id, created_at")
+    // 영수증(장부)은 이미지 보관함에 섞지 않는다.
+    .eq("purpose", "image")
     .order("created_at", { ascending: false });
   return (data ?? []).map((r) => ({
     id: r.id,
@@ -49,6 +51,7 @@ export async function uploadMedia(
   file: File,
   owner: MediaOwner,
   alt: string,
+  purpose: "image" | "receipt" = "image",
 ): Promise<{ id: string } | { error: string }> {
   if (!file || file.size === 0) return { error: "file_required" };
   if (file.size > MEDIA_MAX_BYTES) return { error: "file_too_big" };
@@ -66,7 +69,11 @@ export async function uploadMedia(
       error: /row-level security|unauthorized/i.test(upErr.message) ? "forbidden" : "upload_failed",
     };
 
-  const { data, error } = await supabase.rpc("media_register", { p_path: path, p_alt: alt });
+  const { data, error } = await supabase.rpc("media_register", {
+    p_path: path,
+    p_alt: alt,
+    p_purpose: purpose,
+  });
   if (error || typeof data !== "string") {
     await supabase.storage.from(MEDIA_BUCKET).remove([path]);
     return { error: errorCodeFrom(error?.message) };

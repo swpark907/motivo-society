@@ -663,3 +663,36 @@
     display: none;
   }
 }
+
+// 공개된 활동 장부의 항목(H07)
+.ledgerEntries {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    min-height: 52px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  span {
+    display: grid;
+    gap: 2px;
+    word-break: keep-all;
+  }
+
+  small {
+    color: var(--ink-muted);
+    font-size: 0.8rem;
+  }
+
+  strong {
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+}

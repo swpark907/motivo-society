@@ -1269,3 +1269,81 @@ test.describe("이미지 보관함과 표지", () => {
     ).toBeVisible();
   });
 });
+
+// H07 활동 장부: 들어온 돈은 주문에서, 나간 돈은 호스트가 적고, 고친 기록이 남고, 공개는 호스트가 고른다.
+test.describe("활동 장부", () => {
+  const WORKSHOP = "/host/activities/00000000-0000-4000-c000-000000000006";
+
+  test("호스트는 주문에서 계산된 수입과 직접 적은 지출을 보고, 적고 고치고 지우면 고친 기록에 남는다", async ({
+    page,
+  }) => {
+    await signInAs(page, "바라호스트", WORKSHOP);
+    const ledger = page.getByRole("region", { name: "장부" });
+    await expect(ledger).toContainText("지금은 이 활동을 관리하는 사람만 봐요.");
+    const statement = ledger.getByRole("definition");
+    await expect(statement.first()).toHaveText("+ 15,000원");
+    await expect(statement.last()).toHaveText("− 16,500원");
+    await expect(ledger).toContainText("아직 정산 전 13,500원");
+
+    // 기타 수입을 영수증과 함께 적는다
+    await ledger.getByText("지출 · 수입 적기").click();
+    const add = page.getByRole("form", { name: "장부에 적기" });
+    await add.getByText("기타 수입").click();
+    await add.getByLabel("항목").fill("남은 간식 판매");
+    await add.getByLabel("금액 (원)").fill("6000");
+    await add
+      .getByLabel("영수증 사진 (선택)")
+      .setInputFiles("public/images/platform/mock/cover-workshop.jpg");
+    await add.getByRole("button", { name: "장부에 적기" }).click();
+    await expect(page.getByRole("status")).toHaveText("장부에 적었어요.", { timeout: 30_000 });
+    const items = page.getByRole("list", { name: "장부 항목" });
+    await expect(items.getByRole("listitem").filter({ hasText: "남은 간식 판매" })).toContainText(
+      "영수증 보기",
+    );
+
+    // 대관료를 고친다
+    const rent = items.getByRole("listitem").filter({ hasText: "스터디룸 대관" });
+    await rent.getByText("고치기", { exact: true }).click();
+    await rent.getByLabel("금액 (원)").fill("25000");
+    await rent.getByRole("button", { name: "고친 내용 저장" }).click();
+    await expect(page.getByRole("status")).toHaveText("장부에 적었어요.");
+    // 15,000 − 1,500 + 6,000 − 25,000
+    await expect(
+      page.getByRole("region", { name: "장부" }).getByRole("definition").last(),
+    ).toHaveText("− 5,500원");
+
+    await page
+      .getByRole("form", { name: "남은 간식 판매 지우기" })
+      .getByRole("button", { name: "지우기" })
+      .click();
+    await expect(page.getByRole("status")).toHaveText("장부에서 지웠어요. 고친 기록에 남아요.");
+
+    await page.getByText(/^고친 기록/).click();
+    await expect(page.getByRole("region", { name: "장부" })).toContainText(
+      "고침: 지출 · 스터디룸 대관 (가짜 예시) 30,000원 → 지출 · 스터디룸 대관 (가짜 예시) 25,000원",
+    );
+    await expect(page.getByRole("region", { name: "장부" })).toContainText(
+      "지움: 기타 수입 · 남은 간식 판매 6,000원",
+    );
+  });
+
+  test("공개된 장부는 확정 참가자가 영수증 없이 보고, 호스트가 공개를 그만하면 사라진다", async ({
+    page,
+    browser,
+  }) => {
+    await signInAs(page, "멤버하나", "/activities/capybara-cafe");
+    const seen = page.getByRole("region", { name: "활동 장부" });
+    await expect(seen).toContainText("자리 예약 보증금 (가짜 예시)");
+    await expect(seen).toContainText("− 10,000원");
+    await expect(seen).not.toContainText("영수증");
+
+    const host = await (await browser.newContext()).newPage();
+    await signInAs(host, "바라호스트", "/host/activities/00000000-0000-4000-c000-000000000003");
+    await host.getByRole("button", { name: "공개 그만하기" }).click();
+    await expect(host.getByRole("status")).toHaveText("이제 장부는 관리하는 사람만 봐요.");
+
+    await page.reload();
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    await expect(page.getByRole("region", { name: "활동 장부" })).toHaveCount(0);
+  });
+});

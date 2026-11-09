@@ -19,6 +19,8 @@ import {
 import { clockTime, gatheringWhen, periodWhen } from "@/lib/platform/activity-time";
 import { applyState } from "@/lib/platform/apply-state";
 import { getChallengeRoom } from "@/lib/platform/challenge-room";
+import { getLedger } from "@/lib/platform/host-ledger";
+import { entryMeta, LedgerStatement } from "@/components/LedgerStatement/LedgerStatement";
 import { KIND_LABELS, won } from "@/lib/platform/messages";
 import { listOpenActivities } from "@/lib/platform/queries";
 import { getCurrentUser } from "@/lib/platform/session";
@@ -88,6 +90,8 @@ export default async function ActivityPage({ params, searchParams }: Props) {
   const user =
     a.kind === "challenge" && a.viewer.mine === "confirmed" ? await getCurrentUser() : null;
   const room = user ? await getChallengeRoom(a.id, user.id, now) : null;
+  // 호스트가 공개한 장부는 확정된 참가자에게만 보인다(DB 함수가 정한다, 영수증은 빼고).
+  const ledger = a.viewer.mine === "confirmed" ? await getLedger(a.id) : null;
 
   return (
     <main className={`paper ${s.page}`}>
@@ -235,6 +239,29 @@ export default async function ActivityPage({ params, searchParams }: Props) {
                     <dd>{a.challenge.threshold}번 인증하면 완주예요.</dd>
                   </div>
                 </dl>
+              </section>
+            )}
+
+            {ledger?.access === "participant" && (
+              <section className={s.block} aria-labelledby="ledger-h">
+                <h2 id="ledger-h">활동 장부</h2>
+                <p>여는 사람이 참가자에게 공개한 돈의 흐름이에요.</p>
+                <LedgerStatement ledger={ledger} />
+                {ledger.entries.length > 0 && (
+                  <ul className={s.ledgerEntries}>
+                    {ledger.entries.map((e) => (
+                      <li key={e.id}>
+                        <span>
+                          {e.memo}
+                          <small>{entryMeta(e)}</small>
+                        </span>
+                        <strong>
+                          {e.kind === "income" ? "+" : "−"} {won(e.amount)}
+                        </strong>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </section>
             )}
 

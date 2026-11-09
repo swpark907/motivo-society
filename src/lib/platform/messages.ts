@@ -92,6 +92,9 @@ const ERROR_MESSAGES: Record<string, string> = {
   media_not_usable:
     "이 활동에는 쓸 수 없는 이미지예요. 클럽 보관함 이미지는 그 클럽 활동에만 써요.",
   session_cover: "회차 표지는 시즌에서 정해요.",
+  session_ledger: "회차 장부는 시즌 장부에 적어요.",
+  invalid_amount: "금액은 1원 이상, 1억 원 이하로 적어 주세요.",
+  date_required: "날짜를 골라 주세요.",
 };
 
 const NOTICE_MESSAGES: Record<string, string> = {
@@ -133,6 +136,10 @@ const NOTICE_MESSAGES: Record<string, string> = {
   media_uploaded: "이미지를 올렸어요.",
   cover_set: "표지를 바꿨어요.",
   cover_cleared: "표지를 뺐어요. 종류 색과 제목으로 된 기본 표지가 보여요.",
+  ledger_saved: "장부에 적었어요.",
+  ledger_deleted: "장부에서 지웠어요. 고친 기록에 남아요.",
+  ledger_public: "장부를 확정된 참가자에게 공개했어요. 영수증 사진은 보이지 않아요.",
+  ledger_private: "이제 장부는 관리하는 사람만 봐요.",
   reseeded: "가짜 데이터를 처음 상태로 되돌렸어요.",
   switched: "사람을 바꿨어요.",
 };

@@ -47,6 +47,7 @@ export type Database = {
           id: string;
           join_mode: string;
           kind: string;
+          ledger_public: boolean;
           min_participants: number | null;
           organizer_kind: string;
           payee_user_id: string | null;
@@ -80,6 +81,7 @@ export type Database = {
           id?: string;
           join_mode?: string;
           kind: string;
+          ledger_public?: boolean;
           min_participants?: number | null;
           organizer_kind: string;
           payee_user_id?: string | null;
@@ -113,6 +115,7 @@ export type Database = {
           id?: string;
           join_mode?: string;
           kind?: string;
+          ledger_public?: boolean;
           min_participants?: number | null;
           organizer_kind?: string;
           payee_user_id?: string | null;
@@ -202,6 +205,67 @@ export type Database = {
             columns: ["user_id"];
             isOneToOne: false;
             referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      activity_ledger_entries: {
+        Row: {
+          activity_id: string;
+          amount: number;
+          created_at: string;
+          created_by: string;
+          id: string;
+          kind: string;
+          memo: string;
+          occurred_on: string;
+          receipt_media_id: string | null;
+          updated_at: string;
+        };
+        Insert: {
+          activity_id: string;
+          amount: number;
+          created_at?: string;
+          created_by: string;
+          id?: string;
+          kind: string;
+          memo: string;
+          occurred_on: string;
+          receipt_media_id?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          activity_id?: string;
+          amount?: number;
+          created_at?: string;
+          created_by?: string;
+          id?: string;
+          kind?: string;
+          memo?: string;
+          occurred_on?: string;
+          receipt_media_id?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "activity_ledger_entries_activity_id_fkey";
+            columns: ["activity_id"];
+            isOneToOne: false;
+            referencedRelation: "activities";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "activity_ledger_entries_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "activity_ledger_entries_receipt_media_id_fkey";
+            columns: ["receipt_media_id"];
+            isOneToOne: false;
+            referencedRelation: "media_assets";
             referencedColumns: ["id"];
           },
         ];
@@ -917,6 +981,7 @@ export type Database = {
           id: string;
           owner_user_id: string | null;
           path: string;
+          purpose: string;
           uploaded_by: string;
         };
         Insert: {
@@ -926,6 +991,7 @@ export type Database = {
           id?: string;
           owner_user_id?: string | null;
           path: string;
+          purpose?: string;
           uploaded_by: string;
         };
         Update: {
@@ -935,6 +1001,7 @@ export type Database = {
           id?: string;
           owner_user_id?: string | null;
           path?: string;
+          purpose?: string;
           uploaded_by?: string;
         };
         Relationships: [
@@ -1580,6 +1647,10 @@ export type Database = {
         Args: { p_layer: Database["public"]["Tables"]["club_layers"]["Row"] };
         Returns: string[];
       };
+      _ledger_receipt_ok: {
+        Args: { p_keep: string; p_media: string };
+        Returns: boolean;
+      };
       _media_folder_ok: {
         Args: { p_kind: string; p_owner: string };
         Returns: boolean;
@@ -1624,6 +1695,7 @@ export type Database = {
       };
       activity_create: { Args: { p: Json }; Returns: string };
       activity_create_options: { Args: never; Returns: Json };
+      activity_ledger: { Args: { p_activity: string }; Returns: Json };
       activity_publish: { Args: { p_activity: string }; Returns: string };
       activity_seat_counts: {
         Args: { p_ids: string[] };
@@ -1636,6 +1708,10 @@ export type Database = {
       };
       activity_set_cover: {
         Args: { p_activity: string; p_media?: string };
+        Returns: undefined;
+      };
+      activity_set_ledger_public: {
+        Args: { p_activity: string; p_public: boolean };
         Returns: undefined;
       };
       attendance_mark: {
@@ -1723,9 +1799,22 @@ export type Database = {
         Args: { p_activity: string; p_user: string };
         Returns: boolean;
       };
+      ledger_entry_delete: { Args: { p_id: string }; Returns: undefined };
+      ledger_entry_save: {
+        Args: {
+          p_activity: string;
+          p_amount: number;
+          p_id?: string;
+          p_kind: string;
+          p_memo: string;
+          p_occurred_on: string;
+          p_receipt?: string;
+        };
+        Returns: string;
+      };
       media_delete: { Args: { p_id: string }; Returns: string };
       media_register: {
-        Args: { p_alt: string; p_path: string };
+        Args: { p_alt: string; p_path: string; p_purpose?: string };
         Returns: string;
       };
       nickname_check: { Args: { p_nickname: string }; Returns: string };

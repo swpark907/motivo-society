@@ -13,8 +13,12 @@ import {
   getHostActivity,
   type HostActivityDetail,
 } from "@/lib/platform/host";
+import { getLedger } from "@/lib/platform/host-ledger";
 import { listMedia, type MediaAsset } from "@/lib/platform/host-media";
-import { isRemoteImage } from "@/lib/platform/media";
+import type { Ledger } from "@/lib/platform/ledger-view";
+import { kstDateKey } from "@/lib/platform/schedule";
+import { entryMeta, LedgerStatement } from "@/components/LedgerStatement/LedgerStatement";
+import { isRemoteImage, mediaUrl } from "@/lib/platform/media";
 import {
   attendanceCounts,
   attendanceOpensAt,
@@ -43,6 +47,9 @@ import {
   decideAction,
   finalizeAction,
   publishAction,
+  deleteLedgerAction,
+  ledgerPublicAction,
+  saveLedgerAction,
   setCoverAction,
   uploadCoverAction,
 } from "./actions";
@@ -61,11 +68,12 @@ export default async function HostActivityPage({
   if (!/^[0-9a-f-]{36}$/.test(id)) notFound();
   const sp = await searchParams;
   await requireUser(`/host/activities/${id}`);
-  const [result, access, media, options] = await Promise.all([
+  const [result, access, media, options, ledger] = await Promise.all([
     getHostActivity(id),
     getHostAccess(),
     listMedia(),
     getCreateOptions(),
+    getLedger(id),
   ]);
   if (!result.found) notFound();
   if (!result.canManage) {
@@ -238,6 +246,10 @@ export default async function HostActivityPage({
       )}
 
       {!isSession && (a.price > 0 || a.orders.length > 0) && <Money a={a} now={now} />}
+
+      {ledger.access === "manager" && (
+        <LedgerSection a={a} ledger={ledger} today={kstDateKey(now)} />
+      )}
     </PlatformPage>
   );
 }
@@ -534,5 +546,175 @@ function Cover({
         )}
       </details>
     </section>
+  );
+}
+
+type OpenLedger = Exclude<Ledger, { access: "none" }>;
+
+function LedgerSection({
+  a,
+  ledger,
+  today,
+}: {
+  a: HostActivityDetail;
+  ledger: OpenLedger;
+  today: string;
+}) {
+  const p = ledger.payout;
+  return (
+    <section className={s.section} id="ledger" aria-labelledby="ledger-h">
+      <h2 id="ledger-h">장부</h2>
+      <form action={ledgerPublicAction} className={s.ledgerVisibility}>
+        <input type="hidden" name="activityId" value={a.id} />
+        <input type="hidden" name="public" value={String(!ledger.public)} />
+        <p>
+          {ledger.public
+            ? "확정된 참가자에게 공개 중이에요. 참가자는 합계와 항목을 보고, 영수증 사진은 보지 않아요."
+            : "지금은 이 활동을 관리하는 사람만 봐요."}
+        </p>
+        <SubmitButton className={s.ghostSmall} pendingLabel="바꾸는 중…">
+          {ledger.public ? "공개 그만하기" : "참가자에게 공개"}
+        </SubmitButton>
+      </form>
+
+      <LedgerStatement ledger={ledger} />
+      {p && p.total !== 0 && (
+        <p className={s.hint}>
+          참가비에서 환불과 수수료를 뺀 {won(p.total)}을 정산으로 받아요 · 지급 완료{" "}
+          {won(p.settled)} · 정산 예정 {won(p.scheduled)} · 아직 정산 전 {won(p.unsettled)}.
+          수수료는 주문에 적힌 비율로 계산해요.
+        </p>
+      )}
+
+      {ledger.entries.length > 0 && (
+        <ul className={s.people} aria-label="장부 항목">
+          {ledger.entries.map((e) => (
+            <li key={e.id} className={s.person}>
+              <div className={s.who}>
+                <strong>
+                  {e.memo} · {e.kind === "income" ? "+" : "−"} {won(e.amount)}
+                </strong>
+                <Meta parts={[entryMeta(e), ...(e.createdBy ? [`${e.createdBy} 적음`] : [])]} />
+                {e.receiptPath && (
+                  <a
+                    href={mediaUrl(e.receiptPath)}
+                    target="_blank"
+                    rel="noreferrer"
+                    className={s.textLink}
+                  >
+                    영수증 보기
+                  </a>
+                )}
+              </div>
+              <form
+                action={deleteLedgerAction}
+                aria-label={`${e.memo} 지우기`}
+                className={s.buttons}
+              >
+                <input type="hidden" name="activityId" value={a.id} />
+                <input type="hidden" name="entryId" value={e.id} />
+                <SubmitButton className={s.ghostSmall} pendingLabel="지우는 중…">
+                  지우기
+                </SubmitButton>
+              </form>
+              <details className={s.entryEdit}>
+                <summary>고치기</summary>
+                <LedgerForm a={a} today={today} entry={e} />
+              </details>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <details className={s.ledgerAdd} open={ledger.entries.length === 0}>
+        <summary>지출 · 수입 적기</summary>
+        <LedgerForm a={a} today={today} />
+      </details>
+
+      {ledger.history.length > 0 && (
+        <details className={s.history}>
+          <summary>고친 기록 {ledger.history.length}</summary>
+          <ol>
+            {ledger.history.map((h, i) => (
+              <li key={i}>
+                <span>{h.text}</span>
+                <small>
+                  {h.actor ?? "알 수 없음"} · {shortDate(new Date(h.at))}{" "}
+                  {clockTime(new Date(h.at))}
+                </small>
+              </li>
+            ))}
+          </ol>
+        </details>
+      )}
+    </section>
+  );
+}
+
+function LedgerForm({
+  a,
+  today,
+  entry,
+}: {
+  a: HostActivityDetail;
+  today: string;
+  entry?: OpenLedger["entries"][number];
+}) {
+  return (
+    <form
+      action={saveLedgerAction}
+      className={s.ledgerForm}
+      aria-label={entry ? `${entry.memo} 고치기` : "장부에 적기"}
+    >
+      <input type="hidden" name="activityId" value={a.id} />
+      {entry && <input type="hidden" name="entryId" value={entry.id} />}
+      <fieldset className={s.kindPick}>
+        <legend>종류</legend>
+        {(["expense", "income"] as const).map((k) => (
+          <label key={k}>
+            <input
+              type="radio"
+              name="kind"
+              value={k}
+              defaultChecked={(entry?.kind ?? "expense") === k}
+            />
+            <span>{k === "expense" ? "지출" : "기타 수입"}</span>
+          </label>
+        ))}
+      </fieldset>
+      <label className={s.formField}>
+        <span>항목</span>
+        <input
+          name="memo"
+          required
+          maxLength={60}
+          defaultValue={entry?.memo}
+          placeholder="예: 스터디룸 대관"
+        />
+      </label>
+      <label className={s.formField}>
+        <span>금액 (원)</span>
+        <input
+          name="amount"
+          type="number"
+          inputMode="numeric"
+          min={1}
+          max={100000000}
+          required
+          defaultValue={entry?.amount}
+        />
+      </label>
+      <label className={s.formField}>
+        <span>날짜</span>
+        <input name="occurredOn" type="date" required defaultValue={entry?.occurredOn ?? today} />
+      </label>
+      <label className={s.formField}>
+        <span>{entry?.receiptPath ? "영수증 바꾸기 (선택)" : "영수증 사진 (선택)"}</span>
+        <input name="receipt" type="file" accept="image/jpeg,image/png,image/webp" />
+      </label>
+      <SubmitButton className={s.primarySmall} pendingLabel="적는 중…">
+        {entry ? "고친 내용 저장" : "장부에 적기"}
+      </SubmitButton>
+    </form>
   );
 }
