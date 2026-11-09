@@ -4,7 +4,6 @@
 // 최종 검사와 만들기는 서버 액션 → DB 함수가 다시 한다.
 import { useActionState, useEffect, useRef, useState, type ReactNode } from "react";
 import {
-  emptyDraft,
   kstInputToIso,
   STEPS,
   stepErrors,
@@ -40,14 +39,15 @@ const AUDIENCE: Record<Draft["audience"], string> = {
 
 export function NewActivityForm({
   choices,
+  initial,
   previous,
 }: {
   choices: OrganizerChoice[];
+  /** 처음 값(지난 활동에서 가져온 것 포함) */
+  initial: Draft;
   previous: { id: string; title: string }[];
 }) {
-  const [draft, setDraft] = useState<Draft>(() =>
-    emptyDraft(choices.length === 1 ? choices[0].value : ""),
-  );
+  const [draft, setDraft] = useState<Draft>(initial);
   const [step, setStep] = useState<StepId>("kind");
   const [errors, setErrors] = useState<Errors>({});
   const [state, action, pending] = useActionState<CreateState, FormData>(createAction, {
@@ -57,7 +57,8 @@ export function NewActivityForm({
   });
   const headingRef = useRef<HTMLHeadingElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
-  const firstRender = useRef(true);
+  // 마지막으로 보여 준 단계. 처음 열 때(개발 모드의 효과 두 번 실행 포함)는 움직이지 않는다.
+  const shownStep = useRef(step);
 
   // 서버가 돌려보낸 검사 오류는 그 단계로 데려가 보여 준다.
   const [handled, setHandled] = useState(state);
@@ -71,10 +72,8 @@ export function NewActivityForm({
 
   // 단계를 옮기면 그 단계 제목으로 포커스(화면 읽기 프로그램이 새 단계를 읽는다).
   useEffect(() => {
-    if (firstRender.current) {
-      firstRender.current = false;
-      return;
-    }
+    if (shownStep.current === step) return;
+    shownStep.current = step;
     // 단계 표시부터 보이게 올리고, 포커스는 새 단계 제목에.
     wrapRef.current?.scrollIntoView({ block: "start" });
     headingRef.current?.focus({ preventScroll: true });

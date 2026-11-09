@@ -1003,3 +1003,86 @@ test.describe("활동 만들기", () => {
     await expect(page.getByRole("button", { name: "다음" })).toHaveCount(0);
   });
 });
+
+// H04 지난 활동에서 가져오기: 고른 항목만 새 초안에 옮기고 일정은 비운다.
+test.describe("지난 활동에서 가져오기", () => {
+  const WORKSHOP_ID = "00000000-0000-4000-c000-000000000006";
+
+  test("관리 화면에서 '이 활동으로 새로 만들기' → 소개·장소·정원·가격을 그대로, 일정만 새로 적는다", async ({
+    page,
+  }) => {
+    await signInAs(page, "바라호스트", `/host/activities/${WORKSHOP_ID}`);
+    await page.getByRole("link", { name: "이 활동으로 새로 만들기" }).click();
+    await expect(page).toHaveURL(new RegExp(`/host/new\\?from=${WORKSHOP_ID}$`));
+    await expect(page.getByRole("status")).toContainText(
+      "「AI 도구 실습 워크숍」에서 가져왔어요: 종류 · 소개 · 장소 · 정원 · 가격 · 진행 방식",
+    );
+
+    await expect(page.getByRole("radio", { name: /개인 호스트/ })).toBeChecked();
+    await page.getByRole("button", { name: "다음" }).click();
+    await expect(page.getByLabel("제목")).toHaveValue("AI 도구 실습 워크숍");
+    await expect(page.getByLabel("장소 이름 (선택)")).toHaveValue("합정 스터디룸");
+    await expect(page.getByLabel("상세 주소 (선택)")).toHaveValue("양화로 00, 3층 B룸 (가짜 주소)");
+    await page.getByLabel("제목").fill("AI 도구 실습 워크숍 2기");
+    await page.getByRole("button", { name: "다음" }).click();
+
+    // 일정은 비어 있다
+    await expect(page.getByLabel("시작", { exact: true })).toHaveValue("");
+    const day = new Date(Date.now() + 9 * 3600_000 + 20 * 86_400_000).toISOString().slice(0, 10);
+    await page.getByLabel("시작", { exact: true }).fill(`${day}T14:00`);
+    await page.getByRole("button", { name: "다음" }).click();
+    await expect(page.getByLabel("정원 (선택)")).toHaveValue("3");
+    await expect(page.getByLabel("참가비 (원)")).toHaveValue("15000");
+    await page.getByRole("button", { name: "다음" }).click();
+    await page.getByRole("button", { name: "초안으로 만들기" }).click();
+
+    await expect(page).toHaveURL(/\/host\/activities\/[0-9a-f-]{36}\?notice=activity_created$/, {
+      timeout: 30_000,
+    });
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("AI 도구 실습 워크숍 2기");
+    const overview = page.getByRole("region", { name: "개요" });
+    await expect(overview).toContainText("0/3명");
+    await expect(overview).toContainText("15,000원");
+  });
+
+  test("가져오기 상자에서 시즌의 진행 방식만 고르면 제목·가격은 비우고 중간 합류 설정만 옮긴다", async ({
+    page,
+  }) => {
+    await signInAs(page, "바라호스트", "/host/new");
+    await page.getByText("지난 활동에서 가져오기").click();
+    await page
+      .getByLabel("가져올 활동")
+      .selectOption({ label: "[시즌] 4주 바이브코딩 시즌 · 모집·진행" });
+    for (const name of ["소개", "장소", "정원", "가격"]) {
+      await page.getByRole("checkbox", { name }).uncheck();
+    }
+    await page.getByRole("button", { name: "가져오기" }).click();
+    await expect(page).toHaveURL(/take=&take=rules$/);
+    await expect(page.getByRole("status")).toContainText("가져왔어요: 종류 · 진행 방식");
+
+    await expect(page.getByRole("radio", { name: /^시즌/ })).toBeChecked();
+    await page.getByRole("button", { name: "다음" }).click();
+    await expect(page.getByLabel("제목")).toHaveValue("");
+    await page.getByLabel("제목").fill("겨울 시즌");
+    await page.getByRole("button", { name: "다음" }).click();
+    await expect(page.getByLabel("첫 회차 시작")).toHaveValue("");
+    await expect(page.getByLabel("회차 수")).toHaveValue("4");
+    const day = new Date(Date.now() + 9 * 3600_000 + 14 * 86_400_000).toISOString().slice(0, 10);
+    await page.getByLabel("첫 회차 시작").fill(`${day}T20:00`);
+    await page.getByRole("button", { name: "다음" }).click();
+    await expect(page.getByLabel("참가비 (원)")).toHaveValue("0");
+    await expect(
+      page.getByRole("checkbox", { name: "시작한 뒤에도 중간 합류 받기" }),
+    ).toBeChecked();
+  });
+
+  test("내가 관리하지 않는 활동은 가져올 수 없다고 알리고 빈 초안으로 시작한다", async ({
+    page,
+  }) => {
+    await signInAs(page, "클럽운영진", `/host/new?from=${WORKSHOP_ID}`);
+    await expect(page.getByRole("main").getByRole("alert")).toHaveText(
+      "가져올 수 없는 활동이에요. 내가 관리하는 활동만 가져올 수 있어요.",
+    );
+    await expect(page.getByRole("radio", { name: /^모임/ })).toBeChecked();
+  });
+});

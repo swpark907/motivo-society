@@ -429,3 +429,107 @@
     background: var(--surface);
   }
 }
+
+// ── 지난 활동에서 가져오기(접어 둔 상자)
+.import {
+  max-width: 48rem;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+
+  summary {
+    display: flex;
+    align-items: center;
+    min-height: 52px;
+    padding: 0 var(--space-4);
+    font-weight: 800;
+    cursor: pointer;
+    list-style: none;
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+
+    &::after {
+      content: "+";
+      margin-left: auto;
+      color: var(--ink-muted);
+      font-size: 1.2rem;
+    }
+  }
+
+  &[open] summary::after {
+    content: "−";
+  }
+}
+
+.importForm {
+  display: grid;
+  gap: var(--space-3);
+  padding: 0 var(--space-4) var(--space-4);
+
+  button {
+    justify-self: start;
+  }
+}
+
+.importParts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+
+  legend {
+    width: 100%;
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+    font-weight: 800;
+  }
+
+  label {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 44px;
+    padding: 0 var(--space-3);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    font-weight: 700;
+    cursor: pointer;
+
+    &:has(input:checked) {
+      border-color: var(--ink);
+    }
+  }
+
+  input {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--ink);
+  }
+}
+
+.imported {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+  max-width: 48rem;
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: 12px;
+  background: var(--ink);
+  color: var(--surface);
+  font-weight: 700;
+  line-height: 1.5;
+  word-break: keep-all;
+
+  a {
+    color: inherit;
+    font-size: 0.9rem;
+    white-space: nowrap;
+  }
+}

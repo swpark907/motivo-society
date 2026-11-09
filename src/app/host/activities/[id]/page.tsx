@@ -7,7 +7,7 @@ import { PlatformPage } from "@/components/PlatformPage/PlatformPage";
 import { StatusBadge } from "@/components/StatusBadge/StatusBadge";
 import { SubmitButton } from "@/components/SubmitButton/SubmitButton";
 import { clockTime, gatheringWhen, periodWhen, shortDate } from "@/lib/platform/activity-time";
-import { getHostActivity, type HostActivityDetail } from "@/lib/platform/host";
+import { getHostAccess, getHostActivity, type HostActivityDetail } from "@/lib/platform/host";
 import {
   attendanceCounts,
   attendanceOpensAt,
@@ -45,7 +45,7 @@ export default async function HostActivityPage({
   if (!/^[0-9a-f-]{36}$/.test(id)) notFound();
   const sp = await searchParams;
   await requireUser(`/host/activities/${id}`);
-  const result = await getHostActivity(id);
+  const [result, access] = await Promise.all([getHostActivity(id), getHostAccess()]);
   if (!result.found) notFound();
   if (!result.canManage) {
     return (
@@ -157,11 +157,19 @@ export default async function HostActivityPage({
           )}
         </dl>
 
-        {actions.viewPublic && (
-          <Link href={`/activities/${a.slug}`} className={s.secondary}>
-            참가자 화면 보기 →
-          </Link>
-        )}
+        <div className={s.links}>
+          {actions.viewPublic && (
+            <Link href={`/activities/${a.slug}`} className={s.secondary}>
+              참가자 화면 보기 →
+            </Link>
+          )}
+          {/* 지난 활동을 바탕으로 다음 활동을 연다(H04). 회차는 시즌에서 가져온다. */}
+          {!isSession && (access.hostTier || access.clubCreate || access.official) && (
+            <Link href={`/host/new?from=${a.id}`} className={s.secondary}>
+              이 활동으로 새로 만들기
+            </Link>
+          )}
+        </div>
       </section>
 
       <Roster a={a} now={now} />

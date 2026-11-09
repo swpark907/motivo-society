@@ -1,10 +1,12 @@
 import { describe, expect, it } from "vitest";
 import {
+  applyTemplate,
   emptyDraft,
   firstInvalidStep,
   kstInputToIso,
   organizerChoices,
   parseDraft,
+  parseImportParts,
   stepErrors,
   toCreatePayload,
   type Draft,
@@ -191,5 +193,59 @@ describe("DB에 넘길 모양", () => {
       joinMode: "instant",
     });
     expect(d).not.toHaveProperty("evil");
+  });
+});
+
+describe("지난 활동에서 가져오기", () => {
+  const src = draft({
+    kind: "series",
+    organizer: `club:${CLUB}`,
+    title: "4주 시즌",
+    summary: "한 주에 한 번",
+    format: "online",
+    videoUrl: "https://meet.test/s",
+    capacity: "6",
+    price: "40000",
+    payee: "h1",
+    joinMode: "approval",
+    sessionCount: "6",
+    startsAt: "2026-10-01T19:00",
+    firstStartsAt: "2026-10-01T19:00",
+  });
+
+  it("take가 없으면 전부, 모르는 값은 버린다", () => {
+    expect(parseImportParts(undefined)).toHaveLength(5);
+    expect(parseImportParts("place,evil,intro")).toEqual(["intro", "place"]);
+    expect(parseImportParts("")).toEqual([]);
+  });
+
+  it("고른 항목만 옮기고, 종류는 원본 · 일정은 비운다", () => {
+    const d = applyTemplate(emptyDraft(), src, ["intro", "capacity"], choices);
+    expect(d).toMatchObject({
+      kind: "series",
+      organizer: `club:${CLUB}`,
+      title: "4주 시즌",
+      capacity: "6",
+      price: "0",
+      format: "offline",
+      joinMode: "instant",
+      sessionCount: "4",
+      firstStartsAt: "",
+      startsAt: "",
+    });
+    const all = applyTemplate(emptyDraft(), src, parseImportParts(undefined), choices);
+    expect(all).toMatchObject({
+      price: "40000",
+      payee: "h1",
+      videoUrl: "https://meet.test/s",
+      joinMode: "approval",
+      sessionCount: "6",
+      firstStartsAt: "",
+    });
+  });
+
+  it("지금 고를 수 없는 주최는 옮기지 않는다", () => {
+    const d = applyTemplate(emptyDraft(), { ...src, organizer: "official" }, [], choices);
+    expect(d.organizer).toBe("");
   });
 });

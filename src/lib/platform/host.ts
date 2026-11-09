@@ -1,5 +1,5 @@
 import type { ActivityKind } from "./explore-filters";
-import type { CreateOptions } from "./activity-draft";
+import { emptyDraft, type CreateOptions, type Draft } from "./activity-draft";
 import type { Json } from "./database.types";
 import type { MoneyOrder, ParticipationStatus, RosterRow } from "./host-activity-view";
 import type { HostActivity, HostActivityStatus } from "./host-view";
@@ -358,4 +358,108 @@ export async function createHostActivity(
   const { data, error } = await supabase.rpc("activity_create", { p: payload as Json });
   if (error || typeof data !== "string") return { error: errorCodeFrom(error?.message) };
   return { id: data };
+}
+
+// ─────────────────────────────────────────────── 지난 활동에서 가져오기(H04)
+
+/**
+ * 내가 관리하는 활동 하나를 만들기 입력(Draft) 모양으로 읽는다. 일정 칸은 비워 둔다.
+ * 시즌의 장소는 회차에 있어서 첫 회차에서, 상세 주소·화상 링크는 관리자 전용 함수로 읽는다.
+ */
+export async function getTemplateSource(
+  id: string,
+): Promise<{ title: string; draft: Draft } | null> {
+  const supabase = await createSessionClient();
+  const [{ data: a }, { data: manage }] = await Promise.all([
+    supabase
+      .from("activities")
+      .select(
+        "id, kind, organizer_kind, club_id, title, summary, capacity, price, payee_user_id, join_mode, audience, required_activity_id, allow_late_join, series_id, gathering_details(format, place_name, area)",
+      )
+      .eq("id", id)
+      .maybeSingle(),
+    supabase.rpc("can_manage_activity", { p_activity: id }),
+  ]);
+  if (!a || !manage || a.series_id) return null;
+
+  const [sessions, challenge, mission] = await Promise.all([
+    a.kind === "series"
+      ? supabase
+          .from("activities")
+          .select("id, starts_at, ends_at, gathering_details(format, place_name, area)")
+          .eq("series_id", id)
+          .neq("status", "cancelled")
+          .order("session_no")
+      : Promise.resolve({ data: null }),
+    a.kind === "challenge"
+      ? supabase
+          .from("challenge_details")
+          .select("cert_rule, cert_n, cert_formats, completion_threshold")
+          .eq("activity_id", id)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
+    a.kind === "challenge"
+      ? supabase
+          .from("challenge_missions")
+          .select("title")
+          .eq("activity_id", id)
+          .is("day_no", null)
+          .limit(1)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
+  ]);
+
+  const first = sessions.data?.[0] ?? null;
+  const placeOf = a.kind === "series" ? first : a;
+  const g = placeOf?.gathering_details ?? null;
+  const { data: priv } = placeOf
+    ? await supabase.rpc("get_activity_private", { p_activity: placeOf.id ?? id })
+    : { data: null };
+  const p = (priv ?? {}) as { address_detail?: string | null; video_url?: string | null };
+
+  const ms = (x: string | null | undefined) => (x ? new Date(x).getTime() : NaN);
+  const second = sessions.data?.[1] ?? null;
+  const gapDays =
+    first && second ? Math.round((ms(second.starts_at) - ms(first.starts_at)) / 86_400_000) : NaN;
+  const minutes = first ? Math.round((ms(first.ends_at) - ms(first.starts_at)) / 60_000) : NaN;
+  const c = challenge.data;
+  const base = emptyDraft();
+
+  return {
+    title: a.title,
+    draft: {
+      ...base,
+      kind: a.kind as ActivityKind,
+      organizer: a.organizer_kind === "club" ? `club:${a.club_id}` : a.organizer_kind,
+      title: a.title,
+      summary: a.summary ?? "",
+      format: g?.format === "online" ? "online" : "offline",
+      placeName: g?.place_name ?? "",
+      area: g?.area ?? "",
+      addressDetail: p.address_detail ?? "",
+      videoUrl: p.video_url ?? "",
+      capacity: a.capacity ? String(a.capacity) : "",
+      price: String(a.price),
+      payee: a.organizer_kind === "club" ? (a.payee_user_id ?? "") : "",
+      joinMode: a.join_mode === "approval" ? "approval" : "instant",
+      audience:
+        a.audience === "club_members" || a.audience === "entitlement_holders"
+          ? a.audience
+          : "anyone",
+      requiredActivity: a.required_activity_id ?? "",
+      allowLateJoin: a.allow_late_join,
+      sessionCount: sessions.data
+        ? String(Math.min(12, Math.max(2, sessions.data.length)))
+        : base.sessionCount,
+      intervalDays: Number.isFinite(gapDays) && gapDays >= 1 ? String(gapDays) : base.intervalDays,
+      durationMinutes:
+        Number.isFinite(minutes) && minutes >= 10 ? String(minutes) : base.durationMinutes,
+      certRule: c?.cert_rule === "weekly_n" || c?.cert_rule === "total_n" ? c.cert_rule : "daily",
+      certN: c?.cert_n ? String(c.cert_n) : "",
+      threshold: c ? String(c.completion_threshold) : "",
+      mission: mission.data?.title ?? "",
+      certText: c ? c.cert_formats.includes("text") : true,
+      certLink: c ? c.cert_formats.includes("link") : false,
+    },
+  };
 }

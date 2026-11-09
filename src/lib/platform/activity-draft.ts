@@ -343,3 +343,71 @@ export function parseDraft(json: string): Draft | null {
     d.audience = "anyone";
   return d;
 }
+
+// ─────────────────────────────────────────────── 지난 활동에서 가져오기(H04)
+
+export type ImportPart = "intro" | "place" | "capacity" | "price" | "rules";
+
+export const IMPORT_PARTS: { id: ImportPart; label: string; help: string }[] = [
+  { id: "intro", label: "소개", help: "제목과 한 줄 소개" },
+  { id: "place", label: "장소", help: "진행 방식 · 장소 · 상세 주소 · 화상 링크" },
+  { id: "capacity", label: "정원", help: "정원" },
+  { id: "price", label: "가격", help: "참가비 · 정산받을 사람" },
+  {
+    id: "rules",
+    label: "진행 방식",
+    help: "참가 확정 · 대상 · 중간 합류, 시즌 회차 구성, 챌린지 인증 규칙",
+  },
+];
+
+/** 주소의 take 값("intro,place")을 읽는다. 없으면 전부, 모르는 값은 버린다. */
+export function parseImportParts(value: string | undefined): ImportPart[] {
+  if (value === undefined) return IMPORT_PARTS.map((p) => p.id);
+  const wanted = new Set(value.split(","));
+  return IMPORT_PARTS.map((p) => p.id).filter((id) => wanted.has(id));
+}
+
+/**
+ * 원본(지난 활동을 Draft 모양으로 읽은 것)에서 고른 항목만 새 초안에 옮긴다.
+ * 종류는 늘 원본을 따르고, 주최는 지금도 고를 수 있을 때만 옮긴다. 일정은 옮기지 않는다.
+ */
+export function applyTemplate(
+  base: Draft,
+  src: Draft,
+  parts: ImportPart[],
+  choices: OrganizerChoice[],
+): Draft {
+  const d: Draft = { ...base, kind: src.kind };
+  if (choices.some((c) => c.value === src.organizer)) d.organizer = src.organizer;
+  const take = new Set(parts);
+  if (take.has("intro")) Object.assign(d, { title: src.title, summary: src.summary });
+  if (take.has("place")) {
+    Object.assign(d, {
+      format: src.format,
+      placeName: src.placeName,
+      area: src.area,
+      addressDetail: src.addressDetail,
+      videoUrl: src.videoUrl,
+    });
+  }
+  if (take.has("capacity")) d.capacity = src.capacity;
+  if (take.has("price")) Object.assign(d, { price: src.price, payee: src.payee });
+  if (take.has("rules")) {
+    Object.assign(d, {
+      joinMode: src.joinMode,
+      audience: src.audience,
+      requiredActivity: src.requiredActivity,
+      allowLateJoin: src.allowLateJoin,
+      sessionCount: src.sessionCount,
+      intervalDays: src.intervalDays,
+      durationMinutes: src.durationMinutes,
+      certRule: src.certRule,
+      certN: src.certN,
+      threshold: src.threshold,
+      mission: src.mission,
+      certText: src.certText,
+      certLink: src.certLink,
+    });
+  }
+  return d;
+}
