@@ -6,6 +6,7 @@ import type { HostActivity, HostActivityStatus } from "./host-view";
 import { errorCodeFrom } from "./messages";
 import { kstDateKey } from "./schedule";
 import { createSessionClient, sandboxEnv } from "./supabase-server";
+import { coverSrc } from "./media";
 
 // 호스트 도구의 데이터. 누가 들어오는지와 관리 범위는 DB가 정한다(host_access · host_my_activities).
 
@@ -82,7 +83,7 @@ export async function listHostActivities(now = new Date()): Promise<HostActivity
     clubName: a.clubs?.name ?? null,
     capacity: a.capacity,
     price: a.price,
-    cover: a.cover_path,
+    cover: coverSrc(a.cover_path),
     confirmed: count(a.id, "confirmed"),
     waitlisted: count(a.id, "waitlisted"),
     pendingApproval: count(a.id, "pending_approval"),
@@ -116,6 +117,9 @@ export type HostActivityDetail = {
   price: number;
   joinMode: "instant" | "approval";
   clubName: string | null;
+  clubId: string | null;
+  /** 표지 이미지 주소(없으면 기본 표지) */
+  cover: string | null;
   place: string | null;
   /** 회차면 소속 시즌 */
   series: { id: string; title: string } | null;
@@ -144,7 +148,7 @@ export async function getHostActivity(id: string): Promise<HostActivityResult> {
     supabase
       .from("activities")
       .select(
-        "id, slug, kind, title, status, starts_at, ends_at, capacity, price, join_mode, series_id, session_no, clubs(name), series:series_id(id, title), gathering_details(format, place_name, area)",
+        "id, slug, kind, title, status, starts_at, ends_at, capacity, price, join_mode, series_id, session_no, club_id, cover_path, clubs(name), series:series_id(id, title), gathering_details(format, place_name, area)",
       )
       .eq("id", id)
       .maybeSingle(),
@@ -260,6 +264,8 @@ export async function getHostActivity(id: string): Promise<HostActivityResult> {
       price: a.price,
       joinMode: a.join_mode === "approval" ? "approval" : "instant",
       clubName: a.clubs?.name ?? null,
+      clubId: a.club_id,
+      cover: coverSrc(a.cover_path),
       place: !g
         ? null
         : g.format === "online"

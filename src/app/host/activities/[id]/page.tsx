@@ -7,7 +7,14 @@ import { PlatformPage } from "@/components/PlatformPage/PlatformPage";
 import { StatusBadge } from "@/components/StatusBadge/StatusBadge";
 import { SubmitButton } from "@/components/SubmitButton/SubmitButton";
 import { clockTime, gatheringWhen, periodWhen, shortDate } from "@/lib/platform/activity-time";
-import { getHostAccess, getHostActivity, type HostActivityDetail } from "@/lib/platform/host";
+import {
+  getCreateOptions,
+  getHostAccess,
+  getHostActivity,
+  type HostActivityDetail,
+} from "@/lib/platform/host";
+import { listMedia, type MediaAsset } from "@/lib/platform/host-media";
+import { isRemoteImage } from "@/lib/platform/media";
 import {
   attendanceCounts,
   attendanceOpensAt,
@@ -29,7 +36,16 @@ import {
   won,
 } from "@/lib/platform/messages";
 import { requireUser } from "@/lib/platform/session";
-import { attendanceAction, decideAction, finalizeAction, publishAction } from "./actions";
+import Image from "next/image";
+import { MediaUploadFields } from "../../media/MediaUploadFields";
+import {
+  attendanceAction,
+  decideAction,
+  finalizeAction,
+  publishAction,
+  setCoverAction,
+  uploadCoverAction,
+} from "./actions";
 import s from "./manage.module.scss";
 
 export const metadata: Metadata = {
@@ -45,7 +61,12 @@ export default async function HostActivityPage({
   if (!/^[0-9a-f-]{36}$/.test(id)) notFound();
   const sp = await searchParams;
   await requireUser(`/host/activities/${id}`);
-  const [result, access] = await Promise.all([getHostActivity(id), getHostAccess()]);
+  const [result, access, media, options] = await Promise.all([
+    getHostActivity(id),
+    getHostAccess(),
+    listMedia(),
+    getCreateOptions(),
+  ]);
   if (!result.found) notFound();
   if (!result.canManage) {
     return (
@@ -171,6 +192,20 @@ export default async function HostActivityPage({
           )}
         </div>
       </section>
+
+      {!isSession && (
+        <Cover
+          a={a}
+          // 내 보관함 이미지는 어느 활동에나, 클럽 보관함 이미지는 그 클럽 활동에만.
+          assets={media.filter((m) => m.clubId === null || m.clubId === a.clubId)}
+          owners={[
+            { value: "me", label: "내 보관함" },
+            ...options.clubs
+              .filter((c) => c.id === a.clubId)
+              .map((c) => ({ value: c.id, label: `클럽 · ${c.name}` })),
+          ]}
+        />
+      )}
 
       <Roster a={a} now={now} />
 
@@ -406,6 +441,98 @@ function Money({ a, now }: { a: HostActivityDetail; now: Date }) {
           ))}
         </ul>
       )}
+    </section>
+  );
+}
+
+function Cover({
+  a,
+  assets,
+  owners,
+}: {
+  a: HostActivityDetail;
+  assets: MediaAsset[];
+  owners: { value: string; label: string }[];
+}) {
+  return (
+    <section className={s.section} id="cover" aria-labelledby="cover-h">
+      <h2 id="cover-h">표지</h2>
+      <div className={s.coverRow}>
+        <div className={s.coverPreview} data-kind={a.kind}>
+          {a.cover ? (
+            <Image
+              src={a.cover}
+              unoptimized={isRemoteImage(a.cover)}
+              alt="지금 표지"
+              fill
+              sizes="(min-width: 768px) 320px, 100vw"
+            />
+          ) : (
+            <span aria-hidden="true">{a.title}</span>
+          )}
+        </div>
+        <p className={s.hint}>
+          {a.cover
+            ? "목록 카드 · 활동 화면 · 공유 미리보기에 이 사진이 보여요."
+            : "표지가 없어서 종류 색과 제목으로 된 기본 표지가 보여요."}
+        </p>
+      </div>
+
+      <details className={s.coverEdit}>
+        <summary>표지 바꾸기</summary>
+        {assets.length > 0 && (
+          <form action={setCoverAction} className={s.pick}>
+            <input type="hidden" name="activityId" value={a.id} />
+            <fieldset>
+              <legend>보관함에서 고르기</legend>
+              <div className={s.pickGrid}>
+                {assets.map((m) => (
+                  <label key={m.id}>
+                    <input
+                      type="radio"
+                      name="mediaId"
+                      value={m.id}
+                      required
+                      defaultChecked={a.cover === m.url}
+                    />
+                    <span className={s.pickThumb}>
+                      <Image
+                        src={m.url}
+                        alt={m.alt || "설명 없는 이미지"}
+                        fill
+                        unoptimized
+                        sizes="160px"
+                      />
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+            <SubmitButton className={s.primarySmall} pendingLabel="바꾸는 중…">
+              이 사진으로 표지 바꾸기
+            </SubmitButton>
+          </form>
+        )}
+
+        <form action={uploadCoverAction} className={s.pick} aria-label="새 사진 올려 표지로 쓰기">
+          <input type="hidden" name="activityId" value={a.id} />
+          <p className={s.subTitle}>새 사진 올려 표지로 쓰기</p>
+          <MediaUploadFields owners={owners} idPrefix="cover" />
+          <SubmitButton className={s.primarySmall} pendingLabel="올리는 중…">
+            올리고 표지로 쓰기
+          </SubmitButton>
+        </form>
+
+        {a.cover && (
+          <form action={setCoverAction}>
+            <input type="hidden" name="activityId" value={a.id} />
+            <input type="hidden" name="mediaId" value="" />
+            <SubmitButton className={s.ghostSmall} pendingLabel="빼는 중…">
+              표지 빼기
+            </SubmitButton>
+          </form>
+        )}
+      </details>
     </section>
   );
 }

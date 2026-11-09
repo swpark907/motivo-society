@@ -1,6 +1,7 @@
 import type { MyParticipation } from "./apply-state";
 import type { ActivityKind } from "./explore-filters";
 import { createSessionClient, sandboxEnv } from "./supabase-server";
+import { coverSrc } from "./media";
 
 // 활동 상세 한 화면에 필요한 것을 한 번에 읽는다. 사용자 세션으로 읽으므로
 // 볼 수 없는 활동(초안·멤버 공개)은 없는 것처럼 null이 된다.
@@ -179,7 +180,7 @@ export async function getActivityDetail(slug: string): Promise<DetailResult> {
       status: a.status,
       startsAt: a.starts_at,
       endsAt: a.ends_at,
-      cover: a.cover_path,
+      cover: coverSrc(a.cover_path),
       price: a.price,
       capacity: a.capacity,
       taken: seats.data?.[0]?.taken ?? 0,

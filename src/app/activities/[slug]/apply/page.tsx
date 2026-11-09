@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import { isRemoteImage } from "@/lib/platform/media";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { KindTag } from "@/components/KindTag/KindTag";
@@ -77,7 +78,9 @@ function Summary({ a }: { a: ActivityDetail }) {
   return (
     <section className={s.summary} aria-label="신청할 활동">
       <div className={s.thumb} data-kind={a.kind}>
-        {a.cover && <Image src={a.cover} alt="" fill sizes="96px" />}
+        {a.cover && (
+          <Image src={a.cover} unoptimized={isRemoteImage(a.cover)} alt="" fill sizes="96px" />
+        )}
       </div>
       <div>
         <KindTag kind={a.kind} />

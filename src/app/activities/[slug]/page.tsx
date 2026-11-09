@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import { isRemoteImage } from "@/lib/platform/media";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { ActivityCard } from "@/components/ActivityCard/ActivityCard";
@@ -109,6 +110,7 @@ export default async function ActivityPage({ params, searchParams }: Props) {
               {a.cover ? (
                 <Image
                   src={a.cover}
+                  unoptimized={isRemoteImage(a.cover)}
                   alt=""
                   fill
                   priority

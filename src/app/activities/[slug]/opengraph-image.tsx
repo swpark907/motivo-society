@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { ImageResponse } from "next/og";
 import { getActivityDetail } from "@/lib/platform/activity-detail";
 import { KIND_LABELS } from "@/lib/platform/messages";
+import { isRemoteImage, sniffImage } from "@/lib/platform/media";
 
 // DM·메신저 미리보기 이미지. 표지가 있으면 표지 위에 제목, 없으면 종류 색 면 + 제목.
 // 비로그인으로 읽으므로 멤버 공개·작성 중 활동은 기본 그림만 나온다.
@@ -30,8 +31,19 @@ export default async function Image({ params }: { params: Promise<{ slug: string
 
   let cover: string | null = null;
   if (a?.cover) {
-    const bytes = await readFile(join(process.cwd(), "public", a.cover)).catch(() => null);
-    if (bytes) cover = `data:image/jpeg;base64,${bytes.toString("base64")}`;
+    // 보관함 이미지는 Storage에서, 시안 이미지는 public 폴더에서 읽는다. 못 읽으면 기본 표지.
+    const remote = isRemoteImage(a.cover);
+    const bytes = remote
+      ? await fetch(a.cover)
+          .then((r) => (r.ok ? r.arrayBuffer() : null))
+          .then((b) => (b ? Buffer.from(b) : null))
+          .catch(() => null)
+      : await readFile(join(process.cwd(), "public", a.cover)).catch(() => null);
+    const kind = bytes ? sniffImage(new Uint8Array(bytes)) : null;
+    // OG 그림(Satori)은 webp를 그리지 못해 jpg·png만 쓴다.
+    if (bytes && kind && kind.ext !== "webp") {
+      cover = `data:${kind.mime};base64,${bytes.toString("base64")}`;
+    }
   }
   const bg = a ? (KIND_COLORS[a.kind] ?? "#f3f0ea") : "#f3f0ea";
 

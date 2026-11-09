@@ -2,6 +2,7 @@ import { kstDayStart } from "./activity-time";
 import type { ActivityKind } from "./explore-filters";
 import { listOpenActivities, type ActivityCardData } from "./queries";
 import { createSessionClient } from "./supabase-server";
+import { coverSrc } from "./media";
 
 // 회원 홈 한 화면의 데이터: 오늘 → 내 사람들 → 발견.
 // 대시보드 숫자가 아니라 "지금 할 것"과 "내 사람들의 소식"을 고른다.
@@ -142,7 +143,7 @@ export async function getMemberHome(userId: string, now = new Date()): Promise<M
       title: a.title,
       startsAt: a.starts_at,
       endsAt: a.ends_at,
-      cover: a.cover_path,
+      cover: coverSrc(a.cover_path),
       ...place(a.gathering_details),
     });
   }
@@ -155,7 +156,7 @@ export async function getMemberHome(userId: string, now = new Date()): Promise<M
       title: series.title,
       startsAt: s.starts_at,
       endsAt: s.ends_at,
-      cover: series.cover_path,
+      cover: coverSrc(series.cover_path),
       ...place(s.gathering_details),
     });
   }

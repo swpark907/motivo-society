@@ -1180,3 +1180,92 @@ test.describe("호스트 보관함", () => {
     );
   });
 });
+
+// H06 이미지 보관함과 표지: 올리고, 표지로 고르고, 쓰는 중에는 지울 수 없고, 빼면 기본 표지.
+test.describe("이미지 보관함과 표지", () => {
+  const PHOTO = "public/images/platform/mock/cover-cafe-chat.jpg";
+  const DRAFT = "/host/activities/00000000-0000-4000-c000-000000000005";
+
+  test("보관함에 올린 사진을 초안 표지로 고르고, 쓰는 동안은 못 지우며, 표지를 빼면 기본 표지로", async ({
+    page,
+  }) => {
+    await signInAs(page, "바라호스트", "/host");
+    await page.getByRole("link", { name: "이미지 보관함" }).click();
+    const upload = page.getByRole("form", { name: "이미지 올리기" });
+    await upload.getByLabel(/^이미지/).setInputFiles(PHOTO);
+    await expect(upload.getByRole("img", { name: "고른 사진 미리보기" })).toBeVisible();
+    await upload.getByLabel("사진 설명 (선택)").fill("카페 창가 자리");
+    await upload.getByRole("button", { name: "올리기" }).click();
+    await expect(page.getByRole("status")).toHaveText("이미지를 올렸어요.", { timeout: 30_000 });
+    const mine = page.getByRole("region", { name: /내 보관함/ });
+    await expect(mine.getByRole("img", { name: "카페 창가 자리" })).toBeVisible();
+
+    await page.goto(DRAFT);
+    const cover = page.getByRole("region", { name: "표지" });
+    await expect(cover).toContainText("기본 표지가 보여요");
+    await cover.getByText("표지 바꾸기", { exact: true }).click();
+    await cover.getByRole("radio").first().check();
+    await cover.getByRole("button", { name: "이 사진으로 표지 바꾸기" }).click();
+    await expect(page.getByRole("status")).toHaveText("표지를 바꿨어요.");
+    await expect(
+      page.getByRole("region", { name: "표지" }).getByRole("img", { name: "지금 표지" }),
+    ).toHaveAttribute("src", /\/storage\/v1\/object\/public\/media\/u\//);
+
+    await page.goto("/host/media");
+    await page
+      .getByRole("form", { name: "카페 창가 자리 지우기" })
+      .getByRole("button", { name: "지우기" })
+      .click();
+    await expect(page.getByRole("alert").filter({ hasText: "표지로 쓰고 있는" })).toBeVisible();
+
+    await page.goto(DRAFT);
+    await page
+      .getByRole("region", { name: "표지" })
+      .getByText("표지 바꾸기", { exact: true })
+      .click();
+    await page.getByRole("button", { name: "표지 빼기" }).click();
+    await expect(page.getByRole("status")).toHaveText(
+      "표지를 뺐어요. 종류 색과 제목으로 된 기본 표지가 보여요.",
+    );
+  });
+
+  test("관리 화면에서 새 사진을 올려 바로 표지로 쓰면 참가자 화면에도 보이고, 이미지가 아닌 파일은 거절한다", async ({
+    page,
+  }) => {
+    const workshop = "/host/activities/00000000-0000-4000-c000-000000000006";
+    await signInAs(page, "바라호스트", workshop);
+    const cover = page.getByRole("region", { name: "표지" });
+    await cover.getByText("표지 바꾸기", { exact: true }).click();
+    const form = page.getByRole("form", { name: "새 사진 올려 표지로 쓰기" });
+
+    // 이름만 .png인 글 파일은 서버가 파일 앞부분을 보고 거절한다
+    await form.getByLabel(/^이미지/).setInputFiles({
+      name: "fake.png",
+      mimeType: "image/png",
+      buffer: Buffer.from("not really a picture"),
+    });
+    await form.getByRole("button", { name: "올리고 표지로 쓰기" }).click();
+    await expect(page.getByRole("alert").filter({ hasText: "JPG · PNG · WebP" })).toBeVisible({
+      timeout: 30_000,
+    });
+
+    await page
+      .getByRole("region", { name: "표지" })
+      .getByText("표지 바꾸기", { exact: true })
+      .click();
+    await page
+      .getByRole("form", { name: "새 사진 올려 표지로 쓰기" })
+      .getByLabel(/^이미지/)
+      .setInputFiles(PHOTO);
+    await page
+      .getByRole("form", { name: "새 사진 올려 표지로 쓰기" })
+      .getByRole("button", { name: "올리고 표지로 쓰기" })
+      .click();
+    await expect(page.getByRole("status")).toHaveText("표지를 바꿨어요.", { timeout: 30_000 });
+
+    await page.goto("/activities/ai-tools-workshop");
+    await expect(
+      page.locator('img[src*="/storage/v1/object/public/media/"]').first(),
+    ).toBeVisible();
+  });
+});

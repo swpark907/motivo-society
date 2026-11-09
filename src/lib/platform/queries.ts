@@ -1,5 +1,6 @@
 import type { ActivityKind } from "./explore-filters";
 import { createSessionClient, sandboxEnv } from "./supabase-server";
+import { coverSrc } from "./media";
 
 // 플랫폼 화면의 데이터 읽기는 여기서만 한다(페이지가 쿼리를 직접 쓰지 않는다).
 // 읽기는 사용자 세션으로 하므로 DB의 접근 규칙(RLS)이 그대로 적용된다.
@@ -87,7 +88,7 @@ export async function listOpenActivities(now = new Date()): Promise<Result<Activ
         status: a.status,
         startsAt: a.starts_at,
         endsAt: a.ends_at,
-        cover: a.cover_path,
+        cover: coverSrc(a.cover_path),
         area: place?.area ?? null,
         online: a.kind === "challenge" || place?.format === "online",
         price: a.price,

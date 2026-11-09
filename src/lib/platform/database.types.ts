@@ -909,6 +909,58 @@ export type Database = {
         };
         Relationships: [];
       };
+      media_assets: {
+        Row: {
+          alt: string | null;
+          club_id: string | null;
+          created_at: string;
+          id: string;
+          owner_user_id: string | null;
+          path: string;
+          uploaded_by: string;
+        };
+        Insert: {
+          alt?: string | null;
+          club_id?: string | null;
+          created_at?: string;
+          id?: string;
+          owner_user_id?: string | null;
+          path: string;
+          uploaded_by: string;
+        };
+        Update: {
+          alt?: string | null;
+          club_id?: string | null;
+          created_at?: string;
+          id?: string;
+          owner_user_id?: string | null;
+          path?: string;
+          uploaded_by?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "media_assets_club_id_fkey";
+            columns: ["club_id"];
+            isOneToOne: false;
+            referencedRelation: "clubs";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "media_assets_owner_user_id_fkey";
+            columns: ["owner_user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "media_assets_uploaded_by_fkey";
+            columns: ["uploaded_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       orders: {
         Row: {
           activity_id: string;
@@ -1528,6 +1580,10 @@ export type Database = {
         Args: { p_layer: Database["public"]["Tables"]["club_layers"]["Row"] };
         Returns: string[];
       };
+      _media_folder_ok: {
+        Args: { p_kind: string; p_owner: string };
+        Returns: boolean;
+      };
       _my_club_layer: {
         Args: { p_club: string };
         Returns: {
@@ -1577,6 +1633,10 @@ export type Database = {
           taken: number;
           waitlisted: number;
         }[];
+      };
+      activity_set_cover: {
+        Args: { p_activity: string; p_media?: string };
+        Returns: undefined;
       };
       attendance_mark: {
         Args: { p_activity: string; p_status: string; p_user: string };
@@ -1662,6 +1722,11 @@ export type Database = {
       is_confirmed_participant: {
         Args: { p_activity: string; p_user: string };
         Returns: boolean;
+      };
+      media_delete: { Args: { p_id: string }; Returns: string };
+      media_register: {
+        Args: { p_alt: string; p_path: string };
+        Returns: string;
       };
       nickname_check: { Args: { p_nickname: string }; Returns: string };
       nickname_is_valid: { Args: { p_nickname: string }; Returns: boolean };

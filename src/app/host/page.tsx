@@ -99,6 +99,9 @@ export default async function HostPage({ searchParams }: PageProps<"/host">) {
               <Link href="/host/saved" className={s.savedLink}>
                 내 보관함
               </Link>
+              <Link href="/host/media" className={s.savedLink}>
+                이미지 보관함
+              </Link>
               <Link href="/host/new" className={s.create}>
                 활동 만들기
               </Link>

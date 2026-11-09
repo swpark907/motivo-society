@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { isRemoteImage } from "@/lib/platform/media";
 import Link from "next/link";
 import { KindTag } from "@/components/KindTag/KindTag";
 import { LineIcon } from "@/components/LineIcon/LineIcon";
@@ -61,6 +62,7 @@ export function ActivityCard({
         {a.cover ? (
           <Image
             src={a.cover}
+            unoptimized={isRemoteImage(a.cover)}
             alt=""
             fill
             sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 80vw"

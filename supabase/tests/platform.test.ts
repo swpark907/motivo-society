@@ -418,3 +418,90 @@ describe("호스트 보관함", () => {
     );
   });
 });
+
+describe("이미지 보관함과 표지", () => {
+  // 1×1 투명 PNG
+  const PNG = Uint8Array.from(
+    atob(
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==",
+    ),
+    (c) => c.charCodeAt(0),
+  );
+  const upload = (c: Awaited<ReturnType<typeof as>>, path: string) =>
+    c.storage.from("media").upload(path, PNG, { contentType: "image/png" });
+
+  it("내 폴더에 올려 등록하고 내 활동 표지로 쓰며, 표지로 쓰는 동안은 지울 수 없다", async () => {
+    const host = await as("host");
+    const path = `u/${ID.host}/${crypto.randomUUID()}.png`;
+    expect((await upload(host, path)).error).toBeNull();
+    const { data: media, error } = await host.rpc("media_register", {
+      p_path: path,
+      p_alt: "작업실",
+    });
+    expect(error).toBeNull();
+
+    expect(
+      code(
+        (await host.rpc("activity_set_cover", { p_activity: ID.workshop, p_media: media! })).error,
+      ),
+    ).toBeNull();
+    const { data: act } = await host
+      .from("activities")
+      .select("cover_path")
+      .eq("id", ID.workshop)
+      .single();
+    expect(act?.cover_path).toBe(`media:${path}`);
+
+    expect(code((await host.rpc("media_delete", { p_id: media! })).error)).toBe("media_in_use");
+    await host.rpc("activity_set_cover", { p_activity: ID.workshop });
+    expect((await host.rpc("media_delete", { p_id: media! })).data).toBe(path);
+  });
+
+  it("남의 폴더에는 올릴 수 없고, 남의 이미지로 표지를 바꿀 수 없으며, 목록도 안 보인다", async () => {
+    const host = await as("host");
+    const member = await as("member");
+    const path = `u/${ID.host}/${crypto.randomUUID()}.png`;
+    await upload(host, path);
+    const { data: media } = await host.rpc("media_register", { p_path: path, p_alt: "" });
+
+    expect((await upload(member, `u/${ID.host}/${crypto.randomUUID()}.png`)).error).not.toBeNull();
+    expect(code((await member.rpc("media_register", { p_path: path, p_alt: "" })).error)).toBe(
+      "forbidden",
+    );
+    expect(await member.from("media_assets").select("id")).toMatchObject({ data: [] });
+    expect(
+      code(
+        (await member.rpc("activity_set_cover", { p_activity: ID.workshop, p_media: media! }))
+          .error,
+      ),
+    ).toBe("forbidden");
+    // 올라가지 않은 파일은 등록할 수 없다
+    expect(
+      code(
+        (
+          await host.rpc("media_register", {
+            p_path: `u/${ID.host}/${crypto.randomUUID()}.png`,
+            p_alt: "",
+          })
+        ).error,
+      ),
+    ).toBe("file_missing");
+  });
+
+  it("클럽 보관함은 그 클럽에서 활동을 열 수 있는 사람이 쓰고, 그 클럽 활동에만 표지로 쓴다", async () => {
+    const staff = await as("club-staff");
+    const host = await as("host");
+    const path = `c/${ID.club}/${crypto.randomUUID()}.png`;
+    expect((await upload(staff, path)).error).toBeNull();
+    const { data: media, error } = await staff.rpc("media_register", { p_path: path, p_alt: "" });
+    expect(error).toBeNull();
+    expect(
+      code(
+        (await staff.rpc("activity_set_cover", { p_activity: ID.tonight, p_media: media! })).error,
+      ),
+    ).toBeNull();
+    // 바라호스트는 이 클럽 운영진이 아니다
+    expect((await upload(host, `c/${ID.club}/${crypto.randomUUID()}.png`)).error).not.toBeNull();
+    expect(await host.from("media_assets").select("id")).toMatchObject({ data: [] });
+  });
+});

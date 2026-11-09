@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { isRemoteImage } from "@/lib/platform/media";
 import Link from "next/link";
 import { ActivityCard } from "@/components/ActivityCard/ActivityCard";
 import { Avatar } from "@/components/Avatar/Avatar";
@@ -93,7 +94,13 @@ function Next({ item, now }: { item: Data["upcoming"][number]; now: Date }) {
       <article className={s.next}>
         <div className={s.nextCover} data-kind={item.kind}>
           {item.cover && (
-            <Image src={item.cover} alt="" fill sizes="(min-width: 768px) 420px, 100vw" />
+            <Image
+              src={item.cover}
+              unoptimized={isRemoteImage(item.cover)}
+              alt=""
+              fill
+              sizes="(min-width: 768px) 420px, 100vw"
+            />
           )}
           {badge && <span className={s.dayBadge}>{badge}</span>}
         </div>

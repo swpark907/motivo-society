@@ -82,6 +82,16 @@ const ERROR_MESSAGES: Record<string, string> = {
   too_long: "글자 수가 너무 많아요. 줄여서 다시 해 주세요.",
   body_required: "내용을 적어 주세요.",
   saved_missing: "이미 지웠거나 내 보관함에 없는 항목이에요.",
+  file_required: "올릴 이미지를 골라 주세요.",
+  file_too_big: "이미지는 한 장에 5MB까지 올릴 수 있어요.",
+  not_image: "JPG · PNG · WebP 이미지만 올릴 수 있어요.",
+  upload_failed: "이미지를 올리지 못했어요. 잠시 뒤 다시 해 주세요.",
+  file_missing: "이미지 파일을 찾지 못했어요. 다시 올려 주세요.",
+  invalid_path: "올릴 수 없는 위치예요.",
+  media_in_use: "표지로 쓰고 있는 이미지예요. 표지를 바꾼 뒤 지워 주세요.",
+  media_not_usable:
+    "이 활동에는 쓸 수 없는 이미지예요. 클럽 보관함 이미지는 그 클럽 활동에만 써요.",
+  session_cover: "회차 표지는 시즌에서 정해요.",
 };
 
 const NOTICE_MESSAGES: Record<string, string> = {
@@ -120,6 +130,9 @@ const NOTICE_MESSAGES: Record<string, string> = {
   place_saved: "장소를 저장했어요.",
   snippet_saved: "공지 문구를 저장했어요.",
   saved_deleted: "지웠어요.",
+  media_uploaded: "이미지를 올렸어요.",
+  cover_set: "표지를 바꿨어요.",
+  cover_cleared: "표지를 뺐어요. 종류 색과 제목으로 된 기본 표지가 보여요.",
   reseeded: "가짜 데이터를 처음 상태로 되돌렸어요.",
   switched: "사람을 바꿨어요.",
 };
