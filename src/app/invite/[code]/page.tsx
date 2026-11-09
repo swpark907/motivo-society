@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { KindTag } from "@/components/KindTag/KindTag";
-import { previewInvite } from "@/lib/platform/clubs";
+import { myClubStatusBySlug, previewInvite } from "@/lib/platform/clubs";
 import { errorMessage } from "@/lib/platform/messages";
 import { getCurrentUser } from "@/lib/platform/session";
 import { acceptInviteAction } from "../../clubs/[slug]/actions";
@@ -16,6 +16,7 @@ export default async function InvitePage({ params, searchParams }: PageProps<"/i
   const errorCode = (await searchParams).error;
   const [invite, user] = await Promise.all([previewInvite(code), getCurrentUser()]);
   const here = `/invite/${code}`;
+  const status = invite && user ? await myClubStatusBySlug(invite.slug, user.id) : null;
 
   return (
     <main className={`paper ${s.page}`}>
@@ -50,7 +51,21 @@ export default async function InvitePage({ params, searchParams }: PageProps<"/i
               </p>
             )}
 
-            {!invite.valid ? (
+            {status === "active" ? (
+              <>
+                <p className={s.lead}>이미 이 클럽의 멤버예요.</p>
+                <Link href={`/clubs/${invite.slug}`} className={s.cta}>
+                  클럽으로 가기
+                </Link>
+              </>
+            ) : status === "banned" ? (
+              <>
+                <p className={s.lead}>이 클럽에서 내보내져 초대로도 가입할 수 없어요.</p>
+                <Link href="/clubs" className={s.ghost}>
+                  다른 클럽 둘러보기
+                </Link>
+              </>
+            ) : !invite.valid ? (
               <>
                 <p className={s.lead}>
                   이 초대는 만료됐거나 더 쓸 수 없어요. 클럽 화면에서 직접 가입할 수 있어요.

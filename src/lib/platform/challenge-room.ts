@@ -54,23 +54,35 @@ export async function getChallengeRoom(
   const supabase = await createSessionClient();
   const today = kstDateKey(now);
 
-  const [{ data: d }, { data: missions }, { data: certs }, { data: progress }] = await Promise.all([
-    supabase
-      .from("challenge_details")
-      .select("starts_on, ends_on, cert_rule, cert_formats, completion_threshold, certs_visibility")
-      .eq("activity_id", activityId)
-      .maybeSingle(),
-    supabase.from("challenge_missions").select("day_no, title, body").eq("activity_id", activityId),
-    // 내 것 + (보이면) 다른 사람 것. 읽기 정책이 범위를 정한다.
-    supabase
-      .from("certifications")
-      .select("user_id, cert_date, body, link, status, rejected_reason")
-      .eq("activity_id", activityId)
-      .order("cert_date", { ascending: false })
-      .order("created_at", { ascending: false })
-      .limit(500),
-    supabase.rpc("challenge_progress", { p_activity: activityId }),
-  ]);
+  const [{ data: d }, { data: missions }, { data: certs }, { data: progress }, { data: part }] =
+    await Promise.all([
+      supabase
+        .from("challenge_details")
+        .select(
+          "starts_on, ends_on, cert_rule, cert_formats, completion_threshold, certs_visibility",
+        )
+        .eq("activity_id", activityId)
+        .maybeSingle(),
+      supabase
+        .from("challenge_missions")
+        .select("day_no, title, body")
+        .eq("activity_id", activityId),
+      // 내 것 + (보이면) 다른 사람 것. 읽기 정책이 범위를 정한다.
+      supabase
+        .from("certifications")
+        .select("user_id, cert_date, body, link, status, rejected_reason")
+        .eq("activity_id", activityId)
+        .order("cert_date", { ascending: false })
+        .order("created_at", { ascending: false })
+        .limit(500),
+      supabase.rpc("challenge_progress", { p_activity: activityId }),
+      supabase
+        .from("participations")
+        .select("created_at")
+        .eq("activity_id", activityId)
+        .eq("user_id", userId)
+        .maybeSingle(),
+    ]);
   if (!d) return null;
 
   const rule = d.cert_rule as ChallengeRoom["rule"];
@@ -78,6 +90,13 @@ export async function getChallengeRoom(
   const mine = all.filter((c) => c.user_id === userId);
   const todayRow = mine.find((c) => c.cert_date === today);
   const dayNo = dayNoOf(d.starts_on, today);
+  // 합류한 날: 신청한 날과 내 가장 이른 인증 날 중 앞선 날(그 전 날은 "빠짐"으로 세지 않는다).
+  const joinedOn = [
+    part ? kstDateKey(new Date(part.created_at)) : null,
+    ...mine.map((c) => c.cert_date),
+  ]
+    .filter((x): x is string => !!x)
+    .reduce((a, b) => (b < a ? b : a), today);
   const mission = missionFor(
     (missions ?? []).map((m) => ({ dayNo: m.day_no, title: m.title, body: m.body })),
     dayNo,
@@ -129,6 +148,7 @@ export async function getChallengeRoom(
       today,
       mine.map((c) => ({ date: c.cert_date, status: c.status as MyCert["status"] })),
       rule,
+      joinedOn,
     ),
     accepted: me?.accepted ?? 0,
     threshold: d.completion_threshold,

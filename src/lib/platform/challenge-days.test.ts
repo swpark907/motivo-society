@@ -43,6 +43,11 @@ describe("챌린지 날짜", () => {
     expect(cells[3]).toMatchObject({ date: "2026-11-08", no: 4 });
   });
 
+  it("중간에 합류했으면 합류 전 날은 빠짐이 아니다", () => {
+    const cells = dayStrip("2026-11-05", "2026-11-09", "2026-11-09", [], "daily", "2026-11-08");
+    expect(cells.map((c) => c.state)).toEqual(["rest", "rest", "rest", "missed", "today"]);
+  });
+
   it("주 N회·총 N회는 빈 날을 빠짐으로 보지 않는다", () => {
     const cells = dayStrip("2026-11-05", "2026-11-07", "2026-11-07", [], "weekly_n");
     expect(cells.map((c) => c.state)).toEqual(["rest", "rest", "today"]);

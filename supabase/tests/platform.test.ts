@@ -305,6 +305,29 @@ describe("초대 링크 미리보기", () => {
     expect(Object.keys(preview).sort()).toEqual(["members", "name", "slug", "tagline", "valid"]);
   });
 
+  it("승인 대기 중인 사람도 초대 링크로는 바로 멤버가 되고, 같은 신청을 또 할 수는 없다", async () => {
+    const guest = await as("guest");
+    expect((await guest.rpc("club_join", { p_club: ID.videoClub })).data).toBe("pending");
+    expect(code((await guest.rpc("club_join", { p_club: ID.videoClub })).error)).toBe(
+      "already_member",
+    );
+    const { data: invite } = await (
+      await as("host")
+    ).rpc("club_invite_create", { p_club: ID.videoClub });
+    const { error } = await guest.rpc("club_join_by_invite", { p_code: String(invite) });
+    expect(error).toBeNull();
+    const { data: me } = await guest
+      .from("club_members")
+      .select("status")
+      .eq("club_id", ID.videoClub)
+      .eq("user_id", ID.guest)
+      .single();
+    expect(me?.status).toBe("active");
+    expect(code((await guest.rpc("club_join_by_invite", { p_code: String(invite) })).error)).toBe(
+      "already_member",
+    );
+  });
+
   it("없는 코드는 아무 클럽도 알려 주지 않는다", async () => {
     const { data } = await anon().rpc("club_invite_preview", { p_code: "abcdef123456" });
     expect(data).toEqual({ valid: false });

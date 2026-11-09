@@ -18,6 +18,17 @@ test.beforeEach(async ({ request }, info) => {
   await reseedSandbox(request);
 });
 
+// 여러 사람을 띄우려고 테스트가 직접 만든 창은 끝나면 닫는다.
+// 열어 둔 채 다음 테스트로 넘어가면 개발 서버가 느려져 다음 로그인이 30초를 넘기곤 했다(L13).
+test.afterEach(async ({ browser, context }) => {
+  await Promise.all(
+    browser
+      .contexts()
+      .filter((c) => c !== context)
+      .map((c) => c.close()),
+  );
+});
+
 // 로그인·가입하는 여정도 여기서 돈다. 다른 파일에 있으면 "처음 상태로"가 막 만든 세션·프로필을 지운다.
 test.describe("로그인과 가입", () => {
   test("로그인이 필요한 화면 → 메일 링크 → 원래 화면으로 돌아온다", async ({
@@ -589,6 +600,14 @@ test.describe("클럽", () => {
     await expect(
       guest.getByRole("complementary", { name: "가입" }).getByText("멤버예요"),
     ).toBeVisible();
+
+    // 같은 링크를 다시 열면 가입 버튼 대신 클럽으로 보낸다.
+    await guest.goto(path);
+    await expect(guest.getByText("이미 이 클럽의 멤버예요.")).toBeVisible();
+    await expect(guest.getByRole("link", { name: "클럽으로 가기" })).toHaveAttribute(
+      "href",
+      "/clubs/ai-video-club",
+    );
   });
 
   test("강퇴된 사람은 가입할 수 없다고 안내받고, 없는 초대 코드는 찾을 수 없다고 나온다", async ({
@@ -609,5 +628,100 @@ test.describe("클럽", () => {
 
     await page.goto("/invite/abcdef123456");
     await expect(page.getByRole("heading", { name: "찾을 수 없는 초대예요" })).toBeVisible();
+  });
+});
+
+// L13 회원 여정 하나로: 처음 온 사람이 가입해 시즌·챌린지·클럽까지 들어오는 한 줄의 길.
+test.describe("회원 여정", () => {
+  test("새 메일 가입 → 온보딩 → 발견 → 유료 시즌 → 입금 확인 → 내 일정 → 챌린지 인증 → 클럽 가입", async ({
+    browser,
+    request,
+  }) => {
+    test.setTimeout(180_000);
+    const me = await (await browser.newContext()).newPage();
+    const email = testEmail("journey");
+    const nickname = testNickname();
+
+    // 1) 가입과 온보딩: 메일 링크로 들어와 이름을 정하면 발견으로 간다.
+    await signUpByMail(me, request, email, "/login?next=%2Fexplore");
+    await expect(me.getByRole("heading", { level: 1 })).toContainText("이름을 정해 주세요");
+    await me.getByLabel("닉네임").fill(nickname);
+    await expect(me.getByText("쓸 수 있는 닉네임이에요.")).toBeVisible();
+    await me.getByText("바이브코딩", { exact: true }).click();
+    await me.getByRole("button", { name: "시작하기" }).click();
+    await expect(me).toHaveURL(/\/explore$/, { timeout: 30_000 });
+
+    // 2) 발견에서 시즌을 찾아 신청한다(유료 → 입금 안내).
+    await me
+      .getByRole("link", { name: /4주 바이브코딩 시즌/ })
+      .first()
+      .click();
+    await expect(me.getByRole("heading", { level: 1, name: "4주 바이브코딩 시즌" })).toBeVisible({
+      timeout: 30_000,
+    });
+    await me
+      .getByRole("complementary", { name: "신청" })
+      .getByRole("link", { name: /신청/ })
+      .click();
+    await expect(me.getByRole("heading", { name: "이렇게 신청할게요" })).toBeVisible();
+    await me.getByLabel("입금자명").fill("김여정");
+    await me.getByText("취소·환불 규정을 확인했어요").click();
+    await me.getByRole("button", { name: "40,000원 · 중간 합류 신청" }).click();
+    // 신청 뒤 결과 화면을 개발 서버가 처음 그리면 오래 걸린다.
+    await expect(me.getByRole("heading", { name: "입금하면 확정돼요" })).toBeVisible({
+      timeout: 30_000,
+    });
+
+    // 3) 운영진이 입금을 확인하면 확정된다.
+    const owner = await (await browser.newContext()).newPage();
+    await signInAs(owner, "모쏘운영", "/demo/platform/ops");
+    await owner
+      .getByRole("row", { name: /김여정/ })
+      .getByRole("button", { name: "입금 확인" })
+      .click();
+    await expect(owner.getByRole("row", { name: /김여정/ })).toHaveCount(0);
+    await me.reload();
+    await expect(me.getByRole("heading", { name: "참가가 확정됐어요" })).toBeVisible();
+
+    // 4) 내 일정에 시즌의 남은 회차가 회차마다 보인다(지난 1회차는 없다).
+    await me.goto("/me/schedule");
+    const main = me.getByRole("main");
+    await expect(main.getByText(/2회차 · 첫 화면/)).toBeVisible();
+    await expect(main.getByText(/3회차 · 기능 붙이기/)).toBeVisible();
+    await expect(main.getByText(/1회차 · 기획/)).toHaveCount(0);
+
+    // 5) 진행 중인 챌린지에 중도 합류해 오늘 인증을 올린다.
+    await me.goto("/activities/daily-build-2w/apply");
+    await me.getByRole("button", { name: "중간 합류 신청" }).click();
+    await expect(me.getByRole("heading", { name: "참가가 확정됐어요" })).toBeVisible();
+    await me.goto("/activities/daily-build-2w");
+    const room = me.locator("#today");
+    await expect(room.getByRole("heading", { name: "내 챌린지" })).toBeVisible();
+    // 오늘 합류했으니 지난 날은 "빠짐"이 아니다.
+    await expect(room.getByRole("list", { name: "날짜별 내 인증" })).not.toContainText("빠짐");
+    await room.getByLabel("오늘 한 것").fill("시즌 첫 화면을 AI와 같이 그렸어요.");
+    await room.getByRole("button", { name: "인증 올리기" }).click();
+    await expect(room.getByText("오늘 인증을 올렸어요", { exact: true })).toBeVisible();
+    await expect(room.getByRole("listitem").filter({ hasText: `${nickname} (나)` })).toContainText(
+      "인증 1번",
+    );
+
+    // 6) 챌린지를 연 클럽에 가입하면 내 클럽에 들어온다.
+    await me.goto("/clubs/weekend-vibe");
+    await me
+      .getByRole("complementary", { name: "가입" })
+      .getByRole("button", { name: "가입하기" })
+      .click();
+    await expect(me.getByRole("status").first()).toHaveText("클럽에 가입했어요.");
+
+    // 7) 홈에서 한눈에: 다음 일정은 시즌 회차, 내 사람들에 클럽.
+    await me.goto("/");
+    await expect(me.getByRole("heading", { level: 1 })).toContainText(`${nickname}님`);
+    await expect(me.getByRole("region", { name: "다음 일정", exact: true })).toContainText(
+      "4주 바이브코딩 시즌",
+    );
+    await expect(me.getByRole("region", { name: "내 사람들" })).toContainText(
+      "주말 바이브코딩 클럽",
+    );
   });
 });

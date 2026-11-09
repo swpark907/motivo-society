@@ -102,7 +102,9 @@ export async function getMySchedule(
       const shown =
         status === "confirmed"
           ? own
-          : own.filter((x) => (x.ends_at ?? x.starts_at!) > now.toISOString()).slice(0, 1);
+          : own
+              .filter((x) => new Date(x.ends_at ?? x.starts_at!).getTime() > now.getTime())
+              .slice(0, 1);
       for (const x of shown) {
         rows.push({
           ...base,

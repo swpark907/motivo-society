@@ -143,6 +143,18 @@ export async function previewInvite(code: string): Promise<InvitePreview | null>
   return json as InvitePreview;
 }
 
+/** 초대받은 클럽에서 내 상태(이미 멤버면 가입 버튼 대신 클럽으로 보낸다). */
+export async function myClubStatusBySlug(slug: string, userId: string): Promise<MemberStatus> {
+  const supabase = await createSessionClient();
+  const { data } = await supabase
+    .from("club_members")
+    .select("status, club:clubs!inner(slug)")
+    .eq("user_id", userId)
+    .eq("club.slug", slug)
+    .maybeSingle();
+  return (data?.status as MemberStatus) ?? null;
+}
+
 /** 초대 코드로 가입한다(승인제여도 바로). 클럽 slug 또는 오류 코드. */
 export async function joinByInvite(code: string): Promise<{ ok: true } | { error: string }> {
   const supabase = await createSessionClient();

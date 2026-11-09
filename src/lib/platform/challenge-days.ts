@@ -34,13 +34,17 @@ export type DayCell = {
   state: "done" | "rejected" | "missed" | "today" | "rest";
 };
 
-/** 기간의 날마다 내 인증 상태. 매일 인증일 때만 지난 빈 날을 "빠짐"으로 본다. */
+/**
+ * 기간의 날마다 내 인증 상태. 매일 인증일 때만 지난 빈 날을 "빠짐"으로 본다.
+ * 중간에 합류했으면(joinedOn) 합류 전 날은 빠짐이 아니다 — 그때는 인증할 수 없었다.
+ */
 export function dayStrip(
   startsOn: string,
   endsOn: string,
   today: string,
   certs: { date: string; status: "accepted" | "rejected" }[],
   rule: "daily" | "weekly_n" | "total_n",
+  joinedOn: string = startsOn,
 ): DayCell[] {
   const byDate = new Map(certs.map((c) => [c.date, c.status]));
   const cells: DayCell[] = [];
@@ -50,7 +54,7 @@ export function dayStrip(
     if (cert === "accepted") state = "done";
     else if (cert === "rejected") state = "rejected";
     else if (date === today) state = "today";
-    else if (date < today && rule === "daily") state = "missed";
+    else if (date < today && date >= joinedOn && rule === "daily") state = "missed";
     cells.push({ date, no: dayNoOf(startsOn, date), state });
   }
   return cells;
