@@ -26,6 +26,11 @@
   font-weight: 600;
 
   a {
+    // 글자는 그대로, 누르는 영역만 44px로(위아래 여백을 음수 여백으로 상쇄).
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    margin-block: -12px;
     color: var(--ink);
     text-decoration: none;
 
@@ -373,4 +378,49 @@
   margin: 0;
   color: var(--ink-muted);
   font-size: 0.8rem;
+}
+
+// ── 찾을 수 없음
+.missing {
+  display: grid;
+  gap: var(--space-3);
+  max-width: 520px;
+  margin: 0 auto;
+  padding: var(--space-16) var(--space-4);
+
+  h1 {
+    margin: 0;
+    font-size: clamp(1.6rem, 5vw, 2.25rem);
+    font-weight: 800;
+  }
+
+  p {
+    margin: 0;
+    color: var(--ink-muted);
+    line-height: 1.6;
+  }
+}
+
+.missingActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+.ghostLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 52px;
+  padding: 0 var(--space-6);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  color: var(--ink);
+  font-weight: 800;
+  text-decoration: none;
+  transition: background-color 120ms;
+
+  &:hover {
+    background: var(--white);
+  }
 }

@@ -97,6 +97,7 @@
 }
 
 .login {
+  position: relative;
   display: inline-flex;
   align-items: center;
   min-height: 36px;
@@ -111,6 +112,13 @@
 
   &:hover {
     background: var(--grey-1);
+  }
+
+  // 보이는 알약은 36px, 누르는 영역은 위아래로 넓혀 44px.
+  &::before {
+    content: "";
+    position: absolute;
+    inset: -4px 0;
   }
 }
 

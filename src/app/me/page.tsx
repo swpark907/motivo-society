@@ -6,6 +6,7 @@ import { PlatformPage } from "@/components/PlatformPage/PlatformPage";
 import { requireUser } from "@/lib/platform/session";
 import { signOut } from "../login/actions";
 import s from "./me.module.scss";
+import { SubmitButton } from "@/components/SubmitButton/SubmitButton";
 
 export const metadata: Metadata = {
   title: "나",
@@ -33,9 +34,9 @@ export default async function MePage() {
           <p className={s.email}>{user.email}</p>
         </div>
         <form action={signOut}>
-          <button type="submit" className={s.signOut}>
+          <SubmitButton className={s.signOut} pendingLabel="나가는 중…">
             로그아웃
-          </button>
+          </SubmitButton>
         </form>
       </section>
 

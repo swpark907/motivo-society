@@ -6,6 +6,7 @@ import { errorMessage } from "@/lib/platform/messages";
 import { getCurrentUser } from "@/lib/platform/session";
 import { acceptInviteAction } from "../../clubs/[slug]/actions";
 import s from "./invite.module.scss";
+import { SubmitButton } from "@/components/SubmitButton/SubmitButton";
 
 export const metadata: Metadata = { title: "클럽 초대", robots: { index: false } };
 
@@ -70,9 +71,9 @@ export default async function InvitePage({ params, searchParams }: PageProps<"/i
                 <input type="hidden" name="code" value={code} />
                 <input type="hidden" name="slug" value={invite.slug} />
                 <p className={s.muted}>초대로 들어오면 승인 없이 바로 멤버가 돼요.</p>
-                <button type="submit" className={s.cta}>
+                <SubmitButton className={s.cta} pendingLabel="가입하는 중…">
                   {user.nickname}님으로 가입하기
-                </button>
+                </SubmitButton>
                 <Link href={`/clubs/${invite.slug}`} className={s.ghost}>
                   먼저 클럽 둘러보기
                 </Link>

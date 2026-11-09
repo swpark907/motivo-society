@@ -115,7 +115,10 @@ const NOTICE_MESSAGES: Record<string, string> = {
 };
 
 export function errorMessage(code: string): string {
-  return ERROR_MESSAGES[code] ?? `처리하지 못했어요 (${code}).`;
+  // 모르는 코드는 사람 말로만. 코드는 개발 환경에서만 덧붙인다.
+  const fallback = "처리하지 못했어요. 잠시 뒤 다시 해 주세요.";
+  if (ERROR_MESSAGES[code]) return ERROR_MESSAGES[code];
+  return process.env.NODE_ENV === "development" ? `${fallback} (${code})` : fallback;
 }
 
 export function noticeMessage(code: string): string | null {

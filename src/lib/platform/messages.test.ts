@@ -15,9 +15,10 @@ describe("platform messages", () => {
     expect(errorCodeFrom(undefined)).toBe("unknown");
   });
 
-  it("falls back to the code for unknown errors", () => {
+  it("모르는 오류는 사람 말로, 코드는 개발 환경에서만", () => {
     expect(errorMessage("members_only")).toContain("클럽 멤버");
-    expect(errorMessage("weird")).toContain("weird");
+    expect(errorMessage("weird")).toContain("잠시 뒤 다시 해 주세요");
+    expect(errorMessage("weird").includes("weird")).toBe(process.env.NODE_ENV === "development");
   });
 
   it("returns null for unknown notices", () => {

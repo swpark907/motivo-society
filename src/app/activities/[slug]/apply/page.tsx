@@ -14,6 +14,7 @@ import { cancelApplication } from "./actions";
 import { ApplyForm } from "./ApplyForm";
 import { PaymentGuide } from "./PaymentGuide";
 import s from "./apply.module.scss";
+import { SubmitButton } from "@/components/SubmitButton/SubmitButton";
 
 export const metadata: Metadata = { title: "신청", robots: { index: false } };
 
@@ -271,9 +272,9 @@ function Result({ a, mine }: { a: ActivityDetail; mine: MyApplication }) {
                   : "취소하면 신청 기록이 없어져요."}{" "}
                 다시 신청할 수 있어요.
               </p>
-              <button type="submit" className={s.danger}>
+              <SubmitButton className={s.danger} pendingLabel="취소하는 중…">
                 정말 취소할게요
-              </button>
+              </SubmitButton>
             </form>
           </details>
         )}

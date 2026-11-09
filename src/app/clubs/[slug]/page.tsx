@@ -10,6 +10,7 @@ import { errorMessage, noticeMessage } from "@/lib/platform/messages";
 import { InvitePanel } from "./InvitePanel";
 import { joinAction, leaveAction } from "./actions";
 import s from "./club.module.scss";
+import { SubmitButton } from "@/components/SubmitButton/SubmitButton";
 
 type Props = PageProps<"/clubs/[slug]">;
 
@@ -150,9 +151,9 @@ function JoinCard({ club, state }: { club: ClubDetail; state: ClubJoinState }) {
           <form action={joinAction}>
             <input type="hidden" name="clubId" value={club.id} />
             <input type="hidden" name="slug" value={club.slug} />
-            <button type="submit" className={s.cta}>
+            <SubmitButton className={s.cta} pendingLabel="처리하는 중…">
               {state.label}
-            </button>
+            </SubmitButton>
           </form>
         )}
         {(state.kind === "member" || state.kind === "pending" || state.kind === "banned") && (
@@ -167,9 +168,9 @@ function JoinCard({ club, state }: { club: ClubDetail; state: ClubJoinState }) {
               <input type="hidden" name="clubId" value={club.id} />
               <input type="hidden" name="slug" value={club.slug} />
               <p>나가도 다시 가입할 수 있어요. 신청한 활동은 그대로 남아요.</p>
-              <button type="submit" className={s.danger}>
+              <SubmitButton className={s.danger} pendingLabel="나가는 중…">
                 정말 나갈게요
-              </button>
+              </SubmitButton>
             </form>
           </details>
         )}

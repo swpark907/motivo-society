@@ -7,6 +7,7 @@ import { getCurrentUser } from "@/lib/platform/session";
 import { devSignInAs, signOut } from "./actions";
 import { LoginForm } from "./LoginForm";
 import s from "./login.module.scss";
+import { SubmitButton } from "@/components/SubmitButton/SubmitButton";
 
 export const metadata: Metadata = {
   title: "로그인",
@@ -50,9 +51,9 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
                 계속하기
               </Link>
               <form action={signOut}>
-                <button type="submit" className={s.ghost}>
+                <SubmitButton className={s.ghost} pendingLabel="나가는 중…">
                   로그아웃
-                </button>
+                </SubmitButton>
               </form>
             </div>
           </div>
@@ -83,10 +84,20 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
             <form action={devSignInAs} className={s.personas}>
               <input type="hidden" name="next" value={next} />
               {PERSONAS.map((p) => (
-                <button key={p.handle} type="submit" name="handle" value={p.handle}>
+                <SubmitButton
+                  key={p.handle}
+                  name="handle"
+                  value={p.handle}
+                  pendingLabel={
+                    <>
+                      <strong>{p.nickname}</strong>
+                      <small>들어가는 중…</small>
+                    </>
+                  }
+                >
                   <strong>{p.nickname}</strong>
                   <small>{p.role}</small>
-                </button>
+                </SubmitButton>
               ))}
             </form>
           </details>
