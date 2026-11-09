@@ -905,3 +905,101 @@ test.describe("활동 관리", () => {
     await expect(page.getByText("참가자4")).toHaveCount(0);
   });
 });
+
+// H03 활동 만들기: 단계마다 검사하고, 확인에서 고친 뒤 초안으로 만들면 그 활동의 관리 화면으로 간다.
+test.describe("활동 만들기", () => {
+  /** 오늘(한국)에서 n일 뒤의 "YYYY-MM-DD". */
+  function kstDay(n: number): string {
+    return new Date(Date.now() + 9 * 3600_000 + n * 86_400_000).toISOString().slice(0, 10);
+  }
+
+  test("호스트는 단계를 따라 모임을 만들고, 확인에서 고친 뒤 초안을 공개 전 관리 화면에서 본다", async ({
+    page,
+  }) => {
+    await signInAs(page, "바라호스트", "/host");
+    await page.getByRole("link", { name: "활동 만들기" }).click();
+    await expect(page).toHaveURL(/\/host\/new$/);
+
+    // 1. 종류·주최
+    await page.getByRole("radio", { name: /^모임/ }).check();
+    await page.getByRole("button", { name: "다음" }).click();
+    await expect(page.getByText("누구 이름으로 열지 골라 주세요.")).toBeVisible();
+    await page.getByRole("radio", { name: /개인 호스트/ }).check();
+    await page.getByRole("button", { name: "다음" }).click();
+
+    // 2. 기본 정보: 제목 없이 넘어가지 않는다
+    await expect(page.getByRole("heading", { name: "2. 기본 정보" })).toBeFocused();
+    await page.getByRole("button", { name: "다음" }).click();
+    await expect(page.getByText("제목을 적어 주세요.")).toBeVisible();
+    await page.getByLabel("제목").fill("연남동 AI 수다");
+    await page.getByLabel("지역 (선택)").fill("서울 마포구");
+    await page.getByRole("button", { name: "다음" }).click();
+
+    // 3. 일정(한국 시간)
+    await page.getByLabel("시작", { exact: true }).fill(`${kstDay(10)}T19:30`);
+    await page.getByRole("button", { name: "다음" }).click();
+
+    // 4. 자리·가격
+    await page.getByLabel("정원 (선택)").fill("6");
+    await page.getByRole("button", { name: "다음" }).click();
+
+    // 5. 확인 → 제목 고치기 → 다시 확인
+    const summary = page.getByRole("region", { name: "5. 확인" });
+    await expect(summary).toContainText("연남동 AI 수다");
+    await expect(summary).toContainText("정원 6명");
+    await page.getByRole("button", { name: "제목 고치기" }).click();
+    await page.getByLabel("제목").fill("연남동 AI 수다 모임");
+    for (let i = 0; i < 3; i += 1) await page.getByRole("button", { name: "다음" }).click();
+    await expect(page.getByRole("region", { name: "5. 확인" })).toContainText(
+      "연남동 AI 수다 모임",
+    );
+
+    await page.getByRole("button", { name: "초안으로 만들기" }).click();
+    await expect(page).toHaveURL(/\/host\/activities\/[0-9a-f-]{36}\?notice=activity_created$/, {
+      timeout: 30_000,
+    });
+    await expect(page.getByRole("status")).toHaveText(
+      "초안으로 만들었어요. 확인하고 공개하면 목록에 보여요.",
+    );
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("연남동 AI 수다 모임");
+    await expect(page.getByRole("button", { name: "공개하기" })).toBeVisible();
+    await expect(page.getByRole("region", { name: "개요" })).toContainText("0/6명");
+  });
+
+  test("클럽 운영진은 클럽 챌린지를 만들고, 매일 인증보다 큰 완주 조건은 단계에서 막힌다", async ({
+    page,
+  }) => {
+    await signInAs(page, "클럽운영진", "/host/new");
+    await page.getByRole("radio", { name: /^챌린지/ }).check();
+    await page.getByRole("radio", { name: /주말 바이브코딩 클럽/ }).check();
+    await page.getByRole("button", { name: "다음" }).click();
+    await page.getByLabel("제목").fill("1주 프롬프트 다듬기");
+    await page.getByRole("button", { name: "다음" }).click();
+
+    await page.getByLabel("시작일").fill(kstDay(1));
+    await page.getByLabel("종료일").fill(kstDay(7));
+    await page.getByLabel("완주 조건 (인정된 인증 횟수)").fill("8");
+    await page.getByRole("button", { name: "다음" }).click();
+    await expect(page.getByText(/기간 일수\(7일\)를 넘을 수 없어요/)).toBeVisible();
+    await page.getByLabel("완주 조건 (인정된 인증 횟수)").fill("5");
+    await page.getByRole("button", { name: "다음" }).click();
+
+    // 클럽 주최면 멤버 전용을 고를 수 있다
+    await page.getByLabel("누가 신청할 수 있나요").selectOption("club_members");
+    await page.getByRole("button", { name: "다음" }).click();
+    await expect(page.getByRole("region", { name: "5. 확인" })).toContainText(
+      "클럽 멤버만 · 신청하면 바로 확정",
+    );
+    await page.getByRole("button", { name: "초안으로 만들기" }).click();
+    await expect(page).toHaveURL(/\/host\/activities\/[0-9a-f-]{36}\?notice=activity_created$/, {
+      timeout: 30_000,
+    });
+    await expect(page.getByRole("region", { name: "개요" })).toContainText("주말 바이브코딩 클럽");
+  });
+
+  test("활동을 열 자격이 없으면 만들기 대신 무엇이 필요한지 알려 준다", async ({ page }) => {
+    await signInAs(page, "멤버하나", "/host/new");
+    await expect(page.getByText("아직 활동을 열 수 있는 자격이 없어요")).toBeVisible();
+    await expect(page.getByRole("button", { name: "다음" })).toHaveCount(0);
+  });
+});

@@ -1,0 +1,431 @@
+// 활동 만들기 — 플랫폼 제품 화면 예외(라운드 12~16px, 의미에만 색).
+// 오렌지는 마지막 "초안으로 만들기" 하나에만. 중간 "다음"은 검정 기준 버튼.
+
+.wrap {
+  display: grid;
+  scroll-margin-top: calc(var(--gnb-height) + var(--space-4));
+  gap: var(--space-4);
+  max-width: 48rem;
+}
+
+// ── 단계 표시
+.steps {
+  display: flex;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  overflow-x: auto;
+  list-style: none;
+  scrollbar-width: none;
+
+  li {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: 6px;
+    min-height: 36px;
+    padding: 0 var(--space-3) 0 6px;
+    border-radius: 999px;
+    color: var(--ink-muted);
+    font-size: 0.85rem;
+    font-weight: 700;
+
+    > span:first-child {
+      display: inline-grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      font-size: 0.75rem;
+    }
+
+    &[data-done="true"] > span:first-child {
+      border-color: var(--ink);
+      background: var(--ink);
+      color: var(--surface);
+    }
+
+    &[aria-current="step"] {
+      background: var(--ink);
+      color: var(--surface);
+
+      > span:first-child {
+        border-color: var(--surface);
+      }
+    }
+  }
+}
+
+// 좁은 화면은 지금 단계만 이름을 보이고 나머지는 번호만(이름은 화면 읽기용으로 남긴다).
+.stepLabel {
+  li:not([aria-current="step"]) > & {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+
+    @include up(md) {
+      position: static;
+      width: auto;
+      height: auto;
+      overflow: visible;
+      clip-path: none;
+    }
+  }
+}
+
+// ── 단계 카드
+.card {
+  display: grid;
+  gap: var(--space-6);
+  padding: var(--space-6) var(--space-4);
+  border-radius: 16px;
+  background: var(--white);
+
+  @include up(md) {
+    padding: var(--space-8);
+  }
+
+  h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 800;
+
+    // 단계를 옮길 때 화면 읽기용으로 포커스를 주는 제목이다(누르는 요소가 아니라 테두리를 그리지 않는다).
+    &:focus {
+      outline: none;
+    }
+  }
+}
+
+.fields {
+  display: grid;
+  gap: var(--space-4);
+
+  @include up(md) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.wideField,
+.note {
+  grid-column: 1 / -1;
+}
+
+.note {
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 0.9rem;
+}
+
+.field {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  min-width: 0;
+
+  label {
+    font-size: 0.9rem;
+    font-weight: 800;
+  }
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+    min-height: 48px;
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--white);
+    color: var(--ink);
+    font: inherit;
+    font-size: 1rem;
+
+    &[aria-invalid="true"] {
+      border-color: var(--accent);
+    }
+  }
+
+  textarea {
+    resize: vertical;
+    line-height: 1.5;
+  }
+}
+
+.hint {
+  color: var(--ink-muted);
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.error {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.errorBox {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--accent);
+  border-radius: 12px;
+  font-weight: 700;
+}
+
+// ── 선택 카드(종류 · 주최)
+.choiceGroup {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+
+  legend {
+    margin-bottom: var(--space-2);
+    font-weight: 800;
+  }
+}
+
+.choice {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  min-height: 64px;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background-color 120ms;
+
+  &:hover {
+    background: var(--surface);
+  }
+
+  &:has(input:checked) {
+    border-color: var(--ink);
+    background: var(--surface);
+  }
+
+  &:has(input:focus-visible) {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+
+  input {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    margin: 2px 0 0;
+    accent-color: var(--ink);
+  }
+
+  span {
+    display: grid;
+    gap: 2px;
+  }
+
+  strong {
+    font-weight: 800;
+  }
+
+  small {
+    color: var(--ink-muted);
+    font-size: 0.85rem;
+    line-height: 1.5;
+    word-break: keep-all;
+  }
+}
+
+// ── 둘 중 하나(진행 방식 · 참가 확정)
+.segmented {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+
+  legend {
+    width: 100%;
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+    font-weight: 800;
+  }
+
+  label {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 44px;
+    padding: 0 var(--space-4);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 120ms;
+
+    &:has(input:checked) {
+      border-color: var(--ink);
+      background: var(--ink);
+      color: var(--surface);
+    }
+
+    &:has(input:focus-visible) {
+      outline: 2px solid var(--ink);
+      outline-offset: 2px;
+    }
+  }
+
+  input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+.checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  border: 0;
+
+  legend {
+    width: 100%;
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+    font-weight: 800;
+  }
+}
+
+.checks label,
+.checkLine {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  font-weight: 700;
+  cursor: pointer;
+
+  input {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--ink);
+  }
+}
+
+// ── 확인
+.summary {
+  display: grid;
+  gap: 0;
+  margin: 0;
+
+  > div {
+    display: grid;
+    grid-template-columns: 5rem minmax(0, 1fr) auto;
+    gap: var(--space-3);
+    align-items: center;
+    min-height: 52px;
+    padding: var(--space-2) 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  dt {
+    color: var(--ink-muted);
+    font-size: 0.85rem;
+    font-weight: 700;
+  }
+
+  dd {
+    margin: 0;
+    font-weight: 700;
+    line-height: 1.5;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
+}
+
+.link {
+  min-height: 44px;
+  padding: 0 var(--space-2);
+  border: 0;
+  background: none;
+  color: var(--ink-muted);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--ink);
+  }
+}
+
+// ── 아래 이동
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding-top: var(--space-2);
+
+  form {
+    display: contents;
+  }
+}
+
+.primary,
+.next,
+.ghost {
+  min-height: 48px;
+  padding: 0 var(--space-6);
+  border-radius: 12px;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background-color 120ms;
+
+  &:disabled {
+    cursor: progress;
+    opacity: 0.6;
+  }
+}
+
+.primary {
+  border: 0;
+  background: var(--accent);
+  color: var(--white);
+
+  &:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--accent) 85%, var(--black));
+  }
+}
+
+.next {
+  border: 0;
+  background: var(--ink);
+  color: var(--surface);
+
+  &:hover {
+    background: color-mix(in srgb, var(--ink) 85%, var(--surface));
+  }
+}
+
+.ghost {
+  border: 1px solid var(--line);
+  background: var(--white);
+  color: var(--ink);
+
+  &:hover {
+    background: var(--surface);
+  }
+}

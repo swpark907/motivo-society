@@ -90,9 +90,16 @@ export default async function HostPage({ searchParams }: PageProps<"/host">) {
       </section>
 
       <section className={s.acts} aria-labelledby="acts-h">
-        <h2 id="acts-h" className={s.sectionTitle}>
-          내가 연 활동
-        </h2>
+        <div className={s.actsHead}>
+          <h2 id="acts-h" className={s.sectionTitle}>
+            내가 연 활동
+          </h2>
+          {(access.hostTier || access.clubCreate || access.official) && (
+            <Link href="/host/new" className={s.create}>
+              활동 만들기
+            </Link>
+          )}
+        </div>
 
         <nav className={s.tabs} aria-label="활동 나누기">
           {HOST_TABS.map((t) => (

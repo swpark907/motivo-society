@@ -1,4 +1,6 @@
 import type { ActivityKind } from "./explore-filters";
+import type { CreateOptions } from "./activity-draft";
+import type { Json } from "./database.types";
 import type { MoneyOrder, ParticipationStatus, RosterRow } from "./host-activity-view";
 import type { HostActivity, HostActivityStatus } from "./host-view";
 import { errorCodeFrom } from "./messages";
@@ -328,4 +330,32 @@ export async function finalizeHostChallenge(activityId: string): Promise<string 
   const supabase = await createSessionClient();
   const { error } = await supabase.rpc("challenge_finalize", { p_activity: activityId });
   return error ? errorCodeFrom(error.message) : null;
+}
+
+// ─────────────────────────────────────────────── 활동 만들기(H03)
+
+/** 내가 고를 수 있는 주최(DB가 정한다). */
+export async function getCreateOptions(): Promise<CreateOptions> {
+  const supabase = await createSessionClient();
+  const { data } = await supabase.rpc("activity_create_options");
+  const j = (data ?? {}) as {
+    host_tier?: string | null;
+    official?: boolean;
+    clubs?: { id: string; name: string; paid_hosts?: { id: string; nickname: string }[] }[];
+  };
+  return {
+    hostTier: j.host_tier === "paid" || j.host_tier === "basic" ? j.host_tier : null,
+    official: j.official === true,
+    clubs: (j.clubs ?? []).map((c) => ({ id: c.id, name: c.name, paidHosts: c.paid_hosts ?? [] })),
+  };
+}
+
+/** 초안으로 만든다. 성공하면 새 활동 id, 실패하면 DB 오류 코드. */
+export async function createHostActivity(
+  payload: Record<string, unknown>,
+): Promise<{ id: string } | { error: string }> {
+  const supabase = await createSessionClient();
+  const { data, error } = await supabase.rpc("activity_create", { p: payload as Json });
+  if (error || typeof data !== "string") return { error: errorCodeFrom(error?.message) };
+  return { id: data };
 }
