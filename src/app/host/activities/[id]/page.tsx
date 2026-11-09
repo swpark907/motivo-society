@@ -582,7 +582,8 @@ function LedgerSection({
         <p className={s.hint}>
           참가비에서 환불과 수수료를 뺀 {won(p.total)}을 정산으로 받아요 · 지급 완료{" "}
           {won(p.settled)} · 정산 예정 {won(p.scheduled)} · 아직 정산 전 {won(p.unsettled)}.
-          수수료는 주문에 적힌 비율로 계산해요.
+          수수료는 주문에 적힌 비율로 계산해요.{" "}
+          <Link href="/host/settlements">정산 화면에서 보기</Link>
         </p>
       )}
 

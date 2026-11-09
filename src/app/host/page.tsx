@@ -61,6 +61,8 @@ export default async function HostPage({ searchParams }: PageProps<"/host">) {
     ...new Map(all.filter((a) => a.clubId).map((a) => [a.clubId!, a.clubName ?? "클럽"])),
   ];
   const filtered = Boolean(filters.kind || filters.club || filters.q);
+  // 활동을 열 수 있는 사람에게만 만들기와 도구(보관함 · 정산)를 보인다. 진행만 맡은 사람은 활동 목록만.
+  const canCreate = Boolean(access.hostTier || access.clubCreate || access.official);
 
   return (
     <PlatformPage
@@ -89,23 +91,32 @@ export default async function HostPage({ searchParams }: PageProps<"/host">) {
         )}
       </section>
 
+      {canCreate && (
+        <nav className={s.tools} aria-label="도구">
+          <Link href="/host/saved">
+            <strong>내 보관함</strong>
+            <small>양식 · 장소 · 공지 문구</small>
+          </Link>
+          <Link href="/host/media">
+            <strong>이미지 보관함</strong>
+            <small>표지 사진</small>
+          </Link>
+          <Link href="/host/settlements">
+            <strong>정산</strong>
+            <small>받을 참가비 · 지급 내역</small>
+          </Link>
+        </nav>
+      )}
+
       <section className={s.acts} aria-labelledby="acts-h">
         <div className={s.actsHead}>
           <h2 id="acts-h" className={s.sectionTitle}>
             내가 연 활동
           </h2>
-          {(access.hostTier || access.clubCreate || access.official) && (
-            <div className={s.headLinks}>
-              <Link href="/host/saved" className={s.savedLink}>
-                내 보관함
-              </Link>
-              <Link href="/host/media" className={s.savedLink}>
-                이미지 보관함
-              </Link>
-              <Link href="/host/new" className={s.create}>
-                활동 만들기
-              </Link>
-            </div>
+          {canCreate && (
+            <Link href="/host/new" className={s.create}>
+              활동 만들기
+            </Link>
           )}
         </div>
 

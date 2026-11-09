@@ -1794,6 +1794,7 @@ export type Database = {
       };
       host_access: { Args: never; Returns: Json };
       host_my_activities: { Args: never; Returns: string[] };
+      host_settlement_overview: { Args: never; Returns: Json };
       is_club_member: { Args: { p_club: string }; Returns: boolean };
       is_confirmed_participant: {
         Args: { p_activity: string; p_user: string };

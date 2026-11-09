@@ -7,6 +7,7 @@ import { errorCodeFrom } from "./messages";
 import { kstDateKey } from "./schedule";
 import { createSessionClient, sandboxEnv } from "./supabase-server";
 import { coverSrc } from "./media";
+import { parseOverview, type SettlementOverview } from "./settlement-view";
 
 // 호스트 도구의 데이터. 누가 들어오는지와 관리 범위는 DB가 정한다(host_access · host_my_activities).
 
@@ -468,4 +469,13 @@ export async function getTemplateSource(
       certLink: c ? c.cert_formats.includes("link") : false,
     },
   };
+}
+
+// ─────────────────────────────────────────────── 정산(H08)
+
+/** 내가 정산받는 몫: 정산마다(예정 · 지급 완료)와 아직 정산 전, 활동별로. */
+export async function getSettlementOverview(): Promise<SettlementOverview> {
+  const supabase = await createSessionClient();
+  const { data } = await supabase.rpc("host_settlement_overview");
+  return parseOverview(data);
 }

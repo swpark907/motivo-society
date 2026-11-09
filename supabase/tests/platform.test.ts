@@ -594,3 +594,36 @@ describe("활동 장부", () => {
     ).toBe("forbidden");
   });
 });
+
+describe("호스트 정산", () => {
+  it("내가 받을 정산과 아직 정산 전 몫을 활동별로 보고, 운영진이 정산을 만들면 정산 예정으로 옮겨 간다", async () => {
+    const host = await as("host");
+    type Overview = {
+      settlements: { status: string; payout: number; activities: { title: string }[] }[];
+      unsettled: { payout: number; activities: { title: string; manageable: boolean }[] };
+    };
+    const before = (await host.rpc("host_settlement_overview")).data as Overview;
+    expect(before.settlements).toHaveLength(1);
+    expect(before.settlements[0]).toMatchObject({ status: "paid", payout: 72000 });
+    expect(before.unsettled).toMatchObject({
+      payout: 13500,
+      activities: [{ title: "AI 도구 실습 워크숍", manageable: true }],
+    });
+
+    const owner = await as("owner");
+    const today = new Date(Date.now() + 9 * 3600_000).toISOString().slice(0, 10);
+    const { error } = await owner.rpc("settlement_create", {
+      p_payee: ID.host,
+      p_start: "2026-01-01",
+      p_end: today,
+    });
+    expect(error).toBeNull();
+    const after = (await host.rpc("host_settlement_overview")).data as Overview;
+    expect(after.unsettled.payout).toBe(0);
+    expect(after.settlements.map((s) => s.status).sort()).toEqual(["paid", "scheduled"]);
+
+    const member = (await (await as("member")).rpc("host_settlement_overview")).data as Overview;
+    expect(member).toMatchObject({ settlements: [], unsettled: { payout: 0, activities: [] } });
+    expect((await anon().rpc("host_settlement_overview")).error).not.toBeNull();
+  });
+});

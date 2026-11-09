@@ -1347,3 +1347,40 @@ test.describe("활동 장부", () => {
     await expect(page.getByRole("region", { name: "활동 장부" })).toHaveCount(0);
   });
 });
+
+// H08 정산 화면: 아직 정산 전 · 정산 예정 · 지급 완료를 달별로 보고, 활동 장부로 이어진다.
+test.describe("호스트 정산", () => {
+  test("호스트는 지급된 정산과 아직 정산 전 몫을 보고, 활동을 누르면 그 활동의 장부로 간다", async ({
+    page,
+  }) => {
+    await signInAs(page, "바라호스트", "/host");
+    await page
+      .getByRole("navigation", { name: "도구" })
+      .getByRole("link", { name: /^정산/ })
+      .click();
+    await expect(page).toHaveURL(/\/host\/settlements$/);
+
+    const tiles = page.getByRole("definition");
+    await expect(tiles.nth(0)).toHaveText("13,500원");
+    await expect(tiles.nth(1)).toHaveText("0원");
+    await expect(tiles.nth(2)).toHaveText("72,000원");
+
+    const paid = page.getByRole("article").filter({ hasText: "4주 바이브코딩 시즌" });
+    await expect(paid).toContainText("지급 완료");
+    await expect(paid).toContainText("− 8,000원");
+
+    await page
+      .getByRole("region", { name: "아직 정산 전" })
+      .getByRole("link", { name: "AI 도구 실습 워크숍" })
+      .click();
+    await expect(page).toHaveURL(
+      /\/host\/activities\/00000000-0000-4000-c000-000000000006#ledger$/,
+    );
+    await expect(page.getByRole("region", { name: "장부" })).toContainText("아직 정산 전 13,500원");
+  });
+
+  test("정산받을 참가비가 없으면 무엇이 쌓이는지 알려 준다", async ({ page }) => {
+    await signInAs(page, "클럽운영진", "/host/settlements");
+    await expect(page.getByText("정산할 참가비가 아직 없어요")).toBeVisible();
+  });
+});

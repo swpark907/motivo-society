@@ -369,6 +369,15 @@ begin
   from public.entitlements e
   where e.user_id = p.user_id and e.activity_id = p.activity_id and e.status = 'active';
 
+  -- 정산(H08): 시즌 참가비 두 건은 지난 정산으로 이미 지급됐고, 워크숍 참가비는 아직 정산 전이다.
+  insert into public.settlements (id, payee_user_id, period_start, period_end, gross_amount, refund_amount,
+    fee_amount, payout_amount, status, created_by, created_at, paid_at, processed_by)
+  values ('00000000-0000-4000-e000-000000000001', u_host, v_kst - 14, v_kst - 7, 80000, 0, 8000, 72000,
+    'paid', u_owner, now() - interval '6 days', now() - interval '5 days', u_owner);
+  insert into public.settlement_items (settlement_id, order_id, amount, fee_amount)
+  select '00000000-0000-4000-e000-000000000001', o.id, o.amount, round(o.amount * o.fee_rate)::integer
+  from public.orders o where o.activity_id = a_series and o.status = 'paid';
+
   -- 활동 장부(H07): 워크숍은 대관료 지출(호스트만 봄), 카페 수다는 장부를 참가자에게 공개.
   insert into public.activity_ledger_entries (activity_id, kind, amount, memo, occurred_on, created_by) values
     (a_workshop, 'expense', 30000, '스터디룸 대관 (가짜 예시)', v_kst, u_host),
