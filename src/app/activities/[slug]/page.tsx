@@ -17,9 +17,12 @@ import {
 } from "@/lib/platform/activity-text";
 import { clockTime, gatheringWhen, periodWhen } from "@/lib/platform/activity-time";
 import { applyState } from "@/lib/platform/apply-state";
+import { getChallengeRoom } from "@/lib/platform/challenge-room";
 import { KIND_LABELS, won } from "@/lib/platform/messages";
 import { listOpenActivities } from "@/lib/platform/queries";
+import { getCurrentUser } from "@/lib/platform/session";
 import { ApplyPanel } from "./ApplyPanel";
+import { ChallengeRoom } from "./ChallengeRoom";
 import s from "./activity.module.scss";
 
 type Props = PageProps<"/activities/[slug]">;
@@ -40,7 +43,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ActivityPage({ params, searchParams }: Props) {
   const { slug } = await params;
-  const notice = (await searchParams).notice === "cancelled" ? "신청을 취소했어요." : null;
+  const noticeCode = (await searchParams).notice;
+  const notice =
+    noticeCode === "cancelled"
+      ? "신청을 취소했어요."
+      : noticeCode === "cert_submitted"
+        ? "오늘 인증을 올렸어요."
+        : null;
   const result = await getActivityDetail(slug);
   if (!result.found) {
     // 회차 주소로 들어오면 시즌 화면의 회차 목록으로 보낸다.
@@ -74,6 +83,10 @@ export default async function ActivityPage({ params, searchParams }: Props) {
     .slice(0, 4);
   const left = a.capacity === null ? null : Math.max(0, a.capacity - a.taken);
   const isDev = process.env.NODE_ENV === "development";
+  // 챌린지 참여 영역은 확정 참가자에게만(비참가자에게는 인증 칸이 없다).
+  const user =
+    a.kind === "challenge" && a.viewer.mine === "confirmed" ? await getCurrentUser() : null;
+  const room = user ? await getChallengeRoom(a.id, user.id, now) : null;
 
   return (
     <main className={`paper ${s.page}`}>
@@ -160,6 +173,15 @@ export default async function ActivityPage({ params, searchParams }: Props) {
                 </li>
               </ul>
             </header>
+
+            {room && a.challenge && (
+              <ChallengeRoom
+                room={room}
+                activityId={a.id}
+                slug={a.slug}
+                startsOn={a.challenge.startsOn}
+              />
+            )}
 
             {a.viewer.privateInfo && <PrivateInfo a={a} now={now} />}
 
@@ -292,6 +314,7 @@ export default async function ActivityPage({ params, searchParams }: Props) {
             capacity={a.capacity}
             taken={a.taken}
             title={a.title}
+            room={room ? { href: "#today", label: roomLabel(room) } : undefined}
           />
         </article>
 
@@ -326,6 +349,12 @@ function sessionTitle(title: string, seriesTitle: string): string {
     .replace(/^\s*\d+회차\s*·?\s*/, "")
     .trim();
   return rest || title;
+}
+
+/** 신청 패널에서 참여 영역으로 가는 버튼 이름. */
+function roomLabel(room: NonNullable<Awaited<ReturnType<typeof getChallengeRoom>>>): string {
+  if (room.phase !== "during") return "내 챌린지 기록 보기";
+  return room.todayCert ? "오늘 인증 보기" : "오늘 인증하러 가기";
 }
 
 function statusLine(a: ActivityDetail): string {

@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import {
+  magicLinkFor,
   reseedSandbox,
   sandboxInsert,
   signInAs,
@@ -15,6 +16,101 @@ test.describe.configure({ mode: "serial" });
 test.beforeEach(async ({ request }, info) => {
   test.skip(info.project.name !== "desktop", "DB를 바꾸는 흐름은 한 화면 크기에서만");
   await reseedSandbox(request);
+});
+
+// 로그인·가입하는 여정도 여기서 돈다. 다른 파일에 있으면 "처음 상태로"가 막 만든 세션·프로필을 지운다.
+test.describe("로그인과 가입", () => {
+  test("로그인이 필요한 화면 → 메일 링크 → 원래 화면으로 돌아온다", async ({
+    page,
+    request,
+  }, info) => {
+    const email = `e2e-${info.project.name}-${Date.now()}@example.test`;
+
+    await page.goto("/me");
+    await expect(page).toHaveURL(/\/login\?next=%2Fme$/);
+    await expect(page.getByRole("heading", { level: 1, name: "모쏘에 들어가기" })).toBeVisible();
+
+    await page.getByLabel("이메일").fill(email);
+    await page.getByRole("button", { name: "로그인 링크 받기" }).click();
+    await expect(page.getByRole("heading", { name: "메일을 보냈어요" })).toBeVisible();
+    await expect(page.getByText(email)).toBeVisible();
+    await expect(page.getByRole("button", { name: /다시 보내기 \(\d+초\)/ })).toBeDisabled();
+
+    await page.goto(await magicLinkFor(request, email));
+    // 처음 온 사람은 온보딩을 거쳐 원래 화면으로 간다(L03).
+    await expect(page).toHaveURL(/\/onboarding\?next=%2Fme$/);
+    const nickname = testNickname();
+    await page.getByLabel("닉네임").fill(nickname);
+    await expect(page.getByText("쓸 수 있는 닉네임이에요.")).toBeVisible();
+    await page.getByText("AI 도구", { exact: true }).click();
+    await page.getByRole("button", { name: "시작하기" }).click();
+    await expect(page).toHaveURL(/\/me$/);
+    await expect(page.getByText(email)).toBeVisible();
+    await expect(page.getByRole("main").getByText(nickname, { exact: true })).toBeVisible();
+
+    await page.getByRole("button", { name: "로그아웃" }).click();
+    await expect(page).toHaveURL(/\/$/);
+    await page.goto("/me");
+    await expect(page).toHaveURL(/\/login/);
+  });
+
+  test("개발 환경에서는 시험장 사람으로 바로 들어가고, 상단에 계정이 보인다", async ({ page }) => {
+    await page.goto("/login?next=%2Fclubs");
+    await page.waitForLoadState("networkidle");
+    await page.getByText("개발용 · 시험장 사람으로 들어가기").click();
+    await page.getByRole("button", { name: /멤버하나/ }).click();
+    await expect(page).toHaveURL(/\/clubs$/);
+    await expect(page.getByRole("link", { name: "멤버하나 · 나" })).toBeVisible();
+  });
+  test("확정된 참가자는 참가 확정과 상세 주소를 본다", async ({ page }) => {
+    await signInAs(page, "멤버하나", "/activities/capybara-cafe");
+    await expect(
+      page.getByRole("complementary", { name: "신청" }).getByRole("link", { name: /참가 확정/ }),
+    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: "참가 정보" })).toBeVisible();
+    await expect(page.getByText(/가짜 주소/)).toBeVisible();
+  });
+
+  test("클럽 밖 사람에게 멤버 전용 모임은 멤버 전용이라고 알린다", async ({ page }) => {
+    await signInAs(page, "처음온사람", "/activities/members-retro");
+    await expect(page.getByRole("complementary", { name: "신청" }).getByRole("status")).toHaveText(
+      "클럽 멤버 전용",
+    );
+  });
+
+  test("겹치는 닉네임은 바로 알려 주고, 관심사는 다섯 개까지만 고른다", async ({
+    page,
+    request,
+  }, info) => {
+    await signUpByMail(page, request, testEmail(info.project.name), "/login?next=%2Fclubs");
+    await expect(page).toHaveURL(/\/onboarding\?next=%2Fclubs$/);
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("이름을 정해 주세요");
+
+    const start = page.getByRole("button", { name: "시작하기" });
+    await expect(start).toBeDisabled();
+
+    await page.getByLabel("닉네임").fill("멤버하나");
+    await expect(page.getByText("이미 누가 쓰고 있는 닉네임이에요.")).toBeVisible();
+    await page.getByLabel("닉네임").fill("a!");
+    await expect(page.getByText(/2~12자의 한글·영문·숫자·밑줄/)).toBeVisible();
+
+    await page.getByLabel("닉네임").fill(testNickname());
+    await expect(page.getByText("쓸 수 있는 닉네임이에요.")).toBeVisible();
+    await expect(start).toBeDisabled(); // 관심사가 아직 없다
+
+    for (const name of ["AI 도구", "바이브코딩", "웹 만들기", "디자인", "글쓰기"]) {
+      await page.getByText(name, { exact: true }).click();
+    }
+    await expect(page.getByText("5/5")).toBeVisible();
+    await expect(page.getByRole("checkbox", { name: "영상" })).toBeDisabled();
+
+    await start.click();
+    await expect(page).toHaveURL(/\/clubs$/);
+
+    // 이미 마친 사람이 온보딩 주소로 오면 바로 보낸다.
+    await page.goto("/onboarding?next=%2Fexplore");
+    await expect(page).toHaveURL(/\/explore$/);
+  });
 });
 
 test.describe("시험장", () => {
@@ -260,5 +356,77 @@ test.describe("내 일정", () => {
     await expect(page).toHaveURL(/\/me\/schedule$/);
     await expect(page.getByText("아직 잡힌 일정이 없어요")).toBeVisible();
     await expect(page.getByRole("link", { name: "발견에서 찾아보기" })).toBeVisible();
+  });
+});
+
+// L09 챌린지 참여: 확정 참가자만 상세 안에서 오늘 미션 · 오늘 인증 · 내 진행 · 함께한 기록을 본다.
+test.describe("챌린지 참여", () => {
+  const CHALLENGE = "/activities/daily-build-2w";
+
+  test("인증을 올리면 내 진행과 함께한 기록에 바로 반영되고, 오늘 안에는 고칠 수 있다", async ({
+    page,
+  }) => {
+    await signInAs(page, "멤버하나", CHALLENGE);
+    const room = page.locator("#today");
+    await expect(room.getByRole("heading", { name: "내 챌린지" })).toBeVisible();
+    await expect(room.getByText("오늘의 미션")).toBeVisible();
+    await expect(room.getByText("완주까지 7번")).toBeVisible();
+
+    // 빈 인증은 DB가 막고 이유를 알려 준다.
+    await room.getByRole("button", { name: "인증 올리기" }).click();
+    await expect(room.getByRole("alert")).toHaveText("인증 내용을 적어 주세요.");
+
+    await room.getByLabel("오늘 한 것").fill("버튼 문구를 AI 답 대신 직접 고쳤어요.");
+    await room.getByRole("button", { name: "인증 올리기" }).click();
+    await expect(page).toHaveURL(/notice=cert_submitted/);
+    await expect(room.getByText("오늘 인증을 올렸어요", { exact: true })).toBeVisible();
+    await expect(room.getByText("완주까지 6번")).toBeVisible();
+    const mine = room.getByRole("listitem").filter({ hasText: "멤버하나 (나)" });
+    await expect(mine).toContainText("인증 4번");
+    await expect(mine).toContainText("버튼 문구를 AI 답 대신 직접 고쳤어요.");
+
+    await room.getByRole("button", { name: "고치기" }).click();
+    await expect(room.getByLabel("오늘 한 것")).toHaveValue(
+      "버튼 문구를 AI 답 대신 직접 고쳤어요.",
+    );
+    await room.getByLabel("오늘 한 것").fill("버튼 문구를 직접 고치고 이유를 적었어요.");
+    await room.getByRole("button", { name: "고친 내용 올리기" }).click();
+    await expect(room.getByText("버튼 문구를 직접 고치고 이유를 적었어요.").first()).toBeVisible();
+    await expect(mine).toContainText("인증 4번"); // 고쳐도 하루 한 번
+
+    // 신청 패널은 참여 영역으로 보낸다.
+    await expect(
+      page
+        .getByRole("complementary", { name: "신청" })
+        .getByRole("link", { name: "오늘 인증 보기" }),
+    ).toHaveAttribute("href", "#today");
+  });
+
+  test("오늘 인증이 반려되면 사유가 보이고 다시 올리는 칸은 없다", async ({ page, request }) => {
+    const today = new Date(Date.now() + 9 * 3600_000).toISOString().slice(0, 10);
+    await sandboxInsert(request, "certifications", {
+      activity_id: "00000000-0000-4000-c000-000000000014",
+      user_id: "00000000-0000-4000-a000-000000000005",
+      cert_date: today,
+      body: "오늘 기록",
+      status: "rejected",
+      rejected_reason: "다른 챌린지의 기록이에요",
+    });
+    await signInAs(page, "멤버하나", CHALLENGE);
+    const room = page.locator("#today");
+    await expect(room.getByText("오늘 인증이 반려됐어요")).toBeVisible();
+    await expect(room.getByText("사유: 다른 챌린지의 기록이에요")).toBeVisible();
+    await expect(room.getByLabel("오늘 한 것")).toHaveCount(0);
+  });
+
+  test("참가하지 않은 사람에게는 인증 칸이 없다", async ({ page }) => {
+    await page.goto(CHALLENGE);
+    await expect(page.getByRole("heading", { name: "인증 방법" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "내 챌린지" })).toHaveCount(0);
+
+    await signInAs(page, "처음온사람", CHALLENGE);
+    await expect(page.getByRole("heading", { name: "인증 방법" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "내 챌린지" })).toHaveCount(0);
+    await expect(page.getByLabel("오늘 한 것")).toHaveCount(0);
   });
 });

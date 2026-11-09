@@ -8,13 +8,6 @@ function applyArea(page: Page, isMobile: boolean) {
     : page.getByRole("complementary", { name: "신청" });
 }
 
-async function signInAs(page: Page, nickname: string, next: string) {
-  await page.goto(`/login?next=${encodeURIComponent(next)}`);
-  await page.getByText("개발용 · 시험장 사람으로 들어가기").click();
-  await page.getByRole("button", { name: new RegExp(nickname) }).click();
-  await expect(page).toHaveURL(new RegExp(`${next}$`));
-}
-
 test.describe("활동 상세", () => {
   test("비로그인 직진입: 무엇·누가·언제·어디·자리·가격과 로그인하고 신청", async ({
     page,
@@ -63,18 +56,6 @@ test.describe("활동 상세", () => {
   test("작성 중인 활동은 밖에서 보이지 않는다", async ({ page }) => {
     const res = await page.goto("/activities/draft-night-walk");
     expect(res?.status()).toBe(404);
-  });
-
-  test("확정된 참가자는 참가 확정과 상세 주소를 본다", async ({ page, isMobile }) => {
-    await signInAs(page, "멤버하나", "/activities/capybara-cafe");
-    await expect(applyArea(page, isMobile).getByRole("link", { name: /참가 확정/ })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "참가 정보" })).toBeVisible();
-    await expect(page.getByText(/가짜 주소/)).toBeVisible();
-  });
-
-  test("클럽 밖 사람에게 멤버 전용 모임은 멤버 전용이라고 알린다", async ({ page, isMobile }) => {
-    await signInAs(page, "처음온사람", "/activities/members-retro");
-    await expect(applyArea(page, isMobile).getByRole("status")).toHaveText("클럽 멤버 전용");
   });
 
   test("발견 카드에서 상세로 들어간다", async ({ page }) => {

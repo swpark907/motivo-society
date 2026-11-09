@@ -14,6 +14,9 @@ export default defineConfig({
   testDir: "./e2e",
   fullyParallel: true,
   retries: process.env.CI ? 1 : 0,
+  // 개발 서버(next dev)는 화면을 처음 열 때 컴파일하고, 서버 쪽 이동(redirect)도 느릴 때가 있다.
+  // 기본 5초로는 플랫폼 여정이 늘어난 뒤 이동 대기가 가끔 넘친다.
+  expect: { timeout: 10_000 },
   reporter: process.env.CI ? "github" : "list",
   use: {
     baseURL: externalBaseURL ?? `http://localhost:${PORT}`,

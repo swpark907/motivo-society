@@ -53,6 +53,8 @@ export async function signUpByMail(
 /** 시험장 가짜 사람으로 로그인(개발 환경 전용 로그인 영역). */
 export async function signInAs(page: Page, nickname: string, next: string) {
   await page.goto(`/login?next=${encodeURIComponent(next)}`);
+  // 화면이 다 준비되기 전에 누르면 개발 서버에서 클릭이 가끔 사라진다.
+  await page.waitForLoadState("networkidle");
   await page.getByText("개발용 · 시험장 사람으로 들어가기").click();
   await page.getByRole("button", { name: new RegExp(nickname) }).click();
   await expect(page).toHaveURL(new RegExp(`${next.replace(/[?]/g, "\\?")}$`));

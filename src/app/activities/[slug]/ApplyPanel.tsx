@@ -12,14 +12,33 @@ type Props = {
   capacity: number | null;
   taken: number;
   title: string;
+  /** 챌린지 확정 참가자: 같은 화면의 참여 영역으로 보내는 링크와 그 이름. */
+  room?: { href: string; label: string };
 };
 
 /**
  * 신청 영역. 넓은 화면은 오른쪽에 붙는 카드, 좁은 화면은 하단 탭 바 위 고정 바.
  * 버튼은 신청 확인(/apply)으로, 이미 신청했으면 내 신청 내역(같은 주소)으로 간다.
  */
-export function ApplyPanel({ state, applyHref, price, priceSub, capacity, taken, title }: Props) {
-  const action = <Action state={state} applyHref={applyHref} />;
+export function ApplyPanel({
+  state,
+  applyHref,
+  price,
+  priceSub,
+  capacity,
+  taken,
+  title,
+  room,
+}: Props) {
+  const inRoom = room && state.kind === "mine" && state.status === "confirmed";
+  const note = inRoom ? "참가 확정 · 인증은 아래 '내 챌린지'에서" : state.note;
+  const action = inRoom ? (
+    <a href={room.href} className={s.statusPill} data-kind="mine">
+      {room.label}
+    </a>
+  ) : (
+    <Action state={state} applyHref={applyHref} />
+  );
   return (
     <>
       <aside className={s.side} aria-label="신청">
@@ -38,7 +57,7 @@ export function ApplyPanel({ state, applyHref, price, priceSub, capacity, taken,
             </div>
           )}
           <p className={s.applyNote} data-state-kind={state.kind}>
-            {state.note}
+            {note}
           </p>
           {action}
           <div className={s.applyActions}>
@@ -50,7 +69,7 @@ export function ApplyPanel({ state, applyHref, price, priceSub, capacity, taken,
       <div className={s.mobileBar}>
         <span>
           <strong>{price}</strong>
-          <small>{state.kind === "apply" || state.kind === "login" ? priceSub : state.note}</small>
+          <small>{state.kind === "apply" || state.kind === "login" ? priceSub : note}</small>
         </span>
         {action}
       </div>

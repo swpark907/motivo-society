@@ -166,7 +166,7 @@ function TodoItem({ todo: t, now }: { todo: Todo; now: Date }) {
     const left = Math.max(0, t.threshold - t.accepted);
     const pct = t.threshold ? Math.min(100, Math.round((t.accepted / t.threshold) * 100)) : 0;
     return (
-      <Link href={`/activities/${t.slug}`} className={s.todo}>
+      <Link href={`/activities/${t.slug}#today`} className={s.todo}>
         <span
           className={s.ring}
           style={{ "--p": `${pct}%` } as React.CSSProperties}
@@ -182,7 +182,7 @@ function TodoItem({ todo: t, now }: { todo: Todo; now: Date }) {
           </small>
         </span>
         <span className={s.todoGo}>
-          챌린지 <LineIcon name="arrow" size={16} />
+          인증하기 <LineIcon name="arrow" size={16} />
         </span>
       </Link>
     );

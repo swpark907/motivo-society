@@ -75,7 +75,7 @@ const ERROR_MESSAGES: Record<string, string> = {
   invalid_status: "알 수 없는 출석 상태예요.",
   not_gathering: "출석은 모임에서만 체크해요.",
   too_early_to_check: "출석은 시작 1시간 전부터 체크할 수 있어요.",
-  not_confirmed: "확정된 참가자만 출석을 체크할 수 있어요.",
+  not_confirmed: "참가가 확정된 사람만 할 수 있어요.",
 };
 
 const NOTICE_MESSAGES: Record<string, string> = {

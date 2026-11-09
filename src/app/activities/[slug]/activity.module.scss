@@ -647,6 +647,7 @@
     flex: 1;
     max-width: 220px;
     margin: 0;
+    white-space: nowrap;
   }
 
   @include up(md) {

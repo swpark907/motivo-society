@@ -20,7 +20,7 @@
    - 개발 서버: 승우가 띄운 `http://localhost:3000`을 먼저 쓴다. 없으면 브라우저 도구 `preview_start`의 `motivo-dev`(3100).
    - 스키마가 어긋나 보이면 `supabase db reset` 후 `pnpm test:db`.
    - 모든 페이지가 500이고 개발 서버 로그에 `Unexpected non-whitespace character after JSON`이 보이면, `next.config.ts`를 바꿔 개발 서버가 다시 시작되며 `.next/dev/prerender-manifest.json` 끝에 이전 내용 조각이 남은 것이다. 첫 JSON 객체 뒤를 잘라 내면 바로 돌아온다(서버를 끌 필요 없음).
-   - e2e는 `--workers=2` 이하로 돌린다. 승우의 개발 서버 하나를 같이 쓰므로 병렬이 많으면 개발 서버 캐시가 꼬인다.
+   - 플랫폼 e2e 전체 확인은 `--workers=1`로 돌린다. 승우의 개발 서버 하나를 같이 쓰므로, 두 줄만 돼도 부하로 화면 준비 전에 누른 클릭이 사라져 매번 다른 테스트가 시간 초과로 실패한다(2026-11-09 L09에서 확인).
 3. **항목 고르기.** BACKLOG에서 위에서부터 첫 `[ ]` 항목. `선행:`이 끝나지 않았거나 `결정 대기`면 건너뛴다. 고른 항목을 `[~] (시작 날짜)`로 바꾼다.
 4. **만들기.**
    - Next.js 16은 학습 데이터와 다르다. 쓰는 API는 `node_modules/next/dist/docs/`에서 먼저 확인한다(예: 미들웨어 이름·쿠키·서버 액션).
@@ -30,7 +30,7 @@
 5. **확인(전부 통과해야 커밋).**
    - `pnpm check`
    - `pnpm test:db`
-   - 바꾼 여정의 e2e: `PW_BASE_URL=http://localhost:3000 pnpm exec playwright test <파일>`. **DB를 바꾸는 e2e는 `e2e/platform-flows.spec.ts` 한 파일에** 넣는다(순서대로 돌고 테스트마다 `reseedSandbox`로 초기화). 다른 파일에 두면 병렬 실행 중 한쪽의 초기화가 다른 쪽의 사람·신청을 지운다.
+   - 바꾼 여정의 e2e: `PW_BASE_URL=http://localhost:3000 pnpm exec playwright test <파일>`. **DB를 바꾸거나 로그인·가입하는 e2e는 `e2e/platform-flows.spec.ts` 한 파일에** 넣는다(순서대로 돌고 테스트마다 `reseedSandbox`로 초기화). 다른 파일에 두면 병렬 실행 중 한쪽의 초기화가 다른 쪽의 사람·신청·세션·프로필을 지운다.
    - **디자인·사용성 체크**: 브라우저 도구로 PC 1280px와 모바일 375px를 직접 열어 아래 체크리스트를 본다. 가로 스크롤 0. 발견한 것은 고친다.
 6. **커밋.** `feat/platform-app` 브랜치에 항목 하나 = 커밋 하나. 제목 `feat(platform): <영어 요약> (Lxx)`, 마지막 줄에 `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`. `--no-verify` 금지.
 7. **기록.** BACKLOG 항목을 `[x] (날짜, 커밋 해시)`로 바꾸고, 생긴 후속 일은 백로그 맨 아래 "후속"에 한 줄로. LOG.md에 단락 하나(무엇 · 확인 방법과 결과 · 남은 것 · 스크린샷에서 본 문제).
