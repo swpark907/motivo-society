@@ -333,3 +333,26 @@ describe("초대 링크 미리보기", () => {
     expect(data).toEqual({ valid: false });
   });
 });
+
+describe("호스트 도구 입구", () => {
+  it("호스트·클럽 운영진은 들어오고, 일반 멤버는 들어오지 못한다", async () => {
+    const access = async (h: string) =>
+      ((await (await as(h)).rpc("host_access")).data ?? {}) as Record<string, unknown>;
+    expect(await access("host")).toMatchObject({ eligible: true, host_tier: "paid" });
+    expect(await access("club-staff")).toMatchObject({ eligible: true, club_create: true });
+    expect(await access("member")).toMatchObject({ eligible: false, managed: 0 });
+    expect((await anon().rpc("host_access")).error).not.toBeNull();
+  });
+
+  it("내가 연 활동은 지난 것까지 전부, 시즌 회차는 빼고, 남의 개인 활동은 없다", async () => {
+    const host = await as("host");
+    const { data } = await host.rpc("host_my_activities");
+    const ids = (data ?? []) as string[];
+    expect(ids).toContain(ID.workshop);
+    expect(ids).toContain("00000000-0000-4000-c000-000000000009"); // 시즌
+    expect(ids).not.toContain("00000000-0000-4000-c000-000000000010"); // 시즌 1회차
+    expect(ids).not.toContain(ID.challenge); // 클럽 주최(바라호스트는 그 클럽 운영진이 아님)
+    const { data: mine } = await (await as("member")).rpc("host_my_activities");
+    expect(mine).toEqual([]);
+  });
+});

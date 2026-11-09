@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Avatar } from "@/components/Avatar/Avatar";
 import { LineIcon } from "@/components/LineIcon/LineIcon";
 import { PlatformPage } from "@/components/PlatformPage/PlatformPage";
+import { getHostAccess } from "@/lib/platform/host";
 import { requireUser } from "@/lib/platform/session";
 import { signOut } from "../login/actions";
 import s from "./me.module.scss";
@@ -24,6 +25,15 @@ const SECTIONS: { title: string; body: string; href?: string }[] = [
 export default async function MePage() {
   const user = await requireUser("/me");
   const name = user.nickname ?? user.email.split("@")[0];
+  // 호스트 도구는 자격이 있는 사람에게만 보인다(호스트는 계정 종류가 아니라 자격).
+  const host = await getHostAccess();
+  const sections = host.eligible
+    ? [
+        ...SECTIONS.slice(0, 2),
+        { title: "호스트 도구", body: "내가 연 활동, 처리할 일, 지난 활동 기록", href: "/host" },
+        ...SECTIONS.slice(2),
+      ]
+    : SECTIONS;
 
   return (
     <PlatformPage label="ME" title="나">
@@ -41,7 +51,7 @@ export default async function MePage() {
       </section>
 
       <ul className={s.sections}>
-        {SECTIONS.map((section) => (
+        {sections.map((section) => (
           <li key={section.title}>
             {section.href ? (
               <Link href={section.href} className={s.sectionLink}>

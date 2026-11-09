@@ -725,3 +725,63 @@ test.describe("회원 여정", () => {
     );
   });
 });
+
+// H01 호스트 도구: 자격 있는 사람만 "나"에서 들어가고, 내가 연 활동을 지난 것까지 본다.
+test.describe("호스트 도구", () => {
+  test("호스트는 나 → 호스트 도구에서 처리할 일과 내가 연 활동을 보고, 지난 활동과 거르기도 된다", async ({
+    page,
+  }) => {
+    await signInAs(page, "바라호스트", "/me");
+    await page
+      .getByRole("main")
+      .getByRole("link", { name: /호스트 도구/ })
+      .click();
+    await expect(page).toHaveURL(/\/host$/);
+
+    const todo = page.getByRole("region", { name: "지금 처리할 일" });
+    await expect(todo.getByRole("link", { name: /아직 공개 전이에요/ })).toContainText(
+      "(작성 중) 밤 산책 회고",
+    );
+    await expect(
+      todo.getByRole("link", { name: /입금 대기 1명 · 운영진이 확인해요/ }),
+    ).toBeVisible();
+
+    const acts = page.getByRole("region", { name: "내가 연 활동" });
+    await expect(acts.getByRole("link", { name: "4주 바이브코딩 시즌" })).toBeVisible();
+    await expect(acts.getByRole("link", { name: "프롬프트 클리닉" })).toBeVisible();
+
+    // 지난 활동: 기간이 끝났는데 아직 판정 전이면 "기간 끝남"
+    await acts.getByRole("link", { name: /^지난/ }).click();
+    await expect(page).toHaveURL(/\/host\?tab=past$/);
+    const diary = acts.getByRole("listitem").filter({ hasText: "1주 프롬프트 일기" });
+    await expect(diary).toContainText("기간 끝남");
+
+    // 거르기는 주소에 남는다
+    await page.goto("/host");
+    await acts.getByLabel("제목").fill("클리닉");
+    await acts.getByRole("button", { name: "찾기" }).click();
+    await expect(page).toHaveURL(/q=%ED%81%B4%EB%A6%AC%EB%8B%89/);
+    await expect(acts.getByRole("listitem")).toHaveCount(1);
+    await acts.getByRole("link", { name: "조건 지우기" }).first().click();
+    await expect(page).toHaveURL(/\/host$/);
+  });
+
+  test("자격이 없는 회원에게는 입구가 없고, 주소로 와도 무엇인지와 갈 곳을 알려 준다", async ({
+    page,
+  }) => {
+    await signInAs(page, "멤버하나", "/me");
+    await expect(page.getByRole("main").getByRole("link", { name: /내 일정/ })).toBeVisible();
+    await expect(page.getByRole("link", { name: /호스트 도구/ })).toHaveCount(0);
+    await page.goto("/host");
+    await expect(page.getByText("활동을 여는 사람이 쓰는 곳이에요")).toBeVisible();
+    await expect(page.getByRole("link", { name: "발견에서 활동 찾기" })).toHaveAttribute(
+      "href",
+      "/explore",
+    );
+  });
+
+  test("로그인하지 않으면 로그인 뒤 호스트 도구로 돌아온다", async ({ page }) => {
+    await page.goto("/host?tab=past");
+    await expect(page).toHaveURL(/\/login\?next=%2Fhost%3Ftab%3Dpast$/);
+  });
+});

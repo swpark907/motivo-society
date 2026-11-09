@@ -1547,6 +1547,8 @@ export type Database = {
         Args: { p_permission: string };
         Returns: boolean;
       };
+      host_access: { Args: never; Returns: Json };
+      host_my_activities: { Args: never; Returns: string[] };
       is_club_member: { Args: { p_club: string }; Returns: boolean };
       is_confirmed_participant: {
         Args: { p_activity: string; p_user: string };
