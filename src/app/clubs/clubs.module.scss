@@ -1,0 +1,10 @@
+.section {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.head {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 800;
+}

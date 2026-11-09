@@ -509,3 +509,105 @@ test.describe("주문과 환불", () => {
     expect(res?.status()).toBe(404);
   });
 });
+
+// L11 클럽: 찾기 → 상세 → 바로 가입 / 승인 신청 / 초대 링크 가입, 강퇴된 사람은 다시 못 들어온다.
+test.describe("클럽", () => {
+  test("바로 가입하는 클럽: 비로그인은 로그인부터, 가입하면 내 클럽, 나가면 다시 가입할 수 있다", async ({
+    page,
+  }) => {
+    await page.goto("/clubs/weekend-vibe");
+    await expect(
+      page.getByRole("heading", { level: 1, name: "주말 바이브코딩 클럽" }),
+    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: "클럽 활동" })).toBeVisible();
+    await expect(
+      page
+        .getByRole("complementary", { name: "가입" })
+        .getByRole("link", { name: "로그인하고 가입하기" }),
+    ).toHaveAttribute("href", "/login?next=%2Fclubs%2Fweekend-vibe");
+
+    await signInAs(page, "처음온사람", "/clubs");
+    await page.getByRole("link", { name: /주말 바이브코딩 클럽/ }).click();
+    // 클럽 상세를 처음 여는 순간이면 개발 서버가 컴파일하느라 오래 걸린다.
+    await expect(page).toHaveURL(/\/clubs\/weekend-vibe$/, { timeout: 30_000 });
+    const side = page.getByRole("complementary", { name: "가입" });
+    await side.getByRole("button", { name: "가입하기" }).click();
+    await expect(page.getByRole("status").first()).toHaveText("클럽에 가입했어요.");
+    await expect(side.getByText("멤버예요")).toBeVisible();
+
+    await page.goto("/clubs");
+    await expect(page.getByRole("heading", { name: "내 클럽" })).toBeVisible();
+    await expect(page.getByRole("link", { name: /주말 바이브코딩 클럽/ })).toContainText("멤버");
+
+    await page.getByRole("link", { name: /주말 바이브코딩 클럽/ }).click();
+    await side.getByText("클럽 나가기").click();
+    await side.getByRole("button", { name: "정말 나갈게요" }).click();
+    await expect(page.getByRole("status").first()).toHaveText("클럽에서 나왔어요.");
+    await expect(side.getByText("전에 나간 클럽이에요. 다시 가입할 수 있어요.")).toBeVisible();
+    await expect(side.getByRole("button", { name: "가입하기" })).toBeVisible();
+  });
+
+  test("승인제 클럽: 가입 신청하면 클럽과 홈에 운영진 승인 대기가 보인다", async ({ page }) => {
+    await signInAs(page, "처음온사람", "/clubs/ai-video-club");
+    const side = page.getByRole("complementary", { name: "가입" });
+    await side.getByRole("button", { name: "가입 신청하기" }).click();
+    await expect(page.getByRole("status").first()).toContainText("가입을 신청했어요");
+    await expect(side.getByText("운영진 승인 대기")).toBeVisible();
+
+    await page.goto("/");
+    const todo = page.getByRole("link", { name: /클럽 가입 승인을 기다리고 있어요/ });
+    await expect(todo).toContainText("AI 영상 만들기 클럽");
+    await todo.click();
+    await expect(page).toHaveURL(/\/clubs\/ai-video-club$/);
+
+    await page.goto("/clubs");
+    await expect(page.getByRole("link", { name: /AI 영상 만들기 클럽/ })).toContainText(
+      "승인 대기",
+    );
+  });
+
+  test("초대 링크: 승인제 클럽이어도 로그인하고 한 번 누르면 바로 멤버", async ({ browser }) => {
+    const host = await (await browser.newContext()).newPage();
+    await signInAs(host, "바라호스트", "/clubs/ai-video-club");
+    await host.getByRole("button", { name: "초대 링크 만들기" }).click();
+    const link = await host.locator("code").filter({ hasText: "/invite/" }).textContent();
+    const path = new URL(link!, "http://localhost").pathname;
+
+    const guest = await (await browser.newContext()).newPage();
+    await guest.goto(path);
+    await expect(
+      guest.getByRole("heading", { name: "AI 영상 만들기 클럽에 초대받았어요" }),
+    ).toBeVisible();
+    await guest.getByRole("link", { name: "로그인하고 초대 받기" }).click();
+    await guest.waitForLoadState("networkidle");
+    await guest.getByText("개발용 · 시험장 사람으로 들어가기").click();
+    await guest.getByRole("button", { name: /처음온사람/ }).click();
+    await expect(guest).toHaveURL(new RegExp(`${path}$`), { timeout: 30_000 });
+    await guest.getByRole("button", { name: "처음온사람님으로 가입하기" }).click();
+    await expect(guest).toHaveURL(/\/clubs\/ai-video-club\?notice=invite_joined$/);
+    await expect(guest.getByRole("status").first()).toHaveText("초대 코드로 바로 가입했어요.");
+    await expect(
+      guest.getByRole("complementary", { name: "가입" }).getByText("멤버예요"),
+    ).toBeVisible();
+  });
+
+  test("강퇴된 사람은 가입할 수 없다고 안내받고, 없는 초대 코드는 찾을 수 없다고 나온다", async ({
+    page,
+    request,
+  }) => {
+    await sandboxInsert(request, "club_members", {
+      club_id: "00000000-0000-4000-b000-000000000001",
+      user_id: "00000000-0000-4000-a000-000000000006",
+      layer_id: "00000000-0000-4000-b100-000000000003",
+      status: "banned",
+    });
+    await signInAs(page, "처음온사람", "/clubs/weekend-vibe");
+    const side = page.getByRole("complementary", { name: "가입" });
+    await expect(side.getByText("가입할 수 없어요", { exact: true })).toBeVisible();
+    await expect(side.getByText("이 클럽에서 내보내져 다시 가입할 수 없어요.")).toBeVisible();
+    await expect(side.getByRole("button", { name: "가입하기" })).toHaveCount(0);
+
+    await page.goto("/invite/abcdef123456");
+    await expect(page.getByRole("heading", { name: "찾을 수 없는 초대예요" })).toBeVisible();
+  });
+});

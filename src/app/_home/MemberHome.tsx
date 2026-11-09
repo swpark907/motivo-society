@@ -187,6 +187,22 @@ function TodoItem({ todo: t, now }: { todo: Todo; now: Date }) {
       </Link>
     );
   }
+  if (t.kind === "club_pending") {
+    return (
+      <Link href={`/clubs/${t.slug}`} className={s.todo}>
+        <span className={s.todoIcon} aria-hidden="true">
+          <LineIcon name="users" />
+        </span>
+        <span className={s.todoText}>
+          <strong>클럽 가입 승인을 기다리고 있어요</strong>
+          <small>{t.title} · 운영진이 승인하면 멤버가 돼요</small>
+        </span>
+        <span className={s.todoGo}>
+          클럽 <LineIcon name="arrow" size={16} />
+        </span>
+      </Link>
+    );
+  }
   return (
     <Link href={`/activities/${t.slug}/apply`} className={s.todo}>
       <span className={s.todoIcon} aria-hidden="true">
@@ -238,7 +254,7 @@ function People({ data }: { data: Data }) {
           <ul className={s.clubs}>
             {data.clubs.map((c) => (
               <li key={c.slug}>
-                <Link href="/clubs" className={s.club}>
+                <Link href={`/clubs/${c.slug}`} className={s.club}>
                   <KindTag kind="club">클럽</KindTag>
                   <strong>{c.name}</strong>
                   {c.tagline && <span className={s.muted}>{c.tagline}</span>}

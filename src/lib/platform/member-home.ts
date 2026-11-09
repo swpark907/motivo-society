@@ -26,7 +26,8 @@ export type Todo =
       accepted: number;
       threshold: number;
     }
-  | { kind: "waiting"; slug: string; title: string; status: "waitlisted" | "pending_approval" };
+  | { kind: "waiting"; slug: string; title: string; status: "waitlisted" | "pending_approval" }
+  | { kind: "club_pending"; slug: string; title: string };
 
 export type MyClub = {
   slug: string;
@@ -102,9 +103,9 @@ export async function getMemberHome(userId: string, now = new Date()): Promise<M
       .order("due_at"),
     supabase
       .from("club_members")
-      .select("club:clubs(id, slug, name, tagline)")
+      .select("status, club:clubs(id, slug, name, tagline)")
       .eq("user_id", userId)
-      .eq("status", "active"),
+      .in("status", ["active", "pending"]),
     Promise.all(
       liveChallenges.map(async (c) => {
         const [{ data: rows }, { data: detail }] = await Promise.all([
@@ -191,10 +192,16 @@ export async function getMemberHome(userId: string, now = new Date()): Promise<M
         title: p.activity!.title,
         status: p.status as "waitlisted" | "pending_approval",
       })),
+    ...(clubRows.data ?? [])
+      .filter((m) => m.status === "pending" && m.club)
+      .map((m) => ({ kind: "club_pending" as const, slug: m.club!.slug, title: m.club!.name })),
   ];
 
   // ── 내 사람들: 내 클럽 + 같이 챌린지하는 사람들의 최근 인증
-  const clubs = (clubRows.data ?? []).map((m) => m.club).filter((c) => c !== null);
+  const clubs = (clubRows.data ?? [])
+    .filter((m) => m.status === "active")
+    .map((m) => m.club)
+    .filter((c) => c !== null);
   const clubIds = clubs.map((c) => c.id);
   const myChallengeIds = confirmed
     .filter((p) => p.activity!.kind === "challenge")

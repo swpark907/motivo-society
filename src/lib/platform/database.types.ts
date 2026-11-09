@@ -1515,6 +1515,7 @@ export type Database = {
         Args: { p_club: string; p_max_uses?: number };
         Returns: string;
       };
+      club_invite_preview: { Args: { p_code: string }; Returns: Json };
       club_join: { Args: { p_club: string }; Returns: string };
       club_join_by_invite: { Args: { p_code: string }; Returns: string };
       club_layer_delete: {

@@ -250,7 +250,7 @@ export default async function ActivityPage({ params, searchParams }: Props) {
                   )}
                 </div>
                 {a.organizer.clubSlug && (
-                  <Link href="/clubs" className={s.ghost}>
+                  <Link href={`/clubs/${a.organizer.clubSlug}`} className={s.ghost}>
                     클럽 보기
                   </Link>
                 )}

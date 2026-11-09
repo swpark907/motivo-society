@@ -17,6 +17,8 @@ export default defineConfig({
   // 개발 서버(next dev)는 화면을 처음 열 때 컴파일하고, 서버 쪽 이동(redirect)도 느릴 때가 있다.
   // 기본 5초로는 플랫폼 여정이 늘어난 뒤 이동 대기가 가끔 넘친다.
   expect: { timeout: 10_000 },
+  // 코드가 바뀐 직후에는 화면 하나를 처음 그리는 데만 10초 가까이 걸린다(로그인 → 이동이 겹치면 30초를 넘는다).
+  timeout: 60_000,
   reporter: process.env.CI ? "github" : "list",
   use: {
     baseURL: externalBaseURL ?? `http://localhost:${PORT}`,

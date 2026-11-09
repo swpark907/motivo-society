@@ -290,3 +290,23 @@ describe("첫 가입 온보딩", () => {
     expect(error).not.toBeNull();
   });
 });
+
+describe("초대 링크 미리보기", () => {
+  it("코드를 가진 누구나 어느 클럽인지 보지만, 만든 사람·사용 횟수는 받지 않는다", async () => {
+    const host = await as("host");
+    const { data: invite } = await host.rpc("club_invite_create", { p_club: ID.videoClub });
+    const preview = (await anon().rpc("club_invite_preview", { p_code: String(invite) }))
+      .data as Record<string, unknown>;
+    expect(preview).toMatchObject({
+      valid: true,
+      slug: "ai-video-club",
+      name: "AI 영상 만들기 클럽",
+    });
+    expect(Object.keys(preview).sort()).toEqual(["members", "name", "slug", "tagline", "valid"]);
+  });
+
+  it("없는 코드는 아무 클럽도 알려 주지 않는다", async () => {
+    const { data } = await anon().rpc("club_invite_preview", { p_code: "abcdef123456" });
+    expect(data).toEqual({ valid: false });
+  });
+});

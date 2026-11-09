@@ -1,0 +1,376 @@
+// 클럽 상세 — 플랫폼 제품 화면 예외. 클럽 색(분홍)은 머리 면에만, 오렌지는 가입 버튼 하나.
+
+.page {
+  flex: 1 0 auto;
+  min-height: calc(100dvh - var(--gnb-height));
+}
+
+.inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-6);
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: var(--space-4) var(--space-4) var(--space-16);
+
+  @include up(md) {
+    padding: var(--space-6) var(--space-8) var(--space-16);
+  }
+}
+
+.crumbs {
+  display: flex;
+  gap: var(--space-2);
+  color: var(--ink-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+
+  a {
+    color: var(--ink);
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.notice,
+.errorBox {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: 12px;
+  font-weight: 700;
+}
+
+.notice {
+  background: var(--ink);
+  color: var(--white);
+}
+
+.errorBox {
+  border: 1px solid var(--accent);
+  background: var(--white);
+  color: var(--ink);
+}
+
+// 머리 · 가입 카드 · 본문. 좁은 화면은 위에서 아래로, 넓은 화면은 가입 카드가 오른쪽에 붙는다.
+.layout {
+  display: grid;
+  grid-template-areas: "hero" "side" "main";
+  gap: var(--space-6);
+
+  @include up(lg) {
+    grid-template-areas: "hero side" "main side";
+    grid-template-columns: minmax(0, 1fr) 320px;
+    grid-template-rows: auto 1fr;
+    gap: var(--space-8) var(--space-12);
+    align-items: start;
+  }
+}
+
+.hero {
+  display: grid;
+  grid-area: hero;
+  justify-items: start;
+  gap: var(--space-3);
+  padding: var(--space-8) var(--space-6);
+  border-radius: 20px;
+  background: var(--kind-club);
+
+  h1 {
+    margin: 0;
+    font-size: clamp(1.9rem, 5vw, 3rem);
+    font-weight: 900;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    word-break: keep-all;
+  }
+
+  > p {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 600;
+  }
+
+  // 같은 분홍 위에서 종류 태그가 묻히지 않게 흰 바탕으로.
+  > span[data-kind="club"] {
+    background: var(--white);
+  }
+
+  @include up(md) {
+    padding: var(--space-12) var(--space-8) var(--space-8);
+  }
+}
+
+.faces {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: var(--space-2);
+
+  > :not(span:last-child) {
+    margin-right: -8px;
+    border: 2px solid var(--kind-club);
+    border-radius: 50%;
+  }
+
+  > span:last-child {
+    margin-left: var(--space-4);
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+}
+
+.side {
+  grid-area: side;
+
+  @include up(lg) {
+    position: sticky;
+    top: calc(var(--gnb-height) + var(--space-6));
+  }
+}
+
+.joinCard {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-6);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: var(--white);
+
+  form {
+    display: grid;
+  }
+}
+
+.joinNote {
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 0.9rem;
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  padding: 0 var(--space-6);
+  border: 0;
+  border-radius: 14px;
+  background: var(--orange);
+  color: var(--black);
+  font: inherit;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 120ms;
+
+  &:hover {
+    background: color-mix(in srgb, var(--orange) 88%, var(--black));
+  }
+}
+
+.pill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  margin: 0;
+  padding: 0 var(--space-4);
+  border-radius: 14px;
+  background: var(--ink);
+  color: var(--white);
+  font-weight: 800;
+  text-align: center;
+
+  &[data-kind="pending"] {
+    border: 1px solid var(--accent);
+    background: var(--white);
+    color: var(--ink);
+  }
+
+  &[data-kind="banned"] {
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--ink-muted);
+  }
+}
+
+.leave {
+  summary {
+    min-height: 44px;
+    padding: var(--space-2) 0;
+    color: var(--ink-muted);
+    font-size: 0.875rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  form {
+    gap: var(--space-2);
+  }
+
+  p {
+    margin: 0;
+    color: var(--ink-muted);
+    font-size: 0.875rem;
+  }
+}
+
+.danger {
+  min-height: 44px;
+  border: 1px solid var(--ink);
+  border-radius: 12px;
+  background: var(--white);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background-color 120ms;
+
+  &:hover {
+    background: var(--surface);
+  }
+}
+
+.main {
+  display: grid;
+  grid-area: main;
+  gap: var(--space-8);
+  min-width: 0;
+}
+
+.block {
+  display: grid;
+  gap: var(--space-3);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--line);
+
+  h2 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 800;
+  }
+
+  > p:not(.muted) {
+    margin: 0;
+    line-height: 1.75;
+  }
+}
+
+.muted {
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 0.9rem;
+}
+
+.grid {
+  display: grid;
+  gap: var(--space-8) var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  @include up(md) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @include up(xl) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  > li {
+    display: grid;
+  }
+}
+
+.staff {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  @include up(md) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    border-radius: 14px;
+    background: var(--white);
+  }
+
+  span {
+    display: grid;
+  }
+
+  small {
+    color: var(--ink-muted);
+  }
+}
+
+// ── 초대
+.invite {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-3);
+}
+
+.inviteLink {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  max-width: 100%;
+
+  code {
+    overflow-wrap: anywhere;
+    padding: var(--space-2) var(--space-3);
+    border-radius: 10px;
+    background: var(--white);
+    font-size: 0.85rem;
+  }
+}
+
+.ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--white);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 120ms;
+
+  &:hover:not(:disabled) {
+    background: var(--surface);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+  }
+}
+
+.error {
+  margin: 0;
+  color: var(--accent);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.hint {
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 0.8rem;
+}

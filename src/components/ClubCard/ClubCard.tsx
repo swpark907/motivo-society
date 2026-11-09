@@ -2,13 +2,22 @@ import Link from "next/link";
 import type { ClubCardData } from "@/lib/platform/queries";
 import styles from "./ClubCard.module.scss";
 
-/** 클럽 카드. 분홍 태그가 "클럽"을 뜻한다. href가 없으면 링크 없이. */
-export function ClubCard({ club, href }: { club: ClubCardData; href?: string }) {
+/** 클럽 카드. 분홍 태그가 "클럽"을 뜻한다. href가 없으면 링크 없이. badge는 내 상태(멤버·승인 대기). */
+export function ClubCard({
+  club,
+  href,
+  badge,
+}: {
+  club: ClubCardData;
+  href?: string;
+  badge?: string;
+}) {
   const body = (
     <>
       <span className={styles.name}>
         <span className={styles.tag}>클럽</span>
         {club.name}
+        {badge && <span className={styles.badge}>{badge}</span>}
       </span>
       {club.tagline && <span className={styles.tagline}>{club.tagline}</span>}
       <span className={styles.meta}>
