@@ -627,3 +627,33 @@ describe("호스트 정산", () => {
     expect((await anon().rpc("host_settlement_overview")).error).not.toBeNull();
   });
 });
+
+describe("명단 내보내기 기록", () => {
+  it("관리하는 사람만 내보낼 수 있고, 내보낸 기록이 남는다", async () => {
+    const host = await as("host");
+    expect(
+      code(
+        (await host.rpc("roster_export_log", { p_activity: ID.workshop, p_format: "csv" })).error,
+      ),
+    ).toBeNull();
+    expect(
+      code(
+        (
+          await (
+            await as("member")
+          ).rpc("roster_export_log", { p_activity: ID.workshop, p_format: "csv" })
+        ).error,
+      ),
+    ).toBe("forbidden");
+    const { data } = await (
+      await as("owner")
+    )
+      .from("audit_logs")
+      .select("action, actor_id, detail")
+      .eq("activity_id", ID.workshop)
+      .eq("action", "roster.exported");
+    expect(data).toEqual([
+      { action: "roster.exported", actor_id: ID.host, detail: { format: "csv" } },
+    ]);
+  });
+});

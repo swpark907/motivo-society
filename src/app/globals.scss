@@ -113,3 +113,11 @@ a {
   letter-spacing: 0.12em;
   color: var(--ink-muted);
 }
+
+// 인쇄할 때는 사이트 메뉴(위 · 아래)를 빼고 본문만(호스트 출석표 H09 등).
+@media print {
+  body > header,
+  [data-tab-bar] {
+    display: none !important;
+  }
+}

@@ -1,0 +1,116 @@
+// 빠른 출석 — 휴대폰 한 손. 이름 줄은 크게(64px), 버튼은 엄지가 닿는 오른쪽에. 지금 기록된 쪽이 검게 눌린다.
+.wrap {
+  display: grid;
+  gap: var(--space-3);
+  max-width: 36rem;
+}
+
+.counter {
+  position: sticky;
+  top: calc(var(--gnb-height) + var(--space-2));
+  z-index: 1;
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: 12px;
+  background: var(--ink);
+  color: var(--surface);
+  font-weight: 700;
+
+  strong {
+    font-size: 1.15rem;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.error {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--accent);
+  border-radius: 12px;
+  font-weight: 700;
+}
+
+.search {
+  display: grid;
+  gap: 6px;
+
+  span {
+    font-size: 0.85rem;
+    font-weight: 800;
+  }
+
+  input {
+    min-height: 48px;
+    padding: 0 var(--space-3);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--white);
+    color: var(--ink);
+    font: inherit;
+    font-size: 1rem;
+  }
+}
+
+.list {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 16px;
+  list-style: none;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-height: 72px;
+  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-4);
+  background: var(--white);
+}
+
+.name {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 1.1rem;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  [data-mark="absent"] & {
+    color: var(--ink-muted);
+  }
+}
+
+.buttons {
+  display: flex;
+  flex: none;
+  gap: var(--space-2);
+
+  button {
+    min-width: 72px;
+    min-height: 56px;
+    padding: 0 var(--space-3);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--white);
+    color: var(--ink);
+    font: inherit;
+    font-weight: 800;
+    cursor: pointer;
+    transition: background-color 120ms;
+
+    &[aria-pressed="true"] {
+      border-color: var(--ink);
+      background: var(--ink);
+      color: var(--surface);
+    }
+
+    &:disabled {
+      cursor: progress;
+      opacity: 0.6;
+    }
+  }
+}

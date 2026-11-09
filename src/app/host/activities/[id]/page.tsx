@@ -293,6 +293,25 @@ function Roster({ a, now }: { a: HostActivityDetail; now: Date }) {
   return (
     <section className={s.section} id="roster" aria-labelledby="roster-h">
       <h2 id="roster-h">참가자 명단</h2>
+      {groups.length > 0 && (
+        <div className={s.rosterTools}>
+          {canCheck && (
+            <Link href={`/host/activities/${a.id}/check`} className={s.primarySmall}>
+              빠른 출석 체크
+            </Link>
+          )}
+          {/* 내보낼 때마다 감사 기록이 남는다(이메일·입금자명은 넣지 않는다). */}
+          <a href={`/host/activities/${a.id}/roster.csv`} className={s.ghostSmall} download>
+            명단 CSV 받기
+          </a>
+          {isGathering && (
+            // 출석표를 열면 내보냄 기록이 남아서, 미리 불러오기(prefetch)로 기록이 생기지 않게 끈다.
+            <Link href={`/host/activities/${a.id}/print`} className={s.ghostSmall} prefetch={false}>
+              출석표 인쇄
+            </Link>
+          )}
+        </div>
+      )}
       {isGathering && a.startsAt && a.roster.some((r) => r.status === "confirmed") && (
         <p className={s.hint}>
           {canCheck

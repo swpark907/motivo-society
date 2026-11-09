@@ -1,6 +1,7 @@
 // 호스트 활동 관리 화면(/host/activities/[id])의 계산: 명단 묶기 · 출석 시각 · 받은 돈 요약 · 쓸 수 있는 동작.
 // React·DB 의존 없음.
 import { hostTabOf, type HostActivityStatus } from "./host-view";
+import { kstDateKey } from "./schedule";
 
 export type ParticipationStatus =
   "pending_approval" | "pending_payment" | "waitlisted" | "confirmed" | "cancelled";
@@ -166,4 +167,80 @@ export function progressText(r: RosterRow, threshold: number | null): string | n
     return base;
   }
   return null;
+}
+
+// ─────────────────────────────────────────────── 명단 내보내기(H09)
+
+/** CSV 한 칸. 따옴표·쉼표·줄바꿈을 감싸고, =·+·-·@로 시작하면 앞에 '를 붙여 수식으로 실행되지 않게 한다. */
+export function csvCell(value: string | number | null | undefined): string {
+  let s = value === null || value === undefined ? "" : String(value);
+  if (/^[=+\-@\t\r]/.test(s)) s = `'${s}`;
+  return /[",\r\n]/.test(s) ? `"${s.replaceAll('"', '""')}"` : s;
+}
+
+const STATUS_TEXT: Record<ParticipationStatus, string> = {
+  pending_approval: "승인 대기",
+  pending_payment: "입금 대기",
+  confirmed: "확정",
+  waitlisted: "대기",
+  cancelled: "취소",
+};
+
+/**
+ * 명단 CSV(엑셀에서 한글이 깨지지 않게 BOM, 줄바꿈 CRLF). 항목은 닉네임 · 상태 · 신청일 · 결제 · 주문 번호와
+ * 종류에 맞는 출석/인증 — 이메일 · 입금자명 같은 개인정보는 넣지 않는다.
+ */
+export function rosterCsv(
+  kind: string,
+  rows: RosterRow[],
+  orderLabels: Record<string, string>,
+  threshold: number | null,
+): string {
+  const extra =
+    kind === "gathering"
+      ? ["출석"]
+      : kind === "series"
+        ? ["시즌 출석"]
+        : kind === "challenge"
+          ? ["인정된 인증", "완주"]
+          : [];
+  const header = ["닉네임", "상태", "신청일", "결제", "주문 번호", ...extra];
+  const lines = groupRoster(rows).flatMap((g) =>
+    g.rows.map((r) => {
+      const base = [
+        r.nickname,
+        STATUS_TEXT[r.status],
+        kstDateKey(new Date(r.appliedAt)),
+        r.orderStatus ? (orderLabels[r.orderStatus] ?? r.orderStatus) : "",
+        r.orderNo ?? "",
+      ];
+      const more =
+        kind === "gathering"
+          ? [r.attendance === "attended" ? "참석" : r.attendance === "absent" ? "불참" : ""]
+          : kind === "series"
+            ? [r.seasonHeld !== null ? `${r.seasonAttended ?? 0}/${r.seasonHeld}` : ""]
+            : kind === "challenge"
+              ? [
+                  r.accepted !== null
+                    ? threshold
+                      ? `${r.accepted}/${threshold}`
+                      : String(r.accepted)
+                    : "",
+                  r.outcome === "completed" ? "완주" : r.outcome === "incomplete" ? "미완주" : "",
+                ]
+              : [];
+      return [...base, ...more];
+    }),
+  );
+  return "﻿" + [header, ...lines].map((l) => l.map(csvCell).join(",")).join("\r\n") + "\r\n";
+}
+
+/** 내려받을 파일 이름: "명단-<제목>-<날짜>.csv"(파일 이름에 못 쓰는 글자는 뺀다). */
+export function rosterFileName(title: string, now: Date): string {
+  const safe =
+    title
+      .replace(/[\\/:*?"<>|\r\n]+/g, " ")
+      .trim()
+      .slice(0, 40) || "활동";
+  return `명단-${safe}-${kstDateKey(now)}.csv`;
 }

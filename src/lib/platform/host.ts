@@ -479,3 +479,16 @@ export async function getSettlementOverview(): Promise<SettlementOverview> {
   const { data } = await supabase.rpc("host_settlement_overview");
   return parseOverview(data);
 }
+
+/** 명단을 내보냈다는 감사 기록(H09). 관리 권한이 없으면 오류 코드. */
+export async function logRosterExport(
+  activityId: string,
+  format: "csv" | "print",
+): Promise<string | null> {
+  const supabase = await createSessionClient();
+  const { error } = await supabase.rpc("roster_export_log", {
+    p_activity: activityId,
+    p_format: format,
+  });
+  return error ? errorCodeFrom(error.message) : null;
+}

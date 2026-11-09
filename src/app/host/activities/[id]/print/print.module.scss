@@ -1,0 +1,114 @@
+// 종이 출석표 — .paper 바탕 · 글자색 선만. 인쇄할 때 화면용 버튼은 빠진다(사이트 메뉴는 globals의 인쇄 규칙이 뺀다).
+// body가 flex 컨테이너라 바깥은 화면 폭을 다 쓰고, 안쪽 종이만 가운데 좁게.
+.page {
+  flex: 1 0 auto;
+  width: 100%;
+  min-height: calc(100dvh - var(--gnb-height));
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.sheet {
+  display: grid;
+  gap: var(--space-4);
+  max-width: 48rem;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-4) var(--space-16);
+
+  @media print {
+    max-width: none;
+    padding: 0;
+  }
+}
+
+.screenOnly {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    color: inherit;
+    font-weight: 700;
+  }
+
+  @media print {
+    display: none;
+  }
+}
+
+.print {
+  min-height: 48px;
+  padding: 0 var(--space-6);
+  border: 0;
+  border-radius: 12px;
+  background: var(--ink);
+  color: var(--surface);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.head {
+  display: grid;
+  gap: 4px;
+
+  p {
+    margin: 0;
+    font-size: 0.9rem;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 800;
+  }
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+
+  caption {
+    padding-bottom: var(--space-2);
+    font-weight: 800;
+    text-align: left;
+  }
+
+  th,
+  td {
+    height: 40px;
+    padding: 0 var(--space-2);
+    border: 1px solid var(--ink);
+    text-align: left;
+  }
+
+  th:first-child,
+  td:first-child {
+    width: 3.5rem;
+    text-align: center;
+  }
+
+  th:nth-child(3),
+  td:nth-child(3) {
+    width: 4.5rem;
+    text-align: center;
+  }
+
+  tr {
+    break-inside: avoid;
+  }
+}
+
+.waiting,
+.foot {
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.foot {
+  color: var(--ink-muted);
+}

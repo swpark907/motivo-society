@@ -1384,3 +1384,62 @@ test.describe("호스트 정산", () => {
     await expect(page.getByText("정산할 참가비가 아직 없어요")).toBeVisible();
   });
 });
+
+// H09 명단 내보내기와 빠른 출석.
+test.describe("명단과 빠른 출석", () => {
+  const WORKSHOP = "/host/activities/00000000-0000-4000-c000-000000000006";
+
+  test("곧 시작하는 모임은 휴대폰 화면에서 이름 옆 버튼으로 바로 출석을 체크하고, 다시 열어도 남아 있다", async ({
+    page,
+  }) => {
+    await signInAs(page, "클럽운영진", "/host/activities/00000000-0000-4000-c000-000000000001");
+    await page.getByRole("link", { name: "빠른 출석 체크" }).click();
+    await expect(page).toHaveURL(/\/check$/);
+    const counter = page.getByRole("status");
+    await expect(counter).toHaveText("참석 0 · 불참 0 · 아직 3");
+
+    const one = page.getByRole("group", { name: "참가자1 출석" });
+    await one.getByRole("button", { name: "참석" }).click();
+    await expect(counter).toHaveText("참석 1 · 불참 0 · 아직 2");
+    await page
+      .getByRole("group", { name: "참가자2 출석" })
+      .getByRole("button", { name: "불참" })
+      .click();
+    await expect(counter).toHaveText("참석 1 · 불참 1 · 아직 1");
+
+    await page.reload();
+    await expect(
+      page.getByRole("group", { name: "참가자1 출석" }).getByRole("button", { name: "참석" }),
+    ).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByRole("status")).toHaveText("참석 1 · 불참 1 · 아직 1");
+  });
+
+  test("명단 CSV는 닉네임·상태·결제만 담아 내려받고, 출석표는 확정자만 인쇄용으로 보여 준다", async ({
+    page,
+  }) => {
+    await signInAs(page, "바라호스트", WORKSHOP);
+    const downloading = page.waitForEvent("download");
+    await page.getByRole("link", { name: "명단 CSV 받기" }).click();
+    const file = await downloading;
+    expect(file.suggestedFilename()).toMatch(/^명단-AI 도구 실습 워크숍-\d{4}-\d{2}-\d{2}\.csv$/);
+    const text = (await (await import("node:fs/promises")).readFile(await file.path())).toString(
+      "utf8",
+    );
+    expect(text).toContain("닉네임,상태,신청일,결제,주문 번호,출석");
+    expect(text).toContain("참가자4,확정");
+    expect(text).toContain("참가자5,입금 대기");
+    expect(text).not.toContain("@");
+
+    await page.goto(WORKSHOP);
+    await page.getByRole("link", { name: "출석표 인쇄" }).click();
+    const table = page.getByRole("table", { name: "확정 1명" });
+    await expect(table.getByRole("row")).toHaveCount(2);
+    await expect(table).toContainText("참가자4");
+    await expect(table).not.toContainText("참가자5");
+    await expect(page.getByRole("button", { name: "인쇄하기" })).toBeVisible();
+
+    // 아직 시작 1시간 전이 아니면 빠른 출석은 언제부터인지 알려 준다
+    await page.goto(`${WORKSHOP}/check`);
+    await expect(page.getByText("아직 출석을 체크할 수 없어요")).toBeVisible();
+  });
+});

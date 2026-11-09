@@ -1854,6 +1854,10 @@ export type Database = {
         Args: { p_order: string; p_reason?: string };
         Returns: number;
       };
+      roster_export_log: {
+        Args: { p_activity: string; p_format: string };
+        Returns: undefined;
+      };
       sandbox_reseed: { Args: never; Returns: undefined };
       saved_delete: {
         Args: { p_id: string; p_kind: string };

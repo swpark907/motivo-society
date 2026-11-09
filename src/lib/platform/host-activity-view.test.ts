@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
   attendanceCounts,
+  csvCell,
+  rosterCsv,
+  rosterFileName,
   canCheckAttendance,
   groupRoster,
   manageActions,
@@ -148,5 +151,41 @@ describe("진행 표시", () => {
     expect(progressText(row({ accepted: 6, outcome: "completed" }), 5)).toBe("인증 6/5회 · 완주");
     expect(progressText(row({ accepted: 3 }), 5)).toBe("인증 3/5회");
     expect(progressText(row({}), null)).toBeNull();
+  });
+});
+
+describe("명단 내보내기", () => {
+  it("CSV 칸: 따옴표·쉼표를 감싸고 수식으로 시작하면 막는다", () => {
+    expect(csvCell("가람")).toBe("가람");
+    expect(csvCell('말 "따옴표", 쉼표')).toBe('"말 ""따옴표"", 쉼표"');
+    expect(csvCell("=HYPERLINK(1)")).toBe("'=HYPERLINK(1)");
+    expect(csvCell("-1")).toBe("'-1");
+    expect(csvCell(null)).toBe("");
+  });
+
+  it("모임 명단: BOM · 머리줄 · 상태 순서 · 출석, 이메일 같은 칸은 없다", () => {
+    const csv = rosterCsv(
+      "gathering",
+      [
+        row({ nickname: "하나", attendance: "attended", appliedAt: "2026-11-01T16:00:00Z" }),
+        row({ nickname: "둘", status: "pending_payment", orderNo: "MS-1", orderStatus: "pending" }),
+      ],
+      { pending: "입금 대기" },
+      null,
+    );
+    expect(csv.startsWith("\uFEFF")).toBe(true);
+    const lines = csv.slice(1).trimEnd().split("\r\n");
+    expect(lines[0]).toBe("닉네임,상태,신청일,결제,주문 번호,출석");
+    expect(lines[1]).toBe("둘,입금 대기,2026-11-01,입금 대기,MS-1,");
+    expect(lines[2]).toBe("하나,확정,2026-11-02,,,참석");
+  });
+
+  it("챌린지는 인증과 완주, 파일 이름은 쓸 수 없는 글자를 뺀다", () => {
+    const csv = rosterCsv("challenge", [row({ accepted: 6, outcome: "completed" })], {}, 5);
+    expect(csv).toContain("인정된 인증,완주");
+    expect(csv).toContain("6/5,완주");
+    expect(rosterFileName('1주/프롬프트:"일기"', new Date("2026-11-09T03:00:00Z"))).toBe(
+      "명단-1주 프롬프트 일기-2026-11-09.csv",
+    );
   });
 });
