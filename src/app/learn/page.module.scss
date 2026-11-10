@@ -14,12 +14,14 @@
   }
 }
 
+// 좁은 화면: 제목 · 설명 왼쪽, 화살표 오른쪽의 짧은 행 카드. 넓은 화면: 세 칸 카드(화살표는 아래).
 .door {
   display: grid;
-  align-content: start;
-  gap: var(--space-2);
-  min-height: 160px;
-  padding: var(--space-6);
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: var(--space-3);
+  row-gap: 2px;
+  @include card-pad;
   border: 2px solid transparent;
   border-radius: var(--product-radius);
   background: var(--surface-2);
@@ -30,20 +32,49 @@
   &:hover {
     border-color: var(--ink);
   }
+
+  @include up(md) {
+    grid-template-rows: auto auto 1fr;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    row-gap: var(--space-2);
+    min-height: 160px;
+  }
 }
 
 .doorTitle {
-  font-size: 1.2rem;
+  grid-column: 1;
+  font-size: 1.05rem;
   font-weight: 800;
+
+  @include up(md) {
+    font-size: 1.2rem;
+  }
 }
 
 .doorBody {
+  grid-column: 1;
   color: var(--ink-muted);
-  line-height: 1.6;
+  word-break: keep-all;
+  font-size: 0.9rem;
+  line-height: 1.5;
+
+  @include up(md) {
+    font-size: 1rem;
+    line-height: 1.6;
+  }
 }
 
 .doorGo {
-  margin-top: auto;
-  font-size: 1.25rem;
+  grid-row: 1 / span 2;
+  grid-column: 2;
+  font-size: 1.1rem;
   font-weight: 700;
+
+  @include up(md) {
+    grid-row: 3;
+    grid-column: 1;
+    align-self: end;
+    font-size: 1.25rem;
+  }
 }

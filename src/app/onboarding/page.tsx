@@ -20,7 +20,7 @@ export default async function OnboardingPage({ searchParams }: PageProps<"/onboa
   const interests = await listActiveInterests();
 
   return (
-    <main className={`paper ${s.page}`}>
+    <main data-platform className={`paper ${s.page}`}>
       <div className={s.inner}>
         <p className="label">WELCOME</p>
         <h1 className={s.title}>모쏘에서 쓸 이름을 정해 주세요</h1>

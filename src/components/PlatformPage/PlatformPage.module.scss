@@ -2,40 +2,67 @@
   // body가 flex 컨테이너라 내용보다 작게 줄어들지 않게 한다.
   flex: 1 0 auto;
   min-height: calc(100dvh - var(--gnb-height));
+  @include tab-bar-space;
 }
 
 .inner {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: var(--space-8);
+  gap: 20px; // 좁은 화면: 머리와 본문 사이를 앱처럼 촘촘하게
   max-width: var(--max-width);
   margin: 0 auto;
-  padding: var(--space-8) var(--space-4) var(--space-16);
+  padding: var(--space-4) var(--space-4) var(--space-16);
 
   @include up(md) {
-    padding-inline: var(--space-8);
+    gap: var(--space-8);
+    padding: var(--space-8) var(--space-8) var(--space-16);
   }
 }
 
+// 좁은 화면: 앱식 머리 — 영문 라벨 없이 큰 제목 하나 + 짧은 보조 줄. 넓은 화면은 그대로.
 .head {
   display: grid;
-  gap: var(--space-2);
+  gap: 4px;
+
+  > :global(.label) {
+    display: none;
+  }
+
+  @include up(md) {
+    gap: var(--space-2);
+
+    > :global(.label) {
+      display: block;
+    }
+  }
 }
 
 .title {
   margin: 0;
-  font-size: clamp(1.75rem, 4vw, 2.5rem);
-  font-weight: 800;
+  font-size: 1.85rem;
+  font-weight: 700;
   line-height: 1.2;
+  letter-spacing: -0.02em;
+
+  @include up(md) {
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 800;
+    letter-spacing: normal;
+  }
 }
 
 .lead {
   max-width: 40rem;
   margin: 0;
   color: var(--ink-muted);
-  font-size: 1rem;
-  line-height: 1.6;
+  font-size: 0.9rem;
+  line-height: 1.5;
   word-break: keep-all;
+
+  @include up(md) {
+    font-size: 1rem;
+    line-height: 1.6;
+  }
 }
 
 .back {

@@ -21,7 +21,7 @@ export function PlatformPage({
   children: ReactNode;
 }) {
   return (
-    <main className={`paper ${styles.page}`}>
+    <main data-platform className={`paper ${styles.page}`}>
       <div className={styles.inner}>
         <header className={styles.head}>
           {back && (

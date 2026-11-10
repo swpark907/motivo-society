@@ -28,7 +28,7 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
   const isDev = process.env.NODE_ENV === "development";
 
   return (
-    <main className={`paper ${s.page}`}>
+    <main data-platform className={`paper ${s.page}`}>
       <div className={s.card}>
         <Image
           className={s.capy}

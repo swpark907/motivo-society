@@ -3,6 +3,7 @@
 .page {
   flex: 1 0 auto;
   min-height: calc(100dvh - var(--gnb-height));
+  @include tab-bar-space;
 }
 
 .inner {
@@ -183,7 +184,7 @@
 .welcome {
   display: grid;
   gap: var(--space-3);
-  padding: var(--space-6);
+  @include card-pad;
   border-radius: var(--product-radius);
   background: var(--white);
 
@@ -283,7 +284,7 @@
   align-content: center;
   justify-items: start;
   gap: var(--space-3);
-  padding: var(--space-6);
+  @include card-pad;
 
   h3 {
     margin: 0;

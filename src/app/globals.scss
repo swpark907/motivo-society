@@ -121,3 +121,12 @@ a {
     display: none !important;
   }
 }
+
+// 플랫폼 제품 화면의 모바일 밀도(2026-11-10, 승우 요청 — 앱처럼). 글자 크기가 대부분 rem이라
+// 기준 글자 크기 하나로 화면 전체를 함께 줄인다. 플랫폼 화면(main[data-platform])에서만, md(768px) 미만에서만.
+// 워크북 · 읽을거리 · 브랜드 홈(비로그인)은 그대로다.
+@media (max-width: 767.98px) {
+  html:has(main[data-platform]) {
+    font-size: 15px;
+  }
+}

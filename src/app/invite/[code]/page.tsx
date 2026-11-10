@@ -19,7 +19,7 @@ export default async function InvitePage({ params, searchParams }: PageProps<"/i
   const status = invite && user ? await myClubStatusBySlug(invite.slug, user.id) : null;
 
   return (
-    <main className={`paper ${s.page}`}>
+    <main data-platform className={`paper ${s.page}`}>
       <section className={s.card} aria-labelledby="invite-h">
         {!invite ? (
           <>

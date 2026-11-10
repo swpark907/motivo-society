@@ -42,7 +42,7 @@ export default async function ClubPage({ params, searchParams }: Props) {
   const faces = facesLine(club.members.map((m) => m.nickname));
 
   return (
-    <main className={`paper ${s.page}`}>
+    <main data-platform className={`paper ${s.page}`}>
       <div className={s.inner}>
         <nav className={s.crumbs} aria-label="위치">
           <Link href="/clubs">클럽</Link>

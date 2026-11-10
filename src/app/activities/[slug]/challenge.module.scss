@@ -71,7 +71,7 @@
 .together {
   display: grid;
   gap: var(--space-3);
-  padding: var(--space-6);
+  @include card-pad;
   border-radius: 16px;
   background: var(--white);
 
