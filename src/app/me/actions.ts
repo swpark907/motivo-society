@@ -2,13 +2,14 @@
 
 import { redirect } from "next/navigation";
 import { markCalloutsRead, muteHost, setCalloutAccept } from "@/lib/platform/host-callouts";
+import { isUuid } from "@/lib/platform/ids";
 
 const back = (q: string): never => redirect(`/me?${q}#callouts`);
 
 /** 받은 소식에서 이 호스트를 끄거나 다시 켠다. */
 export async function muteHostAction(formData: FormData) {
   const host = String(formData.get("hostId") ?? "");
-  if (!/^[0-9a-f-]{36}$/.test(host)) throw new Error("invalid host");
+  if (!isUuid(host)) throw new Error("invalid host");
   const mute = formData.get("mute") === "true";
   const code = await muteHost(host, mute);
   back(code ? `error=${code}` : `notice=${mute ? "host_muted" : "host_unmuted"}`);

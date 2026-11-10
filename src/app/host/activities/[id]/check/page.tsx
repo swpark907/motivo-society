@@ -7,6 +7,7 @@ import { getHostActivity } from "@/lib/platform/host";
 import { attendanceOpensAt, canCheckAttendance } from "@/lib/platform/host-activity-view";
 import { requireUser } from "@/lib/platform/session";
 import { QuickCheck } from "./QuickCheck";
+import { isUuid } from "@/lib/platform/ids";
 
 export const metadata: Metadata = {
   title: "빠른 출석",
@@ -16,7 +17,7 @@ export const metadata: Metadata = {
 // 현장에서 휴대폰 한 손으로 쓰는 출석 체크(H09). 모임과 시즌 회차만.
 export default async function CheckPage({ params }: PageProps<"/host/activities/[id]/check">) {
   const { id } = await params;
-  if (!/^[0-9a-f-]{36}$/.test(id)) notFound();
+  if (!isUuid(id)) notFound();
   await requireUser(`/host/activities/${id}/check`);
   const result = await getHostActivity(id);
   if (!result.found || !result.canManage) notFound();

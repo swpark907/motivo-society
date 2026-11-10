@@ -17,6 +17,7 @@ import { KIND_LABELS } from "@/lib/platform/messages";
 import { requireUser } from "@/lib/platform/session";
 import { NewActivityForm } from "./NewActivityForm";
 import s from "./new.module.scss";
+import { isUuid } from "@/lib/platform/ids";
 
 export const metadata: Metadata = {
   title: "활동 만들기",
@@ -27,9 +28,8 @@ const one = (v: string | string[] | undefined) => (Array.isArray(v) ? v.join(","
 
 export default async function NewActivityPage({ searchParams }: PageProps<"/host/new">) {
   const sp = await searchParams;
-  const from = typeof sp.from === "string" && /^[0-9a-f-]{36}$/.test(sp.from) ? sp.from : null;
-  const templateId =
-    typeof sp.template === "string" && /^[0-9a-f-]{36}$/.test(sp.template) ? sp.template : null;
+  const from = typeof sp.from === "string" && isUuid(sp.from) ? sp.from : null;
+  const templateId = typeof sp.template === "string" && isUuid(sp.template) ? sp.template : null;
   const parts = parseImportParts(one(sp.take));
   await requireUser("/host/new");
   const [options, mine, source, saved] = await Promise.all([

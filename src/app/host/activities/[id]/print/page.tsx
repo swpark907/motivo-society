@@ -7,6 +7,7 @@ import { groupRoster } from "@/lib/platform/host-activity-view";
 import { requireUser } from "@/lib/platform/session";
 import { PrintButton } from "./PrintButton";
 import s from "./print.module.scss";
+import { isUuid } from "@/lib/platform/ids";
 
 export const metadata: Metadata = {
   title: "출석표",
@@ -16,7 +17,7 @@ export const metadata: Metadata = {
 // 현장에서 쓸 종이 출석표(H09). 확정된 사람만 표에, 대기자는 아래 짧게. 열 때마다 감사 기록을 남긴다.
 export default async function PrintPage({ params }: PageProps<"/host/activities/[id]/print">) {
   const { id } = await params;
-  if (!/^[0-9a-f-]{36}$/.test(id)) notFound();
+  if (!isUuid(id)) notFound();
   await requireUser(`/host/activities/${id}/print`);
   const result = await getHostActivity(id);
   if (!result.found || !result.canManage) notFound();

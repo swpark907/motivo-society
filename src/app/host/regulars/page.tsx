@@ -41,7 +41,7 @@ export default async function RegularsPage() {
               <div className={s.who}>
                 <strong>{r.nickname}</strong>
                 <small>
-                  {r.lastAt ? `최근 ${shortDate(new Date(r.lastAt))}` : ""}
+                  {r.lastAt ? `최근 참가 ${shortDate(new Date(r.lastAt))}` : "아직 열리기 전"}
                   {r.attended + r.absent > 0
                     ? ` · 출석 체크 ${r.attended + r.absent}번 중 참석 ${r.attended}`
                     : " · 출석 체크 기록 없음"}

@@ -3,6 +3,7 @@ import { errorCodeFrom } from "./messages";
 import { MEDIA_BUCKET, MEDIA_MAX_BYTES, mediaPath, mediaUrl, sniffImage } from "./media";
 import { getCurrentUser } from "./session";
 import { createSessionClient } from "./supabase-server";
+import { isUuid } from "./ids";
 
 // 이미지 보관함(H06). 파일은 Storage media 버킷, 목록은 media_assets. 권한은 Storage 정책과 DB 함수가 정한다.
 
@@ -19,7 +20,7 @@ export type MediaOwner = { kind: "user"; id: string } | { kind: "club"; id: stri
 
 /** 보관함 고르기 값("me" 또는 클럽 id) → 주인. 클럽 권한은 Storage 정책과 DB 함수가 다시 본다. */
 export async function resolveMediaOwner(value: string): Promise<MediaOwner | null> {
-  if (/^[0-9a-f-]{36}$/.test(value)) return { kind: "club", id: value };
+  if (isUuid(value)) return { kind: "club", id: value };
   const user = await getCurrentUser();
   return user ? { kind: "user", id: user.id } : null;
 }

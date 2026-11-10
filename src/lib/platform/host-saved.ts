@@ -96,3 +96,13 @@ export async function deleteSaved(
   const { error } = await supabase.rpc("saved_delete", { p_kind: kind, p_id: id });
   return error ? errorCodeFrom(error.message) : null;
 }
+
+/** 공지 문구만(관리 화면의 공지 쓰기에서 고른다). */
+export async function listSnippets(): Promise<SavedSnippet[]> {
+  const supabase = await createSessionClient();
+  const { data } = await supabase
+    .from("saved_snippets")
+    .select("id, title, body")
+    .order("updated_at", { ascending: false });
+  return (data ?? []).map((r) => ({ id: r.id, title: r.title, body: r.body }));
+}

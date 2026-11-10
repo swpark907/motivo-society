@@ -1588,3 +1588,123 @@ test.describe("지난 참가자 다시 부르기와 단골", () => {
     await expect(first).toContainText("3번");
   });
 });
+
+// 호스트 여정 통합(H01~H11 점검): 한 호스트가 활동 하나를 열어 끝까지 운영한다.
+test.describe("호스트 여정", () => {
+  test("양식으로 만들어 공개하고, 표지를 올리고, 신청을 받아 공지 · 출석 · 장부 · 명단 · 단골까지 이어진다", async ({
+    page,
+    browser,
+  }) => {
+    test.setTimeout(120_000);
+    const title = "호스트 여정 저녁 수다";
+    // 40분 뒤 시작 → 시작 1시간 전부터인 출석 체크가 바로 열린다.
+    const startsAt = new Date(Date.now() + 9 * 3600_000 + 40 * 60_000).toISOString().slice(0, 16);
+
+    // 1. 호스트 도구 → 내 양식으로 시작 → 저장한 장소 → 일정 → 초안
+    await signInAs(page, "바라호스트", "/host");
+    await page.getByRole("link", { name: "활동 만들기" }).click();
+    await page
+      .getByRole("navigation", { name: "내 양식으로 시작" })
+      .getByRole("link", { name: "카페 수다" })
+      .click();
+    await expect(page.getByRole("main").getByRole("status")).toContainText(
+      "양식으로 시작했어요: 카페 수다",
+    );
+    await page.getByRole("button", { name: "다음" }).click();
+    await page.getByLabel("제목").fill(title);
+    await page
+      .getByLabel("저장한 장소에서 고르기")
+      .selectOption({ label: "합정 스터디룸 · 서울 마포구" });
+    await page.getByRole("button", { name: "다음" }).click();
+    await page.getByLabel("시작", { exact: true }).fill(startsAt);
+    await page.getByRole("button", { name: "다음" }).click();
+    await page.getByRole("button", { name: "다음" }).click();
+    await expect(page.getByRole("region", { name: "5. 확인" })).toContainText("합정 스터디룸");
+    await page.getByRole("button", { name: "초안으로 만들기" }).click();
+    await expect(page).toHaveURL(/\/host\/activities\/[0-9a-f-]{36}\?notice=activity_created$/, {
+      timeout: 30_000,
+    });
+    const manage = new URL(page.url()).pathname;
+
+    // 2. 공개 · 표지
+    await page.getByRole("button", { name: "공개하기" }).click();
+    await expect(page.getByRole("status")).toHaveText("공개했어요. 이제 신청을 받아요.");
+    await page
+      .getByRole("region", { name: "표지" })
+      .getByText("표지 바꾸기", { exact: true })
+      .click();
+    const coverForm = page.getByRole("form", { name: "새 사진 올려 표지로 쓰기" });
+    await coverForm
+      .getByLabel(/^이미지/)
+      .setInputFiles("public/images/platform/mock/cover-cafe-chat.jpg");
+    await coverForm.getByRole("button", { name: "올리고 표지로 쓰기" }).click();
+    await expect(page.getByRole("status")).toHaveText("표지를 바꿨어요.", { timeout: 30_000 });
+    const publicHref = await page
+      .getByRole("link", { name: "참가자 화면 보기 →" })
+      .getAttribute("href");
+    expect(publicHref).toMatch(/^\/activities\/a-[0-9a-f]{10}$/);
+
+    // 3. 회원이 신청 → 바로 확정
+    const member = await (await browser.newContext()).newPage();
+    await signInAs(member, "멤버하나", `${publicHref}/apply`);
+    await member.getByRole("button", { name: "신청하기" }).click();
+    await expect(member.getByRole("heading", { name: "참가가 확정됐어요" })).toBeVisible();
+
+    // 4. 호스트: 명단에 보이고, 확정자에게 공지
+    await page.goto(manage);
+    const roster = page.getByRole("region", { name: "참가자 명단" });
+    await expect(roster.getByRole("listitem").filter({ hasText: "멤버하나" })).toBeVisible();
+    const compose = page.getByRole("form", { name: "공지 남기기" });
+    await expect(compose.getByRole("checkbox", { name: "확정 1명" })).toBeChecked();
+    await compose.getByLabel(/^내용/).fill("2층 창가 자리로 오세요.");
+    await compose.getByRole("button", { name: "공지 남기기" }).click();
+    await expect(page.getByRole("status")).toContainText("공지를 남겼어요");
+
+    await member.goto(publicHref!);
+    await expect(member.getByRole("region", { name: "여는 사람의 공지" })).toContainText(
+      "2층 창가 자리로 오세요.",
+    );
+    await expect(
+      member.locator('img[src*="/storage/v1/object/public/media/"]').first(),
+    ).toBeVisible();
+
+    // 5. 빠른 출석
+    await page.getByRole("link", { name: "빠른 출석 체크" }).click();
+    await page
+      .getByRole("group", { name: "멤버하나 출석" })
+      .getByRole("button", { name: "참석" })
+      .click();
+    await expect(page.getByRole("status")).toHaveText("참석 1 · 불참 0 · 아직 0");
+
+    // 6. 장부
+    await page.goto(manage);
+    const add = page.getByRole("form", { name: "장부에 적기" });
+    await add.getByLabel("항목").fill("음료");
+    await add.getByLabel("금액 (원)").fill("12000");
+    await add.getByRole("button", { name: "장부에 적기" }).click();
+    await expect(page.getByRole("status")).toHaveText("장부에 적었어요.");
+    await expect(
+      page.getByRole("region", { name: "장부" }).getByRole("definition").last(),
+    ).toHaveText("− 12,000원");
+
+    // 7. 명단 CSV에 출석까지
+    const downloading = page.waitForEvent("download");
+    await page.getByRole("link", { name: "명단 CSV 받기" }).click();
+    const csv = (
+      await (await import("node:fs/promises")).readFile(await (await downloading).path())
+    ).toString("utf8");
+    expect(csv).toMatch(/멤버하나,확정,\d{4}-\d{2}-\d{2},,,참석/);
+
+    // 8. 단골과 내가 연 활동
+    await page.goto("/host/regulars");
+    await expect(
+      page
+        .getByRole("list", { name: "함께한 사람" })
+        .getByRole("listitem")
+        .filter({ hasText: "멤버하나" }),
+    ).toContainText("2번");
+    await page.goto("/host");
+    await expect(page.getByRole("region", { name: "내가 연 활동" })).toContainText(title);
+    await expect(page.getByRole("region", { name: "지금 처리할 일" })).toContainText(title);
+  });
+});

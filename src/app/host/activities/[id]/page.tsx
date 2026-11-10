@@ -17,7 +17,7 @@ import {
 import { getSentCallout, type SentCallout } from "@/lib/platform/host-callouts";
 import { getLedger } from "@/lib/platform/host-ledger";
 import { AUDIENCE_LABELS, listSentNotices } from "@/lib/platform/host-notices";
-import { listSaved } from "@/lib/platform/host-saved";
+import { listSnippets } from "@/lib/platform/host-saved";
 import { NoticeComposer } from "./NoticeComposer";
 import { listMedia, type MediaAsset } from "@/lib/platform/host-media";
 import type { Ledger } from "@/lib/platform/ledger-view";
@@ -61,6 +61,7 @@ import {
   uploadCoverAction,
 } from "./actions";
 import s from "./manage.module.scss";
+import { isUuid } from "@/lib/platform/ids";
 
 export const metadata: Metadata = {
   title: "활동 관리",
@@ -72,22 +73,10 @@ export default async function HostActivityPage({
   searchParams,
 }: PageProps<"/host/activities/[id]">) {
   const { id } = await params;
-  if (!/^[0-9a-f-]{36}$/.test(id)) notFound();
+  if (!isUuid(id)) notFound();
   const sp = await searchParams;
   await requireUser(`/host/activities/${id}`);
-  const [result, access, media, options, ledger, notices, saved, callout, mine] = await Promise.all(
-    [
-      getHostActivity(id),
-      getHostAccess(),
-      listMedia(),
-      getCreateOptions(),
-      getLedger(id),
-      listSentNotices(id),
-      listSaved(),
-      getSentCallout(id),
-      listHostActivities(),
-    ],
-  );
+  const result = await getHostActivity(id);
   if (!result.found) notFound();
   if (!result.canManage) {
     return (
@@ -103,6 +92,21 @@ export default async function HostActivityPage({
 
   const a = result.activity;
   const now = new Date();
+  // 관리 권한을 확인한 뒤에만, 그리고 그 칸을 보여 주는 활동에서만 칸별 데이터를 읽는다.
+  // 시즌 회차는 표지 · 장부 · 공지 · 다시 부르기를 시즌에서 하므로 읽지 않는다.
+  const full = a.series === null;
+  const canCallout = full && (a.status === "open" || a.status === "in_progress");
+  const [access, media, options, ledger, notices, snippets, callout, mine] = await Promise.all([
+    full ? getHostAccess() : Promise.resolve(null),
+    full ? listMedia() : Promise.resolve([]),
+    full ? getCreateOptions() : Promise.resolve({ hostTier: null, official: false, clubs: [] }),
+    full ? getLedger(id) : Promise.resolve({ access: "none" } as const),
+    full ? listSentNotices(id) : Promise.resolve([]),
+    full ? listSnippets() : Promise.resolve([]),
+    full ? getSentCallout(id) : Promise.resolve(null),
+    // 다시 부르기 대상 고르기에만 쓴다(열린 활동에서만 보낼 수 있다).
+    canCallout ? listHostActivities() : Promise.resolve([]),
+  ]);
   const notice = typeof sp.notice === "string" ? noticeMessage(sp.notice) : null;
   const errorCode = typeof sp.error === "string" && /^[a-z_]+$/.test(sp.error) ? sp.error : null;
   const isSession = a.series !== null;
@@ -206,7 +210,7 @@ export default async function HostActivityPage({
             </Link>
           )}
           {/* 지난 활동을 바탕으로 다음 활동을 연다(H04). 회차는 시즌에서 가져온다. */}
-          {!isSession && (access.hostTier || access.clubCreate || access.official) && (
+          {!isSession && access && (access.hostTier || access.clubCreate || access.official) && (
             <Link href={`/host/new?from=${a.id}`} className={s.secondary}>
               이 활동으로 새로 만들기
             </Link>
@@ -242,7 +246,7 @@ export default async function HostActivityPage({
                 waitlisted: count(a.roster, "waitlisted"),
                 pending_payment: count(a.roster, "pending_payment"),
               }}
-              snippets={saved.snippets}
+              snippets={snippets}
             />
           </details>
           {notices.length > 0 && (
@@ -512,12 +516,12 @@ function Money({ a, now }: { a: HostActivityDetail; now: Date }) {
     <section className={s.section} aria-labelledby="money-h">
       <h2 id="money-h">받은 돈과 환불</h2>
       <p className={s.hint}>
-        참가자 주문에서 계산했어요. 입금 확인과 환불 송금은 운영진이 처리해요.
+        참가자 주문에서 계산했어요. 입금 확인과 환불 송금은 운영진이 처리해요. 수수료와 지출까지 뺀
+        남은 돈은 아래 장부에서 봐요.
       </p>
       <dl className={s.tiles}>
         <Tile label="받은 돈" value={won(m.received)} />
-        <Tile label="돌려준 돈" value={won(m.refunded)} />
-        <Tile label="남은 돈" value={won(m.net)} />
+        <Tile label="송금한 환불" value={won(m.refunded)} />
         {m.refundOpen > 0 && <Tile label="처리 중 환불" value={won(m.refundOpen)} />}
         {m.pending > 0 && <Tile label="입금 대기" value={won(m.pending)} />}
       </dl>
@@ -676,7 +680,9 @@ function LedgerSection({
           참가비에서 환불과 수수료를 뺀 {won(p.total)}을 정산으로 받아요 · 지급 완료{" "}
           {won(p.settled)} · 정산 예정 {won(p.scheduled)} · 아직 정산 전 {won(p.unsettled)}.
           수수료는 주문에 적힌 비율로 계산해요.{" "}
-          <Link href="/host/settlements">정산 화면에서 보기</Link>
+          <Link href="/host/settlements" className={s.inlineLink}>
+            정산 화면에서 보기
+          </Link>
         </p>
       )}
 

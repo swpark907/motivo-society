@@ -2,11 +2,12 @@ import { getHostActivity, logRosterExport } from "@/lib/platform/host";
 import { rosterCsv, rosterFileName } from "@/lib/platform/host-activity-view";
 import { ORDER_STATUS_LABELS } from "@/lib/platform/messages";
 import { getCurrentUser } from "@/lib/platform/session";
+import { isUuid } from "@/lib/platform/ids";
 
 // 명단 CSV 내려받기(H09). 관리 권한이 있는 사람만, 내보낼 때마다 감사 기록을 남긴다.
 export async function GET(req: Request, ctx: RouteContext<"/host/activities/[id]/roster.csv">) {
   const { id } = await ctx.params;
-  if (!/^[0-9a-f-]{36}$/.test(id)) return new Response("Not found", { status: 404 });
+  if (!isUuid(id)) return new Response("Not found", { status: 404 });
   const user = await getCurrentUser();
   if (!user) {
     return Response.redirect(

@@ -2,8 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { deleteMedia, resolveMediaOwner, uploadMedia } from "@/lib/platform/host-media";
-
-const UUID = /^[0-9a-f-]{36}$/;
+import { isUuid } from "@/lib/platform/ids";
 
 export async function uploadMediaAction(formData: FormData) {
   const owner = await resolveMediaOwner(String(formData.get("owner") ?? "me"));
@@ -19,7 +18,7 @@ export async function uploadMediaAction(formData: FormData) {
 
 export async function deleteMediaAction(formData: FormData) {
   const id = String(formData.get("id") ?? "");
-  if (!UUID.test(id)) throw new Error("invalid id");
+  if (!isUuid(id)) throw new Error("invalid id");
   const code = await deleteMedia(id);
   redirect(
     `/host/media?${code ? `error=${code === "not_found" ? "saved_missing" : code}` : "notice=saved_deleted"}`,

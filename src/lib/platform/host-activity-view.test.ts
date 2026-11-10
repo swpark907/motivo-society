@@ -96,7 +96,7 @@ describe("받은 돈", () => {
         ],
         NOW,
       ),
-    ).toEqual({ received: 40000, refunded: 5000, refundOpen: 3000, pending: 7000, net: 35000 });
+    ).toEqual({ received: 40000, refunded: 5000, refundOpen: 3000, pending: 7000 });
   });
 
   it("기한이 지난 입금 대기는 기한 지남", () => {

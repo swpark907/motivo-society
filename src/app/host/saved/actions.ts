@@ -2,14 +2,14 @@
 
 import { redirect } from "next/navigation";
 import { deleteSaved, savePlace, saveSnippet } from "@/lib/platform/host-saved";
+import { isUuid } from "@/lib/platform/ids";
 
-const UUID = /^[0-9a-f-]{36}$/;
 const text = (formData: FormData, name: string) => String(formData.get(name) ?? "");
 
 function idOf(formData: FormData): string | undefined {
   const id = text(formData, "id");
   if (!id) return undefined;
-  if (!UUID.test(id)) throw new Error("invalid id");
+  if (!isUuid(id)) throw new Error("invalid id");
   return id;
 }
 

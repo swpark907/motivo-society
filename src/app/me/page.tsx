@@ -8,8 +8,8 @@ import { shortDate } from "@/lib/platform/activity-time";
 import { getHostAccess } from "@/lib/platform/host";
 import { getCalloutSettings, listReceivedCallouts } from "@/lib/platform/host-callouts";
 import { errorMessage, noticeMessage } from "@/lib/platform/messages";
-import { calloutAcceptAction, muteHostAction } from "./actions";
-import { MarkCalloutsRead } from "./MarkCalloutsRead";
+import { calloutAcceptAction, markCalloutsReadAction, muteHostAction } from "./actions";
+import { RunOnMount } from "@/components/RunOnMount/RunOnMount";
 import { requireUser } from "@/lib/platform/session";
 import { signOut } from "../login/actions";
 import s from "./me.module.scss";
@@ -84,7 +84,7 @@ export default async function MePage({ searchParams }: PageProps<"/me">) {
           ))}
         </ul>
       )}
-      {callouts.some((c) => !c.read) && <MarkCalloutsRead />}
+      {callouts.some((c) => !c.read) && <RunOnMount action={markCalloutsReadAction} />}
 
       <div className={s.calloutSettings}>
         <form action={calloutAcceptAction}>

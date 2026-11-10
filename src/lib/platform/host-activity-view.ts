@@ -109,7 +109,6 @@ export function moneySummary(
   refunded: number;
   refundOpen: number;
   pending: number;
-  net: number;
 } {
   let received = 0;
   let refunded = 0;
@@ -123,7 +122,7 @@ export function moneySummary(
       if (r.status === "requested" || r.status === "approved") refundOpen += r.amount;
     }
   }
-  return { received, refunded, refundOpen, pending, net: received - refunded };
+  return { received, refunded, refundOpen, pending };
 }
 
 export type ManageActions = {

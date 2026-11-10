@@ -1,5 +1,6 @@
 // 호스트 도구(/host) 첫 화면의 계산: 활동 나누기 · 거르기 · 지금 처리할 일. React·DB 의존 없음.
 import type { ActivityKind } from "./explore-filters";
+import { isUuid } from "./ids";
 
 export type HostActivityStatus =
   "draft" | "open" | "closed" | "in_progress" | "ended" | "cancelled";
@@ -60,7 +61,7 @@ export function parseHostFilters(sp: Record<string, string | string[] | undefine
   const one = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v) ?? "";
   const tab = HOST_TABS.find((t) => t.tab === one(sp.tab))?.tab ?? "live";
   const kind = KINDS.find((k) => k === one(sp.kind)) ?? null;
-  const club = /^[0-9a-f-]{36}$/.test(one(sp.club)) ? one(sp.club) : null;
+  const club = isUuid(one(sp.club)) ? one(sp.club) : null;
   const q = one(sp.q).trim().slice(0, 40);
   return { tab, kind, club, q };
 }

@@ -21,7 +21,8 @@ import { applyState } from "@/lib/platform/apply-state";
 import { getChallengeRoom } from "@/lib/platform/challenge-room";
 import { getLedger } from "@/lib/platform/host-ledger";
 import { listMyNotices } from "@/lib/platform/host-notices";
-import { MarkNoticesRead } from "./MarkNoticesRead";
+import { RunOnMount } from "@/components/RunOnMount/RunOnMount";
+import { markNoticesReadAction } from "./notice-actions";
 import { entryMeta, LedgerStatement } from "@/components/LedgerStatement/LedgerStatement";
 import { KIND_LABELS, won } from "@/lib/platform/messages";
 import { listOpenActivities } from "@/lib/platform/queries";
@@ -81,22 +82,26 @@ export default async function ActivityPage({ params, searchParams }: Props) {
     },
     now,
   );
-  const { items } = await listOpenActivities(now);
+  // 신청한 사람(어떤 상태든)만 사람 정보를 읽는다. 서로 기대지 않는 읽기는 한 번에(DM 진입 화면이라 기다림을 줄인다).
+  const [{ items }, user] = await Promise.all([
+    listOpenActivities(now),
+    a.viewer.mine ? getCurrentUser() : Promise.resolve(null),
+  ]);
+  const confirmed = a.viewer.mine === "confirmed";
+  const [room, ledger, notices] = await Promise.all([
+    // 챌린지 참여 영역은 확정 참가자에게만(비참가자에게는 인증 칸이 없다).
+    user && confirmed && a.kind === "challenge" ? getChallengeRoom(a.id, user.id, now) : null,
+    // 호스트가 공개한 장부는 확정된 참가자에게만 보인다(DB 함수가 정한다, 영수증은 빼고).
+    confirmed ? getLedger(a.id) : null,
+    // 호스트가 남긴 공지는 받은 사람에게만 보인다(받은 사람은 보낸 순간의 명단, H10).
+    user ? listMyNotices(a.id, user.id) : [],
+  ]);
   const others = items
     .filter((x) => x.id !== a.id)
     .sort((x, y) => Number(y.host === a.organizer.name) - Number(x.host === a.organizer.name))
     .slice(0, 4);
   const left = a.capacity === null ? null : Math.max(0, a.capacity - a.taken);
   const isDev = process.env.NODE_ENV === "development";
-  // 챌린지 참여 영역은 확정 참가자에게만(비참가자에게는 인증 칸이 없다).
-  const user =
-    a.kind === "challenge" && a.viewer.mine === "confirmed" ? await getCurrentUser() : null;
-  const room = user ? await getChallengeRoom(a.id, user.id, now) : null;
-  // 호스트가 공개한 장부는 확정된 참가자에게만 보인다(DB 함수가 정한다, 영수증은 빼고).
-  const ledger = a.viewer.mine === "confirmed" ? await getLedger(a.id) : null;
-  // 호스트가 남긴 공지는 받은 사람에게만 보인다(받은 사람은 보낸 순간의 명단, H10).
-  const noticeUser = a.viewer.mine ? (user ?? (await getCurrentUser())) : null;
-  const notices = noticeUser ? await listMyNotices(a.id, noticeUser.id) : [];
 
   return (
     <main className={`paper ${s.page}`}>
@@ -213,7 +218,9 @@ export default async function ActivityPage({ params, searchParams }: Props) {
                     </li>
                   ))}
                 </ul>
-                {notices.some((n) => n.unread) && <MarkNoticesRead activityId={a.id} />}
+                {notices.some((n) => n.unread) && (
+                  <RunOnMount action={markNoticesReadAction.bind(null, a.id)} />
+                )}
               </section>
             )}
 

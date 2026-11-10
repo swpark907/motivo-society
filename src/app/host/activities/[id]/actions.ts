@@ -11,12 +11,11 @@ import { deleteLedgerEntry, saveLedgerEntry, setLedgerPublic } from "@/lib/platf
 import { resolveMediaOwner, setActivityCover, uploadMedia } from "@/lib/platform/host-media";
 import { sendCallout } from "@/lib/platform/host-callouts";
 import { postNotice, withdrawNotice, type NoticeAudience } from "@/lib/platform/host-notices";
-
-const UUID = /^[0-9a-f-]{36}$/;
+import { isUuid } from "@/lib/platform/ids";
 
 function uuidOf(formData: FormData, name: string): string {
   const v = String(formData.get(name) ?? "");
-  if (!UUID.test(v)) throw new Error(`invalid ${name}`);
+  if (!isUuid(v)) throw new Error(`invalid ${name}`);
   return v;
 }
 
@@ -59,7 +58,7 @@ export async function finalizeAction(formData: FormData) {
 export async function setCoverAction(formData: FormData) {
   const id = uuidOf(formData, "activityId");
   const media = String(formData.get("mediaId") ?? "");
-  if (media && !UUID.test(media)) throw new Error("invalid mediaId");
+  if (media && !isUuid(media)) throw new Error("invalid mediaId");
   const code = await setActivityCover(id, media || null);
   back(id, code ? { error: code } : { notice: media ? "cover_set" : "cover_cleared" }, "#cover");
 }
@@ -85,7 +84,7 @@ export async function uploadCoverAction(formData: FormData) {
 export async function saveLedgerAction(formData: FormData) {
   const id = uuidOf(formData, "activityId");
   const entry = String(formData.get("entryId") ?? "");
-  if (entry && !UUID.test(entry)) throw new Error("invalid entryId");
+  if (entry && !isUuid(entry)) throw new Error("invalid entryId");
   const amount = Number(String(formData.get("amount") ?? "").replaceAll(",", ""));
   const file = formData.get("receipt");
   const code = await saveLedgerEntry(
@@ -160,7 +159,7 @@ export async function sendCalloutAction(formData: FormData) {
   const sources = formData
     .getAll("sources")
     .map(String)
-    .filter((v) => UUID.test(v));
+    .filter((v) => isUuid(v));
   const r = await sendCallout(id, sources, String(formData.get("message") ?? ""));
   back(id, "error" in r ? { error: r.error } : { notice: "callout_sent" }, "#callout");
 }
