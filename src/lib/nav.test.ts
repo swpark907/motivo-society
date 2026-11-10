@@ -3,7 +3,7 @@ import { currentNav, hidesTabBar, NAV_ITEMS } from "./nav";
 
 describe("nav", () => {
   it("has the five approved menus in order", () => {
-    expect(NAV_ITEMS.map((i) => i.label)).toEqual(["홈", "발견", "클럽", "배우기", "나"]);
+    expect(NAV_ITEMS.map((i) => i.label)).toEqual(["홈", "둘러보기", "클럽", "클래스", "MY"]);
   });
 
   it("finds the current menu including nested and aliased paths", () => {

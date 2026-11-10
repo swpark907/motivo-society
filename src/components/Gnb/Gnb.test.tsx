@@ -36,7 +36,7 @@ describe("Gnb", () => {
     render(<Gnb />);
     expect(screen.queryByRole("navigation", { name: "하단 메뉴" })).toBeNull();
     const top = screen.getByRole("navigation", { name: "주 메뉴" });
-    expect(within(top).getByRole("link", { name: "배우기" })).toHaveAttribute(
+    expect(within(top).getByRole("link", { name: "클래스" })).toHaveAttribute(
       "aria-current",
       "page",
     );

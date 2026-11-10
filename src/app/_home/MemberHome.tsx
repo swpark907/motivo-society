@@ -25,8 +25,8 @@ const TODAY = new Intl.DateTimeFormat("ko-KR", {
 });
 
 /**
- * 회원 홈 — 대시보드가 아니라 위에서 아래로 읽는 하루: 오늘 → 내 사람들 → 발견.
- * 처음 온 회원(일정·할 일·클럽이 없는 사람)은 빈 칸 대신 발견을 먼저 본다.
+ * 회원 홈 — 대시보드가 아니라 위에서 아래로 읽는 하루: 오늘 → 내 사람들 → 새로 열린 것.
+ * 처음 온 회원(일정·할 일·클럽이 없는 사람)은 빈 칸 대신 지금 함께할 수 있는 것을 먼저 본다.
  */
 export async function MemberHome({ user }: { user: CurrentUser }) {
   const now = new Date();
@@ -34,7 +34,7 @@ export async function MemberHome({ user }: { user: CurrentUser }) {
   const [next, ...later] = data.upcoming;
 
   return (
-    <main className={`paper ${s.page}`}>
+    <main data-platform className={`paper ${s.page}`}>
       <div className={s.inner}>
         <header className={s.hello}>
           <div>
@@ -309,7 +309,7 @@ function Discover({ data, now, first }: { data: Data; now: Date; first?: boolean
           <h2 id="discover-h">{first ? "지금 함께할 수 있는 것" : "새로 열린 것"}</h2>
           <p>{first ? "마음에 드는 것 하나에 들어가 보세요" : "아직 신청하지 않은 모집 중 활동"}</p>
         </div>
-        <Link href="/explore">발견으로</Link>
+        <Link href="/explore">둘러보기로</Link>
       </div>
       <ul className={s.row}>
         {data.discover.map((a) => (
@@ -328,7 +328,7 @@ function Welcome() {
       <h2 id="welcome-h">모쏘는 이렇게 써요</h2>
       <ol>
         <li>
-          <strong>발견</strong>에서 모임·시즌·챌린지를 골라 신청해요.
+          <strong>둘러보기</strong>에서 모임·시즌·챌린지를 골라 신청해요.
         </li>
         <li>
           신청한 일정과 할 일이 이 <strong>홈</strong>에 모여요.
@@ -342,7 +342,7 @@ function Welcome() {
           클럽 둘러보기
         </Link>
         <Link href="/learn" className={s.ghost}>
-          배우기
+          클래스 보기
         </Link>
       </div>
     </section>

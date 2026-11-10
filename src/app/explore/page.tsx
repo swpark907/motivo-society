@@ -15,7 +15,7 @@ import { listOpenActivities, type ActivityCardData } from "@/lib/platform/querie
 import styles from "./page.module.scss";
 
 export const metadata: Metadata = {
-  title: "발견",
+  title: "둘러보기",
   description: "지금 모집 중인 모임·시즌·챌린지를 찾아보세요.",
 };
 
@@ -56,7 +56,7 @@ export default async function ExplorePage({ searchParams }: PageProps<"/explore"
   return (
     <PlatformPage
       label="EXPLORE"
-      title="발견"
+      title="둘러보기"
       lead="함께할 모임·시즌·챌린지를 찾아보세요. 진행 중이어도 중간에 합류할 수 있는 것까지 보여요."
     >
       <nav className={styles.filters} aria-label="활동 거르기">

@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
-// L04 발견: 비로그인도 보고, 필터는 URL에 담겨 공유·새로고침에서 그대로다.
-test.describe("발견", () => {
+// L04 둘러보기(/explore, 2026-11-10 전 이름 "발견"): 비로그인도 보고, 필터는 URL에 담겨 공유·새로고침에서 그대로다.
+test.describe("둘러보기", () => {
   test("필터 없이 오면 이번 주 → 합류 가능 → 전체 순서로 보인다", async ({ page }) => {
     await page.goto("/explore");
     const sections = page.locator("main section h2");

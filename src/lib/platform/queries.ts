@@ -33,7 +33,7 @@ export type ActivityCardData = {
 export type Result<T> = { available: boolean; items: T[] };
 
 /**
- * 발견에 보일 활동: 모집 중, 또는 진행 중이지만 중도 합류를 받는 것. 회차는 빼고 시즌으로 보인다.
+ * 둘러보기에 보일 활동: 모집 중, 또는 진행 중이지만 중도 합류를 받는 것. 회차는 빼고 시즌으로 보인다.
  * 필터는 화면에서 `explore-filters`로 건다(지금 규모에서는 한 번 읽어 거르는 쪽이 단순하다).
  */
 export async function listOpenActivities(now = new Date()): Promise<Result<ActivityCardData>> {

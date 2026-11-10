@@ -71,7 +71,7 @@ test.describe("로그인과 가입", () => {
     await page.getByText("개발용 · 시험장 사람으로 들어가기").click();
     await page.getByRole("button", { name: /멤버하나/ }).click();
     await expect(page).toHaveURL(/\/clubs$/);
-    await expect(page.getByRole("link", { name: "멤버하나 · 나" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "멤버하나 · MY" })).toBeVisible();
   });
   test("확정된 참가자는 참가 확정과 상세 주소를 본다", async ({ page }) => {
     await signInAs(page, "멤버하나", "/activities/capybara-cafe");
@@ -358,7 +358,7 @@ test.describe("내 일정", () => {
     await expect(main.getByRole("link", { name: "오늘", exact: true })).toBeVisible();
   });
 
-  test("일정이 없는 회원은 발견으로 안내받고, 나에서 내 일정으로 들어간다", async ({ page }) => {
+  test("일정이 없는 회원은 둘러보기로 안내받고, MY에서 내 일정으로 들어간다", async ({ page }) => {
     await signInAs(page, "처음온사람", "/me");
     await page
       .getByRole("main")
@@ -366,7 +366,7 @@ test.describe("내 일정", () => {
       .click();
     await expect(page).toHaveURL(/\/me\/schedule$/);
     await expect(page.getByText("아직 잡힌 일정이 없어요")).toBeVisible();
-    await expect(page.getByRole("link", { name: "발견에서 찾아보기" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "둘러보기에서 찾아보기" })).toBeVisible();
   });
 });
 
@@ -513,7 +513,7 @@ test.describe("주문과 환불", () => {
     );
   });
 
-  test("주문이 없으면 발견으로 안내하고, 남의 주문 번호는 열리지 않는다", async ({ page }) => {
+  test("주문이 없으면 둘러보기로 안내하고, 남의 주문 번호는 열리지 않는다", async ({ page }) => {
     await signInAs(page, "멤버하나", "/me/orders");
     await expect(page.getByText("주문이 없어요")).toBeVisible();
     const res = await page.goto("/me/orders/MS-000000-0001");
@@ -726,9 +726,9 @@ test.describe("회원 여정", () => {
   });
 });
 
-// H01 호스트 도구: 자격 있는 사람만 "나"에서 들어가고, 내가 연 활동을 지난 것까지 본다.
+// H01 호스트 도구: 자격 있는 사람만 MY에서 들어가고, 내가 연 활동을 지난 것까지 본다.
 test.describe("호스트 도구", () => {
-  test("호스트는 나 → 호스트 도구에서 처리할 일과 내가 연 활동을 보고, 지난 활동과 거르기도 된다", async ({
+  test("호스트는 MY → 호스트 도구에서 처리할 일과 내가 연 활동을 보고, 지난 활동과 거르기도 된다", async ({
     page,
   }) => {
     await signInAs(page, "바라호스트", "/me");
@@ -774,7 +774,7 @@ test.describe("호스트 도구", () => {
     await expect(page.getByRole("link", { name: /호스트 도구/ })).toHaveCount(0);
     await page.goto("/host");
     await expect(page.getByText("활동을 여는 사람이 쓰는 곳이에요")).toBeVisible();
-    await expect(page.getByRole("link", { name: "발견에서 활동 찾기" })).toHaveAttribute(
+    await expect(page.getByRole("link", { name: "둘러보기에서 활동 찾기" })).toHaveAttribute(
       "href",
       "/explore",
     );

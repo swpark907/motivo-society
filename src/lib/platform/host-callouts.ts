@@ -99,7 +99,7 @@ export async function sendCallout(
   return error ? { error: errorCodeFrom(error.message) } : { count: num(data) };
 }
 
-/** "나" 화면의 받은 소식 설정: 전체 받기 여부와 끈 호스트 목록. */
+/** MY 화면의 받은 소식 설정: 전체 받기 여부와 끈 호스트 목록. */
 export async function getCalloutSettings(
   userId: string,
 ): Promise<{ accept: boolean; muted: { id: string; nickname: string }[] }> {

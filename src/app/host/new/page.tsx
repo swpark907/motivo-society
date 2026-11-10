@@ -193,7 +193,7 @@ function Page({ children }: { children: ReactNode }) {
     <PlatformPage
       label="HOST · NEW"
       title="활동 만들기"
-      lead="만들면 초안으로 저장돼요. 관리 화면에서 확인하고 공개해야 발견에 보여요."
+      lead="만들면 초안으로 저장돼요. 관리 화면에서 확인하고 공개해야 둘러보기에 보여요."
       back={{ href: "/host", label: "호스트 도구" }}
     >
       {children}

@@ -85,7 +85,7 @@ export default async function SchedulePage({ searchParams }: PageProps<"/me/sche
           <EmptyState
             title="아직 잡힌 일정이 없어요"
             body="모임·시즌·챌린지를 신청하면 여기에 날짜순으로 모여요."
-            action={{ href: "/explore", label: "발견에서 찾아보기" }}
+            action={{ href: "/explore", label: "둘러보기에서 찾아보기" }}
           />
         ))}
 

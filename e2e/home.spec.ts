@@ -1,11 +1,11 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("홈", () => {
-  test("비로그인 홈: 히어로 · 이번 주 활동 · Library", async ({ page }) => {
+  test("비로그인 홈: 히어로 · 곧 열리는 활동 · Library", async ({ page }) => {
     await page.goto("/");
     await expect(page.getByRole("heading", { level: 1 })).toContainText("배우고");
 
-    const week = page.getByRole("list", { name: "이번 주 활동" });
+    const week = page.getByRole("list", { name: "곧 열리는 활동" });
     await expect(week.getByRole("link").first()).toBeVisible();
 
     const library = page.getByRole("list", { name: "Library" });
@@ -21,9 +21,9 @@ test.describe("홈", () => {
     // 넓은 화면은 상단 GNB, 좁은 화면은 하단 탭 바가 같은 메뉴를 보여 준다.
     const nav = page.getByRole("navigation", { name: isMobile ? "하단 메뉴" : "주 메뉴" });
     for (const [label, path] of [
-      ["발견", "/explore"],
+      ["둘러보기", "/explore"],
       ["클럽", "/clubs"],
-      ["배우기", "/learn"],
+      ["클래스", "/learn"],
       ["홈", "/"],
     ] as const) {
       await nav.getByRole("link", { name: label, exact: true }).click();
@@ -33,8 +33,8 @@ test.describe("홈", () => {
         "page",
       );
     }
-    // "나"는 로그인이 필요해서 로그인 화면으로 갔다가 돌아온다.
-    await nav.getByRole("link", { name: "나", exact: true }).click();
+    // "MY"는 로그인이 필요해서 로그인 화면으로 갔다가 돌아온다.
+    await nav.getByRole("link", { name: "MY", exact: true }).click();
     await expect(page).toHaveURL(/\/login\?next=%2Fme$/);
   });
 });

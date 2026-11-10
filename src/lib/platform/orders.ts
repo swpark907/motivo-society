@@ -2,7 +2,7 @@ import { errorCodeFrom } from "./messages";
 import { orderStage, type OrderStage, type RefundInfo } from "./order-view";
 import { createSessionClient } from "./supabase-server";
 
-// 내 주문과 환불. 읽기는 내 주문만(운영진 권한이 있어도 "나" 화면에서는 내 것만), 쓰기는 DB 함수만.
+// 내 주문과 환불. 읽기는 내 주문만(운영진 권한이 있어도 MY 화면에서는 내 것만), 쓰기는 DB 함수만.
 
 export type MyOrder = {
   id: string;

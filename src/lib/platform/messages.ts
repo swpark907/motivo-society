@@ -147,7 +147,7 @@ const NOTICE_MESSAGES: Record<string, string> = {
   ledger_private: "이제 장부는 관리하는 사람만 봐요.",
   notice_posted: "공지를 남겼어요. 받는 사람은 활동 화면에서 봐요.",
   notice_withdrawn: "공지를 내렸어요. 참가자에게 더는 보이지 않아요.",
-  callout_sent: "지난 참가자에게 알렸어요. 받은 사람은 ‘나’ 화면의 받은 소식에서 봐요.",
+  callout_sent: "지난 참가자에게 알렸어요. 받은 사람은 MY 화면의 받은 소식에서 봐요.",
   callout_on: "지난 활동 호스트의 새 활동 소식을 받아요.",
   callout_off: "이제 지난 활동 호스트의 새 활동 소식을 받지 않아요.",
   host_muted: "이 호스트의 소식은 더 받지 않아요.",

@@ -1,4 +1,4 @@
-// 발견 화면의 필터. URL 쿼리에 담아 공유·뒤로 가기에서 그대로 복원한다. React 의존 없음.
+// 둘러보기(/explore) 화면의 필터. URL 쿼리에 담아 공유·뒤로 가기에서 그대로 복원한다. React 의존 없음.
 import { kstWeekRange } from "./activity-time";
 
 export type ActivityKind = "gathering" | "series" | "challenge";

@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PlatformPage } from "@/components/PlatformPage/PlatformPage";
+import { getAllLibraryItems } from "@/lib/content/library";
 import styles from "./page.module.scss";
 
 export const metadata: Metadata = {
-  title: "배우기",
+  title: "클래스",
   description: "워크북 클래스와 모쏘가 직접 써 보고 정리한 읽을거리.",
 };
 
@@ -26,15 +27,22 @@ const DOORS = [
   },
 ] as const;
 
-export default function LearnPage() {
+export default async function LearnPage() {
+  // 라이브러리에 글이 아직 없으면 "모았어요"라고 말하지 않는다(정직함).
+  const libraryCount = (await getAllLibraryItems()).length;
+  const doors = DOORS.map((d) =>
+    d.href === "/library" && libraryCount === 0
+      ? { ...d, body: "스킬·프롬프트·사용법을 모으고 있어요. 첫 글을 준비 중이에요." }
+      : d,
+  );
   return (
     <PlatformPage
-      label="LEARN"
-      title="배우기"
+      label="CLASSES"
+      title="클래스"
       lead="혼자 따라가는 클래스와, 필요할 때 꺼내 보는 읽을거리예요."
     >
       <ul className={styles.doors}>
-        {DOORS.map((d) => (
+        {doors.map((d) => (
           <li key={d.href}>
             <Link href={d.href} className={styles.door}>
               <span className={styles.doorTitle}>{d.title}</span>

@@ -154,7 +154,7 @@ export default async function HostActivityPage({
             <input type="hidden" name="activityId" value={a.id} />
             <p>
               <strong>아직 공개 전이에요.</strong> 나와 함께 관리하는 사람에게만 보여요. 공개하면
-              발견에 올라가고 신청을 받아요.
+              둘러보기에 올라가고 신청을 받아요.
             </p>
             <SubmitButton className={s.primary} pendingLabel="공개하는 중…">
               공개하기
