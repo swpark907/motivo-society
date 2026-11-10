@@ -244,3 +244,4 @@ Workbook 페이지의 **적극적 레퍼런스**. 이미 컨셉이 담긴 목업
 | `platform/ref-platform-mobile-onboarding.webp`     | 앱 온보딩 8종: 한 화면 한 색, 큰 제목, 검정 알약 버튼       | 나중의 앱 첫 화면·가입 흐름. 화면당 색 하나 + 큰 제목 + 행동 하나                                     | 그라디언트, 3D·밈 캐릭터            |
 | `platform/ref-platform-peers-leaderboard.png`      | 사람 카드 격자 + 리더보드(학습 플랫폼)                      | 사람이 먼저 보이는 카드(클럽 멤버·참가자), 진행 중 콘텐츠 카드                                        | 3D 아바타, 이모지, 순위 경쟁 표현   |
 | `platform/ref-platform-week-calendar-tasks.webp`   | 주간 캘린더 블록 + 급한 일 목록 + 통계(업무 도구, 다크)     | 색 = 종류인 일정 블록, "지금 처리할 일" 목록 — 호스트·운영 도구                                       | 네온·그라디언트, 장식 통계 그래프   |
+| `platform/mobile-app-draft.md`                     | 모바일 앱 문법 시안 기록(2026-11-10, 승인 전)               | 탭 첫 화면 큰 제목 · 하위 “← 제목” · 목록 행 · 아래 시트 · 위 탭                                      | 아직 실제 화면에 적용하지 않음      |
