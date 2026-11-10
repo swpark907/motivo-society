@@ -20,7 +20,7 @@ import {
 } from "@/lib/platform/host-view";
 import { ACTIVITY_STATUS_LABELS, KIND_LABELS, won } from "@/lib/platform/messages";
 import { requireUser } from "@/lib/platform/session";
-import s from "./host.module.scss";
+import s from "../host.module.scss";
 
 export const metadata: Metadata = {
   title: "호스트 도구",
@@ -46,7 +46,7 @@ export default async function HostPage({ searchParams }: PageProps<"/host">) {
         <EmptyState
           title="활동을 여는 사람이 쓰는 곳이에요"
           body="호스트 자격이 있거나 클럽에서 활동을 만드는 역할을 맡으면, 여기서 내가 연 모임·시즌·챌린지를 관리해요."
-          action={{ href: "/explore", label: "발견에서 활동 찾기" }}
+          action={{ href: "/explore", label: "둘러보기에서 활동 찾기" }}
         />
       </PlatformPage>
     );

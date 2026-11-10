@@ -10,7 +10,7 @@ import { won } from "@/lib/platform/messages";
 import { STAGE_LABELS, stageTone } from "@/lib/platform/order-view";
 import { listMyOrders, type MyOrder } from "@/lib/platform/orders";
 import { requireUser } from "@/lib/platform/session";
-import s from "./orders.module.scss";
+import s from "../orders.module.scss";
 
 export const metadata: Metadata = {
   title: "주문과 환불",
@@ -64,7 +64,7 @@ export default async function OrdersPage() {
         <EmptyState
           title="주문이 없어요"
           body="유료 모임·시즌·챌린지에 신청하면 여기에 주문이 생겨요."
-          action={{ href: "/explore", label: "발견에서 찾아보기" }}
+          action={{ href: "/explore", label: "둘러보기에서 찾아보기" }}
         />
       )}
     </PlatformPage>

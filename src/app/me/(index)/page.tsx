@@ -8,15 +8,15 @@ import { shortDate } from "@/lib/platform/activity-time";
 import { getHostAccess } from "@/lib/platform/host";
 import { getCalloutSettings, listReceivedCallouts } from "@/lib/platform/host-callouts";
 import { errorMessage, noticeMessage } from "@/lib/platform/messages";
-import { calloutAcceptAction, markCalloutsReadAction, muteHostAction } from "./actions";
+import { calloutAcceptAction, markCalloutsReadAction, muteHostAction } from "../actions";
 import { RunOnMount } from "@/components/RunOnMount/RunOnMount";
 import { requireUser } from "@/lib/platform/session";
-import { signOut } from "../login/actions";
-import s from "./me.module.scss";
+import { signOut } from "../../login/actions";
+import s from "../me.module.scss";
 import { SubmitButton } from "@/components/SubmitButton/SubmitButton";
 
 export const metadata: Metadata = {
-  title: "나",
+  title: "MY",
   description: "내 일정, 주문과 환불, 프로필.",
   robots: { index: false },
 };
@@ -118,9 +118,9 @@ export default async function MePage({ searchParams }: PageProps<"/me">) {
   );
 
   return (
-    <PlatformPage label="ME" title="나">
+    <PlatformPage label="MY PAGE" title="MY">
       <section className={s.profile} aria-label="내 계정">
-        <Avatar name={name} size={56} />
+        <Avatar name={name} size={44} />
         <div className={s.who}>
           <p className={s.name}>{name}</p>
           <p className={s.email}>{user.email}</p>

@@ -3,6 +3,7 @@ import { isRemoteImage } from "@/lib/platform/media";
 import Link from "next/link";
 import { KindTag } from "@/components/KindTag/KindTag";
 import { LineIcon } from "@/components/LineIcon/LineIcon";
+import { LinkPending } from "@/components/LinkPending/LinkPending";
 import { dayBadge, gatheringWhen, periodWhen } from "@/lib/platform/activity-time";
 import { won } from "@/lib/platform/messages";
 import type { ActivityCardData } from "@/lib/platform/queries";
@@ -76,6 +77,8 @@ export function ActivityCard({
           <KindTag kind={a.kind} />
           {badge && <span className={badge.live ? styles.live : styles.day}>{badge.text}</span>}
         </div>
+        {/* 상세 화면을 기다리는 동안 표지 위에 작은 LOADING(링크일 때만) */}
+        {href && <LinkPending />}
       </div>
       <div className={styles.body}>
         <p className={styles.when}>{whenText(a, now)}</p>

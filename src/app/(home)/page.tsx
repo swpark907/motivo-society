@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 import { onboardingHref } from "@/lib/platform/auth-paths";
 import { getCurrentUser } from "@/lib/platform/session";
-import { MemberHome } from "./_home/MemberHome";
-import { PublicHome } from "./_home/PublicHome";
+import { MemberHome } from "../_home/MemberHome";
+import { PublicHome } from "../_home/PublicHome";
 
 /**
  * `/` — 로그인하면 회원 홈(오늘 → 내 사람들 → 발견), 아니면 모쏘 소개 + 이번 주 활동.

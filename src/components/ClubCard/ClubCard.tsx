@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { KindTag } from "@/components/KindTag/KindTag";
+import { LinkPending } from "@/components/LinkPending/LinkPending";
 import type { ClubCardData } from "@/lib/platform/queries";
 import styles from "./ClubCard.module.scss";
 
@@ -15,7 +17,7 @@ export function ClubCard({
   const body = (
     <>
       <span className={styles.name}>
-        <span className={styles.tag}>클럽</span>
+        <KindTag kind="club">클럽</KindTag>
         {club.name}
         {badge && <span className={styles.badge}>{badge}</span>}
       </span>
@@ -28,6 +30,7 @@ export function ClubCard({
   return href ? (
     <Link href={href} className={styles.card}>
       {body}
+      <LinkPending scene="walk" />
     </Link>
   ) : (
     <div className={styles.card}>{body}</div>

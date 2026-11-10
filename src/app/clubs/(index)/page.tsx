@@ -4,8 +4,8 @@ import { EmptyState } from "@/components/EmptyState/EmptyState";
 import { PlatformPage } from "@/components/PlatformPage/PlatformPage";
 import { listClubsFor } from "@/lib/platform/clubs";
 import { getCurrentUser } from "@/lib/platform/session";
-import styles from "../explore/page.module.scss";
-import s from "./clubs.module.scss";
+import styles from "../../explore/page.module.scss";
+import s from "../clubs.module.scss";
 
 export const metadata: Metadata = {
   title: "클럽",

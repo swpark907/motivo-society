@@ -1,0 +1,25 @@
+// 누른 카드 위를 종이색으로 덮고 작은 LOADING을 가운데에. 0.2초 안에 끝나면 CapyLoading이 나타나지 않는다.
+.cover {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  border-radius: inherit;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  animation: fade 160ms ease-out 200ms both;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
