@@ -11,8 +11,10 @@ import {
   getCreateOptions,
   getHostAccess,
   getHostActivity,
+  listHostActivities,
   type HostActivityDetail,
 } from "@/lib/platform/host";
+import { getSentCallout, type SentCallout } from "@/lib/platform/host-callouts";
 import { getLedger } from "@/lib/platform/host-ledger";
 import { AUDIENCE_LABELS, listSentNotices } from "@/lib/platform/host-notices";
 import { listSaved } from "@/lib/platform/host-saved";
@@ -53,6 +55,7 @@ import {
   deleteLedgerAction,
   ledgerPublicAction,
   saveLedgerAction,
+  sendCalloutAction,
   withdrawNoticeAction,
   setCoverAction,
   uploadCoverAction,
@@ -72,15 +75,19 @@ export default async function HostActivityPage({
   if (!/^[0-9a-f-]{36}$/.test(id)) notFound();
   const sp = await searchParams;
   await requireUser(`/host/activities/${id}`);
-  const [result, access, media, options, ledger, notices, saved] = await Promise.all([
-    getHostActivity(id),
-    getHostAccess(),
-    listMedia(),
-    getCreateOptions(),
-    getLedger(id),
-    listSentNotices(id),
-    listSaved(),
-  ]);
+  const [result, access, media, options, ledger, notices, saved, callout, mine] = await Promise.all(
+    [
+      getHostActivity(id),
+      getHostAccess(),
+      listMedia(),
+      getCreateOptions(),
+      getLedger(id),
+      listSentNotices(id),
+      listSaved(),
+      getSentCallout(id),
+      listHostActivities(),
+    ],
+  );
   if (!result.found) notFound();
   if (!result.canManage) {
     return (
@@ -272,6 +279,16 @@ export default async function HostActivityPage({
             </ul>
           )}
         </section>
+      )}
+
+      {!isSession && (
+        <CalloutSection
+          a={a}
+          sent={callout}
+          sources={mine
+            .filter((x) => x.id !== a.id && x.status !== "draft" && x.confirmed > 0)
+            .map((x) => ({ id: x.id, title: x.title, kind: x.kind, confirmed: x.confirmed }))}
+        />
       )}
 
       {a.kind === "series" && a.sessions.length > 0 && (
@@ -793,5 +810,79 @@ function LedgerForm({
         {entry ? "고친 내용 저장" : "장부에 적기"}
       </SubmitButton>
     </form>
+  );
+}
+
+function CalloutSection({
+  a,
+  sent,
+  sources,
+}: {
+  a: HostActivityDetail;
+  sent: SentCallout | null;
+  sources: { id: string; title: string; kind: string; confirmed: number }[];
+}) {
+  const open = a.status === "open" || a.status === "in_progress";
+  return (
+    <section className={s.section} id="callout" aria-labelledby="callout-h">
+      <h2 id="callout-h">지난 참가자에게 알리기</h2>
+      {sent ? (
+        <div className={s.person}>
+          <div className={s.who}>
+            <strong>알렸어요</strong>
+            <Meta
+              parts={[
+                `${shortDate(new Date(sent.createdAt))} ${clockTime(new Date(sent.createdAt))}`,
+                `받은 ${sent.recipients}명 · 읽은 ${sent.read}명`,
+              ]}
+            />
+            {sent.message && <p className={s.noticeBody}>{sent.message}</p>}
+          </div>
+        </div>
+      ) : !open ? (
+        <p className={s.hint}>
+          공개한 뒤에 내가 연 지난 활동의 참가자에게 이 활동을 알릴 수 있어요.
+        </p>
+      ) : sources.length === 0 ? (
+        <p className={s.hint}>
+          알릴 지난 활동이 없어요. 확정된 참가자가 있는 활동을 열면 여기서 고를 수 있어요.
+        </p>
+      ) : (
+        <form
+          action={sendCalloutAction}
+          className={s.noticeForm}
+          aria-label="지난 참가자에게 알리기"
+        >
+          <input type="hidden" name="activityId" value={a.id} />
+          <fieldset className={`${s.sourcePick} ${s.wideField}`}>
+            <legend>어느 활동의 참가자에게</legend>
+            {sources.map((x) => (
+              <label key={x.id}>
+                <input type="checkbox" name="sources" value={x.id} />
+                <span>
+                  {x.title} <small>확정 {x.confirmed}명</small>
+                </span>
+              </label>
+            ))}
+          </fieldset>
+          <label className={`${s.formField} ${s.wideField}`}>
+            <span>한마디 (선택)</span>
+            <textarea
+              name="message"
+              maxLength={300}
+              rows={3}
+              placeholder="예: 지난번에 와 주셔서 고마워요. 이번엔 이런 걸 해요."
+            />
+          </label>
+          <p className={s.hint}>
+            받은 사람은 &apos;나&apos; 화면의 받은 소식에서 봐요. 소식을 끈 사람, 나를 끈 사람, 이미
+            신청한 사람은 빠지고, 이 활동에서는 한 번만 보낼 수 있어요.
+          </p>
+          <SubmitButton className={s.primarySmall} pendingLabel="알리는 중…">
+            알리기
+          </SubmitButton>
+        </form>
+      )}
+    </section>
   );
 }

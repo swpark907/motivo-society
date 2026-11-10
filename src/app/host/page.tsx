@@ -105,6 +105,10 @@ export default async function HostPage({ searchParams }: PageProps<"/host">) {
             <strong>정산</strong>
             <small>받을 참가비 · 지급 내역</small>
           </Link>
+          <Link href="/host/regulars">
+            <strong>단골</strong>
+            <small>함께한 사람 · 출석 기록</small>
+          </Link>
         </nav>
       )}
 

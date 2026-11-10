@@ -738,3 +738,62 @@ describe("참가자 공지", () => {
     ).toBe("audience_required");
   });
 });
+
+describe("지난 참가자 다시 부르기와 단골", () => {
+  const CLINIC = "00000000-0000-4000-c000-000000000008"; // 열린 유료 클리닉, 아직 신청 없음
+  const CAFE = "00000000-0000-4000-c000-000000000003";
+
+  it("지난 활동 확정자에게 한 번만 보내고, 받지 않기로 한 사람은 빠지며, 호스트를 끄면 받은 소식에서도 사라진다", async () => {
+    const host = await as("host");
+    const member = await as("member");
+    const filler4 = await as("filler4");
+
+    // 참가자4가 전체 소식을 끔 → 멤버하나만 받는다(워크숍 · 카페 확정자 중복 없이)
+    await filler4.rpc("callout_settings_set", { p_accept: false });
+    const { data: n, error } = await host.rpc("callout_send", {
+      p_activity: CLINIC,
+      p_sources: [ID.workshop, CAFE],
+      p_message: "막힌 요청문을 들고 오세요.",
+    });
+    expect(error).toBeNull();
+    expect(n).toBe(1);
+    expect(
+      code((await host.rpc("callout_send", { p_activity: CLINIC, p_sources: [CAFE] })).error),
+    ).toBe("callout_exists");
+
+    const mine = (await member.rpc("my_callouts")).data as {
+      host: string;
+      activity: { title: string };
+    }[];
+    expect(mine).toHaveLength(1);
+    expect(mine[0]).toMatchObject({ host: "바라호스트", activity: { title: "프롬프트 클리닉" } });
+    expect((await filler4.rpc("my_callouts")).data).toEqual([]);
+
+    await member.rpc("callout_mute_host", { p_host: ID.host, p_mute: true });
+    expect((await member.rpc("my_callouts")).data).toEqual([]);
+  });
+
+  it("초안이거나 내 활동이 아니면 못 보내고, 단골은 내 활동 참가 횟수와 출석 기록을 보여 준다", async () => {
+    const host = await as("host");
+    expect(
+      code((await host.rpc("callout_send", { p_activity: ID.draft, p_sources: [CAFE] })).error),
+    ).toBe("not_open");
+    expect(
+      code((await host.rpc("callout_send", { p_activity: CLINIC, p_sources: [ID.tonight] })).error),
+    ).toBe("forbidden");
+
+    const regulars = (await host.rpc("host_regulars")).data as {
+      nickname: string;
+      times: number;
+      attended: number;
+      absent: number;
+    }[];
+    expect(regulars[0]).toMatchObject({ nickname: "참가자4", times: 3 });
+    expect(regulars.find((r) => r.nickname === "참가자2")).toMatchObject({
+      attended: 0,
+      absent: 1,
+    });
+    expect(regulars.some((r) => r.nickname === "바라호스트")).toBe(false);
+    expect((await (await as("member")).rpc("host_regulars")).data).toEqual([]);
+  });
+});

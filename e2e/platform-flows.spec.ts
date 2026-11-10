@@ -1505,3 +1505,86 @@ test.describe("참가자 공지", () => {
     await expect(page.getByText("확정자만 보는 안내예요.")).toHaveCount(0);
   });
 });
+
+// H11 지난 참가자 다시 부르기와 단골.
+test.describe("지난 참가자 다시 부르기와 단골", () => {
+  const CLINIC = "/host/activities/00000000-0000-4000-c000-000000000008";
+
+  test("열린 활동에서 지난 활동 참가자에게 알리면 받은 소식에 오고, 받은 사람은 그 호스트를 끄고 다시 켤 수 있다", async ({
+    page,
+    browser,
+  }) => {
+    await signInAs(page, "바라호스트", CLINIC);
+    const form = page.getByRole("form", { name: "지난 참가자에게 알리기" });
+    await form.getByRole("checkbox", { name: /AI 도구 실습 워크숍/ }).check();
+    await form.getByRole("checkbox", { name: /카피바라 카페에서 AI 수다/ }).check();
+    await form.getByLabel("한마디 (선택)").fill("지난번에 와 주셔서 고마워요.");
+    await form.getByRole("button", { name: "알리기" }).click();
+    await expect(page.getByRole("status")).toContainText("지난 참가자에게 알렸어요");
+    const callout = page.getByRole("region", { name: "지난 참가자에게 알리기" });
+    await expect(callout).toContainText("받은 2명 · 읽은 0명");
+    await expect(callout.getByRole("button", { name: "알리기" })).toHaveCount(0);
+
+    const member = await (await browser.newContext()).newPage();
+    await signInAs(member, "멤버하나", "/me");
+    const inbox = member.getByRole("region", { name: "받은 소식" });
+    await expect(inbox).toContainText("바라호스트님이 새 활동을 열었어요");
+    await expect(inbox).toContainText("새 소식");
+    await expect(inbox.getByRole("link", { name: /프롬프트 클리닉/ })).toHaveAttribute(
+      "href",
+      "/activities/prompt-clinic",
+    );
+
+    await expect(async () => {
+      await page.reload();
+      await expect(page.getByRole("region", { name: "지난 참가자에게 알리기" })).toContainText(
+        "읽은 1명",
+        { timeout: 2000 },
+      );
+    }).toPass({ timeout: 20_000 });
+
+    await inbox.getByRole("button", { name: "바라호스트님 소식 받지 않기" }).click();
+    await expect(member.getByRole("status")).toHaveText("이 호스트의 소식은 더 받지 않아요.");
+    await expect(member.getByRole("region", { name: "받은 소식" })).not.toContainText(
+      "프롬프트 클리닉",
+    );
+    await member
+      .getByRole("list", { name: "소식을 끈 호스트" })
+      .getByRole("button", { name: "다시 받기" })
+      .click();
+    await expect(member.getByRole("status")).toHaveText("이 호스트의 소식을 다시 받아요.");
+    await expect(member.getByRole("region", { name: "받은 소식" })).toContainText(
+      "프롬프트 클리닉",
+    );
+  });
+
+  test("소식을 끈 사람은 빠지고, 단골은 함께한 횟수와 참고용 출석 기록을 보여 준다", async ({
+    page,
+    browser,
+  }) => {
+    const member = await (await browser.newContext()).newPage();
+    await signInAs(member, "멤버하나", "/me");
+    await member.getByRole("button", { name: "끄기" }).click();
+    await expect(member.getByRole("status")).toHaveText(
+      "이제 지난 활동 호스트의 새 활동 소식을 받지 않아요.",
+    );
+
+    await signInAs(page, "바라호스트", CLINIC);
+    const form = page.getByRole("form", { name: "지난 참가자에게 알리기" });
+    await form.getByRole("checkbox", { name: /카피바라 카페에서 AI 수다/ }).check();
+    await form.getByRole("button", { name: "알리기" }).click();
+    await expect(page.getByRole("region", { name: "지난 참가자에게 알리기" })).toContainText(
+      "받은 1명",
+    );
+
+    await page.goto("/host");
+    await page
+      .getByRole("navigation", { name: "도구" })
+      .getByRole("link", { name: /^단골/ })
+      .click();
+    await expect(page.getByText("신청을 막거나 제재하는 데 쓰지 않아요")).toBeVisible();
+    const first = page.getByRole("list", { name: "함께한 사람" }).getByRole("listitem").first();
+    await expect(first).toContainText("참가자4");
+    await expect(first).toContainText("3번");
+  });
+});

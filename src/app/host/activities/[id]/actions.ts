@@ -9,6 +9,7 @@ import {
 } from "@/lib/platform/host";
 import { deleteLedgerEntry, saveLedgerEntry, setLedgerPublic } from "@/lib/platform/host-ledger";
 import { resolveMediaOwner, setActivityCover, uploadMedia } from "@/lib/platform/host-media";
+import { sendCallout } from "@/lib/platform/host-callouts";
 import { postNotice, withdrawNotice, type NoticeAudience } from "@/lib/platform/host-notices";
 
 const UUID = /^[0-9a-f-]{36}$/;
@@ -150,4 +151,16 @@ export async function withdrawNoticeAction(formData: FormData) {
       : { notice: "notice_withdrawn" },
     "#notices",
   );
+}
+
+// ── 지난 참가자 다시 부르기(H11)
+
+export async function sendCalloutAction(formData: FormData) {
+  const id = uuidOf(formData, "activityId");
+  const sources = formData
+    .getAll("sources")
+    .map(String)
+    .filter((v) => UUID.test(v));
+  const r = await sendCallout(id, sources, String(formData.get("message") ?? ""));
+  back(id, "error" in r ? { error: r.error } : { notice: "callout_sent" }, "#callout");
 }

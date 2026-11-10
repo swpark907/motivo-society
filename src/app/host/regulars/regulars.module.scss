@@ -1,0 +1,63 @@
+// 단골 — 사람 목록. 순위표처럼 보이지 않게 숫자는 오른쪽에 담백하게, 색 없음.
+.note {
+  max-width: 40rem;
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--ink-muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  word-break: keep-all;
+}
+
+.list {
+  display: grid;
+  gap: 2px;
+  max-width: 40rem;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 16px;
+  list-style: none;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 64px;
+  padding: var(--space-2) var(--space-4);
+  background: var(--white);
+}
+
+.who {
+  display: grid;
+  flex: 1;
+  gap: 2px;
+  min-width: 0;
+
+  strong {
+    font-weight: 800;
+  }
+
+  small {
+    color: var(--ink-muted);
+    font-size: 0.8rem;
+    line-height: 1.4;
+    word-break: keep-all;
+  }
+}
+
+.times {
+  flex: none;
+  color: var(--ink-muted);
+  font-size: 0.85rem;
+
+  strong {
+    color: var(--ink);
+    font-size: 1.1rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+  }
+}

@@ -176,6 +176,81 @@ export type Database = {
           },
         ];
       };
+      activity_callout_recipients: {
+        Row: {
+          callout_id: string;
+          read_at: string | null;
+          user_id: string;
+        };
+        Insert: {
+          callout_id: string;
+          read_at?: string | null;
+          user_id: string;
+        };
+        Update: {
+          callout_id?: string;
+          read_at?: string | null;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "activity_callout_recipients_callout_id_fkey";
+            columns: ["callout_id"];
+            isOneToOne: false;
+            referencedRelation: "activity_callouts";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "activity_callout_recipients_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      activity_callouts: {
+        Row: {
+          activity_id: string;
+          created_at: string;
+          created_by: string;
+          id: string;
+          message: string | null;
+          source_activity_ids: string[];
+        };
+        Insert: {
+          activity_id: string;
+          created_at?: string;
+          created_by: string;
+          id?: string;
+          message?: string | null;
+          source_activity_ids: string[];
+        };
+        Update: {
+          activity_id?: string;
+          created_at?: string;
+          created_by?: string;
+          id?: string;
+          message?: string | null;
+          source_activity_ids?: string[];
+        };
+        Relationships: [
+          {
+            foreignKeyName: "activity_callouts_activity_id_fkey";
+            columns: ["activity_id"];
+            isOneToOne: true;
+            referencedRelation: "activities";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "activity_callouts_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       activity_hosts: {
         Row: {
           activity_id: string;
@@ -534,6 +609,39 @@ export type Database = {
           {
             foreignKeyName: "audit_logs_target_user_id_fkey";
             columns: ["target_user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      callout_mutes: {
+        Row: {
+          created_at: string;
+          host_user_id: string;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          host_user_id: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          host_user_id?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "callout_mutes_host_user_id_fkey";
+            columns: ["host_user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "callout_mutes_user_id_fkey";
+            columns: ["user_id"];
             isOneToOne: false;
             referencedRelation: "profiles";
             referencedColumns: ["id"];
@@ -1397,6 +1505,7 @@ export type Database = {
       };
       profiles: {
         Row: {
+          accept_host_callouts: boolean;
           bio: string | null;
           created_at: string;
           id: string;
@@ -1406,6 +1515,7 @@ export type Database = {
           updated_at: string;
         };
         Insert: {
+          accept_host_callouts?: boolean;
           bio?: string | null;
           created_at?: string;
           id: string;
@@ -1415,6 +1525,7 @@ export type Database = {
           updated_at?: string;
         };
         Update: {
+          accept_host_callouts?: boolean;
           bio?: string | null;
           created_at?: string;
           id?: string;
@@ -1716,6 +1827,7 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      _can_manage_callout: { Args: { p_callout: string }; Returns: boolean };
       _can_manage_notice: { Args: { p_notice: string }; Returns: boolean };
       _club_admit: {
         Args: { p_club: string; p_invite?: string; p_status: string };
@@ -1734,6 +1846,7 @@ export type Database = {
         Args: { p_order?: string; p_participation: string };
         Returns: undefined;
       };
+      _is_callout_recipient: { Args: { p_callout: string }; Returns: boolean };
       _is_notice_recipient: { Args: { p_notice: string }; Returns: boolean };
       _kst_today: { Args: never; Returns: string };
       _layer_permissions: {
@@ -1811,6 +1924,16 @@ export type Database = {
         Args: { p_activity: string; p_status: string; p_user: string };
         Returns: undefined;
       };
+      callout_mark_read: { Args: never; Returns: number };
+      callout_mute_host: {
+        Args: { p_host: string; p_mute: boolean };
+        Returns: undefined;
+      };
+      callout_send: {
+        Args: { p_activity: string; p_message?: string; p_sources: string[] };
+        Returns: number;
+      };
+      callout_settings_set: { Args: { p_accept: boolean }; Returns: undefined };
       can_manage_activity: { Args: { p_activity: string }; Returns: boolean };
       can_read_activity: { Args: { p_activity: string }; Returns: boolean };
       certification_reject: {
@@ -1887,6 +2010,7 @@ export type Database = {
       };
       host_access: { Args: never; Returns: Json };
       host_my_activities: { Args: never; Returns: string[] };
+      host_regulars: { Args: never; Returns: Json };
       host_settlement_overview: { Args: never; Returns: Json };
       is_club_member: { Args: { p_club: string }; Returns: boolean };
       is_confirmed_participant: {
@@ -1911,6 +2035,7 @@ export type Database = {
         Args: { p_alt: string; p_path: string; p_purpose?: string };
         Returns: string;
       };
+      my_callouts: { Args: never; Returns: Json };
       nickname_check: { Args: { p_nickname: string }; Returns: string };
       nickname_is_valid: { Args: { p_nickname: string }; Returns: boolean };
       notice_mark_read: { Args: { p_activity: string }; Returns: number };

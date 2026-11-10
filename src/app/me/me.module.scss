@@ -109,3 +109,156 @@
     background: var(--surface);
   }
 }
+
+// ── 받은 소식(H11)
+.notice,
+.errorBox {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: 12px;
+  font-weight: 700;
+}
+
+.notice {
+  background: var(--ink);
+  color: var(--surface);
+}
+
+.errorBox {
+  border: 1px solid var(--accent);
+}
+
+.callouts {
+  display: grid;
+  gap: var(--space-3);
+  scroll-margin-top: calc(var(--gnb-height) + var(--space-4));
+
+  h2 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 800;
+  }
+
+  > ul {
+    display: grid;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+}
+
+.muted {
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  word-break: keep-all;
+}
+
+.callout {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border-radius: var(--product-radius);
+  background: var(--white);
+
+  form {
+    justify-self: start;
+  }
+}
+
+.calloutHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px var(--space-2);
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+
+  small {
+    color: var(--ink-muted);
+    font-weight: 600;
+  }
+}
+
+.newBadge {
+  padding: 1px var(--space-2);
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  color: var(--accent);
+  font-size: 0.75rem;
+}
+
+.calloutLink {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  color: var(--ink);
+  text-decoration: none;
+
+  strong {
+    flex: 1;
+    font-size: 1.05rem;
+    font-weight: 800;
+    word-break: keep-all;
+  }
+}
+
+.calloutMessage {
+  margin: 0;
+  line-height: 1.6;
+  white-space: pre-line;
+  word-break: keep-all;
+}
+
+.textButton {
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink-muted);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--ink);
+  }
+}
+
+.calloutSettings {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--product-radius);
+
+  > form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    font-size: 0.9rem;
+  }
+
+  ul {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    font-size: 0.9rem;
+  }
+}
