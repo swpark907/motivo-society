@@ -55,6 +55,8 @@ export function QuickCheck({ activityId, people }: { activityId: string; people:
       <p className={s.counter} role="status" aria-live="polite">
         참석 <strong>{counts.attended}</strong> · 불참 <strong>{counts.absent}</strong> · 아직{" "}
         <strong>{counts.unchecked}</strong>
+        {/* 숫자는 누르자마자 바뀌지만 저장은 뒤에서 끝난다. 끝나기 전에 화면을 떠나면 빠질 수 있어 알린다(검수 F-025). */}
+        {busy.size > 0 && <span className={s.saving}> · 저장 중…</span>}
       </p>
       {error && (
         <p className={s.error} role="alert">

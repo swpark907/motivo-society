@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { StatusBadge } from "@/components/StatusBadge/StatusBadge";
 import { accountNumber, refundText } from "@/lib/platform/activity-text";
+import { clockTime, shortDate } from "@/lib/platform/activity-time";
 import { won } from "@/lib/platform/messages";
 import {
   STAGE_LABELS,
@@ -19,15 +20,9 @@ import { RefundForm } from "./RefundForm";
 
 export const metadata: Metadata = { title: "주문 상세", robots: { index: false } };
 
-const AT = new Intl.DateTimeFormat("ko-KR", {
-  timeZone: "Asia/Seoul",
-  month: "long",
-  day: "numeric",
-  weekday: "short",
-  hour: "numeric",
-  minute: "2-digit",
-});
-const at = (iso: string | null) => (iso ? AT.format(new Date(iso)) : null);
+// 다른 플랫폼 화면과 같은 꼴: "11.15 (일) · 오후 4:08"(검수 U10 — 화면마다 같은 날짜 형식).
+const at = (iso: string | null) =>
+  iso ? `${shortDate(new Date(iso))} · ${clockTime(new Date(iso))}` : null;
 
 export default async function OrderPage({ params, searchParams }: PageProps<"/me/orders/[no]">) {
   const { no } = await params;
@@ -37,7 +32,7 @@ export default async function OrderPage({ params, searchParams }: PageProps<"/me
   const notice = (await searchParams).notice === "refund_requested";
 
   return (
-    <main className={`paper ${s.page}`}>
+    <main data-platform className={`paper ${s.page}`}>
       <div className={s.narrow}>
         <nav className={s.crumbs} aria-label="위치">
           <Link href="/me">나</Link>

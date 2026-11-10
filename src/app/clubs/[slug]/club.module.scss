@@ -3,6 +3,7 @@
 .page {
   flex: 1 0 auto;
   min-height: calc(100dvh - var(--gnb-height));
+  @include tab-bar-space;
 }
 
 .inner {
@@ -31,6 +32,9 @@
     align-items: center;
     min-height: 44px;
     margin-block: -12px;
+    // 두 글자 링크("발견"·"클럽")도 폭 44px가 되도록 좌우로도 넓힌다.
+    padding-inline: 11px;
+    margin-inline: -11px;
     color: var(--ink);
     text-decoration: none;
 
@@ -79,7 +83,7 @@
   grid-area: hero;
   justify-items: start;
   gap: var(--space-3);
-  padding: var(--space-8) var(--space-6);
+  @include card-pad(16px 12px, var(--space-8) var(--space-6));
   border-radius: 20px;
   background: var(--kind-club);
 
@@ -139,7 +143,7 @@
 .joinCard {
   display: grid;
   gap: var(--space-3);
-  padding: var(--space-6);
+  @include card-pad;
   border: 1px solid var(--line);
   border-radius: 20px;
   background: var(--white);

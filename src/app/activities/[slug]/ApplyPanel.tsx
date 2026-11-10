@@ -48,12 +48,14 @@ export function ApplyPanel({
             <small> · {priceSub}</small>
           </p>
           {capacity !== null && (
-            <div
-              className={s.meter}
-              role="img"
-              aria-label={`정원 ${capacity}명 중 ${taken}명 참여`}
-            >
-              <span style={{ width: `${Math.min(100, (taken / capacity) * 100)}%` }} />
+            <div className={s.meterWrap}>
+              {/* 막대만으로는 무엇의 비율인지 모른다 — 숫자를 함께 쓴다(색만으로 전하지 않기). */}
+              <div className={s.meter} aria-hidden="true">
+                <span style={{ width: `${Math.min(100, (taken / capacity) * 100)}%` }} />
+              </div>
+              <small className={s.meterText}>
+                정원 {capacity}명 중 {taken}명
+              </small>
             </div>
           )}
           <p className={s.applyNote} data-state-kind={state.kind}>
@@ -66,13 +68,22 @@ export function ApplyPanel({
         </div>
       </aside>
 
-      <div className={s.mobileBar}>
+      {/* 좁은 화면의 신청 영역. 넓은 화면 카드와 화면 크기로 하나만 보이므로 같은 이름을 쓴다
+          (스크린 리더가 모바일에서도 "신청" 영역으로 찾는다 — 검수 F-023). */}
+      <aside className={s.mobileBar} aria-label="신청">
         <span>
           <strong>{price}</strong>
-          <small>{state.kind === "apply" || state.kind === "login" ? priceSub : note}</small>
+          {/* 좁은 바에는 짧게: 신청 전이면 종류, 대상이 정해졌으면 누가 신청할 수 있는지(검수 F-022). */}
+          <small>
+            {state.kind === "login"
+              ? (state.who ?? priceSub)
+              : state.kind === "apply"
+                ? priceSub
+                : note}
+          </small>
         </span>
         {action}
-      </div>
+      </aside>
     </>
   );
 }

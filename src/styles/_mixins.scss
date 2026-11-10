@@ -14,6 +14,26 @@
   }
 }
 
+// 좁은 화면의 하단 탭 바(56px + 안전 영역) 높이만큼 아래를 비운다.
+// body는 height: 100%라 body의 padding-bottom은 내용이 긴 화면에서 스크롤 끝을 늘리지 못한다
+// (2026-11-10 검수 F-007). 그래서 화면의 바깥 틀(main)이 직접 비운다. $extra는 원래 있던 아래 여백.
+@mixin tab-bar-space($extra: 0px) {
+  padding-bottom: calc(#{$extra} + 56px + env(safe-area-inset-bottom));
+
+  @include up(md) {
+    padding-bottom: $extra;
+  }
+}
+
+// 플랫폼 카드 안쪽 여백: 좁은 화면은 앱 밀도(12px), 넓은 화면은 지금처럼 24px(2026-11-10 승우 피드백).
+@mixin card-pad($mobile: 12px, $desktop: var(--space-6)) {
+  padding: $mobile;
+
+  @include up(md) {
+    padding: $desktop;
+  }
+}
+
 // Mobile-first: @include up(md) { ... }
 @mixin up($key) {
   $bp: map.get($breakpoints, $key);

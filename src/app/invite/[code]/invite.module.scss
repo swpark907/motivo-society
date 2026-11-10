@@ -6,6 +6,7 @@
   place-items: start center;
   min-height: calc(100dvh - var(--gnb-height));
   padding: var(--space-12) var(--space-4) var(--space-16);
+  @include tab-bar-space(var(--space-16));
 }
 
 .card {
@@ -13,7 +14,7 @@
   gap: var(--space-4);
   width: 100%;
   max-width: 480px;
-  padding: var(--space-8) var(--space-6);
+  @include card-pad(16px 12px, var(--space-8) var(--space-6));
   border-radius: 20px;
   background: var(--white);
 }
@@ -22,7 +23,7 @@
   display: grid;
   justify-items: start;
   gap: var(--space-2);
-  padding: var(--space-6);
+  @include card-pad;
   border-radius: 16px;
   background: var(--kind-club);
 }

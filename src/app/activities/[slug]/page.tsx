@@ -17,7 +17,7 @@ import {
   sessionWhen,
 } from "@/lib/platform/activity-text";
 import { clockTime, gatheringWhen, periodWhen, shortDate } from "@/lib/platform/activity-time";
-import { applyState } from "@/lib/platform/apply-state";
+import { applyState, periodOver } from "@/lib/platform/apply-state";
 import { getChallengeRoom } from "@/lib/platform/challenge-room";
 import { getLedger } from "@/lib/platform/host-ledger";
 import { listMyNotices } from "@/lib/platform/host-notices";
@@ -64,6 +64,7 @@ export default async function ActivityPage({ params, searchParams }: Props) {
   }
   const a = result.activity;
   const now = new Date();
+  const over = isOver(a, now);
   const state = applyState(
     {
       status: a.status,
@@ -79,6 +80,7 @@ export default async function ActivityPage({ params, searchParams }: Props) {
       isClubMember: a.viewer.isClubMember,
       hasEntitlement: a.viewer.hasEntitlement,
       mine: a.viewer.mine,
+      periodOver: over,
     },
     now,
   );
@@ -104,10 +106,10 @@ export default async function ActivityPage({ params, searchParams }: Props) {
   const isDev = process.env.NODE_ENV === "development";
 
   return (
-    <main className={`paper ${s.page}`}>
+    <main data-platform className={`paper ${s.page}`}>
       <div className={s.inner}>
         <nav className={s.crumbs} aria-label="위치">
-          <Link href="/explore">발견</Link>
+          <Link href="/explore">둘러보기</Link>
           <span aria-hidden="true">/</span>
           <span>{KIND_LABELS[a.kind]}</span>
         </nav>
@@ -143,7 +145,7 @@ export default async function ActivityPage({ params, searchParams }: Props) {
                   {KIND_LABELS[a.kind]}
                   {a.kind === "series" && a.sessions.length > 0 && ` · ${a.sessions.length}회`}
                 </KindTag>
-                <span className={s.state}>{statusLine(a)}</span>
+                <span className={s.state}>{statusLine(a, over)}</span>
               </div>
               <h1 className={s.title}>{a.title}</h1>
               {a.summary && <p className={s.summary}>{a.summary}</p>}
@@ -164,27 +166,32 @@ export default async function ActivityPage({ params, searchParams }: Props) {
                           ? (a.place.name ?? "온라인")
                           : [a.place.name, a.place.area].filter(Boolean).join(" · ") || "장소 미정"}
                       </strong>
-                      <small>{placeNote(a)}</small>
+                      {!over && <small>{placeNote(a)}</small>}
                     </span>
                   </li>
                 )}
                 <li>
                   <LineIcon name="users" />
                   <span>
+                    {/* 끝난 활동은 지난 일로 말한다(남은 자리 · 확정 방식 안내는 의미가 없다). */}
                     <strong>
-                      {a.capacity === null
-                        ? `${a.taken}명 참여 중`
-                        : left === 0
-                          ? `정원 ${a.capacity}명이 찼어요`
-                          : `${a.taken}명 참여 중 · ${left}자리 남음`}
+                      {over
+                        ? `${a.taken}명이 함께했어요`
+                        : a.capacity === null
+                          ? `${a.taken}명 참여 중`
+                          : left === 0
+                            ? `정원 ${a.capacity}명이 찼어요`
+                            : `${a.taken}명 참여 중 · ${left}자리 남음`}
                     </strong>
-                    <small>
-                      {a.joinMode === "approval"
-                        ? "여는 사람이 확인한 뒤 확정돼요"
-                        : a.price > 0
-                          ? "입금이 확인되면 확정돼요"
-                          : "신청하면 바로 확정돼요"}
-                    </small>
+                    {!over && (
+                      <small>
+                        {a.joinMode === "approval"
+                          ? "여는 사람이 확인한 뒤 확정돼요"
+                          : a.price > 0
+                            ? "입금이 확인되면 확정돼요"
+                            : "신청하면 바로 확정돼요"}
+                      </small>
+                    )}
                   </span>
                 </li>
               </ul>
@@ -224,10 +231,13 @@ export default async function ActivityPage({ params, searchParams }: Props) {
               </section>
             )}
 
-            <section className={s.block} aria-labelledby="about-h">
-              <h2 id="about-h">이런 {KIND_LABELS[a.kind]}이에요</h2>
-              <p>{a.description ?? a.summary ?? "여는 사람이 소개를 준비하고 있어요."}</p>
-            </section>
+            {/* 소개가 없으면 제목 아래 요약과 같은 문장을 다시 쓰지 않는다. 요약도 없을 때만 안내한다. */}
+            {(a.description && a.description !== a.summary) || !a.summary ? (
+              <section className={s.block} aria-labelledby="about-h">
+                <h2 id="about-h">이런 {KIND_LABELS[a.kind]}이에요</h2>
+                <p>{a.description ?? "여는 사람이 소개를 준비하고 있어요."}</p>
+              </section>
+            ) : null}
 
             {a.kind === "series" && a.sessions.length > 0 && (
               <section className={s.block} aria-labelledby="sessions-h" id="sessions">
@@ -387,7 +397,7 @@ export default async function ActivityPage({ params, searchParams }: Props) {
                 <h2 id="more-h">이런 활동도 있어요</h2>
                 <p>지금 모집 중인 다른 활동</p>
               </div>
-              <Link href="/explore">발견으로</Link>
+              <Link href="/explore">둘러보기로</Link>
             </div>
             <ul className={s.grid}>
               {others.map((x) => (
@@ -419,7 +429,19 @@ function roomLabel(room: NonNullable<Awaited<ReturnType<typeof getChallengeRoom>
   return room.todayCert ? "오늘 인증 보기" : "오늘 인증하러 가기";
 }
 
-function statusLine(a: ActivityDetail): string {
+/** 끝난 활동인지: 상태가 ended이거나, 아직 ended로 바뀌기 전이라도 기간이 지났으면. */
+function isOver(a: ActivityDetail, now: Date): boolean {
+  return (
+    a.status === "ended" ||
+    (a.status !== "cancelled" &&
+      a.status !== "draft" &&
+      periodOver({ kind: a.kind, endsAt: a.endsAt, challengeEndsOn: a.challenge?.endsOn }, now))
+  );
+}
+
+function statusLine(a: ActivityDetail, over: boolean): string {
+  if (a.status === "cancelled") return "취소된 활동";
+  if (over) return a.kind === "challenge" ? "기간 끝남" : "끝난 활동";
   if (a.status === "in_progress")
     return a.allowLateJoin ? "진행 중 · 중간에 합류할 수 있어요" : "진행 중";
   if (a.status === "ended") return "끝난 활동";

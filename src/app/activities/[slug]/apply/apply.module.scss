@@ -3,6 +3,7 @@
 .page {
   flex: 1 0 auto;
   min-height: calc(100dvh - var(--gnb-height));
+  @include tab-bar-space;
 }
 
 .inner {
@@ -75,7 +76,7 @@
 .card {
   display: grid;
   gap: var(--space-4);
-  padding: var(--space-6);
+  @include card-pad;
   border-radius: var(--product-radius);
   background: var(--white);
 }

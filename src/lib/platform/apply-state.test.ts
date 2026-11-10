@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { applyState, type ApplyInput } from "./apply-state";
+import { applyState, periodOver, type ApplyInput } from "./apply-state";
 
 const NOW = new Date("2026-11-06T09:00:00Z");
 const base: ApplyInput = {
@@ -59,5 +59,35 @@ describe("applyState", () => {
 
   it("끝난 활동은 비로그인에게도 로그인을 권하지 않는다", () => {
     expect(label({ signedIn: false, status: "ended" })).toBe("끝난 활동이에요");
+  });
+
+  it("기간이 지난 활동은 상태가 바뀌기 전에도 끝난 것으로", () => {
+    expect(label({ status: "in_progress", periodOver: true })).toBe("끝난 활동이에요");
+    expect(label({ status: "in_progress", periodOver: true, mine: "confirmed" })).toBe("참가 확정");
+  });
+
+  it("대상이 정해진 활동은 비로그인에게 누가 신청할 수 있는지 먼저 알린다", () => {
+    const note = (audience: ApplyInput["audience"]) =>
+      applyState({ ...base, signedIn: false, audience }, NOW).note;
+    expect(note("club_members")).toContain("클럽 멤버만");
+    expect(note("entitlement_holders")).toContain("참가한 사람만");
+    expect(note("anyone")).not.toContain("만 신청");
+    const login = applyState({ ...base, signedIn: false, audience: "club_members" }, NOW);
+    expect(login.kind === "login" && login.who).toBe("클럽 멤버만 신청할 수 있어요.");
+  });
+});
+
+describe("periodOver", () => {
+  // NOW = 2026-11-06 18:00 KST
+  it("챌린지는 종료일 하루가 끝나야 지난 것", () => {
+    const c = (endsOn: string) =>
+      periodOver({ kind: "challenge", endsAt: null, challengeEndsOn: endsOn }, NOW);
+    expect(c("2026-11-06")).toBe(false);
+    expect(c("2026-11-05")).toBe(true);
+  });
+  it("모임은 끝나는 시각, 시즌은 보지 않는다", () => {
+    expect(periodOver({ kind: "gathering", endsAt: "2026-11-06T08:00:00Z" }, NOW)).toBe(true);
+    expect(periodOver({ kind: "gathering", endsAt: null }, NOW)).toBe(false);
+    expect(periodOver({ kind: "series", endsAt: "2026-11-01T00:00:00Z" }, NOW)).toBe(false);
   });
 });

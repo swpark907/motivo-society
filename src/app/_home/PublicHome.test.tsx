@@ -6,7 +6,7 @@ describe("PublicHome", () => {
   it("renders the hero and the Library section", async () => {
     render(await PublicHome());
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("배우고");
-    expect(screen.queryByRole("list", { name: "이번 주 활동" })).toBeNull();
+    expect(screen.queryByRole("list", { name: "곧 열리는 활동" })).toBeNull();
     expect(screen.getByRole("list", { name: "Library" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /AI\s*활용법/ })).toHaveAttribute(
       "href",

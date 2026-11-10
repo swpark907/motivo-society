@@ -6,7 +6,7 @@ import { notFound, redirect } from "next/navigation";
 import { KindTag } from "@/components/KindTag/KindTag";
 import { getActivityDetail, type ActivityDetail } from "@/lib/platform/activity-detail";
 import { accountNumber, refundText, sessionWhen } from "@/lib/platform/activity-text";
-import { gatheringWhen, periodWhen } from "@/lib/platform/activity-time";
+import { clockTime, gatheringWhen, periodWhen, shortDate } from "@/lib/platform/activity-time";
 import { getMyApplication, type MyApplication } from "@/lib/platform/apply";
 import { applyState } from "@/lib/platform/apply-state";
 import { errorMessage, won } from "@/lib/platform/messages";
@@ -19,14 +19,8 @@ import { SubmitButton } from "@/components/SubmitButton/SubmitButton";
 
 export const metadata: Metadata = { title: "신청", robots: { index: false } };
 
-const DUE = new Intl.DateTimeFormat("ko-KR", {
-  timeZone: "Asia/Seoul",
-  month: "long",
-  day: "numeric",
-  weekday: "short",
-  hour: "numeric",
-  minute: "2-digit",
-});
+// 다른 플랫폼 화면과 같은 꼴: "11.11 (수) · 오후 4:16"(검수 U10).
+const due = (at: Date) => `${shortDate(at)} · ${clockTime(at)}`;
 
 /**
  * 신청 확인 → 결과. 같은 주소가 신청 전에는 확인 단계, 신청 뒤에는 내 신청 내역(입금 안내 포함)을 보여 준다.
@@ -49,7 +43,7 @@ export default async function ApplyPage({
   const error = typeof query.error === "string" ? errorMessage(query.error) : null;
 
   return (
-    <main className={`paper ${s.page}`}>
+    <main data-platform className={`paper ${s.page}`}>
       <div className={s.inner}>
         <Link href={`/activities/${a.slug}`} className={s.back}>
           ← 활동으로 돌아가기
@@ -227,7 +221,11 @@ function Result({ a, mine }: { a: ActivityDetail; mine: MyApplication }) {
       <h1 id="result-h" className={s.title} data-status={mine.status}>
         {copy.title}
       </h1>
-      <p className={s.lead}>{copy.lead}</p>
+      <p className={s.lead}>
+        {mine.status === "confirmed" && a.kind === "challenge"
+          ? "미션과 오늘 인증은 활동 화면의 '내 챌린지'에서 올려요."
+          : copy.lead}
+      </p>
       {mine.status === "waitlisted" && <p className={s.muted}>지금 대기 {mine.waitlisted}명</p>}
 
       {mine.status === "pending_payment" && mine.order && mine.bankNote && (
@@ -238,7 +236,7 @@ function Result({ a, mine }: { a: ActivityDetail; mine: MyApplication }) {
             account={accountNumber(mine.bankNote)}
             depositor={mine.order.depositor}
             dueAt={mine.order.dueAt}
-            dueLabel={DUE.format(new Date(mine.order.dueAt))}
+            dueLabel={due(new Date(mine.order.dueAt))}
             orderNo={mine.order.no}
             renderedAt={new Date().toISOString()}
           />

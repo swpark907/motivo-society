@@ -17,6 +17,8 @@ export async function PublicHome() {
     matchesFilters(a, { ...EMPTY_FILTERS, when: "this-week" }, now),
   );
   const activities = [...thisWeek, ...items.filter((a) => !thisWeek.includes(a))].slice(0, 8);
+  // 다음 주 이후 것이 섞이면 "이번 주"라고 부르지 않는다.
+  const allThisWeek = activities.every((a) => thisWeek.includes(a));
 
   return (
     <main className={styles.main}>
@@ -30,8 +32,12 @@ export async function PublicHome() {
       </section>
 
       {activities.length > 0 && (
-        <Section title="이번 주 모쏘에서 열리는 것" label="This week" href="/explore">
-          <Carousel label="이번 주 활동">
+        <Section
+          title={allThisWeek ? "이번 주 모쏘에서 열리는 것" : "곧 모쏘에서 열리는 것"}
+          label={allThisWeek ? "This week" : "Coming up"}
+          href="/explore"
+        >
+          <Carousel label="곧 열리는 활동">
             {activities.map((a) => (
               <ActivityCard key={a.id} activity={a} now={now} href={`/activities/${a.slug}`} />
             ))}

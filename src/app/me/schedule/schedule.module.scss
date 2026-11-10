@@ -13,7 +13,7 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    min-height: 40px;
+    min-height: 44px;
     padding: 0 var(--space-4);
     border-radius: 999px;
     color: var(--ink-muted);
@@ -223,7 +223,7 @@
 
 .none {
   margin: 0;
-  padding: var(--space-6);
+  @include card-pad;
   border-radius: 16px;
   background: var(--white);
   color: var(--ink-muted);
@@ -258,8 +258,8 @@
 .todayLink {
   display: inline-grid;
   place-items: center;
-  min-width: 40px;
-  min-height: 40px;
+  min-width: 44px;
+  min-height: 44px;
   border-radius: 12px;
   color: var(--ink);
   font-weight: 800;

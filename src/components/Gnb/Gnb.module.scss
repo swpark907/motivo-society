@@ -24,7 +24,11 @@
 }
 
 .brand {
+  // 글자 크기는 그대로, 누르는 영역만 높이 44px로(검수 F-009).
+  display: inline-flex;
   flex-shrink: 0;
+  align-items: center;
+  min-height: 44px;
   font-size: 1.125rem;
   line-height: 1;
   color: var(--white);
@@ -125,7 +129,9 @@
 .me {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: var(--space-2);
+  min-width: 44px; // 좁은 화면은 얼굴(28px)만 보여서 폭도 44px로
   min-height: 44px;
   color: var(--white);
   font-size: 0.875rem;

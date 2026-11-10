@@ -6,6 +6,7 @@
   place-items: start center;
   min-height: calc(100dvh - var(--gnb-height));
   padding: var(--space-8) var(--space-4) var(--space-16);
+  @include tab-bar-space(var(--space-16));
 
   @include up(md) {
     place-items: center;
@@ -165,7 +166,7 @@
 .sent {
   display: grid;
   gap: var(--space-3);
-  padding: var(--space-6);
+  @include card-pad;
   border-radius: var(--product-radius);
   background: var(--white);
 

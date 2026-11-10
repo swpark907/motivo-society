@@ -12,11 +12,23 @@ import styles from "./Gnb.module.scss";
 
 type Account = { name: string | null } | null | undefined; // undefined = 아직 확인 전, name null = 온보딩 전
 
+// 로그인·온보딩을 막 마치고 떠나는 화면. 여기서 확인한 상태(비로그인·가입 전)는 다음 화면에서 곧 바뀌므로,
+// 다시 확인할 때까지 "로그인"·"가입 마무리"를 잠깐이라도 보여 주지 않는다(검수 F-014).
+const AUTH_STEPS = ["/login", "/onboarding", "/auth/callback"];
+
 export function AccountMenu() {
   const pathname = usePathname();
   const supabase = useMemo(() => createBrowserSupabase(), []);
   // 연결 정보가 없으면(로그인을 쓸 수 없는 환경) 처음부터 비로그인으로 둔다.
-  const [account, setAccount] = useState<Account>(supabase ? undefined : null);
+  const [checked, setChecked] = useState<{ account: Account; path: string }>({
+    account: supabase ? undefined : null,
+    path: pathname,
+  });
+  const stale =
+    checked.path !== pathname &&
+    AUTH_STEPS.includes(checked.path) &&
+    (checked.account === null || checked.account?.name === null);
+  const account = stale ? undefined : checked.account;
 
   useEffect(() => {
     if (!supabase) return;
@@ -27,7 +39,7 @@ export function AccountMenu() {
       const { data } = await supabase.auth.getUser();
       const user = data.user;
       if (!user) {
-        if (alive) setAccount(null);
+        if (alive) setChecked({ account: null, path: pathname });
         return;
       }
       const { data: profile } = await supabase
@@ -35,7 +47,7 @@ export function AccountMenu() {
         .select("nickname")
         .eq("id", user.id)
         .maybeSingle();
-      if (alive) setAccount({ name: profile?.nickname ?? null });
+      if (alive) setChecked({ account: { name: profile?.nickname ?? null }, path: pathname });
     })();
     return () => {
       alive = false;
@@ -62,7 +74,7 @@ export function AccountMenu() {
     );
   }
   return (
-    <Link href="/me" className={styles.me} aria-label={`${account.name} · 나`}>
+    <Link href="/me" className={styles.me} aria-label={`${account.name} · MY`}>
       <Avatar name={account.name} size={28} />
       <span className={styles.meName}>{account.name}</span>
     </Link>

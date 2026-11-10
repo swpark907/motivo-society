@@ -30,6 +30,9 @@
     align-items: center;
     min-height: 44px;
     margin-block: -12px;
+    // 두 글자 링크("발견"·"클럽")도 폭 44px가 되도록 좌우로도 넓힌다.
+    padding-inline: 11px;
+    margin-inline: -11px;
     color: var(--ink);
     text-decoration: none;
 
@@ -162,7 +165,7 @@
 .private {
   display: grid;
   gap: var(--space-2);
-  padding: var(--space-6);
+  @include card-pad;
   border-radius: var(--product-radius);
   background: var(--ink);
   color: var(--white);
@@ -601,6 +604,16 @@
     border-radius: inherit;
     background: var(--ink);
   }
+}
+
+.meterWrap {
+  display: grid;
+  gap: 6px;
+}
+
+.meterText {
+  color: var(--ink-muted);
+  font-size: 0.8rem;
 }
 
 .applyNote {

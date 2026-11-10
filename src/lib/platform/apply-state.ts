@@ -20,10 +20,32 @@ export type ApplyInput = {
   /** 이용권 보유자 전용일 때 가지고 있는지(아니면 null). */
   hasEntitlement: boolean | null;
   mine: MyParticipation;
+  /** 기간이 이미 지났는지(상태가 아직 ended로 바뀌기 전에도). `periodOver()`로 계산한다. */
+  periodOver?: boolean;
 };
 
+/**
+ * 활동 기간이 지났는지. 챌린지는 종료일(한국 시각) 하루가 끝나면, 그 밖에는 끝나는 시각이 지나면.
+ * DB가 상태를 ended로 바꾸기 전(완주 판정 전)에도 화면은 끝난 것으로 보여 준다.
+ */
+export function periodOver(
+  a: { kind: string; endsAt: string | null; challengeEndsOn?: string | null },
+  now: Date,
+): boolean {
+  if (a.kind === "challenge" && a.challengeEndsOn) {
+    return now > new Date(`${a.challengeEndsOn}T23:59:59.999+09:00`);
+  }
+  if (a.kind === "series") return false; // 시즌은 회차별로 본다.
+  return a.endsAt !== null && now > new Date(a.endsAt);
+}
+
 export type ApplyState =
-  | { kind: "login"; label: string; note: string }
+  | {
+      kind: "login";
+      label: string;
+      note: string;
+      /** 대상이 정해진 활동이면 누가 신청할 수 있는지(짧게). */ who?: string;
+    }
   | { kind: "apply"; label: string; note: string; waitlist: boolean }
   | { kind: "mine"; label: string; note: string; status: Exclude<MyParticipation, null> }
   | { kind: "blocked"; label: string; note: string; reason: string };
@@ -71,9 +93,10 @@ export function applyState(a: ApplyInput, now: Date): ApplyState {
     };
   }
 
-  if (a.status === "ended" || a.status === "cancelled") {
-    const label = a.status === "ended" ? "끝난 활동이에요" : "취소된 활동이에요";
-    return { kind: "blocked", reason: a.status, label, note: "발견에서 다른 활동을 찾아보세요." };
+  if (a.status === "ended" || a.status === "cancelled" || (a.periodOver && a.status !== "draft")) {
+    const label = a.status === "cancelled" ? "취소된 활동이에요" : "끝난 활동이에요";
+    const reason = a.status === "cancelled" ? "cancelled" : "ended";
+    return { kind: "blocked", reason, label, note: "둘러보기에서 다른 활동을 찾아보세요." };
   }
   if (a.isManager) {
     return {
@@ -89,7 +112,7 @@ export function applyState(a: ApplyInput, now: Date): ApplyState {
       kind: "blocked",
       reason: "closed",
       label: "모집 마감",
-      note: "다음에 열리면 발견에 다시 보여요.",
+      note: "다음에 열리면 둘러보기에 다시 보여요.",
     };
   }
   if (a.applyOpensAt && now < new Date(a.applyOpensAt)) {
@@ -110,10 +133,18 @@ export function applyState(a: ApplyInput, now: Date): ApplyState {
   }
 
   if (!a.signedIn) {
+    // 대상이 정해진 활동은 누가 신청할 수 있는지 먼저 말한다(로그인한 뒤에야 막히지 않게).
+    const who =
+      a.audience === "club_members"
+        ? "클럽 멤버만 신청할 수 있어요."
+        : a.audience === "entitlement_holders"
+          ? "앞선 활동에 참가한 사람만 신청할 수 있어요."
+          : undefined;
     return {
       kind: "login",
       label: "로그인하고 신청",
-      note: "이메일로 바로 가입·로그인할 수 있어요.",
+      note: `${who ? `${who} ` : ""}이메일로 바로 가입·로그인할 수 있어요.`,
+      who,
     };
   }
   if (a.audience === "club_members" && a.isClubMember === false) {
