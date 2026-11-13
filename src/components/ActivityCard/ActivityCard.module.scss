@@ -1,21 +1,21 @@
-// 활동 카드 — 기준 시안(L01b). 표지가 먼저, 색은 종류 태그와 기본 표지에만.
+// 활동 카드 — 작업 노트(2026-11-13). 카드뉴스처럼 위아래 오렌지 띠 + 검은 1px 선,
+// 마우스를 올리면 떠오른다. 언제는 Syne 숫자로 크게. 기준 시안 /demo/design-notebook.
 
 .card {
+  @include note-box;
+  @include note-lift;
   display: grid;
-  align-content: start;
-  gap: var(--space-3);
+  grid-template-rows: auto 1fr;
   min-width: 0;
+  overflow: hidden;
+  border-top: 5px solid var(--orange);
+  border-bottom: 5px solid var(--orange);
   color: var(--ink);
   text-decoration: none;
 
-  &:hover .cover img {
-    opacity: 0.92;
-  }
-
   &:focus-visible {
-    border-radius: var(--product-radius);
-    outline: 2px solid var(--ink);
-    outline-offset: 4px;
+    outline: 2px solid var(--orange-deep);
+    outline-offset: 3px;
   }
 }
 
@@ -23,28 +23,15 @@
   position: relative;
   overflow: hidden;
   aspect-ratio: 4 / 3;
-  border-radius: var(--product-radius);
-  background: var(--white);
+  border-bottom: 1px solid var(--note-edge);
+  background: var(--note-soft);
 
   img {
     object-fit: cover;
-    transition: opacity 120ms;
-  }
-
-  // 표지가 없을 때: 종류 색 면 + 제목(호스트 이미지 보관함 전까지의 기본 표지)
-  &[data-kind="gathering"]:not(:has(img)) {
-    background: var(--kind-gathering);
-  }
-
-  &[data-kind="series"]:not(:has(img)) {
-    background: var(--kind-series);
-  }
-
-  &[data-kind="challenge"]:not(:has(img)) {
-    background: var(--kind-challenge);
   }
 }
 
+// 표지가 없을 때: 따뜻한 종이 면 + 제목(호스트 이미지 보관함 전까지의 기본 표지)
 .fallback {
   position: absolute;
   right: var(--space-4);
@@ -62,51 +49,41 @@
   -webkit-line-clamp: 3;
 }
 
-// 기본 표지에서는 종류 태그가 같은 색 면에 묻히지 않게 흰 바탕으로.
-.cover:not(:has(img)) .coverTop > :first-child {
-  background: var(--white);
-}
-
 .coverTop {
   position: absolute;
-  top: var(--space-3);
-  right: var(--space-3);
-  left: var(--space-3);
+  top: 10px;
+  right: 10px;
+  left: 10px;
   display: flex;
   justify-content: space-between;
   gap: var(--space-2);
 }
 
 .day {
-  display: inline-flex;
-  align-items: center;
-  height: 24px;
-  padding: 0 var(--space-2);
-  border-radius: 999px;
-  background: var(--black);
-  color: var(--white);
-  font-size: 0.75rem;
-  font-weight: 800;
-  white-space: nowrap;
+  @include note-stamp;
 }
 
 .live {
-  composes: day;
-  background: var(--white);
+  @include note-stamp;
+  background: var(--orange);
   color: var(--black);
 }
 
 .body {
   display: grid;
+  align-content: start;
   gap: 6px;
   min-width: 0;
+  padding: 12px 14px 14px;
 }
 
 .when {
   margin: 0;
-  color: var(--ink-muted);
-  font-size: 0.8rem;
+  font-family: var(--font-note);
+  font-size: 0.82rem;
   font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--ink);
 }
 
 .title {
@@ -116,7 +93,7 @@
   font-size: 1.05rem;
   font-weight: 800;
   line-height: 1.35;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
@@ -139,22 +116,24 @@
 
 .foot {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: space-between;
   gap: var(--space-2);
-  margin: 2px 0 0;
+  margin: 4px 0 0;
+  padding-top: 8px;
+  border-top: 1px dashed var(--note-edge);
   color: var(--ink-muted);
   font-size: 0.8rem;
   font-weight: 600;
 }
 
 .urgent {
-  color: var(--ink);
+  color: var(--orange-deep);
   font-weight: 800;
 }
 
 .price {
   color: var(--ink);
   font-size: 0.95rem;
-  font-weight: 800;
+  font-weight: 900;
 }

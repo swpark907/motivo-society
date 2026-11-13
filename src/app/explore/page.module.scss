@@ -1,4 +1,4 @@
-// 발견 — 기준 시안(L01b)의 구조: 필터 칩 → 이번 주(가로 줄) → 합류 가능 → 전체(격자).
+// 둘러보기 — 작업 노트(2026-11-13): 네모 칩 → 이번 주(카드 줄) → 합류 가능 → 전체(장부).
 
 .filters {
   display: flex;
@@ -27,7 +27,7 @@
   & + & {
     margin-left: var(--space-2);
     padding-left: var(--space-3);
-    border-left: 1px solid var(--line);
+    border-left: 1px solid var(--note-edge);
   }
 }
 
@@ -36,12 +36,12 @@
   align-items: center;
   height: 44px; // 누름 영역 44px(모바일 한 손 조작)
   padding: 0 var(--space-4);
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: var(--white);
+  border: 1px solid var(--note-edge);
+  border-radius: var(--radius);
+  background: #ffffff;
   color: var(--ink);
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 700;
   text-decoration: none;
   white-space: nowrap;
   // 글자색도 함께 바꿔, 고르는 순간 흰 글자가 흰 면 위에서 잠깐 사라지지 않게.
@@ -50,7 +50,7 @@
     color 120ms;
 
   &:hover:not([data-on]) {
-    background: var(--surface);
+    background: var(--note-soft);
   }
 
   &[data-on] {
@@ -65,6 +65,17 @@
   min-width: 0;
 }
 
+// 섹션 순서 번호는 아이브로에(제목 이름 밖). 번호 초기화는 PlatformPage 본문 틀이 한다.
+.eyebrow {
+  @include note-eyebrow;
+  margin: 0 0 2px;
+
+  &::before {
+    counter-increment: sec;
+    content: counter(sec, decimal-leading-zero) " — ";
+  }
+}
+
 .sectionHead {
   display: flex;
   align-items: flex-end;
@@ -74,9 +85,13 @@
 
   h2 {
     margin: 0;
-    font-size: 1.3rem;
-    font-weight: 800;
-    letter-spacing: -0.01em;
+    font-size: 1.4rem;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+
+    @include up(md) {
+      font-size: 1.7rem;
+    }
   }
 
   p {
@@ -92,11 +107,12 @@
     min-height: 44px;
     color: var(--ink);
     font-size: 0.875rem;
-    font-weight: 700;
-    text-decoration: none;
+    font-weight: 800;
+    text-decoration: underline;
+    text-underline-offset: 4px;
 
     &:hover {
-      text-decoration: underline;
+      color: var(--orange-deep);
     }
   }
 }
@@ -109,7 +125,7 @@
   gap: var(--space-4);
   overflow-x: auto;
   margin: 0 calc(var(--space-4) * -1);
-  padding: 0 var(--space-4) var(--space-2);
+  padding: 2px var(--space-4) var(--space-3); // 떠오른 그림자가 잘리지 않게
   scroll-snap-type: x mandatory;
   scroll-padding-inline: var(--space-4);
   scrollbar-width: none;
@@ -123,7 +139,7 @@
   @include up(md) {
     grid-auto-columns: calc((100% - var(--space-4) * 3) / 4);
     margin: 0;
-    padding: 0 0 var(--space-2);
+    padding: 2px 6px var(--space-3) 2px;
     scroll-padding-inline: 0;
   }
 }
@@ -169,4 +185,94 @@
   color: var(--ink);
   font-size: 0.875rem;
   font-weight: 700;
+}
+
+// ── 장부형 목록
+.ledger {
+  @include note-box;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li + li {
+    border-top: 1px solid var(--line);
+  }
+}
+
+.ledgerRow {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: var(--space-3);
+  align-items: center;
+  padding: 14px var(--space-4);
+  color: var(--ink);
+  text-decoration: none;
+  transition: background-color 120ms;
+
+  &:hover {
+    background: var(--note-soft);
+  }
+
+  @include up(md) {
+    grid-template-columns: 96px minmax(0, 1fr) auto;
+    gap: var(--space-6);
+    padding: 16px 20px;
+  }
+}
+
+.ledgerDate {
+  font-family: var(--font-note);
+  font-size: 1.4rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.03em;
+
+  small {
+    display: block;
+    margin-top: 4px;
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0;
+    color: var(--ink-muted);
+  }
+}
+
+.ledgerMain {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px var(--space-2);
+  min-width: 0;
+
+  strong {
+    font-size: 1rem;
+    font-weight: 800;
+  }
+
+  > span:last-child {
+    flex-basis: 100%;
+    color: var(--ink-muted);
+    font-size: 0.82rem;
+  }
+}
+
+.ledgerEnd {
+  grid-column: 2;
+  display: flex;
+  gap: var(--space-3);
+  font-size: 0.82rem;
+  color: var(--ink-muted);
+
+  strong {
+    color: var(--ink);
+    font-weight: 900;
+  }
+
+  @include up(md) {
+    grid-column: auto;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+  }
 }

@@ -136,3 +136,55 @@ $workbook-step-focus: #ad6949;
     }
   }
 }
+
+// ── 작업 노트(플랫폼 제품 화면, 2026-11-13) ──
+// 흰 칸 + 검은 1px 선. 카드·묶음·입력 칸의 기본 면.
+@mixin note-box {
+  background: #ffffff;
+  border: 1px solid var(--note-edge);
+  border-radius: var(--product-radius);
+}
+
+// 누를 수 있는 칸: 마우스를 올리면 단색 오프셋 그림자와 함께 살짝 떠오른다.
+// "그림자 없음"의 예외(작업 노트 안에서만). 흐린 그림자·글로우는 쓰지 않는다.
+@mixin note-lift($shadow: var(--note-edge)) {
+  transition:
+    transform 120ms,
+    box-shadow 120ms;
+  @media (hover: hover) {
+    &:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 4px 4px 0 $shadow;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+    &:hover {
+      transform: none;
+    }
+  }
+}
+
+// 오렌지 영문 아이브로(THIS WEEK 같은 작은 라벨).
+@mixin note-eyebrow {
+  font-family: var(--font-note);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--orange-deep);
+}
+
+// 검은 도장(종류·상태 표시).
+@mixin note-stamp {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 7px;
+  border-radius: var(--radius);
+  background: var(--black);
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  white-space: nowrap;
+}

@@ -1,27 +1,4 @@
+// 종류 표시 — 작업 노트의 검은 도장(2026-11-13). 종류는 색이 아니라 글자로 구분한다.
 .tag {
-  display: inline-flex;
-  align-items: center;
-  height: 24px;
-  padding: 0 var(--space-2);
-  border-radius: 999px;
-  color: var(--black);
-  font-size: 0.75rem;
-  font-weight: 800;
-  white-space: nowrap;
-
-  &[data-kind="gathering"] {
-    background: var(--kind-gathering);
-  }
-
-  &[data-kind="series"] {
-    background: var(--kind-series);
-  }
-
-  &[data-kind="challenge"] {
-    background: var(--kind-challenge);
-  }
-
-  &[data-kind="club"] {
-    background: var(--kind-club);
-  }
+  @include note-stamp;
 }

@@ -44,10 +44,10 @@
 
 .title {
   margin: 0;
-  font-size: clamp(1.75rem, 4.5vw, 2.5rem);
-  font-weight: 800;
-  line-height: 1.2;
-  letter-spacing: -0.02em;
+  font-size: clamp(1.9rem, 5vw, 3rem);
+  font-weight: 900;
+  line-height: 1.15;
+  letter-spacing: -0.04em;
   word-break: keep-all;
 }
 
@@ -76,8 +76,8 @@
   width: 100%;
   min-height: 52px;
   padding: 0 var(--space-6);
-  border: 0;
-  border-radius: 14px;
+  border: 1px solid var(--note-edge);
+  border-radius: var(--radius);
   background: var(--orange);
   color: var(--black);
   font: inherit;
@@ -85,14 +85,27 @@
   font-weight: 800;
   text-decoration: none;
   cursor: pointer;
-  transition: background-color 120ms;
+  transition:
+    transform 120ms,
+    box-shadow 120ms;
 
-  &:hover:not(:disabled) {
-    background: var(--orange-deep);
-    color: var(--white);
+  @media (hover: hover) {
+    &:hover:not(:disabled) {
+      transform: translate(-2px, -2px);
+      box-shadow: 4px 4px 0 var(--note-edge);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+
+    &:hover:not(:disabled) {
+      transform: none;
+    }
   }
 
   &:disabled {
+    border-color: var(--line);
     background: var(--line);
     color: var(--ink-muted);
     cursor: not-allowed;
@@ -101,7 +114,7 @@
 
 .ctaSoon {
   padding: 2px var(--space-2);
-  border-radius: 999px;
+  border-radius: var(--radius);
   background: var(--white);
   font-size: 0.7rem;
   font-weight: 700;
@@ -110,7 +123,7 @@
 .notice {
   margin: 0;
   padding: var(--space-3) var(--space-4);
-  border-radius: var(--product-radius-sm);
+  border-radius: var(--radius);
   background: var(--ink);
   color: var(--white);
   font-weight: 700;
@@ -125,7 +138,7 @@
   min-height: 52px;
   margin: 0;
   padding: 0 var(--space-4);
-  border-radius: 14px;
+  border-radius: var(--radius);
   background: var(--ink);
   color: var(--white);
   font-weight: 800;
@@ -145,9 +158,9 @@
   gap: var(--space-2);
   min-height: 44px;
   padding: 0 var(--space-4);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: var(--white);
+  border: 1px solid var(--note-edge);
+  border-radius: var(--radius);
+  background: #ffffff;
   color: var(--ink);
   font: inherit;
   font-size: 0.9rem;
@@ -158,7 +171,7 @@
   transition: background-color 120ms;
 
   &:hover {
-    background: var(--surface);
+    background: var(--note-soft);
   }
 }
 
@@ -191,7 +204,7 @@
   gap: var(--space-2);
   min-height: 44px;
   padding: 0 var(--space-4);
-  border-radius: 12px;
+  border-radius: var(--radius);
   background: var(--white);
   color: var(--black);
   font-weight: 800;
@@ -207,8 +220,9 @@
 
   h2 {
     margin: 0;
-    font-size: 1.3rem;
-    font-weight: 800;
+    font-size: 1.4rem;
+    font-weight: 900;
+    letter-spacing: -0.03em;
   }
 
   p {
@@ -288,7 +302,7 @@
   }
 }
 
-// 활동 상세 — 기준 시안(L01b): 큰 표지 → 제목과 핵심 사실 → 본문 / 오른쪽 신청 카드(좁은 화면은 하단 고정 바).
+// 활동 상세 — 작업 노트(2026-11-13): 테이프로 붙인 표지 → 큰 제목과 줄 친 사실 → 본문 / 오른쪽 신청 카드(좁은 화면은 하단 고정 바).
 
 .layout {
   display: grid;
@@ -307,32 +321,40 @@
   min-width: 0;
 }
 
+// 표지 = 흰 테두리 사진을 오렌지 테이프 두 조각으로 붙인 한 장(살짝 기울게)
 .hero {
   position: relative;
-  overflow: hidden;
   aspect-ratio: 16 / 10;
-  margin: 0 calc(var(--space-4) * -1);
-  background: var(--white);
+  margin: 14px 4px 0;
+  border: 10px solid #ffffff;
+  border-bottom-width: 28px;
+  outline: 1px solid var(--note-edge);
+  background: var(--note-soft);
+  transform: rotate(-1deg);
 
   img {
     object-fit: cover;
   }
 
-  &[data-kind="gathering"]:not(:has(img)) {
-    background: var(--kind-gathering);
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    top: -22px;
+    width: 86px;
+    height: 24px;
+    background: rgb(255 117 31 / 72%);
   }
 
-  &[data-kind="series"]:not(:has(img)) {
-    background: var(--kind-series);
+  &::before {
+    left: 14px;
+    transform: rotate(-6deg);
   }
 
-  &[data-kind="challenge"]:not(:has(img)) {
-    background: var(--kind-challenge);
-  }
-
-  @include up(md) {
-    margin: 0;
-    border-radius: 20px;
+  &::after {
+    right: 14px;
+    transform: rotate(5deg);
   }
 }
 
@@ -369,16 +391,17 @@
 
 .facts {
   display: grid;
-  gap: var(--space-3);
   margin: 0;
-  padding: var(--space-4) 0 0;
-  border-top: 1px solid var(--line);
+  padding: 0;
+  border-top: 1px solid var(--note-edge);
   list-style: none;
 
   li {
     display: flex;
     gap: var(--space-3);
     align-items: flex-start;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
 
     > svg {
       flex-shrink: 0;
@@ -405,12 +428,13 @@
   display: grid;
   gap: var(--space-3);
   padding-top: var(--space-6);
-  border-top: 1px solid var(--line);
+  border-top: 1px solid var(--note-edge);
 
   h2 {
     margin: 0;
-    font-size: 1.15rem;
-    font-weight: 800;
+    font-size: 1.35rem;
+    font-weight: 900;
+    letter-spacing: -0.03em;
   }
 
   > p {
@@ -442,33 +466,34 @@
   list-style: none;
 
   li {
+    @include note-box;
     display: flex;
     align-items: center;
     gap: var(--space-3);
     padding: var(--space-3) var(--space-4);
-    border-radius: 14px;
-    background: var(--white);
 
+    // 끝난 회차: 점선 칸 + 흐린 번호
     &[data-state="끝남"] {
-      opacity: 0.55;
+      border-style: dashed;
+      background: transparent;
+      color: var(--ink-muted);
     }
 
+    // 오늘 회차: 오렌지 면
     &[data-state="오늘"] {
-      outline: 2px solid var(--ink);
+      background: var(--orange);
     }
   }
 }
 
 .sessionNo {
-  display: grid;
   flex-shrink: 0;
-  place-items: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: var(--kind-series);
-  font-family: var(--font-display);
-  font-size: 1.1rem;
+  min-width: 44px;
+  font-family: var(--font-note);
+  font-size: 1.6rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.04em;
 }
 
 .sessionBody {
@@ -487,13 +512,20 @@
   font-weight: 800;
 }
 
+// "끝남"은 비스듬한 오렌지 도장
+li[data-state="끝남"] .sessionState {
+  padding: 1px 6px;
+  border: 1.5px solid var(--orange-deep);
+  color: var(--orange-deep);
+  transform: rotate(8deg);
+}
+
 .hostCard {
+  @include note-box;
   display: flex;
   align-items: center;
   gap: var(--space-4);
   padding: var(--space-4);
-  border-radius: 16px;
-  background: var(--white);
 
   > div {
     flex: 1;
@@ -537,12 +569,14 @@
 
 .policy {
   display: grid;
-  gap: var(--space-3);
   margin: 0;
+  border-top: 1px solid var(--note-edge);
 
   div {
     display: grid;
     gap: 2px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
 
     @include up(md) {
       grid-template-columns: 6rem 1fr;
@@ -572,18 +606,19 @@
 }
 
 .applyCard {
+  @include note-box;
   display: grid;
   gap: var(--space-3);
   padding: var(--space-6);
-  border: 1px solid var(--line);
-  border-radius: 20px;
-  background: var(--white);
+  border-top: 5px solid var(--orange);
+  box-shadow: 5px 5px 0 var(--note-edge);
 }
 
 .applyPrice {
   margin: 0;
-  font-size: 1.6rem;
-  font-weight: 800;
+  font-size: 1.8rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
 
   small {
     color: var(--ink-muted);
@@ -595,13 +630,12 @@
 .meter {
   height: 8px;
   overflow: hidden;
-  border-radius: 999px;
-  background: var(--surface);
+  border: 1px solid var(--note-edge);
+  background: #ffffff;
 
   span {
     display: block;
     height: 100%;
-    border-radius: inherit;
     background: var(--ink);
   }
 }
@@ -649,8 +683,8 @@
   justify-content: space-between;
   gap: var(--space-3);
   padding: var(--space-3) var(--space-4);
-  border-top: 1px solid var(--line);
-  background: var(--white);
+  border-top: 1px solid var(--note-edge);
+  background: #ffffff;
 
   span {
     display: grid;
@@ -722,8 +756,7 @@
     display: grid;
     gap: var(--space-2);
     padding: var(--space-4);
-    border-radius: 16px;
-    background: var(--white);
+    @include note-box;
   }
 }
 
@@ -747,7 +780,7 @@
 .newBadge {
   padding: 1px var(--space-2);
   border: 1px solid var(--accent);
-  border-radius: 999px;
+  border-radius: var(--radius);
   color: var(--accent);
   font-size: 0.75rem;
   font-weight: 700;

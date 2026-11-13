@@ -4,16 +4,13 @@
   align-content: start;
   gap: var(--space-2);
   @include card-pad;
-  border: 2px solid transparent;
-  border-radius: var(--product-radius);
-  background: var(--surface-2);
+  @include note-box; // 작업 노트: 흰 칸 + 검은 선
   color: var(--ink);
   text-decoration: none;
-  transition: border-color 120ms;
 }
 
-a.card:hover {
-  border-color: var(--ink);
+a.card {
+  @include note-lift;
 }
 
 .name {
@@ -37,7 +34,7 @@ a.card:hover {
 .badge {
   padding: 1px var(--space-2);
   border: 1px solid var(--ink);
-  border-radius: 999px;
+  border-radius: var(--radius);
   font-size: 0.75rem;
   font-weight: 800;
 }

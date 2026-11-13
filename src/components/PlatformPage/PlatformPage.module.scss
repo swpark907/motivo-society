@@ -5,56 +5,49 @@
   @include tab-bar-space;
 }
 
-.inner {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 20px; // 좁은 화면: 머리와 본문 사이를 앱처럼 촘촘하게
-  max-width: var(--max-width);
-  margin: 0 auto;
-  padding: var(--space-4) var(--space-4) var(--space-16);
-
-  @include up(md) {
-    gap: var(--space-8);
-    padding: var(--space-8) var(--space-8) var(--space-16);
-  }
+// 검은 머리 띠 — motivo.kr 랜딩·회원 공간의 머리와 같은 문법(오렌지 3px 윗선).
+.band {
+  background: var(--black);
+  border-top: 3px solid var(--orange);
+  color: #f4f0ea;
 }
 
-// 좁은 화면: 앱식 머리 — 영문 라벨 없이 큰 제목 하나 + 짧은 보조 줄. 넓은 화면은 그대로.
 .head {
   display: grid;
-  gap: 4px;
-
-  > :global(.label) {
-    display: none;
-  }
+  gap: 6px;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 22px var(--space-4) 24px;
 
   @include up(md) {
     gap: var(--space-2);
-
-    > :global(.label) {
-      display: block;
-    }
+    padding: 40px var(--space-8) 44px;
   }
+}
+
+.eyebrow {
+  @include note-eyebrow;
+  color: var(--orange);
 }
 
 .title {
   margin: 0;
+  color: #fff6ef;
   font-size: 1.85rem;
-  font-weight: 700;
-  line-height: 1.2;
-  letter-spacing: -0.02em;
+  font-weight: 900;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
 
   @include up(md) {
-    font-size: clamp(1.75rem, 4vw, 2.5rem);
-    font-weight: 800;
-    letter-spacing: normal;
+    font-size: clamp(2rem, 4.4vw, 3rem);
+    letter-spacing: -0.04em;
   }
 }
 
 .lead {
   max-width: 40rem;
   margin: 0;
-  color: var(--ink-muted);
+  color: #cfc9c1;
   font-size: 0.9rem;
   line-height: 1.5;
   word-break: keep-all;
@@ -70,14 +63,29 @@
   display: inline-flex;
   align-items: center;
   min-height: 44px;
-  margin-top: calc(var(--space-3) * -1);
-  color: var(--ink-muted);
+  margin-top: -10px;
+  color: #b8b3ad;
   font-size: 0.9rem;
   font-weight: 700;
   text-decoration: none;
   transition: color 120ms;
 
   &:hover {
-    color: var(--ink);
+    color: #ffffff;
+  }
+}
+
+.inner {
+  counter-reset: sec; // 섹션 아이브로의 "01 —" 번호
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 24px;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 24px var(--space-4) var(--space-16);
+
+  @include up(md) {
+    gap: var(--space-8);
+    padding: var(--space-8) var(--space-8) var(--space-16);
   }
 }

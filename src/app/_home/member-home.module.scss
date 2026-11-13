@@ -1,4 +1,5 @@
-// 회원 홈 — 기준 시안(L01b): 인사 → 다음 일정(사진 카드) → 오늘 할 일 → 그다음 일정 → 내 사람들 → 발견.
+// 회원 홈 — 작업 노트(2026-11-13, 기준 /demo/design-notebook): 검은 머리 띠 → 다음 일정 티켓 →
+// 오늘 할 일(도장판) → 그다음 일정(장부) → 내 사람들(메모) → 새로 열린 것.
 
 .page {
   flex: 1 0 auto;
@@ -13,25 +14,65 @@
   max-width: 1160px;
   margin: 0 auto;
   padding: var(--space-8) var(--space-4) var(--space-16);
+  counter-reset: sec; // 섹션 번호 "01—"
 
   @include up(md) {
     padding-inline: var(--space-8);
   }
 }
 
+.band {
+  position: relative;
+  overflow: hidden;
+  background: var(--black);
+  border-top: 3px solid var(--orange);
+  color: #f4f0ea;
+}
+
+// 띠 뒤의 흐린 큰 영문 글자(장식)
+.bandGhost {
+  position: absolute;
+  right: -0.06em;
+  bottom: -0.2em;
+  font-family: var(--font-note);
+  font-size: clamp(72px, 16vw, 200px);
+  font-weight: 800;
+  line-height: 0.85;
+  letter-spacing: -0.04em;
+  color: #1c1b1a;
+  pointer-events: none;
+  user-select: none;
+}
+
 .title {
   margin: 0;
-  font-size: clamp(1.6rem, 4.5vw, 2.4rem);
-  font-weight: 800;
-  line-height: 1.2;
-  letter-spacing: -0.02em;
+  color: #fff6ef;
+  font-size: clamp(1.7rem, 4.8vw, 2.8rem);
+  font-weight: 900;
+  line-height: 1.15;
+  letter-spacing: -0.04em;
   word-break: keep-all;
 }
 
-.sub,
+.sub {
+  margin: 0;
+  color: #cfc9c1;
+}
+
 .muted {
   margin: 0;
   color: var(--ink-muted);
+}
+
+.eyebrow {
+  @include note-eyebrow;
+  margin: 0 0 2px;
+
+  // "01 — NEXT": 섹션 순서 번호. 제목(접근성 이름) 밖에 둔다.
+  &::before {
+    counter-increment: sec;
+    content: counter(sec, decimal-leading-zero) " — ";
+  }
 }
 
 .sectionHead {
@@ -43,9 +84,13 @@
 
   h2 {
     margin: 0;
-    font-size: 1.3rem;
-    font-weight: 800;
-    letter-spacing: -0.01em;
+    font-size: 1.4rem;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+
+    @include up(md) {
+      font-size: 1.7rem;
+    }
   }
 
   p {
@@ -61,21 +106,14 @@
     min-height: 44px;
     color: var(--ink);
     font-size: 0.875rem;
-    font-weight: 700;
-    text-decoration: none;
-  }
-}
+    font-weight: 800;
+    text-decoration: underline;
+    text-underline-offset: 4px;
 
-.dayBadge {
-  display: inline-flex;
-  align-items: center;
-  height: 24px;
-  padding: 0 var(--space-2);
-  border-radius: 999px;
-  background: var(--black);
-  color: var(--white);
-  font-size: 0.75rem;
-  font-weight: 800;
+    &:hover {
+      color: var(--orange-deep);
+    }
+  }
 }
 
 .cta {
@@ -83,19 +121,15 @@
   align-items: center;
   justify-content: center;
   min-height: 48px;
-  margin-top: var(--space-2);
   padding: 0 var(--space-6);
-  border-radius: 14px;
+  border: 1px solid var(--note-edge);
+  border-radius: var(--radius);
   background: var(--orange);
   color: var(--black);
   font-weight: 800;
   text-decoration: none;
-  transition: background-color 120ms;
-
-  &:hover {
-    background: var(--orange-deep);
-    color: var(--white);
-  }
+  white-space: nowrap;
+  @include note-lift;
 }
 
 .ghost {
@@ -104,54 +138,63 @@
   justify-content: center;
   min-height: 44px;
   padding: 0 var(--space-4);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: var(--white);
+  @include note-box;
+  @include note-lift;
   color: var(--ink);
   font-size: 0.9rem;
   font-weight: 700;
   text-decoration: none;
-
-  &:hover {
-    background: var(--surface);
-  }
 }
 
 .later {
+  @include note-box;
   display: grid;
-  gap: var(--space-2);
   margin: 0;
   padding: 0;
   list-style: none;
 
+  li + li {
+    border-top: 1px solid var(--line);
+  }
+
   a {
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-columns: 64px minmax(0, 1fr);
     align-items: center;
-    gap: 4px var(--space-3);
-    padding: var(--space-3) var(--space-4);
-    border-radius: var(--product-radius-sm);
-    background: var(--white);
+    gap: var(--space-3);
+    padding: 14px var(--space-4);
     color: var(--ink);
     text-decoration: none;
+    transition: background-color 120ms;
 
     &:hover {
-      background: var(--surface);
-    }
-
-    span:last-child {
-      grid-column: 2;
-      color: var(--ink-muted);
-      font-size: 0.85rem;
+      background: var(--note-soft);
     }
 
     @include up(md) {
-      grid-template-columns: auto minmax(0, 1fr) auto;
-
-      span:last-child {
-        grid-column: auto;
-      }
+      grid-template-columns: 90px minmax(0, 1fr);
+      padding: 16px 20px;
     }
+  }
+}
+
+.laterDate {
+  font-family: var(--font-note);
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.laterMain {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px var(--space-3);
+  min-width: 0;
+
+  > span:last-child {
+    color: var(--ink-muted);
+    font-size: 0.85rem;
   }
 }
 
@@ -162,7 +205,7 @@
   gap: var(--space-4);
   overflow-x: auto;
   margin: 0 calc(var(--space-4) * -1);
-  padding: 0 var(--space-4) var(--space-2);
+  padding: 2px var(--space-4) var(--space-3); // 떠오른 그림자가 잘리지 않게
   scroll-snap-type: x mandatory;
   scroll-padding-inline: var(--space-4);
   scrollbar-width: none;
@@ -176,7 +219,7 @@
   @include up(md) {
     grid-auto-columns: calc((100% - var(--space-4) * 3) / 4);
     margin: 0;
-    padding: 0 0 var(--space-2);
+    padding: 2px 6px var(--space-3) 2px;
     scroll-padding-inline: 0;
   }
 }
@@ -185,8 +228,7 @@
   display: grid;
   gap: var(--space-3);
   @include card-pad;
-  border-radius: var(--product-radius);
-  background: var(--white);
+  @include note-box;
 
   h2 {
     margin: 0;
@@ -210,10 +252,18 @@
 }
 
 .hello {
+  position: relative;
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
   gap: var(--space-4);
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 24px var(--space-4) 0;
+
+  @include up(md) {
+    padding: 44px var(--space-8) 0;
+  }
 
   > div {
     display: grid;
@@ -223,7 +273,7 @@
 
 .date {
   margin: 0;
-  color: var(--ink-muted);
+  color: var(--orange);
   font-size: 0.85rem;
   font-weight: 700;
 }
@@ -232,36 +282,29 @@
   flex-shrink: 0;
   width: 56px;
   height: auto;
+  margin-bottom: -2px; // 띠 바닥에 발을 붙인다
 
   @include up(md) {
-    width: 80px;
+    width: 84px;
   }
 }
 
 // ── 다음 일정
 .next {
+  @include note-box;
   display: grid;
-  overflow: hidden;
-  border-radius: 20px;
-  background: var(--white);
+  box-shadow: 5px 5px 0 var(--orange); // 오늘의 티켓 한 장만 오렌지 그림자
 
   @include up(md) {
-    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    grid-template-columns: minmax(0, 4fr) minmax(0, 6fr) 220px;
   }
 }
 
 .nextCover {
   position: relative;
-  aspect-ratio: 4 / 3;
-  background: var(--surface);
-
-  &[data-kind="gathering"]:not(:has(img)) {
-    background: var(--kind-gathering);
-  }
-
-  &[data-kind="series"]:not(:has(img)) {
-    background: var(--kind-series);
-  }
+  aspect-ratio: 16 / 9;
+  border-bottom: 1px solid var(--note-edge);
+  background: var(--note-soft);
 
   img {
     object-fit: cover;
@@ -275,7 +318,9 @@
 
   @include up(md) {
     aspect-ratio: auto;
-    min-height: 280px;
+    min-height: 220px;
+    border-bottom: 0;
+    border-right: 1px solid var(--note-edge);
   }
 }
 
@@ -288,10 +333,76 @@
 
   h3 {
     margin: 0;
-    font-size: 1.4rem;
-    font-weight: 800;
-    line-height: 1.3;
+    font-size: 1.35rem;
+    font-weight: 900;
+    line-height: 1.25;
+    letter-spacing: -0.03em;
   }
+}
+
+// 절취선 너머: 큰 시각 + 버튼. 점선과 양끝 반원 홈.
+.stub {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 16px;
+  border-top: 2px dashed var(--note-edge);
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    top: -10px;
+    width: 18px;
+    height: 18px;
+    border: 1px solid var(--note-edge);
+    border-radius: 50%;
+    background: var(--note-paper);
+  }
+
+  &::before {
+    left: -10px;
+  }
+
+  &::after {
+    right: -10px;
+  }
+
+  @include up(md) {
+    grid-template-columns: 1fr;
+    align-content: center;
+    justify-items: start;
+    padding: 20px;
+    border-top: 0;
+    border-left: 2px dashed var(--note-edge);
+
+    &::after {
+      top: auto;
+      right: auto;
+      bottom: -10px;
+      left: -10px;
+    }
+  }
+}
+
+.stubLabel {
+  margin: 0;
+  font-family: var(--font-note);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--ink-muted);
+}
+
+.stubTime {
+  margin: 0;
+  font-family: var(--font-note);
+  font-size: 2.2rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.04em;
 }
 
 .nextFacts {
@@ -331,41 +442,52 @@
 }
 
 .todo {
+  @include note-box;
+  @include note-lift;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--space-3);
   height: 100%;
   padding: var(--space-4);
-  border-radius: 16px;
-  background: var(--white);
   color: var(--ink);
   text-decoration: none;
-  transition: background-color 120ms;
+}
 
-  &:hover {
-    background: var(--surface);
+// 챌린지 인증: 넓게 쓰고 아래에 도장판
+.todoCert {
+  @include up(md) {
+    grid-column: 1 / -1;
   }
 }
 
-.ring {
-  display: grid;
-  flex-shrink: 0;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  // 진행 링(완주 조건 대비 인증 수). 장식 그라디언트가 아니라 비율 표시다.
-  background: conic-gradient(var(--ink) var(--p), var(--line) 0);
+.stamps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  width: 100%;
 
-  span {
+  > span {
     display: grid;
     place-items: center;
     width: 34px;
     height: 34px;
-    border-radius: 50%;
-    background: var(--kind-challenge);
-    font-weight: 800;
+    border: 1px dashed var(--grey-3);
+    font-family: var(--font-note);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--ink-muted);
   }
+}
+
+// 찍힌 도장: 오렌지 원, 살짝 기울게
+.stampOn {
+  border: 0 !important;
+  border-radius: 50%;
+  background: var(--orange);
+  color: var(--black) !important;
+  font-size: 0.95rem !important;
+  transform: rotate(-8deg);
 }
 
 .todoIcon {
@@ -374,8 +496,9 @@
   place-items: center;
   width: 44px;
   height: 44px;
+  border: 1px solid var(--note-edge);
   border-radius: 50%;
-  background: var(--surface);
+  background: var(--note-soft);
 }
 
 .todoText {
@@ -424,15 +547,10 @@
   justify-items: start;
   gap: var(--space-2);
   padding: var(--space-4);
-  border-radius: var(--product-radius);
-  background: var(--white);
+  @include note-box;
+  @include note-lift;
   color: var(--ink);
   text-decoration: none;
-  transition: background-color 120ms;
-
-  &:hover {
-    background: var(--surface);
-  }
 
   strong {
     font-size: 1.1rem;
@@ -468,8 +586,9 @@
     display: flex;
     gap: var(--space-3);
     padding: var(--space-4);
-    border-radius: 16px;
-    background: var(--white);
+    border: 1px dashed var(--note-edge); // 메모처럼
+    border-radius: var(--radius);
+    background: rgb(255 255 255 / 75%);
 
     > div {
       display: grid;
@@ -493,4 +612,13 @@
 .feedBody {
   margin: 0;
   line-height: 1.6;
+}
+
+// 띠 안 글자는 아래 여백을 두고, 카피바라는 띠 바닥에 선다.
+.hello > div {
+  padding-bottom: 24px;
+
+  @include up(md) {
+    padding-bottom: 44px;
+  }
 }

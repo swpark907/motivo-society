@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ActivityCard } from "@/components/ActivityCard/ActivityCard";
+import { ActivityCard, seatsText, whenText } from "@/components/ActivityCard/ActivityCard";
+import { KindTag } from "@/components/KindTag/KindTag";
+import { CapySays } from "@/components/CapySays/CapySays";
 import { EmptyState } from "@/components/EmptyState/EmptyState";
 import { PlatformPage } from "@/components/PlatformPage/PlatformPage";
 import {
@@ -11,6 +13,8 @@ import {
   parseExploreFilters,
   type ExploreFilters,
 } from "@/lib/platform/explore-filters";
+import { dateMark } from "@/lib/platform/activity-time";
+import { won } from "@/lib/platform/messages";
 import { listOpenActivities, type ActivityCardData } from "@/lib/platform/queries";
 import styles from "./page.module.scss";
 
@@ -115,6 +119,7 @@ function Overview({ items, now }: { items: ActivityCardData[]; now: Date }) {
     <>
       {thisWeek.length > 0 && (
         <Section
+          eyebrow="This week"
           title="이번 주에 열리는 것"
           sub="일요일까지 시작하는 모임·시즌"
           more={{ href: exploreHref(EMPTY_FILTERS, { when: "this-week" }), label: "이번 주 모두" }}
@@ -124,14 +129,17 @@ function Overview({ items, now }: { items: ActivityCardData[]; now: Date }) {
       )}
       {joinable.length > 0 && (
         <Section
+          eyebrow="Join now"
           title="지금 합류할 수 있어요"
           sub="이미 시작했지만 중간부터 함께할 수 있는 시즌·챌린지"
         >
           <CardRow items={joinable} now={now} />
+          <CapySays>시작한 지 좀 됐어도 괜찮아요. 오늘부터 같이 하면 돼요.</CapySays>
         </Section>
       )}
-      <Section title="전체 활동" sub={`${items.length}개 · 가까운 날짜순`}>
-        <CardGrid items={items} now={now} />
+      {/* 전체는 장부처럼 한 줄씩: 위 카드와 같은 사진을 다시 늘어놓지 않는다 */}
+      <Section eyebrow="All" title="전체 활동" sub={`${items.length}개 · 가까운 날짜순`}>
+        <Ledger items={items} now={now} />
       </Section>
     </>
   );
@@ -162,11 +170,13 @@ function Filtered({ items, now }: { items: ActivityCardData[]; now: Date }) {
 }
 
 function Section({
+  eyebrow,
   title,
   sub,
   more,
   children,
 }: {
+  eyebrow: string;
   title: string;
   sub?: string;
   more?: { href: string; label: string };
@@ -177,6 +187,7 @@ function Section({
     <section aria-labelledby={id} className={styles.section}>
       <div className={styles.sectionHead}>
         <div>
+          <p className={styles.eyebrow}>{eyebrow}</p>
           <h2 id={id}>{title}</h2>
           {sub && <p>{sub}</p>}
         </div>
@@ -211,6 +222,40 @@ function CardGrid({ items, now }: { items: ActivityCardData[]; now: Date }) {
           <ActivityCard activity={a} now={now} href={`/activities/${a.slug}`} />
         </li>
       ))}
+    </ul>
+  );
+}
+
+/** 장부형 목록: 큰 날짜 열 · 종류와 제목 · 장소와 언제 · 가격과 남은 자리. */
+function Ledger({ items, now }: { items: ActivityCardData[]; now: Date }) {
+  return (
+    <ul className={styles.ledger}>
+      {items.map((a) => {
+        const mark = a.startsAt ? dateMark(new Date(a.startsAt)) : null;
+        const seats = seatsText(a);
+        return (
+          <li key={a.id}>
+            <Link href={`/activities/${a.slug}`} className={styles.ledgerRow}>
+              <span className={styles.ledgerDate}>
+                {mark ? mark.date : "미정"}
+                {mark && <small>{mark.weekday}요일</small>}
+              </span>
+              <span className={styles.ledgerMain}>
+                <KindTag kind={a.kind} />
+                <strong>{a.title}</strong>
+                <span>
+                  {whenText(a, now)} · {a.online ? "온라인" : (a.area ?? "장소 미정")}
+                  {a.host && ` · ${a.host}`}
+                </span>
+              </span>
+              <span className={styles.ledgerEnd}>
+                <strong>{a.price > 0 ? won(a.price) : "무료"}</strong>
+                <span>{seats ?? "누구나 참여"}</span>
+              </span>
+            </Link>
+          </li>
+        );
+      })}
     </ul>
   );
 }

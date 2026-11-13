@@ -3,8 +3,8 @@
   justify-items: start;
   gap: var(--space-2);
   @include card-pad;
-  border-radius: var(--product-radius);
-  background: var(--surface-2);
+  @include note-box;
+  border-style: dashed; // 아직 비어 있는 칸
 }
 
 .title {
@@ -23,7 +23,7 @@
   min-height: 44px;
   margin-top: var(--space-2);
   padding: 0 var(--space-4);
-  border-radius: 999px;
+  border-radius: var(--radius);
   background: var(--ink);
   color: var(--surface);
   font-weight: 700;

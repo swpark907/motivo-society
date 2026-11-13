@@ -6,7 +6,14 @@ import { Avatar } from "@/components/Avatar/Avatar";
 import { KindTag } from "@/components/KindTag/KindTag";
 import { LineIcon } from "@/components/LineIcon/LineIcon";
 import { dateOnly } from "@/lib/platform/activity-text";
-import { clockTime, dayBadge, gatheringWhen, timeLeftText } from "@/lib/platform/activity-time";
+import {
+  clock24,
+  clockTime,
+  dateMark,
+  dayBadge,
+  gatheringWhen,
+  timeLeftText,
+} from "@/lib/platform/activity-time";
 import {
   getMemberHome,
   greeting,
@@ -35,8 +42,12 @@ export async function MemberHome({ user }: { user: CurrentUser }) {
 
   return (
     <main data-platform className={`paper ${s.page}`}>
-      <div className={s.inner}>
-        <header className={s.hello}>
+      {/* 검은 머리 띠(작업 노트): 날짜 · 인사 · 오늘 요약. 흐린 큰 글자는 장식. */}
+      <header className={s.band}>
+        <span className={s.bandGhost} aria-hidden="true">
+          BUILD
+        </span>
+        <div className={s.hello}>
           <div>
             <p className={s.date}>{TODAY.format(now)}</p>
             <h1 className={s.title}>
@@ -51,8 +62,9 @@ export async function MemberHome({ user }: { user: CurrentUser }) {
             width={88}
             height={160}
           />
-        </header>
-
+        </div>
+      </header>
+      <div className={s.inner}>
         {data.isNewcomer ? (
           <>
             <Discover data={data} now={now} first />
@@ -88,9 +100,13 @@ function Next({ item, now }: { item: Data["upcoming"][number]; now: Date }) {
   return (
     <section aria-labelledby="next-h">
       <div className={s.sectionHead}>
-        <h2 id="next-h">다음 일정</h2>
+        <div>
+          <p className={s.eyebrow}>Next</p>
+          <h2 id="next-h">다음 일정</h2>
+        </div>
         <Link href="/me/schedule">내 일정 전체</Link>
       </div>
+      {/* 다음 일정 = 티켓 한 장: 표지 | 내용 | 절취선 너머 시각과 버튼 */}
       <article className={s.next}>
         <div className={s.nextCover} data-kind={item.kind}>
           {item.cover && (
@@ -102,7 +118,6 @@ function Next({ item, now }: { item: Data["upcoming"][number]; now: Date }) {
               sizes="(min-width: 768px) 420px, 100vw"
             />
           )}
-          {badge && <span className={s.dayBadge}>{badge}</span>}
         </div>
         <div className={s.nextBody}>
           <KindTag kind={item.kind} />
@@ -123,6 +138,14 @@ function Next({ item, now }: { item: Data["upcoming"][number]; now: Date }) {
               </li>
             )}
           </ul>
+        </div>
+        <div className={s.stub}>
+          <div>
+            <p className={s.stubLabel}>{badge ?? "NEXT"}</p>
+            <p className={s.stubTime} aria-label={clockTime(start)}>
+              {clock24(start)}
+            </p>
+          </div>
           <Link href={`/activities/${item.slug}`} className={s.cta}>
             참가 정보 보기
           </Link>
@@ -136,7 +159,10 @@ function Todos({ todos, now }: { todos: Todo[]; now: Date }) {
   return (
     <section aria-labelledby="todo-h">
       <div className={s.sectionHead}>
-        <h2 id="todo-h">오늘 할 일</h2>
+        <div>
+          <p className={s.eyebrow}>Today</p>
+          <h2 id="todo-h">오늘 할 일</h2>
+        </div>
       </div>
       <ul className={s.todos}>
         {todos.map((t) => (
@@ -171,17 +197,8 @@ function TodoItem({ todo: t, now }: { todo: Todo; now: Date }) {
   }
   if (t.kind === "cert") {
     const left = Math.max(0, t.threshold - t.accepted);
-    const pct = t.threshold ? Math.min(100, Math.round((t.accepted / t.threshold) * 100)) : 0;
     return (
-      <Link href={`/activities/${t.slug}#today`} className={s.todo}>
-        <span
-          className={s.ring}
-          style={{ "--p": `${pct}%` } as React.CSSProperties}
-          role="img"
-          aria-label={`완주 조건 ${t.threshold}번 중 ${t.accepted}번 인증`}
-        >
-          <span>{t.accepted}</span>
-        </span>
+      <Link href={`/activities/${t.slug}#today`} className={`${s.todo} ${s.todoCert}`}>
         <span className={s.todoText}>
           <strong>오늘 인증이 아직이에요</strong>
           <small>
@@ -190,6 +207,18 @@ function TodoItem({ todo: t, now }: { todo: Todo; now: Date }) {
         </span>
         <span className={s.todoGo}>
           인증하기 <LineIcon name="arrow" size={16} />
+        </span>
+        {/* 도장판: 완주 조건 칸 수만큼, 인정된 인증 수만큼 도장 */}
+        <span
+          className={s.stamps}
+          role="img"
+          aria-label={`완주 조건 ${t.threshold}번 중 ${t.accepted}번 인증`}
+        >
+          {Array.from({ length: Math.min(t.threshold, 30) }, (_, i) => (
+            <span key={i} className={i < t.accepted ? s.stampOn : undefined}>
+              {i < t.accepted ? "✓" : i + 1}
+            </span>
+          ))}
         </span>
       </Link>
     );
@@ -230,15 +259,21 @@ function Later({ items, now }: { items: Data["upcoming"]; now: Date }) {
   return (
     <section aria-labelledby="later-h">
       <div className={s.sectionHead}>
-        <h2 id="later-h">그다음 일정</h2>
+        <div>
+          <p className={s.eyebrow}>Coming up</p>
+          <h2 id="later-h">그다음 일정</h2>
+        </div>
       </div>
       <ul className={s.later}>
         {items.map((x) => (
           <li key={`${x.slug}-${x.startsAt}`}>
             <Link href={`/activities/${x.slug}`}>
-              <KindTag kind={x.kind} />
-              <strong>{x.title}</strong>
-              <span>{gatheringWhen(new Date(x.startsAt), now)}</span>
+              <span className={s.laterDate}>{dateMark(new Date(x.startsAt)).date}</span>
+              <span className={s.laterMain}>
+                <KindTag kind={x.kind} />
+                <strong>{x.title}</strong>
+                <span>{gatheringWhen(new Date(x.startsAt), now)}</span>
+              </span>
             </Link>
           </li>
         ))}
@@ -252,6 +287,7 @@ function People({ data }: { data: Data }) {
     <section aria-labelledby="people-h">
       <div className={s.sectionHead}>
         <div>
+          <p className={s.eyebrow}>My people</p>
           <h2 id="people-h">내 사람들</h2>
           <p>내 클럽과 같이 챌린지하는 사람들의 소식</p>
         </div>
@@ -306,6 +342,7 @@ function Discover({ data, now, first }: { data: Data; now: Date; first?: boolean
     <section aria-labelledby="discover-h">
       <div className={s.sectionHead}>
         <div>
+          <p className={s.eyebrow}>{first ? "Start here" : "Just opened"}</p>
           <h2 id="discover-h">{first ? "지금 함께할 수 있는 것" : "새로 열린 것"}</h2>
           <p>{first ? "마음에 드는 것 하나에 들어가 보세요" : "아직 신청하지 않은 모집 중 활동"}</p>
         </div>

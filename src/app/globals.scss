@@ -1,7 +1,7 @@
 // 브랜드 팔레트 — 오렌지 / 블랙 / 화이트. OS 다크모드에 따라 바뀌지 않는다 (브랜드 고정 테마).
 :root {
-  --orange: #ff4f1f;
-  --orange-deep: #d63d10;
+  --orange: #ff751f; // motivo.kr(대표 운영)와 맞춤 · 2026-11-13
+  --orange-deep: #c9500a; // 종이 위 글자용(작은 글자 대비 확보)
   --black: #0b0b0b;
   --black-2: #161616;
   --grey-1: #2a2a2a;
@@ -22,6 +22,8 @@
   // 서체. display = 압축 헤비 산세리프 (Anton → 한글은 Black Han Sans), body = Pretendard
   --font-display: var(--font-anton), var(--font-black-han), Impact, sans-serif;
   --font-body: "Pretendard Variable", Pretendard, system-ui, -apple-system, sans-serif;
+  // 작업 노트(플랫폼 제품 화면)의 숫자·영문 아이브로. motivo.kr과 같은 Syne.
+  --font-note: var(--font-syne), var(--font-body);
 
   --space-1: 0.25rem;
   --space-2: 0.5rem;
@@ -33,13 +35,18 @@
   --space-16: 4rem;
 
   // 플랫폼 제품 화면(클럽·활동·내 활동·호스트 도구) 전용 — AGENTS.md "플랫폼 제품 화면 예외".
-  // 의미 색: 활동 종류를 구분할 때만 쓴다. 장식용 면으로 쓰지 않는다. 배정은 시안 단계(2026-11-05).
-  --kind-gathering: #f4dc78;
-  --kind-series: #bcd0f2;
-  --kind-challenge: #bfd394;
-  --kind-club: #f2bfd8;
-  --product-radius: 16px;
-  --product-radius-sm: 12px;
+  // 2026-11-13 "작업 노트"로 전환: 파스텔 종류 색 대신 따뜻한 종이 면 하나, 모서리는 거의 직각.
+  // 종류는 색이 아니라 글자(검은 도장)로 구분한다. 토큰 이름은 기존 화면 호환을 위해 남긴다.
+  --kind-gathering: #ffe9da;
+  --kind-series: #ffe9da;
+  --kind-challenge: #ffe9da;
+  --kind-club: #ffe9da;
+  --product-radius: 2px;
+  --product-radius-sm: 2px;
+  --note-paper: #fffaf4;
+  --note-edge: var(--black); // 카드·칸의 검은 1px 선
+  --note-dot: rgb(10 10 10 / 13%);
+  --note-soft: #ffe9da; // 따뜻한 강조 면(오늘·선택)
 
   --max-width: 1200px;
   --gnb-height: 60px;
@@ -120,6 +127,16 @@ a {
   [data-tab-bar] {
     display: none !important;
   }
+}
+
+// 플랫폼 제품 화면 = 작업 노트 바탕(2026-11-13): 도트 그리드 종이 + 흰 칸.
+// 도트 무늬는 "그라디언트 없음"의 예외(AGENTS.md 플랫폼 제품 화면 예외 안에서만).
+main[data-platform] {
+  --surface: var(--note-paper);
+  --surface-2: #ffffff;
+  background-color: var(--note-paper);
+  background-image: radial-gradient(var(--note-dot) 1px, transparent 1px);
+  background-size: 16px 16px;
 }
 
 // 플랫폼 제품 화면의 모바일 밀도(2026-11-10, 승우 요청 — 앱처럼). 글자 크기가 대부분 rem이라

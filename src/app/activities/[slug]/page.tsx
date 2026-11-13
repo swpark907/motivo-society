@@ -5,6 +5,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { ActivityCard } from "@/components/ActivityCard/ActivityCard";
 import { Avatar } from "@/components/Avatar/Avatar";
+import { CapySays } from "@/components/CapySays/CapySays";
 import { KindTag } from "@/components/KindTag/KindTag";
 import { LineIcon } from "@/components/LineIcon/LineIcon";
 import { getActivityDetail, type ActivityDetail } from "@/lib/platform/activity-detail";
@@ -376,6 +377,10 @@ export default async function ActivityPage({ params, searchParams }: Props) {
                 )}
               </dl>
             </section>
+            {/* 카피바라 한마디: 진행 중 합류가 열린 활동에서만(실제 규칙 그대로) */}
+            {a.status === "in_progress" && a.allowLateJoin && !a.viewer.mine && (
+              <CapySays>지금 들어와도 돼요. 지난 일정만 함께하지 못해요.</CapySays>
+            )}
           </div>
 
           <ApplyPanel

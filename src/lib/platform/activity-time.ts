@@ -37,6 +37,18 @@ function parts(at: Date) {
   };
 }
 
+/** 장부·티켓의 큰 날짜: { date: "11.8", weekday: "일" } */
+export function dateMark(at: Date): { date: string; weekday: string } {
+  const p = parts(at);
+  return { date: `${p.month}.${p.day}`, weekday: p.weekday };
+}
+
+/** 티켓의 큰 시각: "19:30"(24시간제) */
+export function clock24(at: Date): string {
+  const p = parts(at);
+  return `${String(p.hour).padStart(2, "0")}:${String(p.minute).padStart(2, "0")}`;
+}
+
 /** "11.8 (일)" */
 export function shortDate(at: Date): string {
   const p = parts(at);

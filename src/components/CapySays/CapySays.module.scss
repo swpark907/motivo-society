@@ -1,0 +1,44 @@
+.capy {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.img {
+  flex: none;
+  width: 60px;
+  height: auto;
+
+  @include up(md) {
+    width: 76px;
+  }
+}
+
+// 두꺼운 선의 말풍선. 꼬리는 카피바라 쪽 아래.
+.bubble {
+  position: relative;
+  max-width: 19em;
+  margin: 0 0 44px;
+  padding: 10px 14px;
+  border: 1.5px solid var(--note-edge);
+  border-radius: 18px;
+  background: #ffffff;
+  color: var(--black);
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.45;
+  word-break: keep-all;
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: 10px;
+    left: -9px;
+    width: 14px;
+    height: 14px;
+    border-bottom: 1.5px solid var(--note-edge);
+    border-left: 1.5px solid var(--note-edge);
+    background: #ffffff;
+    transform: skewY(-35deg);
+  }
+}
