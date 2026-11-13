@@ -1,0 +1,749 @@
+// "포스터" 시안 (2026-11-13). AGENTS.md 브랜드 규칙을 제품 화면 끝까지 밀어본 안.
+// 검은 캔버스 · 오렌지는 잉크(한 화면에 한 순간) · 압축 헤비 타이포가 이미지 · 사진은 흑백 · 2px · 그림자 없음.
+// 레퍼런스: AIR UK 캠페인, Nike Running 소셜. 전역 토큰(--orange 등)을 그대로 쓴다.
+
+.root {
+  --pt-bg: var(--black);
+  --pt-bg-2: var(--black-2);
+  --pt-ink: var(--white);
+  --pt-muted: #8f8a83;
+  --pt-line: #2b2a28;
+  --pt-orange: var(--orange);
+
+  flex: 1 0 auto; // body가 화면 높이 flex 열이라 내용만큼 자라게 한다
+  background: var(--pt-bg);
+  color: var(--pt-ink);
+  font-family: var(--font-body);
+  word-break: keep-all;
+
+  :where(h1, h2, h3, p, figure, ol, ul) {
+    margin: 0;
+  }
+  :where(ol, ul) {
+    padding: 0;
+    list-style: none;
+  }
+  :where(a) {
+    color: inherit;
+    text-decoration: none;
+  }
+}
+
+/* ── 시안 안내 띠 ── */
+.draftBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  padding: 8px max(16px, env(safe-area-inset-left, 0px));
+  border-bottom: 1px solid var(--pt-line);
+  font-size: 12px;
+  color: var(--pt-muted);
+}
+.draftTag {
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--pt-ink);
+}
+.draftLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  a {
+    padding: 4px 8px;
+    border-radius: var(--radius);
+    &[aria-current="page"] {
+      background: var(--pt-ink);
+      color: var(--pt-bg);
+      font-weight: 700;
+    }
+    &:hover:not([aria-current]) {
+      color: var(--pt-ink);
+    }
+  }
+}
+.draftCompare {
+  margin-left: auto;
+  border-bottom: 1px solid currentColor;
+  &:hover {
+    color: var(--pt-ink);
+  }
+}
+
+/* ── 틀 ── */
+.wrap {
+  width: min(100% - 32px, 1200px);
+  margin: 0 auto;
+}
+.section {
+  display: grid;
+  gap: 18px;
+  padding-block: 36px;
+  border-top: 1px solid var(--pt-line);
+  @include up(md) {
+    gap: 24px;
+    padding-block: 56px;
+  }
+}
+.secHead {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+.label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--pt-muted);
+}
+.secTitle {
+  margin-top: 6px;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(30px, 6vw, 52px);
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+.more {
+  flex: none;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--pt-muted);
+  border-bottom: 1px solid currentColor;
+  &:hover {
+    color: var(--pt-ink);
+  }
+}
+.display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  text-transform: uppercase;
+  line-height: 0.88;
+  letter-spacing: -0.01em;
+}
+
+/* ── 머리: 타이포가 곧 이미지 ── */
+.head {
+  display: grid;
+  gap: 14px;
+  padding-block: 36px 40px;
+  @include up(md) {
+    padding-block: 64px 72px;
+  }
+}
+.headHuge {
+  font-size: clamp(64px, 17vw, 220px);
+}
+.headSub {
+  max-width: 36em;
+  font-size: 15px;
+  color: #c9c4bc;
+  @include up(md) {
+    font-size: 17px;
+  }
+}
+.headRow {
+  display: grid;
+  gap: 16px;
+  @include up(md) {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+  }
+}
+
+/* ── 사진: 흑백. 고르면 따뜻한 원래 색으로 ── */
+.photo {
+  position: relative;
+  overflow: hidden;
+  background: var(--pt-bg-2);
+  img {
+    object-fit: cover;
+    filter: grayscale(1) contrast(1.08);
+    transition: filter 0.12s;
+  }
+}
+
+/* ── 오늘 밤: 한 화면의 오렌지 순간 ── */
+.tonight {
+  display: grid;
+  border: 1px solid var(--pt-line);
+  @include up(md) {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  }
+}
+.tonightPhoto {
+  aspect-ratio: 4 / 5;
+  @include up(md) {
+    aspect-ratio: auto;
+    min-height: 420px;
+  }
+}
+.tonightBody {
+  display: grid;
+  align-content: space-between;
+  gap: 24px;
+  padding: 20px;
+  @include up(md) {
+    padding: 32px;
+  }
+}
+.tonightTime {
+  font-size: clamp(88px, 22vw, 168px);
+  color: var(--pt-orange);
+}
+.tonightTitle {
+  font-family: var(--font-display);
+  font-size: clamp(26px, 5vw, 36px);
+  line-height: 1.05;
+}
+.tonightRows {
+  display: grid;
+  gap: 4px;
+  margin-top: 12px;
+  font-size: 14px;
+  color: #c9c4bc;
+}
+
+/* ── 버튼 ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 12px 22px;
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--pt-ink);
+  color: var(--pt-bg);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.12s;
+  &:hover {
+    opacity: 0.85;
+  }
+  &:focus-visible {
+    outline: 2px solid var(--pt-orange);
+    outline-offset: 3px;
+  }
+}
+.btnOrange {
+  background: var(--pt-orange);
+  color: var(--black);
+}
+.btnLine {
+  background: transparent;
+  color: var(--pt-ink);
+  box-shadow: inset 0 0 0 1px var(--pt-ink);
+}
+
+/* ── 챌린지: 큰 숫자와 14칸 막대 ── */
+.streak {
+  display: grid;
+  gap: 18px;
+  @include up(md) {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: end;
+    gap: 40px;
+  }
+}
+.streakNum {
+  font-size: clamp(72px, 16vw, 132px);
+  small {
+    font-size: 0.4em;
+    color: var(--pt-muted);
+  }
+}
+.streakBar {
+  display: grid;
+  grid-template-columns: repeat(14, 1fr);
+  gap: 3px;
+  li {
+    height: 28px;
+    background: var(--pt-line);
+  }
+}
+.on {
+  background: var(--pt-ink) !important;
+}
+.now {
+  box-shadow: inset 0 0 0 1px var(--pt-ink);
+  background: transparent !important;
+}
+.streakText {
+  display: grid;
+  gap: 4px;
+  margin-top: 10px;
+  font-size: 14px;
+  color: #c9c4bc;
+  strong {
+    font-size: 17px;
+    color: var(--pt-ink);
+  }
+}
+
+/* ── 사람들: 인용처럼 ── */
+.voices {
+  display: grid;
+  gap: 1px;
+  background: var(--pt-line);
+  border: 1px solid var(--pt-line);
+  @include up(md) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+.voice {
+  display: grid;
+  align-content: space-between;
+  gap: 18px;
+  padding: 20px;
+  background: var(--pt-bg);
+}
+.quote {
+  font-family: var(--font-display);
+  font-size: 24px;
+  line-height: 1.1;
+}
+.by {
+  font-size: 13px;
+  color: var(--pt-muted);
+  strong {
+    color: var(--pt-ink);
+    font-weight: 600;
+  }
+}
+
+/* ── 포스터 카드 (4:5, 사진 위 큰 날짜) ── */
+.posters {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px 10px;
+  @include up(md) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 32px 12px;
+  }
+}
+.rail {
+  grid-auto-flow: column;
+  grid-template-columns: none;
+  grid-auto-columns: 62%;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  > * {
+    scroll-snap-align: start;
+  }
+  @include up(md) {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    overflow: visible;
+  }
+}
+.poster {
+  display: grid;
+  gap: 10px;
+  &:hover img,
+  &:focus-visible img {
+    filter: none;
+  }
+  &:focus-visible {
+    outline: 2px solid var(--pt-orange);
+    outline-offset: 4px;
+  }
+}
+.posterPhoto {
+  aspect-ratio: 4 / 5;
+  border-radius: var(--radius);
+}
+.posterDate {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  padding: 6px 10px 2px;
+  background: var(--pt-bg);
+  font-size: clamp(30px, 7vw, 46px);
+  color: var(--pt-ink);
+}
+.posterKind {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 2px 6px;
+  background: var(--pt-bg);
+  color: var(--pt-ink);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+.posterLive {
+  left: auto;
+  right: 10px;
+  background: var(--pt-ink);
+  color: var(--pt-bg);
+}
+.posterTitle {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.35;
+  @include up(md) {
+    font-size: 16px;
+  }
+}
+.posterMeta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--pt-muted);
+  strong {
+    color: var(--pt-ink);
+    font-weight: 700;
+  }
+}
+.low {
+  color: var(--pt-ink);
+  font-weight: 700;
+}
+
+/* ── 시간표 (경주 기록표처럼) ── */
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 20px;
+  font-family: var(--font-display);
+  font-size: 22px;
+  text-transform: uppercase;
+  @include up(md) {
+    font-size: 28px;
+  }
+  button {
+    padding: 4px 0;
+    border: 0;
+    background: none;
+    color: var(--pt-muted);
+    font: inherit;
+    cursor: pointer;
+    &[aria-pressed="true"] {
+      color: var(--pt-ink);
+      box-shadow: inset 0 -3px 0 var(--pt-ink);
+    }
+    &:hover {
+      color: var(--pt-ink);
+    }
+  }
+}
+.table {
+  border-top: 1px solid var(--pt-ink);
+}
+.tRow {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+  padding-block: 16px;
+  border-bottom: 1px solid var(--pt-line);
+  transition: background 0.12s;
+  &:hover {
+    background: var(--pt-bg-2);
+  }
+  @include up(md) {
+    grid-template-columns: 120px 90px minmax(0, 1fr) 140px 110px;
+    gap: 20px;
+    padding-inline: 8px;
+  }
+}
+.tDate {
+  font-size: 40px;
+  @include up(md) {
+    font-size: 48px;
+  }
+}
+.tDay {
+  display: none;
+  font-size: 13px;
+  color: var(--pt-muted);
+  @include up(md) {
+    display: block;
+  }
+}
+.tMain {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.tTitle {
+  font-size: 16px;
+  font-weight: 700;
+}
+.tSub {
+  font-size: 13px;
+  color: var(--pt-muted);
+}
+.tEnd {
+  grid-column: 2;
+  display: flex;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--pt-muted);
+  @include up(md) {
+    display: contents;
+  }
+  strong {
+    color: var(--pt-ink);
+  }
+}
+
+/* ── 활동 상세 ── */
+.hero {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  max-height: 78vh;
+  width: 100%;
+  @include up(md) {
+    aspect-ratio: 21 / 9;
+  }
+}
+.heroText {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+.heroInner {
+  display: grid;
+  gap: 10px;
+  padding-block: 20px;
+}
+.heroTag {
+  justify-self: start;
+  padding: 3px 8px;
+  background: var(--pt-ink);
+  color: var(--pt-bg);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+.heroTitle {
+  font-size: clamp(44px, 10vw, 120px);
+  line-height: 1.16; // 줄마다 검은 면을 깔아서 줄끼리 겹치지 않게
+  // 사진 위 글자: 검은 면을 글자 뒤에만 깐다(그라디언트 대신)
+  span {
+    background: var(--pt-bg);
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+    padding: 0 0.08em;
+  }
+}
+.detail {
+  display: grid;
+  gap: 0;
+  @include up(lg) {
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: 56px;
+    align-items: start;
+  }
+}
+.stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 1px solid var(--pt-ink);
+  @include up(md) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  li {
+    display: grid;
+    gap: 6px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--pt-line);
+  }
+  strong {
+    font-family: var(--font-display);
+    font-size: 34px;
+    font-weight: 400;
+    line-height: 1;
+  }
+}
+// 긴 글은 종이 위에서 읽는다(브랜드 규칙)
+.paperNote {
+  padding: 24px;
+  background: var(--white);
+  color: var(--black);
+  border-radius: var(--radius);
+  font-size: 16px;
+  line-height: 1.8;
+  @include up(md) {
+    padding: 36px 40px;
+    font-size: 17px;
+  }
+  strong {
+    font-weight: 800;
+  }
+}
+.paperLabel {
+  margin-bottom: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: #6b665f;
+}
+// 회차: 앨범 트랙 목록처럼
+.tracks {
+  border-top: 1px solid var(--pt-ink);
+}
+.track {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  padding-block: 14px;
+  border-bottom: 1px solid var(--pt-line);
+}
+.trackNo {
+  font-size: 36px;
+}
+.trackTitle {
+  font-size: 16px;
+  font-weight: 700;
+}
+.trackWhen {
+  font-size: 13px;
+  color: var(--pt-muted);
+}
+.trackEnd {
+  font-size: 13px;
+  font-weight: 700;
+}
+.trackDone {
+  color: #5c5853;
+}
+.trackNow {
+  .trackNo {
+    color: var(--pt-ink);
+  }
+}
+.nowBadge {
+  padding: 2px 8px;
+  background: var(--pt-ink);
+  color: var(--pt-bg);
+}
+.faq {
+  border-top: 1px solid var(--pt-ink);
+  details {
+    border-bottom: 1px solid var(--pt-line);
+  }
+  summary {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 16px 0;
+    font-weight: 700;
+    cursor: pointer;
+    list-style: none;
+    &::-webkit-details-marker {
+      display: none;
+    }
+    &::after {
+      content: "+";
+      font-family: var(--font-display);
+      font-size: 22px;
+      line-height: 1;
+    }
+  }
+  details[open] summary::after {
+    content: "–";
+  }
+  p {
+    padding-bottom: 16px;
+    font-size: 14px;
+    color: #c9c4bc;
+  }
+}
+.side {
+  display: grid;
+  gap: 16px;
+  padding-block: 36px;
+  @include up(lg) {
+    position: sticky;
+    top: 24px;
+    padding-block: 56px;
+  }
+}
+.price {
+  font-size: 64px;
+}
+.host {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid var(--pt-line);
+  font-size: 13px;
+  color: var(--pt-muted);
+  strong {
+    display: block;
+    color: var(--pt-ink);
+    font-size: 16px;
+  }
+}
+.face {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--pt-ink);
+  color: var(--pt-bg);
+  font-family: var(--font-display);
+  font-size: 20px;
+}
+.sideCta {
+  display: none;
+  @include up(lg) {
+    display: inline-flex;
+  }
+}
+.applyBar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0; // /demo는 하단 탭 바를 숨긴다. 실제 화면에서는 탭 바 위.
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px max(16px, env(safe-area-inset-left, 0px))
+    calc(10px + env(safe-area-inset-bottom, 0px));
+  background: var(--pt-bg);
+  border-top: 1px solid var(--pt-line);
+  strong {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 400;
+    line-height: 1;
+  }
+  small {
+    font-size: 12px;
+    color: var(--pt-muted);
+  }
+  @include up(lg) {
+    display: none;
+  }
+}
+.applySpace {
+  height: 80px;
+  @include up(lg) {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .photo img,
+  .btn,
+  .tRow {
+    transition: none;
+  }
+}

@@ -54,6 +54,8 @@ export const TEST_PAGE_GROUPS = [
       { href: "/demo/workbook-intro-sprite", label: "인트로 카피바라 스프라이트" },
       { href: "/demo/platform", label: "플랫폼 시험장(로컬 DB)" },
       { href: "/demo/design-mobile", label: "모바일 앱 문법 시안" },
+      { href: "/demo/design-notebook", label: "작업 노트 톤 시안" },
+      { href: "/demo/design-poster", label: "포스터 톤 시안" },
       { href: "/demo/loading", label: "공용 로딩 화면" },
     ],
   },
