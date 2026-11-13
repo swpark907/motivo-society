@@ -40,8 +40,9 @@
   position: relative;
   overflow: hidden;
   aspect-ratio: 1;
-  border-radius: var(--product-radius-sm);
+  border-radius: var(--radius);
   background: var(--white);
+  border: 1px solid var(--note-edge);
 
   img {
     object-fit: cover;
@@ -77,8 +78,9 @@
   display: grid;
   gap: var(--space-4);
   @include card-pad;
-  border-radius: var(--product-radius);
+  border-radius: var(--radius);
   background: var(--white);
+  border: 1px solid var(--note-edge);
 }
 
 .title {
@@ -156,8 +158,8 @@
   input {
     height: 52px;
     padding: 0 var(--space-4);
-    border: 1px solid var(--line);
-    border-radius: 14px;
+    border: 1px solid var(--note-edge);
+    border-radius: var(--radius);
     background: var(--white);
     color: var(--ink);
     font: inherit;
@@ -195,7 +197,7 @@
 .error {
   margin: 0;
   padding: var(--space-3) var(--space-4);
-  border-radius: var(--product-radius-sm);
+  border-radius: var(--radius);
   background: var(--ink);
   color: var(--white);
   font-weight: 700;
@@ -208,7 +210,7 @@
   min-height: 52px;
   padding: 0 var(--space-6);
   border: 0;
-  border-radius: 14px;
+  border-radius: var(--radius);
   background: var(--orange);
   color: var(--black);
   font: inherit;
@@ -236,8 +238,8 @@
   justify-content: center;
   min-height: 48px;
   padding: 0 var(--space-4);
-  border: 1px solid var(--line);
-  border-radius: 12px;
+  border: 1px solid var(--note-edge);
+  border-radius: var(--radius);
   background: var(--white);
   color: var(--ink);
   font-weight: 700;
@@ -254,7 +256,7 @@
   gap: 0;
   margin: 0;
   border: 1px solid var(--line);
-  border-radius: var(--product-radius-sm);
+  border-radius: var(--radius);
 
   > div {
     display: grid;
@@ -305,8 +307,8 @@
 .copy {
   min-height: 36px;
   padding: 0 var(--space-3);
-  border: 1px solid var(--line);
-  border-radius: 999px;
+  border: 1px solid var(--note-edge);
+  border-radius: var(--radius);
   background: var(--white);
   color: var(--ink);
   font: inherit;
@@ -323,7 +325,7 @@
   margin: 0;
   padding: var(--space-3) var(--space-4);
   border: 1px dashed var(--line);
-  border-radius: var(--product-radius-sm);
+  border-radius: var(--radius);
   color: var(--ink-muted);
   font-size: 0.85rem;
   line-height: 1.5;
@@ -358,7 +360,7 @@
     gap: var(--space-3);
     margin-top: var(--space-2);
     padding: var(--space-4);
-    border-radius: var(--product-radius-sm);
+    border-radius: var(--radius);
     background: var(--surface);
   }
 
@@ -374,7 +376,7 @@
   min-height: 44px;
   padding: 0 var(--space-4);
   border: 1px solid var(--ink);
-  border-radius: 12px;
+  border-radius: var(--radius);
   background: var(--white);
   color: var(--ink);
   font: inherit;

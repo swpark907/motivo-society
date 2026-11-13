@@ -2,7 +2,7 @@
   display: inline-grid;
   flex-shrink: 0;
   place-items: center;
-  border: 2px solid var(--surface);
+  border: 1px solid var(--note-edge); // 작업 노트: 얼굴도 검은 선 동그라미
   border-radius: 50%;
   color: var(--black);
   font-weight: 800;

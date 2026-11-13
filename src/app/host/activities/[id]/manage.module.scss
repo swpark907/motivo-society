@@ -4,7 +4,7 @@
 .errorBox {
   margin: 0;
   padding: var(--space-3) var(--space-4);
-  border-radius: 12px;
+  border-radius: var(--radius);
   font-weight: 700;
 }
 
@@ -35,7 +35,7 @@
 .chip {
   padding: 1px 10px;
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: var(--radius);
   color: var(--ink-muted);
   font-size: 0.8rem;
   font-weight: 700;
@@ -46,7 +46,7 @@
   gap: var(--space-3);
   align-items: center;
   padding: var(--space-4);
-  border-radius: 16px;
+  border-radius: var(--radius);
   background: var(--black);
   color: var(--white);
 
@@ -81,8 +81,9 @@
   display: grid;
   gap: 2px;
   padding: var(--space-3) var(--space-4);
-  border-radius: 12px;
+  border-radius: var(--radius);
   background: var(--white);
+  border: 1px solid var(--note-edge);
 
   dt {
     color: var(--ink-muted);
@@ -105,7 +106,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 12px;
+  border-radius: var(--radius);
   font: inherit;
   font-weight: 800;
   text-decoration: none;
@@ -170,7 +171,7 @@
 }
 
 .ghostSmall {
-  border: 1px solid var(--line);
+  border: 1px solid var(--note-edge);
   background: var(--white);
   color: var(--ink);
 
@@ -222,7 +223,7 @@
   margin: 0;
   padding: 0;
   overflow: hidden;
-  border-radius: 16px;
+  border-radius: var(--radius);
   list-style: none;
 }
 
@@ -235,6 +236,7 @@
   min-height: 64px;
   padding: var(--space-3) var(--space-4);
   background: var(--white);
+  border: 1px solid var(--note-edge);
 
   @include up(md) {
     padding-inline: var(--space-6);
@@ -281,7 +283,7 @@
   margin: 0;
   padding: 0;
   overflow: hidden;
-  border-radius: 16px;
+  border-radius: var(--radius);
   list-style: none;
 
   a {
@@ -291,6 +293,7 @@
     min-height: 64px;
     padding: var(--space-3) var(--space-4);
     background: var(--white);
+    border: 1px solid var(--note-edge);
     color: var(--ink);
     text-decoration: none;
     transition: background-color 120ms;
@@ -342,7 +345,7 @@
   position: relative;
   aspect-ratio: 16 / 9;
   overflow: hidden;
-  border-radius: 12px;
+  border-radius: var(--radius);
 
   img {
     object-fit: cover;
@@ -384,7 +387,7 @@
     min-height: 44px;
     padding: 0 var(--space-4);
     border: 1px solid var(--line);
-    border-radius: 12px;
+    border-radius: var(--radius);
     font-weight: 800;
     list-style: none;
     cursor: pointer;
@@ -409,8 +412,9 @@
   gap: var(--space-3);
   max-width: 40rem;
   padding: var(--space-4);
-  border-radius: 16px;
+  border-radius: var(--radius);
   background: var(--white);
+  border: 1px solid var(--note-edge);
 
   fieldset {
     margin: 0;
@@ -464,7 +468,7 @@
   aspect-ratio: 16 / 9;
   overflow: hidden;
   border: 2px solid transparent;
-  border-radius: 12px;
+  border-radius: var(--radius);
 
   img {
     object-fit: cover;
@@ -527,8 +531,8 @@
 
   summary {
     padding: 0 var(--space-3);
-    border: 1px solid var(--line);
-    border-radius: 12px;
+    border: 1px solid var(--note-edge);
+    border-radius: var(--radius);
     background: var(--white);
     font-size: 0.9rem;
   }
@@ -555,7 +559,7 @@
 .ledgerAdd {
   padding: 0 var(--space-4) var(--space-2);
   border: 1px dashed var(--line);
-  border-radius: 16px;
+  border-radius: var(--radius);
 }
 
 .history {
@@ -619,7 +623,7 @@
     min-height: 44px;
     padding: 0 var(--space-4);
     border: 1px solid var(--line);
-    border-radius: 999px;
+    border-radius: var(--radius);
     font-weight: 700;
     cursor: pointer;
 
@@ -656,8 +660,8 @@
     width: 100%;
     min-height: 44px;
     padding: 0 var(--space-3);
-    border: 1px solid var(--line);
-    border-radius: 12px;
+    border: 1px solid var(--note-edge);
+    border-radius: var(--radius);
     background: var(--white);
     color: var(--ink);
     font: inherit;
@@ -674,7 +678,7 @@
       margin-right: var(--space-3);
       padding: 0 var(--space-4);
       border: 1px solid var(--line);
-      border-radius: 12px;
+      border-radius: var(--radius);
       background: var(--surface);
       color: var(--ink);
       font: inherit;
@@ -714,8 +718,8 @@
     width: 100%;
     min-height: 44px;
     padding: var(--space-2) var(--space-3);
-    border: 1px solid var(--line);
-    border-radius: 12px;
+    border: 1px solid var(--note-edge);
+    border-radius: var(--radius);
     background: var(--white);
     color: var(--ink);
     font: inherit;
@@ -783,8 +787,8 @@
     gap: var(--space-3);
     min-height: 48px;
     padding: 0 var(--space-3);
-    border: 1px solid var(--line);
-    border-radius: 12px;
+    border: 1px solid var(--note-edge);
+    border-radius: var(--radius);
     background: var(--white);
     font-weight: 700;
     cursor: pointer;

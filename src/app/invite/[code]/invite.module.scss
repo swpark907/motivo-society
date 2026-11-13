@@ -15,8 +15,9 @@
   width: 100%;
   max-width: 480px;
   @include card-pad(16px 12px, var(--space-8) var(--space-6));
-  border-radius: 20px;
+  border-radius: var(--radius);
   background: var(--white);
+  border: 1px solid var(--note-edge);
 }
 
 .club {
@@ -24,8 +25,15 @@
   justify-items: start;
   gap: var(--space-2);
   @include card-pad;
-  border-radius: 16px;
-  background: var(--kind-club);
+  border-radius: var(--radius);
+  border-top: 3px solid var(--orange); // 작업 노트: 초대받은 클럽 = 검은 띠
+  background: var(--black);
+  color: #fff6ef;
+
+  > span[data-kind="club"] {
+    background: var(--orange);
+    color: var(--black);
+  }
 }
 
 .title {
@@ -47,15 +55,16 @@
   font-size: 0.9rem;
 }
 
-.club .muted {
-  color: var(--ink);
+.club .muted,
+.club .lead {
+  color: #cfc9c1;
 }
 
 .error {
   margin: 0;
   padding: var(--space-3) var(--space-4);
   border: 1px solid var(--accent);
-  border-radius: 12px;
+  border-radius: var(--radius);
   font-weight: 700;
 }
 
@@ -71,7 +80,7 @@
   min-height: 52px;
   padding: 0 var(--space-6);
   border: 0;
-  border-radius: 14px;
+  border-radius: var(--radius);
   background: var(--orange);
   color: var(--black);
   font: inherit;
@@ -92,7 +101,7 @@
   min-height: 44px;
   padding: 0 var(--space-4);
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: var(--radius);
   color: var(--ink);
   font-size: 0.9rem;
   font-weight: 700;

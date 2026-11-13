@@ -4,7 +4,7 @@
 .errorBox {
   margin: 0;
   padding: var(--space-3) var(--space-4);
-  border-radius: 12px;
+  border-radius: var(--radius);
   font-weight: 700;
 }
 
@@ -44,7 +44,7 @@
   margin: 0;
   padding: 0;
   overflow: hidden;
-  border-radius: 16px;
+  border-radius: var(--radius);
   list-style: none;
 }
 
@@ -55,6 +55,7 @@
   gap: var(--space-2) var(--space-4);
   padding: var(--space-3) var(--space-4);
   background: var(--white);
+  border: 1px solid var(--note-edge);
 
   @include up(md) {
     padding-inline: var(--space-6);
@@ -105,8 +106,8 @@
     align-items: center;
     min-height: 44px;
     padding: 0 var(--space-4);
-    border: 1px solid var(--line);
-    border-radius: 12px;
+    border: 1px solid var(--note-edge);
+    border-radius: var(--radius);
     background: var(--white);
     font-size: 0.9rem;
     font-weight: 800;
@@ -150,7 +151,7 @@
 .add {
   padding: 0 var(--space-4) var(--space-2);
   border: 1px dashed var(--line);
-  border-radius: 16px;
+  border-radius: var(--radius);
 
   summary {
     color: var(--ink);
@@ -190,8 +191,8 @@
     width: 100%;
     min-height: 44px;
     padding: var(--space-2) var(--space-3);
-    border: 1px solid var(--line);
-    border-radius: 12px;
+    border: 1px solid var(--note-edge);
+    border-radius: var(--radius);
     background: var(--white);
     color: var(--ink);
     font: inherit;
@@ -211,7 +212,7 @@
   justify-content: center;
   min-height: 44px;
   padding: 0 var(--space-4);
-  border-radius: 12px;
+  border-radius: var(--radius);
   font: inherit;
   font-size: 0.9rem;
   font-weight: 800;
@@ -237,7 +238,7 @@
 }
 
 .ghostSmall {
-  border: 1px solid var(--line);
+  border: 1px solid var(--note-edge);
   background: var(--white);
   color: var(--ink);
 

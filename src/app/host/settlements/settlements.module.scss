@@ -10,8 +10,9 @@
     display: grid;
     gap: 2px;
     padding: var(--space-3);
-    border-radius: 12px;
+    border-radius: var(--radius);
     background: var(--white);
+    border: 1px solid var(--note-edge);
 
     @include up(md) {
       padding: var(--space-3) var(--space-4);
@@ -68,8 +69,9 @@
   display: grid;
   gap: var(--space-3);
   padding: var(--space-4);
-  border-radius: 16px;
+  border-radius: var(--radius);
   background: var(--white);
+  border: 1px solid var(--note-edge);
 
   @include up(md) {
     padding: var(--space-4) var(--space-6);

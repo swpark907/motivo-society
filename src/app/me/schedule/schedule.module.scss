@@ -6,8 +6,9 @@
   justify-self: start;
   gap: 4px;
   padding: 4px;
-  border-radius: 999px;
+  border-radius: var(--radius);
   background: var(--white);
+  border: 1px solid var(--note-edge);
 
   a {
     display: inline-flex;
@@ -15,7 +16,7 @@
     gap: 6px;
     min-height: 44px;
     padding: 0 var(--space-4);
-    border-radius: 999px;
+    border-radius: var(--radius);
     color: var(--ink-muted);
     font-size: 0.9rem;
     font-weight: 700;
@@ -64,8 +65,9 @@
   grid-template-columns: 76px minmax(0, 1fr);
   gap: var(--space-4);
   padding: var(--space-4);
-  border-radius: 16px;
+  border-radius: var(--radius);
   background: var(--white);
+  border: 1px solid var(--note-edge);
   transition: background-color 120ms;
 
   &:has(.title:hover) {
@@ -147,7 +149,7 @@
   align-items: center;
   height: 24px;
   padding: 0 var(--space-2);
-  border-radius: 999px;
+  border-radius: var(--radius);
   font-size: 0.75rem;
   font-weight: 800;
 }
@@ -174,14 +176,14 @@
 .track {
   overflow: hidden;
   height: 8px;
-  border-radius: 999px;
+  border-radius: var(--radius);
   background: var(--surface);
 
   > span {
     display: block;
     height: 100%;
     border-radius: inherit;
-    background: var(--kind-challenge);
+    background: var(--orange); // 진행 = 오렌지(작업 노트)
   }
 }
 
@@ -206,7 +208,7 @@
   z-index: 1;
   min-height: 40px;
   padding: 0 var(--space-4);
-  border-radius: 12px;
+  border-radius: var(--radius);
   background: var(--accent);
   color: var(--white);
   text-decoration: none;
@@ -224,8 +226,9 @@
 .none {
   margin: 0;
   @include card-pad;
-  border-radius: 16px;
+  border-radius: var(--radius);
   background: var(--white);
+  border: 1px solid var(--note-edge);
   color: var(--ink-muted);
 }
 
@@ -234,8 +237,9 @@
   display: grid;
   gap: var(--space-3);
   padding: var(--space-3);
-  border-radius: 20px;
+  border-radius: var(--radius);
   background: var(--white);
+  border: 1px solid var(--note-edge);
 
   @include up(md) {
     padding: var(--space-4) var(--space-6) var(--space-6);
@@ -260,7 +264,7 @@
   place-items: center;
   min-width: 44px;
   min-height: 44px;
-  border-radius: 12px;
+  border-radius: var(--radius);
   color: var(--ink);
   font-weight: 800;
   text-decoration: none;
@@ -359,7 +363,7 @@
 .span {
   overflow: hidden;
   height: 6px;
-  background: var(--kind-challenge);
+  background: var(--orange);
 
   &[data-shape="start"],
   &[data-shape="single"] {
@@ -414,7 +418,7 @@
     height: auto;
     margin: 0 4px;
     padding: 2px 6px;
-    border-radius: 6px;
+    border-radius: var(--radius);
     background: var(--kind-gathering);
 
     &[data-kind="series"] {

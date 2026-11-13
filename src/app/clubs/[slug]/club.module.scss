@@ -48,7 +48,7 @@
 .errorBox {
   margin: 0;
   padding: var(--space-3) var(--space-4);
-  border-radius: 12px;
+  border-radius: var(--radius);
   font-weight: 700;
 }
 
@@ -84,11 +84,15 @@
   justify-items: start;
   gap: var(--space-3);
   @include card-pad(16px 12px, var(--space-8) var(--space-6));
-  border-radius: 20px;
-  background: var(--kind-club);
+  // 작업 노트: 다른 플랫폼 화면의 머리처럼 검은 띠 + 오렌지 윗선
+  border-radius: var(--radius);
+  border-top: 3px solid var(--orange);
+  background: var(--black);
+  color: #f4f0ea;
 
   h1 {
     margin: 0;
+    color: #fff6ef;
     font-size: clamp(1.9rem, 5vw, 3rem);
     font-weight: 900;
     line-height: 1.1;
@@ -98,13 +102,15 @@
 
   > p {
     margin: 0;
+    color: #cfc9c1;
     font-size: 1.05rem;
     font-weight: 600;
   }
 
-  // 같은 분홍 위에서 종류 태그가 묻히지 않게 흰 바탕으로.
+  // 검은 띠 위에서 검은 도장이 묻히지 않게 오렌지로.
   > span[data-kind="club"] {
-    background: var(--white);
+    background: var(--orange);
+    color: var(--black);
   }
 
   @include up(md) {
@@ -120,7 +126,7 @@
 
   > :not(span:last-child) {
     margin-right: -8px;
-    border: 2px solid var(--kind-club);
+    border: 2px solid var(--black);
     border-radius: 50%;
   }
 
@@ -144,8 +150,8 @@
   display: grid;
   gap: var(--space-3);
   @include card-pad;
-  border: 1px solid var(--line);
-  border-radius: 20px;
+  border: 1px solid var(--note-edge);
+  border-radius: var(--radius);
   background: var(--white);
 
   form {
@@ -166,7 +172,7 @@
   min-height: 52px;
   padding: 0 var(--space-6);
   border: 0;
-  border-radius: 14px;
+  border-radius: var(--radius);
   background: var(--orange);
   color: var(--black);
   font: inherit;
@@ -187,7 +193,7 @@
   min-height: 52px;
   margin: 0;
   padding: 0 var(--space-4);
-  border-radius: 14px;
+  border-radius: var(--radius);
   background: var(--ink);
   color: var(--white);
   font-weight: 800;
@@ -230,7 +236,7 @@
 .danger {
   min-height: 44px;
   border: 1px solid var(--ink);
-  border-radius: 12px;
+  border-radius: var(--radius);
   background: var(--white);
   color: var(--ink);
   font: inherit;
@@ -310,8 +316,9 @@
     align-items: center;
     gap: var(--space-3);
     padding: var(--space-3) var(--space-4);
-    border-radius: 14px;
+    border-radius: var(--radius);
     background: var(--white);
+    border: 1px solid var(--note-edge);
   }
 
   span {
@@ -340,8 +347,9 @@
   code {
     overflow-wrap: anywhere;
     padding: var(--space-2) var(--space-3);
-    border-radius: 10px;
+    border-radius: var(--radius);
     background: var(--white);
+    border: 1px solid var(--note-edge);
     font-size: 0.85rem;
   }
 }
@@ -352,8 +360,8 @@
   justify-content: center;
   min-height: 44px;
   padding: 0 var(--space-4);
-  border: 1px solid var(--line);
-  border-radius: 12px;
+  border: 1px solid var(--note-edge);
+  border-radius: var(--radius);
   background: var(--white);
   color: var(--ink);
   font: inherit;
@@ -418,7 +426,7 @@
   min-height: 52px;
   padding: 0 var(--space-6);
   border: 1px solid var(--line);
-  border-radius: 14px;
+  border-radius: var(--radius);
   color: var(--ink);
   font-weight: 800;
   text-decoration: none;

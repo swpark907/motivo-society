@@ -44,8 +44,9 @@
 .alert {
   margin: 0;
   padding: var(--space-3) var(--space-4);
-  border-radius: var(--product-radius-sm);
+  border-radius: var(--radius);
   background: var(--white);
+  border: 1px solid var(--note-edge);
   font-size: 0.9rem;
   line-height: 1.5;
 }
@@ -62,8 +63,8 @@
   input {
     height: 52px;
     padding: 0 var(--space-4);
-    border: 1px solid var(--line);
-    border-radius: 14px;
+    border: 1px solid var(--note-edge);
+    border-radius: var(--radius);
     background: var(--white);
     color: var(--ink);
     font: inherit;
@@ -95,7 +96,7 @@
   margin-top: var(--space-2);
   padding: 0 var(--space-6);
   border: 0;
-  border-radius: 14px;
+  border-radius: var(--radius);
   background: var(--orange);
   color: var(--black);
   font: inherit;
@@ -119,8 +120,8 @@
 .ghost {
   min-height: 44px;
   padding: 0 var(--space-4);
-  border: 1px solid var(--line);
-  border-radius: 12px;
+  border: 1px solid var(--note-edge);
+  border-radius: var(--radius);
   background: var(--white);
   color: var(--ink);
   font: inherit;
@@ -167,8 +168,9 @@
   display: grid;
   gap: var(--space-3);
   @include card-pad;
-  border-radius: var(--product-radius);
+  border-radius: var(--radius);
   background: var(--white);
+  border: 1px solid var(--note-edge);
 
   h2 {
     margin: 0;
@@ -201,7 +203,7 @@
   margin-top: var(--space-8);
   padding: var(--space-4);
   border: 1px dashed var(--line);
-  border-radius: var(--product-radius-sm);
+  border-radius: var(--radius);
   font-size: 0.875rem;
 
   summary {
@@ -228,8 +230,8 @@
     gap: 2px;
     min-height: 52px;
     padding: var(--space-2) var(--space-3);
-    border: 1px solid var(--line);
-    border-radius: 12px;
+    border: 1px solid var(--note-edge);
+    border-radius: var(--radius);
     background: var(--white);
     color: var(--ink);
     font: inherit;

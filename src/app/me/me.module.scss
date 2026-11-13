@@ -4,8 +4,9 @@
   align-items: center;
   gap: var(--space-3);
   @include card-pad;
-  border-radius: var(--product-radius);
+  border-radius: var(--radius);
   background: var(--white);
+  border: 1px solid var(--note-edge);
 }
 
 .who {
@@ -30,8 +31,8 @@
 .signOut {
   min-height: 44px;
   padding: 0 var(--space-4);
-  border: 1px solid var(--line);
-  border-radius: 12px;
+  border: 1px solid var(--note-edge);
+  border-radius: var(--radius);
   background: var(--white);
   color: var(--ink);
   font: inherit;
@@ -49,8 +50,9 @@
   display: grid;
   margin: 0;
   padding: 0;
-  border-radius: var(--product-radius);
+  border-radius: var(--radius);
   background: var(--white);
+  border: 1px solid var(--note-edge);
   list-style: none;
 
   li {
@@ -86,7 +88,7 @@
 .soon {
   flex-shrink: 0;
   padding: 2px var(--space-2);
-  border-radius: 999px;
+  border-radius: var(--radius);
   background: var(--surface);
   color: var(--ink-muted);
   font-size: 0.75rem;
@@ -125,7 +127,7 @@
 .errorBox {
   margin: 0;
   padding: var(--space-3) var(--space-4);
-  border-radius: 12px;
+  border-radius: var(--radius);
   font-weight: 700;
 }
 
@@ -170,8 +172,9 @@
   display: grid;
   gap: var(--space-2);
   padding: var(--space-4);
-  border-radius: var(--product-radius);
+  border-radius: var(--radius);
   background: var(--white);
+  border: 1px solid var(--note-edge);
 
   form {
     justify-self: start;
@@ -196,7 +199,7 @@
 .newBadge {
   padding: 1px var(--space-2);
   border: 1px solid var(--accent);
-  border-radius: 999px;
+  border-radius: var(--radius);
   color: var(--accent);
   font-size: 0.75rem;
 }
@@ -246,7 +249,7 @@
   gap: var(--space-2);
   padding: var(--space-3) var(--space-4);
   border: 1px solid var(--line);
-  border-radius: var(--product-radius);
+  border-radius: var(--radius);
 
   > form {
     display: flex;

@@ -23,7 +23,7 @@
   row-gap: 2px;
   @include card-pad;
   border: 2px solid transparent;
-  border-radius: var(--product-radius);
+  border-radius: var(--radius);
   background: var(--surface-2);
   color: var(--ink);
   text-decoration: none;

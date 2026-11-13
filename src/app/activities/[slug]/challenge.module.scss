@@ -45,7 +45,7 @@
   display: grid;
   gap: var(--space-1);
   padding: var(--space-4) var(--space-6);
-  border-radius: 16px;
+  border-radius: var(--radius);
   background: var(--kind-challenge);
 
   strong {
@@ -72,8 +72,9 @@
   display: grid;
   gap: var(--space-3);
   @include card-pad;
-  border-radius: 16px;
+  border-radius: var(--radius);
   background: var(--white);
+  border: 1px solid var(--note-edge);
 
   h3 {
     margin: 0;
@@ -112,8 +113,8 @@
   input {
     width: 100%;
     padding: var(--space-3);
-    border: 1px solid var(--line);
-    border-radius: 12px;
+    border: 1px solid var(--note-edge);
+    border-radius: var(--radius);
     background: var(--white);
     color: var(--ink);
     font: inherit;
@@ -152,7 +153,7 @@
   min-height: 48px;
   padding: 0 var(--space-6);
   border: 0;
-  border-radius: 14px;
+  border-radius: var(--radius);
   background: var(--orange);
   color: var(--black);
   font: inherit;
@@ -181,8 +182,8 @@
   justify-self: start;
   min-height: 44px;
   padding: 0 var(--space-4);
-  border: 1px solid var(--line);
-  border-radius: 12px;
+  border: 1px solid var(--note-edge);
+  border-radius: var(--radius);
   background: var(--white);
   color: var(--ink);
   font: inherit;
@@ -208,7 +209,7 @@
   height: 26px;
   margin: 0;
   padding: 0 var(--space-3);
-  border-radius: 999px;
+  border-radius: var(--radius);
   background: var(--black);
   color: var(--white);
   font-size: 0.8rem;
@@ -235,7 +236,7 @@
   display: grid;
   gap: 4px;
   padding: var(--space-4);
-  border-radius: 12px;
+  border-radius: var(--radius);
   background: var(--surface);
 
   p {
@@ -276,6 +277,7 @@
     height: 60px;
     border-radius: 50%;
     background: var(--white);
+    border: 1px solid var(--note-edge);
     color: var(--ink-muted);
     font-size: 0.8rem;
     font-weight: 700;
@@ -300,14 +302,14 @@
     display: grid;
     place-items: center;
     aspect-ratio: 1;
-    border-radius: 8px;
+    border-radius: var(--radius);
     background: var(--surface);
     color: var(--ink-muted);
     font-size: 0.75rem;
     font-weight: 700;
 
     &[data-state="done"] {
-      background: var(--kind-challenge);
+      background: var(--orange); // 인증한 날 = 오렌지 도장
       color: var(--ink);
     }
 
@@ -353,7 +355,7 @@
     }
 
     &[data-state="done"]::before {
-      background: var(--kind-challenge);
+      background: var(--orange);
     }
 
     &[data-state="missed"]::before {
