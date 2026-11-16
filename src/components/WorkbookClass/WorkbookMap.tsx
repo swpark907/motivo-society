@@ -2,7 +2,7 @@
 
 // 지도 이동과 수업이 하나의 여정이다. 수업 중에도 부모가 지도를 유지해 위치를 보존한다.
 import { WorkbookPanelDisclosure } from "./WorkbookPanelDisclosure";
-import { getWorkbookCourseLesson } from "@/lib/workbook-course";
+import { getWorkbookCourseLesson, workbookLessonId } from "@/lib/workbook-course";
 import { WorkbookMapLessonCard } from "./WorkbookMapLessonCard";
 import Image from "next/image";
 import { WorkbookPracticalPoint } from "./WorkbookPracticalPoint";
@@ -23,6 +23,8 @@ import styles from "./WorkbookMap.module.scss";
 const stops = [
   { x: 26, y: 64, place: "첫 만남의 찻집" },
   { x: 53, y: 67, place: "도구 장터" },
+  // 1-3은 아직 그림에 건물이 없어 장터와 쉼터 사이 길목에 둔다(여섯 장소 원화가 생기면 옮긴다).
+  { x: 64.7, y: 70.1, place: "길목" },
   { x: 79, y: 58, place: "실습 쉼터" },
   { x: 69, y: 28, place: "대화 서재" },
   { x: 36, y: 26, place: "첫 제작 공방" },
@@ -116,22 +118,15 @@ export function WorkbookMap({
       " · 둘째 수업 후 열려요",
       " · 셋째 수업 후 열려요",
       " · 넷째 수업 후 열려요",
+      " · 다섯째 수업 후 열려요",
     ][index];
   const paths = [
     firstPath,
     nextPath,
+    [stops[1], { x: 55.1, y: 67 }, { x: 59, y: 70.1 }, stops[2]],
+    [stops[2], { x: 69.1, y: 67 }, { x: 71.7, y: 62.3 }, { x: 73.3, y: 59.2 }, stops[3]],
     [
-      stops[1],
-      { x: 55.1, y: 67 },
-      { x: 59, y: 70.1 },
-      { x: 64.7, y: 70.1 },
-      { x: 69.1, y: 67 },
-      { x: 71.7, y: 62.3 },
-      { x: 73.3, y: 59.2 },
-      stops[2],
-    ],
-    [
-      stops[2],
+      stops[3],
       { x: 71.5, y: 59.2 },
       { x: 67.3, y: 52.9 },
       { x: 67.8, y: 48.2 },
@@ -139,10 +134,10 @@ export function WorkbookMap({
       { x: 74.6, y: 37.3 },
       { x: 73.6, y: 35.4 },
       { x: 69.1, y: 31.4 },
-      stops[3],
+      stops[4],
     ],
     [
-      stops[3],
+      stops[4],
       { x: 64.5, y: 28.3 },
       { x: 62.4, y: 30.7 },
       { x: 59.5, y: 30.7 },
@@ -150,7 +145,7 @@ export function WorkbookMap({
       { x: 44.4, y: 28.7 },
       { x: 41.5, y: 27.5 },
       { x: 39.7, y: 25.6 },
-      stops[4],
+      stops[5],
     ],
   ];
   const [moving, setMoving] = useState(false);
@@ -213,7 +208,7 @@ export function WorkbookMap({
       {showMap && (
         <>
           <p className={styles.mobileNote}>
-            지도를 좌우로 움직여 기본 학습 5곳과 선택 심화 1곳을 살펴보세요. 장소를 선택하면 학습
+            지도를 좌우로 움직여 기본 학습 6곳과 선택 심화 1곳을 살펴보세요. 장소를 선택하면 학습
             패널에서 수업을 시작할 수 있어요.
           </p>
           <div className={styles.mapViewport}>
@@ -278,7 +273,7 @@ export function WorkbookMap({
                 {onPractical && (
                   <WorkbookPracticalPoint
                     stage="agent"
-                    available={completed.includes(4) && !moving}
+                    available={completed.includes(workbookLessonId.firstFile) && !moving}
                     selected={practicalSelected}
                     onSelect={() => setPracticalSelected(true)}
 
@@ -373,10 +368,10 @@ export function WorkbookMap({
             <section className={styles.recap} aria-label="첫 맵의 학습 기록">
               <h2>{showMap ? "첫 맵에서 챙긴 것" : "AI 도구 준비하기와 제작 기록"}</h2>
               <p>
-                AI의 도움과 한계, 모델과 도구, 준비, 첫 대화, 파일 작업의 흐름을 배웠어요.
+                AI의 도움과 한계, 챗봇과 코드 에이전트, 준비, 첫 대화, 파일 작업의 흐름을 배웠어요.
                 <strong>예시 복습과 실제 컴퓨터 실습 기록은 구분</strong>해요.
               </p>
-              {[3, 4].map((index) => (
+              {[workbookLessonId.firstRequest, workbookLessonId.firstFile].map((index) => (
                 <details key={index}>
                   <summary>
                     {stops[index].name} ·{" "}
@@ -397,7 +392,7 @@ export function WorkbookMap({
                 요청과 첫 화면 확인까지 이어가요. 기획하고 첫 화면 만들기 지도에서 같은 기록으로
                 이어가요.
               </p>
-              <button onClick={() => onEnter(5)}>
+              <button onClick={() => onEnter(workbookLessonId.project)}>
                 {projectCompleted
                   ? "2단원 기획하고 첫 화면 만들기 다시보기"
                   : "2단원 기획하고 첫 화면 만들기로 →"}
@@ -422,7 +417,10 @@ export function WorkbookMap({
                 내 소개 페이지를 휴대폰과 넓은 화면에서 보고, 화면 밖으로 나가는 한 부분을 고쳐
                 전후를 비교해요. 반응형 화면 만들기 지도에서 관찰·개선 요청·전후 확인을 이어가요.
               </p>
-              <button disabled={!projectCompleted} onClick={() => onEnter(6)}>
+              <button
+                disabled={!projectCompleted}
+                onClick={() => onEnter(workbookLessonId.experience)}
+              >
                 {experienceCompleted
                   ? "반응형 화면 만들기 단원 다시보기"
                   : "작은 화면에서 예시 페이지 확인하기 시작"}
@@ -452,7 +450,7 @@ export function WorkbookMap({
               </p>
               <button
                 disabled={!experienceCompleted || !projectCompleted}
-                onClick={() => onEnter(7)}
+                onClick={() => onEnter(workbookLessonId.data)}
               >
                 {dataCompleted
                   ? "기능과 데이터 저장 단원 다시보기"
@@ -478,7 +476,7 @@ export function WorkbookMap({
               </p>
               <button
                 disabled={!dataCompleted || !experienceCompleted || !projectCompleted}
-                onClick={() => onEnter(8)}
+                onClick={() => onEnter(workbookLessonId.publish)}
               >
                 {publishCompleted
                   ? "배포하고 고치기 단원 다시보기"

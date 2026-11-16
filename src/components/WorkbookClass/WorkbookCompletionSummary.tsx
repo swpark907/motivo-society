@@ -1,3 +1,4 @@
+import { workbookLessonId } from "@/lib/workbook-course";
 import { classProjectSummary } from "@/lib/workbook-class-summary";
 import { WorkbookFirstProjectStatus } from "./WorkbookFirstProjectResult";
 import { WorkbookCompletionScreens } from "./WorkbookCompletionScreens";
@@ -7,7 +8,7 @@ import styles from "./WorkbookCompletionSummary.module.scss";
 const learning = {
   ai: [
     "AI 도구 준비하기",
-    "AI의 도움과 한계, 모델과 도구의 차이를 구분하고 요청 → 확인 → 수정을 연습했어요.",
+    "AI의 도움과 한계, 챗봇과 코드 에이전트의 차이를 구분하고 요청 → 확인 → 수정을 연습했어요.",
   ],
   project: [
     "기획하고 첫 화면 만들기",
@@ -45,7 +46,12 @@ export function WorkbookCompletionSummary({ stage }: { stage: keyof typeof learn
   const actual = summary.items.find((item) => item.stage === (stage === "ai" ? "setup" : stage));
   const result =
     stage === "ai"
-      ? ["내가 확인한 점", p.practice[4].observation, "다음 수정 요청", p.practice[4].revision]
+      ? [
+          "내가 확인한 점",
+          p.practice[workbookLessonId.firstFile].observation,
+          "다음 수정 요청",
+          p.practice[workbookLessonId.firstFile].revision,
+        ]
       : stage === "project"
         ? ["내 페이지 기획", p.project.title, "첫 화면에서 확인한 점", p.project.observation]
         : stage === "experience"
@@ -65,7 +71,7 @@ export function WorkbookCompletionSummary({ stage }: { stage: keyof typeof learn
               ];
   const scope =
     stage === "ai"
-      ? p.practice[4].mode === "computer"
+      ? p.practice[workbookLessonId.firstFile].mode === "computer"
         ? "컴퓨터 실습 · 본인 확인"
         : "예시 복습 기록"
       : stage === "project" && p.project.mode === "computer"

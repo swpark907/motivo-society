@@ -3,7 +3,7 @@
 // 홈과 마지막 정리에서 선택한 기록 화면을 연다. 기존 학습·적용 기록을 그대로 사용한다.
 import Link from "next/link";
 import { useEffect, useRef } from "react";
-import { workbookCourse } from "@/lib/workbook-course";
+import { workbookCourse, workbookLessonId } from "@/lib/workbook-course";
 import { applicationStages, type ApplicationStage } from "@/lib/workbook-application";
 import { useWorkbookProgress } from "./WorkbookProgressContext";
 import { WorkbookApplicationRecord } from "./WorkbookApplicationRecord";
@@ -21,7 +21,7 @@ export function WorkbookReview({
   const heading = useRef<HTMLHeadingElement>(null);
   const body = useRef<HTMLDivElement>(null);
   const allLearned =
-    p.completed.length === 5 &&
+    p.completed.length === workbookLessonId.aiCount &&
     p.projectCompleted &&
     p.experienceCompleted &&
     p.dataCompleted &&
@@ -30,14 +30,14 @@ export function WorkbookReview({
     view === "summary"
       ? allLearned
       : view === "project"
-        ? p.completed.length === 5
+        ? p.completed.length === workbookLessonId.aiCount
         : view === "experience"
           ? p.projectCompleted
           : view === "data"
             ? p.projectCompleted && p.experienceCompleted
             : p.projectCompleted && p.experienceCompleted && p.dataCompleted;
   const learnedUnits = [
-    p.completed.length === 5,
+    p.completed.length === workbookLessonId.aiCount,
     p.projectCompleted,
     p.experienceCompleted,
     p.dataCompleted,

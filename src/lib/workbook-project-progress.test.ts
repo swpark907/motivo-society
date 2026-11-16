@@ -62,7 +62,7 @@ describe("학습과 실제 프로젝트의 독립적인 판정", () => {
       learned: learningUnits.map((unit) => ({ unit, source: "example" })),
       notes: { "application-publish.confirmed": "true", "application-publish.result": "공개함" },
     });
-    expect(projectProgress(state).learned).toHaveLength(9);
+    expect(projectProgress(state).learned).toHaveLength(learningUnits.length);
     expect(projectProgress(state).complete).toBe(false);
     expect(stageProgress(state, "publish").status).toBe("unstarted");
   });

@@ -7,6 +7,7 @@ export const learningUnits = [
   "ai-3",
   "ai-4",
   "ai-5",
+  "ai-6",
   "project",
   "experience",
   "data",

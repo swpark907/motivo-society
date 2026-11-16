@@ -1,5 +1,7 @@
 "use client";
 
+import { workbookLessonId } from "@/lib/workbook-course";
+
 // 이 클래스의 방문 상태는 워크북 레이아웃이 소유한다. 화면/라우트 재마운트와 분리하고,
 // 향후 회원별 진행 데이터는 이 경계에서 초기화·갱신한다. 학습 진도는 메모리로 유지하고 첨부 결과만 브라우저에 임시 저장한다.
 import {
@@ -181,10 +183,12 @@ function useProgressState(preview?: PreviewRecords) {
   const [currentStop, setCurrentStop] = useState(-1);
   const [setupStatus, setSetupStatus] = useState<SetupStatus | null>(null);
   const [practice, setPractice] = useState<Record<number, PracticeRecord>>({
-    3: emptyPractice(),
-    4: emptyPractice(),
+    [workbookLessonId.firstRequest]: emptyPractice(),
+    [workbookLessonId.firstFile]: emptyPractice(),
   });
-  const [completed, setCompleted] = useState<number[]>(preview ? [0, 1, 2, 3, 4] : []);
+  const [completed, setCompleted] = useState<number[]>(
+    preview ? Array.from({ length: workbookLessonId.aiCount }, (_, index) => index) : [],
+  );
   const [project, setProject] = useState<ProjectRecord>(() => preview?.project ?? emptyProject());
   const [projectCompleted, setProjectCompleted] = useState(Boolean(preview));
   const [experience, setExperience] = useState(() => preview?.experience ?? emptyExperience());
@@ -195,11 +199,11 @@ function useProgressState(preview?: PreviewRecords) {
   const [publishCompleted, setPublishCompleted] = useState(false);
   useEffect(() => {
     const learned: { unit: LearningUnit; source: "example" | "computer" }[] = [];
-    for (let index = 0; index < 5; index++) {
+    for (let index = 0; index < workbookLessonId.aiCount; index++) {
       if (completed.includes(index))
         learned.push({
           unit: `ai-${index + 1}` as LearningUnit,
-          source: index >= 3 && practice[index]?.mode === "computer" ? "computer" : "example",
+          source: practice[index]?.mode === "computer" ? "computer" : "example",
         });
     }
     if (projectCompleted)
@@ -220,8 +224,8 @@ function useProgressState(preview?: PreviewRecords) {
       experience,
       data,
       publish,
-      practice3: practice[3],
-      practice4: practice[4],
+      practice3: practice[workbookLessonId.firstRequest],
+      practice4: practice[workbookLessonId.firstFile],
       ...Object.fromEntries(
         Object.entries(applications).map(([key, value]) => [`application-${key}`, value]),
       ),

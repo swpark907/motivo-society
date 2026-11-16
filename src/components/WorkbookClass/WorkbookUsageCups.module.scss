@@ -1,0 +1,119 @@
+// 1-3 화면 3: 계량컵 두 개. 같은 부탁에 챗봇 컵은 한 번, 에이전트 컵은 일할 때마다 차오른다.
+// 들어올 때 한 번 재생하고 "다시 보기"를 둔다. 숫자는 적지 않는다. 오렌지는 쓰지 않는 조용한 화면.
+// 수업 공통 p·h3·ul 규칙보다 우선하도록 .cups 아래에서 지정한다.
+$paper: #f6efe2;
+$ink: #2b2925;
+$mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+
+.cups {
+  word-break: keep-all;
+}
+.cups .title {
+  margin: 0;
+}
+.cups .lead {
+  margin-top: 10px;
+  max-width: 46rem;
+  p {
+    margin: 0;
+  }
+  p + p {
+    margin-top: 6px;
+  }
+}
+.cups .request {
+  margin: 14px 0 0;
+  font-weight: 700;
+  span {
+    margin-right: 6px;
+    padding: 1px 8px;
+    border-radius: 4px;
+    background: $ink;
+    color: $paper;
+    font-size: 0.75rem;
+    font-weight: 400;
+  }
+}
+
+.pair {
+  margin-top: 12px;
+  display: grid;
+  gap: 12px;
+  @include up(md) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
+}
+.side {
+  padding: 14px 16px;
+  border: 1.5px solid $ink;
+  border-radius: var(--workbook-card-radius, 12px);
+  background: #fffdf8;
+  color: $ink;
+}
+.cups .side h3 {
+  margin: 0 0 8px;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+.row {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 16px;
+  align-items: end;
+  @include up(md) {
+    grid-template-columns: 116px minmax(0, 1fr);
+  }
+}
+.cups ul.log {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 4px;
+  align-content: end;
+  min-height: 132px;
+  font-family: $mono;
+  font-size: 0.82rem;
+  li {
+    padding: 2px 8px;
+    border-left: 3px solid #c9a77c;
+    background: $paper;
+    opacity: 0;
+    transition: opacity 200ms ease-out;
+  }
+  li[data-on] {
+    opacity: 1;
+  }
+}
+
+.foot {
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+.cups .foot p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+}
+.cups .replay {
+  --workbook-button-hover: var(--workbook-button-neutral-hover);
+  flex: none;
+  min-height: 0;
+  padding: 2px 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink-muted);
+  font-size: 0.75rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cups ul.log li {
+    transition: none;
+  }
+}

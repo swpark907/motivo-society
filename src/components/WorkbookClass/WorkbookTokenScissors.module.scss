@@ -1,0 +1,147 @@
+// 1-3 화면 1: 문장 띠를 가위로 자르는 화면. 오렌지는 "가위로 자르기" 버튼 한 곳.
+// 수업 공통 p·button 규칙보다 우선하도록 .tokens 아래에서 지정한다.
+$paper: #f6efe2;
+$ink: #2b2925;
+$mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+
+.tokens {
+  word-break: keep-all;
+}
+.tokens .title {
+  margin: 0;
+}
+.tokens .lead {
+  margin-top: 10px;
+  max-width: 46rem;
+  p {
+    margin: 0;
+  }
+  p + p {
+    margin-top: 6px;
+  }
+}
+
+// 작업대
+.bench {
+  margin-top: 18px;
+  padding: 18px 16px 20px;
+  border: 1.5px solid $ink;
+  border-radius: var(--workbook-card-radius, 12px);
+  background: #fffdf8;
+  color: $ink;
+  display: grid;
+  gap: 14px;
+  justify-items: center;
+  @include up(md) {
+    padding: 22px 28px 26px;
+  }
+}
+.tokens .bench .invite {
+  margin: 0;
+  font-weight: 700;
+}
+.samples {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+.tokens .samples button {
+  --workbook-button-hover: var(--workbook-button-neutral-hover);
+  padding: 6px 14px;
+  border: 1.5px solid $ink;
+  border-radius: 999px;
+  background: white;
+  color: $ink;
+  font-size: 0.9rem;
+}
+.tokens .samples button[aria-pressed="true"] {
+  background: $ink;
+  color: $paper;
+}
+
+// 문장 띠: 자르기 전에는 한 장, 자르면 조각 사이가 벌어진다.
+.strip {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  row-gap: 8px;
+  min-height: 3.4rem;
+  align-items: center;
+  font-size: 1.35rem;
+  font-weight: 700;
+  @include up(md) {
+    font-size: 1.9rem;
+  }
+}
+.strip[data-code] {
+  font-family: $mono;
+  font-weight: 400;
+}
+.piece {
+  padding: 0.35em 0.12em;
+  background: $paper;
+  white-space: pre;
+  transition:
+    margin 260ms ease-out,
+    rotate 260ms ease-out;
+}
+.piece:first-child {
+  padding-left: 0.5em;
+}
+.piece:last-child {
+  padding-right: 0.5em;
+}
+.strip[data-cut] .piece {
+  margin: 0 5px;
+  padding: 0.35em 0.4em;
+  outline: 1.5px dashed $ink;
+  outline-offset: -1.5px;
+}
+.strip[data-cut] .piece:nth-child(odd) {
+  rotate: -2deg;
+  background: #efe3cc;
+}
+.strip[data-cut] .piece:nth-child(even) {
+  rotate: 1.5deg;
+}
+
+.result {
+  min-height: 2.6rem;
+  display: grid;
+  place-items: center;
+}
+.tokens .result p {
+  margin: 0;
+}
+.tokens .cutButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--accent);
+  color: white;
+  font-weight: 700;
+}
+.scissors {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.tokens .note {
+  margin: 12px 0 0;
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .piece {
+    transition: none;
+  }
+}

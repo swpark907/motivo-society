@@ -1,0 +1,223 @@
+// 1-2 화면 5: 이름표 세 장 + 함께 쓰는 흐름(도는 그림). 로고 없이 이름만 우리 글꼴로.
+// 오렌지는 "이 클래스에서 써요" 표시 한 곳.
+// 도는 그림은 들어올 때 한 번, 일하는 순서대로 그려지고 점 하나가 한 바퀴 돈다(반복 없음, "다시 보기").
+// 모션 줄이기에서는 완성된 그림만 보인다.
+// 수업 공통 p·ul 규칙보다 우선하도록 .names 아래에서 지정한다.
+$paper: #f6efe2;
+$ink: #2b2925;
+
+.names {
+  word-break: keep-all;
+}
+.names .title {
+  margin: 0;
+}
+.names .lead {
+  margin: 10px 0 0;
+  max-width: 46rem;
+}
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.layout {
+  margin-top: 18px;
+  display: grid;
+  gap: 20px;
+  @include up(md) {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 40px;
+    align-items: center;
+  }
+}
+
+// 이름표: 구멍 뚫린 종이 꼬리표
+.names ul.tags {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 10px;
+  li {
+    position: relative;
+    display: grid;
+    gap: 2px;
+    padding: 12px 16px 12px 44px;
+    border: 1.5px solid $ink;
+    border-radius: 6px;
+    background: $paper;
+    color: $ink;
+  }
+  li:nth-child(odd) {
+    rotate: -0.7deg;
+  }
+  li:nth-child(even) {
+    rotate: 0.6deg;
+  }
+  strong {
+    font-size: 1.35rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+  }
+}
+.hole {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  translate: 0 -50%;
+  border: 1.5px solid $ink;
+  border-radius: 50%;
+  background: var(--surface, #fff);
+}
+.maker {
+  font-size: 0.85rem;
+  color: #5a554d;
+}
+.pick {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  translate: 0 -50%;
+  padding: 2px 10px;
+  border-radius: 4px;
+  background: var(--accent);
+  color: white;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+.names .asOf {
+  margin: 10px 0 0;
+  font-size: 0.8rem;
+  color: var(--ink-muted);
+}
+
+// 도는 그림
+.flow {
+  justify-self: center;
+  width: 100%;
+  max-width: 400px;
+  svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    font-family: var(--font-body);
+  }
+}
+.entry {
+  font-size: 14px;
+  font-weight: 700;
+  fill: $ink;
+}
+.arc {
+  fill: none;
+  stroke: $ink;
+  stroke-width: 2;
+  stroke-dasharray: 5 6;
+}
+.node {
+  rect {
+    fill: #fffdf8;
+    stroke: $ink;
+    stroke-width: 1.6;
+  }
+  text {
+    font-size: 15px;
+    font-weight: 700;
+    fill: $ink;
+  }
+}
+.center {
+  font-size: 14px;
+  fill: #5a554d;
+}
+
+// 순서대로 나타나기: 칸은 툭 붙고, 선은 스르륵 나타난다.
+.step {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pop 280ms cubic-bezier(0.3, 1.6, 0.5, 1) both;
+  animation-delay: var(--at);
+}
+.link {
+  animation: fade 300ms ease-out both;
+  animation-delay: var(--at);
+}
+// 고리를 한 바퀴 도는 점 (먹색: 오렌지는 이름표 한 곳에만)
+.runner {
+  fill: $ink;
+  offset-path: path(
+    "M220 56C262 62 320 130 284 196C262 236 214 246 180 250C140 252 100 240 70 198C40 150 80 80 220 56"
+  );
+  offset-distance: 0%;
+  opacity: 0;
+  animation: lap 2600ms ease-in-out 3500ms both;
+}
+.names .replay {
+  --workbook-button-hover: var(--workbook-button-neutral-hover);
+  display: block;
+  margin: 4px 0 0 auto;
+  min-height: 0;
+  padding: 2px 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink-muted);
+  font-size: 0.75rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes lap {
+  0% {
+    offset-distance: 0%;
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  92% {
+    opacity: 1;
+  }
+  100% {
+    offset-distance: 100%;
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .step,
+  .link {
+    animation: none;
+  }
+  .runner {
+    display: none;
+  }
+}
+
+.names .closing {
+  margin: 16px 0 0;
+}

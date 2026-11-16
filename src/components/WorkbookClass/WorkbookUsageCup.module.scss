@@ -1,0 +1,34 @@
+// 1-3의 계량컵: 숫자 없이 "쓴 양"을 보여준다. 채워지는 높이만 부드럽게 바뀐다.
+$ink: #2b2925;
+
+.cup {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.glass {
+  fill: #fffdf8;
+}
+.fill {
+  fill: #c9a77c;
+  transition:
+    y 400ms ease-out,
+    height 400ms ease-out;
+}
+.mark {
+  stroke: $ink;
+  stroke-width: 1.5;
+  opacity: 0.45;
+}
+.outline {
+  fill: none;
+  stroke: $ink;
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+@media (prefers-reduced-motion: reduce) {
+  .fill {
+    transition: none;
+  }
+}

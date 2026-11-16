@@ -76,7 +76,7 @@ export function WorkbookConversationLesson({
   function update(patch: Partial<PracticeRecord>) {
     setCopyStatus("");
     onChange({ ...record, ...patch });
-    p.dispatchProjectWorkflow({ type: "learn", unit: "ai-4", status: "in-progress" });
+    p.dispatchProjectWorkflow({ type: "learn", unit: "ai-5", status: "in-progress" });
   }
   async function copy(value: string) {
     try {
@@ -418,7 +418,7 @@ export function WorkbookConversationLesson({
                     setAnswer(index);
                     p.dispatchProjectWorkflow({
                       type: "learn",
-                      unit: "ai-4",
+                      unit: "ai-5",
                       status: "in-progress",
                     });
                   }}
@@ -557,7 +557,7 @@ export function WorkbookConversationLesson({
               onClick={() => {
                 p.dispatchProjectWorkflow({
                   type: "learn",
-                  unit: "ai-4",
+                  unit: "ai-5",
                   status: "confirmed",
                   source: computer ? "computer" : "example",
                 });

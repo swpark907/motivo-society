@@ -3,7 +3,7 @@ import { workbookCourse } from "../src/lib/workbook-course";
 const base = "/workbook/classes/vibe-web";
 const totals: Record<string, number> = {
   "ai-understanding": 5,
-  "ai-tools": 11,
+  "ai-tools": 6,
   "tool-setup": 12,
   "first-request": 8,
   "first-file": 10,

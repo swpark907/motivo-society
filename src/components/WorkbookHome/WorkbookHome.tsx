@@ -1,6 +1,7 @@
 "use client";
 
 // 클래스 방문 context와 별도의 브라우저 실험 기록을 이어가기에서 구분한다. 구매 권한을 뜻하지 않는다.
+import { workbookLessonId } from "@/lib/workbook-course";
 import { useWorkbookProgress } from "@/components/WorkbookClass/WorkbookProgressContext";
 import { workbookLessonRoutes } from "@/lib/workbook-lesson-routes";
 import { getWorkbookPurpose } from "@/lib/workbook-purpose";
@@ -48,7 +49,7 @@ export function WorkbookHome({
     publish,
   } = useWorkbookProgress();
   const resumeStep =
-    lesson !== null && lesson < 5
+    lesson !== null && lesson < workbookLessonId.aiCount
       ? lesson
       : mapWorld === "project"
         ? projectStop
@@ -63,7 +64,7 @@ export function WorkbookHome({
           ?.path
       : undefined) ?? "/workbook/classes/vibe-web?view=map";
   const allLearned =
-    completed.length === 5 &&
+    completed.length === workbookLessonId.aiCount &&
     projectCompleted &&
     experienceCompleted &&
     dataCompleted &&
@@ -73,7 +74,7 @@ export function WorkbookHome({
   const dataState = dataProgress(data);
   const publishState = publishProgress(publish);
   const activeProgress = {
-    ai: `${completed.length}/5 학습 확인`,
+    ai: `${completed.length}/${workbookLessonId.aiCount} 학습 확인`,
     project: projectCompleted ? "첫 화면 확인 완료" : "기획·요청·첫 화면 확인 중",
     experience: `${[experienceState.observed, experienceState.requested, experienceCompleted].filter(Boolean).length}/3 학습 확인`,
     data: `${[dataState.displayed, dataState.stored, dataCompleted].filter(Boolean).length}/3 학습 확인`,

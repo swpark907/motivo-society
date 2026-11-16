@@ -41,12 +41,7 @@ test("공개 홈부터 17수업 예시 학습과 최종 정리 홈 왕복을 한
   await click("학습 마치고 단원 지도로 →");
   await mapNext("1-2");
   await lesson("ai-tools");
-  await next(8);
-  await click("파일 작업 기능과 연결된 폴더·권한을 확인해야 해요");
-  await next();
-  await click("이미지를 생성하고 저장하는 기능");
-  await click("그럴 수 있어요");
-  await click("학습 정리 보기");
+  await next(5);
   await click("학습 마치고 단원 지도로 →");
   await mapNext("1-3");
   await lesson("tool-setup");

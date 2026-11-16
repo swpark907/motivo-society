@@ -1,0 +1,284 @@
+// 1-2 화면 2: 종이 위 4컷 만화. 1-1의 검은 판 콜라주와 다른 형식으로 같은 대비를 보여준다.
+// 칸은 굵은 먹선 테두리, 칸 위 손글씨 해설, 손그림 말풍선. 오렌지는 4컷의 열린 화면 윗선 한 곳.
+// 들어올 때 한 번 칸이 차례로 붙는다(반복 없음). 모션 줄이기에서는 완성된 띠만 보인다.
+// 수업 공통 p·ol 규칙(.lesson .lessonBody ...)보다 우선하도록 .comic 아래에서 지정한다.
+$paper: #f6efe2;
+$ink: #2b2925;
+$mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+$pop: cubic-bezier(0.3, 1.6, 0.5, 1);
+
+.comic {
+  word-break: keep-all;
+}
+.comic .title {
+  margin: 0;
+}
+
+.comic ol.strip {
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  @include up(md) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+  }
+  > li {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    @include up(md) {
+      aspect-ratio: 10 / 11;
+    }
+    border: 2.5px solid $ink;
+    background: #fffdf8;
+    color: $ink;
+    animation: stick 300ms $pop both;
+    animation-delay: calc(var(--i) * 450ms + 150ms);
+  }
+  > li:nth-child(odd) {
+    rotate: -0.6deg;
+  }
+  > li:nth-child(even) {
+    rotate: 0.5deg;
+  }
+}
+
+// 칸 위 해설 띠
+.caption {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  padding: 2px 10px 0;
+  border-right: 2.5px solid $ink;
+  border-bottom: 2.5px solid $ink;
+  background: $paper;
+  font-size: 1.1rem;
+  line-height: 1.3;
+  @include up(md) {
+    font-size: 1.35rem;
+  }
+}
+
+// 손그림 말풍선
+.bubble {
+  position: absolute;
+  top: 18%;
+  right: 6%;
+  z-index: 2;
+  max-width: 78%;
+  padding: 4px 10px;
+  border: 2px solid $ink;
+  border-radius: 14px;
+  background: white;
+  font-size: 0.95rem;
+  @include up(md) {
+    max-width: 70%;
+    padding: 6px 12px;
+    border-width: 2.5px;
+    border-radius: 18px;
+    font-size: 1.25rem;
+  }
+  line-height: 1.15;
+  text-align: center;
+}
+
+// 두 줄 대사: 칸 위쪽에 넓게
+.bubbleWide {
+  top: 15%;
+  max-width: 88%;
+  @include up(md) {
+    max-width: 84%;
+  }
+}
+
+.capy {
+  position: absolute;
+  bottom: -2%;
+  left: 8%;
+  width: auto;
+  height: 58%;
+  @include up(md) {
+    height: 66%;
+  }
+}
+.capySmall {
+  left: auto;
+  right: 2%;
+  height: 46%;
+}
+
+// 그려 넣은 창 (특정 서비스 화면이 아니다)
+.window {
+  position: absolute;
+  top: 20%;
+  left: 8%;
+  right: 8%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  border: 2px solid $ink;
+  border-radius: 6px;
+  background: $paper;
+  font-family: var(--font-body);
+  code {
+    display: block;
+    padding: 8px;
+    border-radius: 4px;
+    background: $ink;
+    color: #e9e2d2;
+    font-family: $mono;
+    font-size: 0.68rem;
+    line-height: 1.55;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+}
+.tag {
+  align-self: flex-start;
+  padding: 2px 8px;
+  background: $ink;
+  color: $paper;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  line-height: 1.2;
+}
+.note {
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  color: #5a554d;
+}
+.folder {
+  font-family: $mono;
+  font-size: 0.72rem;
+}
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 8px;
+  border: 2px solid $ink;
+  border-top: 5px solid var(--accent);
+  background: white;
+  strong {
+    font-size: 0.85rem;
+    font-weight: 800;
+  }
+  span {
+    display: block;
+    height: 6px;
+    width: 88%;
+    border-radius: 2px;
+    background: #d9d2c3;
+  }
+  span + span {
+    width: 60%;
+  }
+}
+
+// 3컷: 코드를 어디에 넣어야 할지 몰라 둘러보는 바탕 화면 아이콘들
+.files {
+  position: absolute;
+  top: 40%;
+  left: 4%;
+  right: 4%;
+  height: 50%;
+  > span {
+    position: absolute;
+    display: grid;
+    justify-items: center;
+    gap: 1px;
+    font-family: var(--font-body);
+    font-size: 0.62rem;
+    line-height: 1.2;
+    @include up(md) {
+      font-size: 0.72rem;
+    }
+  }
+  // 카피바라(왼쪽 아래)를 가리지 않게 오른쪽에 세로로 흩어 놓는다.
+  > span:nth-child(1) {
+    right: 30%;
+    top: 4%;
+    rotate: -6deg;
+  }
+  > span:nth-child(2) {
+    right: 2%;
+    top: 22%;
+    rotate: 5deg;
+  }
+  > span:nth-child(3) {
+    right: 22%;
+    top: 62%;
+    rotate: -3deg;
+  }
+}
+.icon {
+  width: 30px;
+  height: 30px;
+  stroke: $ink;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  @include up(md) {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+// 칸 뒤의 아주 흐린 방 그림: 비어 보이지 않게만, 이야기보다 훨씬 옅게.
+.backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: $ink;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.1;
+  pointer-events: none;
+}
+
+.comic .text {
+  margin-top: 14px;
+  display: grid;
+  gap: 6px;
+  max-width: 52rem;
+  p {
+    margin: 0;
+  }
+}
+.comic .replay {
+  --workbook-button-hover: var(--workbook-button-neutral-hover);
+  justify-self: start;
+  min-height: 0;
+  padding: 2px 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink-muted);
+  font-size: 0.75rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@keyframes stick {
+  from {
+    opacity: 0;
+    transform: scale(1.06);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .comic ol.strip > li {
+    animation: none;
+  }
+}

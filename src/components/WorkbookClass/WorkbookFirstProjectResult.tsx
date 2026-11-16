@@ -1,6 +1,7 @@
 "use client";
 
 // 1·2단원의 실제 파일 결과만 명시적으로 기록한다. 예시 조작·학습 완료로 승격하지 않는다.
+import { workbookLessonId } from "@/lib/workbook-course";
 import { useWorkbookProgress } from "./WorkbookProgressContext";
 import { useWorkbookLessonState } from "./useWorkbookLessonState";
 import { requiredCheckpoints, stageProgress } from "@/lib/workbook-project-progress";
@@ -138,7 +139,7 @@ export function WorkbookFirstProjectResult({
       {computer && !prerequisite && (
         <p>
           첫 파일 확인이 남았어요. 초안 기록은 보존하며 실제 목표는 첫 파일부터 확인해요.{" "}
-          <button className={styles.quiet} onClick={() => p.setLesson(4)}>
+          <button className={styles.quiet} onClick={() => p.setLesson(workbookLessonId.firstFile)}>
             첫 파일 확인으로 →
           </button>
         </p>

@@ -7,11 +7,12 @@ const units = [
     stage: "agent",
     title: "AI 도구 준비하기",
     lessons: [
-      { slug: "ai-understanding", title: "AI 이해하기" },
-      { slug: "ai-tools", title: "AI 종류와 도구 알아보기" },
-      { slug: "tool-setup", title: "도구 준비하기" },
-      { slug: "first-request", title: "AI와 첫 대화하기" },
-      { slug: "first-file", title: "첫 파일 만들기" },
+      { slug: "ai-understanding", title: "AI란 무엇인가" },
+      { slug: "ai-tools", title: "어떤 AI를 쓸까" },
+      { slug: "ai-usage", title: "AI를 쓰는 만큼" },
+      { slug: "tool-setup", title: "도구와 작업 공간 준비" },
+      { slug: "first-request", title: "요청 잘하기" },
+      { slug: "first-file", title: "첫 코드 만들기" },
     ],
   },
   {
@@ -55,6 +56,21 @@ const units = [
     ],
   },
 ] as const;
+// 수업 화면이 쓰는 번호. 1단원 수업은 순서대로 0부터, 2단원부터는 단원마다 번호 하나를 쓴다.
+// 1단원 수업 수가 바뀌어도 다른 파일의 숫자를 고치지 않도록 여기 한 곳에서만 정한다.
+const aiCount = units[0].lessons.length;
+const aiIndex = (slug: string) => units[0].lessons.findIndex((item) => item.slug === slug);
+export const workbookLessonId = {
+  aiCount,
+  usage: aiIndex("ai-usage"),
+  setup: aiIndex("tool-setup"),
+  firstRequest: aiIndex("first-request"),
+  firstFile: aiIndex("first-file"),
+  project: aiCount,
+  experience: aiCount + 1,
+  data: aiCount + 2,
+  publish: aiCount + 3,
+} as const;
 export const workbookCourse = units.map((unit, index) => ({
   ...unit,
   optionalTitle: practicalLabs[unit.stage].title,

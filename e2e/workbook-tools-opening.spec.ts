@@ -1,38 +1,32 @@
 import { expect, test } from "./workbook-test";
-test("2강 첫 화면은 결과와 기능을 연결하고 기존 예시로 이어진다", async ({ page }, testInfo) => {
+test("1-2 첫 두 화면은 AI 종류에서 코드 에이전트로 이어진다", async ({ page }, testInfo) => {
   if (testInfo.project.name === "desktop") await page.setViewportSize({ width: 1280, height: 720 });
   await page.goto("/workbook/classes/vibe-web/lessons/ai-tools");
+  await expect(page.getByRole("heading", { name: "어떤 AI를 쓸까", exact: true })).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "AI 종류와 도구 알아보기", exact: true }),
-  ).toBeVisible();
-  await expect(
-    page.getByRole("heading", { name: /도구 이름보다,.*만들 결과부터 정해요/ }),
+    page.getByRole("heading", { name: "무엇을 만들지에 따라 AI가 달라요" }),
   ).toBeVisible();
   const progress = page.getByLabel("현재 학습 단계", { exact: true });
   await expect(progress).toHaveCount(1);
-  await expect(progress).toHaveText("화면 1 / 11");
-  const table = page.getByRole("table", { name: "만들 결과와 필요한 기능" });
-  await expect(table.getByRole("rowheader")).toHaveText(["소개 글", "표지 그림", "웹 화면"]);
-  await expect(table).toContainText("파일 반영 · 실행 확인");
+  await expect(progress).toHaveText("1 / 6");
   const body = page.getByLabel("수업 내용", { exact: true });
+  const cards = body.getByRole("listitem");
+  await expect(cards).toHaveCount(6);
+  await expect(cards.last()).toContainText("코드 에이전트");
+  await expect(cards.last()).toContainText("Claude Code");
+  await expect(body).toContainText("2026년 11월 기준");
   await expect(body.locator("[data-current-action]")).toHaveCount(0);
-  if (testInfo.project.name === "desktop") {
-    await expect
-      .poll(() => body.evaluate((element) => element.scrollHeight - element.clientHeight))
-      .toBeLessThanOrEqual(2);
-  }
-  await page.screenshot({ path: testInfo.outputPath("tools-opening.png") });
-  const next = page.getByRole("button", { name: "다음으로", exact: true });
+  await page.screenshot({ path: testInfo.outputPath("tools-kinds.png") });
+  const next = page.getByRole("button", { name: /^다음으로/ });
   await next.click();
-  await expect(progress).toHaveText("화면 2 / 11");
-  await page.getByRole("button", { name: "표지 그림", exact: true }).click();
-  await expect(body.getByRole("img")).toBeVisible();
+  await expect(progress).toHaveText("2 / 6");
+  await expect(page.getByRole("heading", { name: /그럼 코드 에이전트는.*뭘까요/ })).toBeVisible();
+  await expect(body).toContainText("챗봇은 대화창에서 답을 글로 돌려줍니다.");
+  await expect(body).toContainText("코드 에이전트는 내 컴퓨터의 폴더를 직접 열고");
+  await page.screenshot({ path: testInfo.outputPath("tools-agent.png") });
   await next.click();
-  await expect(progress).toHaveText("화면 3 / 11");
-  await next.click();
-  await expect(
-    page.getByRole("heading", { name: /모델은 결과를 만들고,.*도구는 작업을 연결해요/ }),
-  ).toBeVisible();
+  await expect(progress).toHaveText("3 / 6");
+  await expect(page.getByRole("heading", { name: "코드 에이전트, 이렇게 써요" })).toBeVisible();
   await expect(progress).toHaveCount(1);
   await expect(page).toHaveURL(/\/lessons\/ai-tools$/);
 });

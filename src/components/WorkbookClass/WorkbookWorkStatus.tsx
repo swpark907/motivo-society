@@ -1,3 +1,4 @@
+import { workbookLessonId } from "@/lib/workbook-course";
 import { applicationProgress } from "@/lib/workbook-application";
 import { useWorkbookProgress } from "./WorkbookProgressContext";
 import styles from "./WorkbookClass.module.scss";
@@ -17,7 +18,9 @@ export function WorkbookWorkStatus() {
         <dt>워크북에서 배운 것</dt>
         <dd>
           <strong>제작 {learned}/4단원</strong>
-          <span>AI 도구 준비하기 {p.completed.length}/5수업</span>
+          <span>
+            AI 도구 준비하기 {p.completed.length}/{workbookLessonId.aiCount}수업
+          </span>
         </dd>
       </div>
       <div>

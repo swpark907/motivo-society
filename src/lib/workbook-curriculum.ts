@@ -3,11 +3,13 @@ import type { PracticalStage } from "./workbook-practical-labs";
 
 const topics = [
   {
-    description: "AI 도구 준비하기 5수업 · 모델과 도구를 구분하고 요청·확인·수정을 연습해요.",
+    description:
+      "AI 도구 준비하기 6수업 · 챗봇과 코드 에이전트를 구분하고 요청·확인·수정을 연습해요.",
     lessons: [
       "생성형 AI · 초안과 사실 확인",
-      "LLM · 모델과 AI 도구의 차이",
-      "AI 도구 선택 · 텍스트·이미지·웹 화면",
+      "AI 종류 · 글·그림·영상·3D·웹사이트 빌더",
+      "코드 에이전트 · 챗봇과의 차이와 쓰는 법",
+      "토큰과 컨텍스트 · AI가 읽고 쓰는 양과 요금제",
       "코드 에이전트 · 설치와 로컬 프로젝트 준비",
       "프롬프트 작성 · 대상과 결과 조건 전달",
       "수정 프롬프트 · 바꿀 것과 유지할 것",
@@ -67,7 +69,7 @@ export const workbookCurriculum = topics.map((unit, index) => ({
 
 // 같은 제작 행동에서 다루는 목차 주제를 하나의 지도 지점으로 묶는다.
 export const workbookPointTopics: Record<PracticalStage, number[][]> = {
-  agent: [[0], [1, 2], [3], [4, 5], [6]],
+  agent: [[0], [1, 2], [3], [4], [5, 6], [7]],
   project: [
     [0, 1],
     [2, 3],

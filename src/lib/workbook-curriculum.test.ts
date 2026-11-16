@@ -11,7 +11,7 @@ describe("커리큘럼과 실제 지도 지점의 대응", () => {
     for (const [unit, stage] of workbookCurriculumStages.entries()) {
       const topics = workbookPointTopics[stage].flat().sort((a, b) => a - b);
       expect(topics).toEqual(workbookCurriculum[unit].lessons.map((_, index) => index));
-      expect(workbookPointTopics[stage]).toHaveLength(stage === "agent" ? 5 : 3);
+      expect(workbookPointTopics[stage]).toHaveLength(stage === "agent" ? 6 : 3);
     }
   });
   it("단원마다 독립 심화 장소와 실제 상황 활동이 대응한다", () => {

@@ -1,6 +1,6 @@
 "use client";
 
-import { workbookCourse } from "@/lib/workbook-course";
+import { workbookCourse, workbookLessonId } from "@/lib/workbook-course";
 import { applicationStages, type ApplicationStage } from "@/lib/workbook-application";
 import { actualStatusLabels, classProjectSummary } from "@/lib/workbook-class-summary";
 import type { ProjectStage } from "@/lib/workbook-project-progress";
@@ -21,7 +21,7 @@ export function WorkbookClassSummary({ standalone = false }: { standalone?: bool
   const p = useWorkbookProgress();
   const [tab, setTab] = useWorkbookLessonState("class-summary-tab", "learned");
   const done = [
-    p.completed.length === 5,
+    p.completed.length === workbookLessonId.aiCount,
     p.projectCompleted,
     p.experienceCompleted,
     p.dataCompleted,

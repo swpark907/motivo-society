@@ -1,0 +1,171 @@
+// 1-2 화면 6: 공책 한 장으로 정리한다(1-1의 카드 세 장과 다른 형식).
+// 세 줄에 체크가 차례로 그어진다(들어올 때 한 번). 오렌지는 다음 수업 표의 띠 한 곳.
+// 수업 공통 p·h3·ol 규칙보다 우선하도록 .recap 아래에서 지정한다.
+$paper: #f6efe2;
+$ink: #2b2925;
+
+.recap {
+  word-break: keep-all;
+}
+.recap .title {
+  margin: 0;
+}
+.layout {
+  margin-top: 18px;
+  display: grid;
+  gap: 16px;
+  @include up(md) {
+    grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+    gap: 28px;
+    align-items: start;
+  }
+}
+
+// 공책 한 장
+.page {
+  position: relative;
+  padding: 10px 20px 14px 44px;
+  border: 1.5px solid $ink;
+  background: #fffdf8;
+  color: $ink;
+  rotate: -0.5deg;
+  @include up(md) {
+    padding: 14px 150px 18px 60px;
+  }
+}
+// 왼쪽 구멍 세 개
+.holes {
+  position: absolute;
+  left: 14px;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  @include up(md) {
+    left: 22px;
+  }
+  i {
+    display: block;
+    width: 11px;
+    height: 11px;
+    border: 1.5px solid $ink;
+    border-radius: 50%;
+    background: $paper;
+  }
+}
+.recap ol.lines {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  li {
+    display: grid;
+    grid-template-columns: 28px minmax(0, 1fr);
+    gap: 12px;
+    align-items: start;
+    padding: 14px 0;
+    border-bottom: 1px solid #cfd9dc;
+    @include up(md) {
+      padding: 20px 0;
+    }
+  }
+  li:last-child {
+    border-bottom: 0;
+  }
+  strong {
+    font-size: 1.05rem;
+    font-weight: 700;
+    @include up(md) {
+      font-size: 1.2rem;
+    }
+  }
+  p {
+    margin: 2px 0 0;
+    font-size: 0.9rem;
+    line-height: 1.55;
+    color: #5a554d;
+    @include up(md) {
+      font-size: 1rem;
+    }
+  }
+}
+.tick {
+  width: 28px;
+  height: 28px;
+  margin-top: 2px;
+  path {
+    fill: none;
+    stroke: $ink;
+    stroke-width: 3.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 40;
+    stroke-dashoffset: 40;
+    animation: tick 320ms ease-out forwards;
+    animation-delay: calc(var(--i) * 450ms + 300ms);
+  }
+}
+// 만화에서 온 카피바라 스티커
+.capy {
+  display: none;
+  @include up(md) {
+    display: block;
+    position: absolute;
+    right: 18px;
+    bottom: -14px;
+    width: auto;
+    height: 220px;
+    rotate: 4deg;
+    filter: drop-shadow(2px 0 0 #fffdf8) drop-shadow(-2px 0 0 #fffdf8) drop-shadow(0 2px 0 #fffdf8)
+      drop-shadow(0 -2px 0 #fffdf8) drop-shadow(0 1px 2px rgb(0 0 0 / 20%));
+  }
+}
+
+// 다음 수업 표
+.ticket {
+  position: relative;
+  padding: 16px 18px 16px 30px;
+  border: 1.5px solid $ink;
+  background: $paper;
+  color: $ink;
+  rotate: 0.8deg;
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 12px;
+    background: var(--accent);
+    border-right: 1.5px dashed $ink;
+  }
+}
+.ticketLabel {
+  font-size: 0.78rem;
+  color: #5a554d;
+}
+.recap .ticket h3 {
+  margin: 2px 0 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+  span {
+    font-family: var(--font-display);
+    font-weight: 400;
+    margin-right: 4px;
+  }
+}
+.recap .ticket p {
+  margin: 6px 0 0;
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+@keyframes tick {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tick path {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}

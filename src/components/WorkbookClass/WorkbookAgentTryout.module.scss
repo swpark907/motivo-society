@@ -1,0 +1,335 @@
+// 1-2 화면 3: 연습용 에이전트 창을 직접 눌러 보는 화면.
+// 창은 특정 서비스 화면을 흉내 내지 않은 종이 창이다. 오렌지는 "허락" 버튼 한 곳.
+// 수업 공통 p·ol·button 규칙(.lesson .lessonBody ...)보다 우선하도록 .tryout 아래에서 지정한다.
+$paper: #f6efe2;
+$ink: #2b2925;
+$mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+
+.tryout {
+  word-break: keep-all;
+}
+.tryout .title {
+  margin: 0;
+}
+.tryout .lead {
+  margin: 10px 0 0;
+  max-width: 46rem;
+}
+
+.layout {
+  margin-top: 16px;
+  display: grid;
+  gap: 16px;
+  @include up(md) {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+  }
+}
+
+// 연습 창
+.window {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 300px;
+  border: 1.5px solid $ink;
+  border-radius: var(--workbook-card-radius, 12px);
+  background: #fffdf8;
+  color: $ink;
+  overflow: hidden;
+}
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-bottom: 1.5px solid $ink;
+  background: $paper;
+  font-size: 0.85rem;
+  strong {
+    font-family: $mono;
+    font-weight: 700;
+  }
+}
+.dots {
+  width: 34px;
+  height: 8px;
+  background: radial-gradient(circle, $ink 3px, transparent 3.5px) 0 0 / 12px 8px repeat-x;
+}
+
+// 창 안: 왼쪽 파일 탐색기 + 오른쪽 작업 칸
+.panes {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+}
+.explorer {
+  padding: 12px;
+  border-right: 1.5px solid $ink;
+  background: #f9f4ea;
+  ul {
+    margin: 8px 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 6px;
+  }
+  li {
+    font-family: $mono;
+    font-size: 0.85rem;
+  }
+}
+.paneLabel {
+  font-size: 0.75rem;
+  color: var(--ink-muted);
+}
+.tryout .folder,
+.tryout .folderMain {
+  --workbook-button-hover: var(--workbook-button-neutral-hover);
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: 1.5px solid $ink;
+  border-radius: 6px;
+  background: white;
+  color: $ink;
+  font-family: $mono;
+  font-size: 0.85rem;
+}
+.tryout .folder:disabled {
+  border-color: #d3ccbd;
+  background: transparent;
+  color: #9a9387;
+  cursor: default;
+}
+.tryout .folderMain {
+  font-weight: 700;
+}
+.folderIcon {
+  flex: none;
+  width: 18px;
+  height: 14px;
+  color: #c9a77c;
+}
+.openFolder {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+}
+.newFile,
+.empty {
+  padding-left: 24px;
+}
+.empty {
+  color: var(--ink-muted);
+  font-family: var(--font-body);
+}
+.newFile em {
+  margin-left: 6px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: $ink;
+  color: $paper;
+  font-family: var(--font-body);
+  font-style: normal;
+  font-size: 0.7rem;
+}
+
+.work {
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.tryout .work p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+.tryout .work .hint {
+  color: var(--ink-muted);
+}
+.tryout .work .request {
+  font-weight: 700;
+  span {
+    margin-right: 6px;
+    padding: 1px 8px;
+    border-radius: 4px;
+    background: $ink;
+    color: $paper;
+    font-size: 0.75rem;
+    font-weight: 400;
+  }
+}
+.tryout .work .status {
+  color: var(--ink-muted);
+}
+
+// 허락 쪽지: 테이프로 붙인 종이. 답하면 도장이 찍힌다.
+.slip {
+  position: relative;
+  padding: 14px 14px 12px;
+  background: $paper;
+  rotate: -0.6deg;
+  &::before {
+    content: "";
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    width: 56px;
+    height: 16px;
+    translate: -50% 0;
+    rotate: 3deg;
+    background: rgb(201 167 124 / 75%);
+  }
+}
+.askButtons {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+}
+.tryout .allow {
+  padding: 6px 18px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--accent);
+  color: white;
+  font-weight: 700;
+}
+.tryout .decline,
+.tryout .again {
+  --workbook-button-hover: var(--workbook-button-neutral-hover);
+  align-self: flex-start;
+  padding: 6px 14px;
+  border: 1.5px solid $ink;
+  border-radius: 8px;
+  background: white;
+  color: $ink;
+}
+// 도장: 허락은 강조색(이때는 허락 버튼이 사라져 화면의 오렌지는 여전히 한 곳), 거절은 먹색.
+.stamp {
+  position: absolute;
+  right: 12px;
+  bottom: 6px;
+  padding: 2px 10px;
+  border: 2.5px solid currentColor;
+  border-radius: 6px;
+  color: var(--accent);
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  rotate: -12deg;
+  opacity: 0.85;
+  animation: stamp 200ms ease-out both;
+}
+.slip[data-answer="2"] .stamp {
+  color: #5a554d;
+}
+.diff {
+  display: grid;
+  padding: 8px 10px;
+  border: 1.5px solid $ink;
+  border-radius: 6px;
+  font-family: $mono;
+  font-size: 0.78rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-all;
+  span {
+    padding: 0 4px;
+    background: #e3eedb;
+  }
+}
+@keyframes stamp {
+  from {
+    opacity: 0;
+    scale: 1.4;
+  }
+  to {
+    opacity: 0.85;
+    scale: 1;
+  }
+}
+// 좁은 화면: 탐색기를 위, 작업 칸을 아래로.
+@media (max-width: 520px) {
+  .panes {
+    grid-template-columns: 1fr;
+  }
+  .explorer {
+    border-right: 0;
+    border-bottom: 1.5px solid $ink;
+  }
+}
+
+// 다시 해 보기: 주 동작처럼 보이지 않게 밑줄 글자 버튼.
+.tryout .restart {
+  --workbook-button-hover: var(--workbook-button-neutral-hover);
+  align-self: flex-end;
+  margin: auto 10px 8px 0;
+  min-height: 0;
+  padding: 2px 6px;
+  border: 0;
+  background: transparent;
+  color: var(--ink-muted);
+  font-size: 0.75rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+// 세 가지 차이: 처음부터 다 읽을 수 있고, 창에서 닿은 곳만 표시가 바뀐다.
+.tryout ol.points {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 10px;
+  li {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: var(--workbook-support-radius, 8px);
+    background: var(--surface-2);
+  }
+  strong {
+    font-size: 1rem;
+    font-weight: 700;
+  }
+  p {
+    margin: 2px 0 0;
+    font-size: 0.875rem;
+    line-height: 1.55;
+  }
+  p.chat {
+    color: var(--ink-muted);
+  }
+}
+.number {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 1.5px solid $ink;
+  border-radius: 50%;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+.tryout ol.points li[data-reached] .number {
+  background: $ink;
+  color: $paper;
+}
+
+.tryout .next {
+  margin: 14px 0 0;
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stamp {
+    animation: none;
+  }
+}

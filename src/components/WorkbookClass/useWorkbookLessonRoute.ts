@@ -1,5 +1,6 @@
 "use client";
 
+import { workbookLessonId } from "@/lib/workbook-course";
 import { applicationStages, type ApplicationStage } from "@/lib/workbook-application";
 import { useEffect, useRef } from "react";
 import { workbookClassPath, workbookLessonRoutes } from "@/lib/workbook-lesson-routes";
@@ -71,7 +72,7 @@ export function useWorkbookLessonRoute() {
     // 개발용으로 클래스를 삽입한 페이지의 주소는 유지한다.
     if (!window.location.pathname.startsWith(workbookClassPath)) return;
     const step =
-      p.lesson !== null && p.lesson < 5
+      p.lesson !== null && p.lesson < workbookLessonId.aiCount
         ? p.lesson
         : p.mapWorld === "project"
           ? p.projectStop

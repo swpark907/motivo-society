@@ -1,6 +1,7 @@
 "use client";
 
 // 기록 형태는 유지하고 각 수업은 전용 학습 화면을 소유한다.
+import { workbookLessonId } from "@/lib/workbook-course";
 import { WorkbookConversationLesson } from "./WorkbookConversationLesson";
 import { WorkbookFirstFileLesson } from "./WorkbookFirstFileLesson";
 
@@ -19,7 +20,7 @@ export const emptyPractice = (): PracticeRecord => ({
   checks: [false, false, false],
 });
 export type PracticeLessonProps = {
-  lesson: 3 | 4;
+  lesson: number;
   record: PracticeRecord;
   ready: boolean;
   onChange: (record: PracticeRecord) => void;
@@ -28,7 +29,7 @@ export type PracticeLessonProps = {
 };
 
 export function WorkbookPracticeLesson(props: PracticeLessonProps) {
-  return props.lesson === 3 ? (
+  return props.lesson === workbookLessonId.firstRequest ? (
     <WorkbookConversationLesson {...props} />
   ) : (
     <WorkbookFirstFileLesson {...props} />

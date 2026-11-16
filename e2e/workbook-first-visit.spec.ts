@@ -60,12 +60,7 @@ test("첫 방문 소개부터 1단원 예시 학습 전체와 2단원 진입을 
   await button("클래스 소개 보기").click();
   await button("학습으로 돌아가기 ↗").click();
   await mapNext("AI 종류와 도구 알아보기");
-  for (let i = 0; i < 8; i++) await next();
-  await button("파일 작업 기능과 연결된 폴더·권한을 확인해야 해요").click();
-  await next();
-  await button("이미지를 생성하고 저장하는 기능").click();
-  await button("그럴 수 있어요").click();
-  await button("학습 정리 보기").click();
+  for (let i = 0; i < 5; i++) await next();
   await button("학습 마치고 단원 지도로 →").click();
   await mapNext("도구 준비하기");
   for (let screen = 1; screen <= 9; screen++) {

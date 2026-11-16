@@ -1,0 +1,121 @@
+// 1-2 화면 4: 조용한 비교표. 웹사이트 빌더를 깎아내리지 않고 이 클래스의 목표에 맞는 쪽을 보여준다.
+// 오렌지는 우리 열 머리에 두른 손그림 동그라미 한 곳(들어올 때 한 번 그려진다).
+// 수업 공통 p·table 규칙보다 우선하도록 .why 아래에서 지정한다.
+$paper: #f6efe2;
+$ink: #2b2925;
+
+.why {
+  word-break: keep-all;
+}
+.why .title {
+  margin: 0;
+}
+.why .lead {
+  margin: 10px 0 0;
+  max-width: 46rem;
+}
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.why table.table {
+  margin: 14px 0 0;
+  width: 100%;
+  max-width: 56rem;
+  border-collapse: collapse;
+  table-layout: fixed;
+  color: $ink;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  @include up(md) {
+    font-size: 1rem;
+  }
+  th,
+  td {
+    padding: 10px 8px;
+    border: 0;
+    border-bottom: 1px solid #d9d2c3;
+    background: transparent;
+    text-align: left;
+    vertical-align: top;
+    @include up(md) {
+      padding: 11px 18px;
+    }
+  }
+  thead th {
+    padding-top: 16px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid $ink;
+    font-size: 1rem;
+    font-weight: 700;
+    @include up(md) {
+      font-size: 1.15rem;
+    }
+  }
+  thead td {
+    width: 24%;
+    border-bottom: 2px solid $ink;
+  }
+  tbody th {
+    font-weight: 700;
+    color: #5a554d;
+  }
+  // 우리 열: 종이색 면으로 구분
+  .ours {
+    background: $paper;
+  }
+  tbody .ours {
+    font-weight: 700;
+  }
+}
+// 손으로 두른 동그라미
+.ring {
+  position: relative;
+  display: inline-block;
+  padding: 2px 6px;
+  svg {
+    position: absolute;
+    inset: -10px -14px;
+    width: calc(100% + 28px);
+    height: calc(100% + 20px);
+    overflow: visible;
+  }
+  path {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 3;
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+    stroke-dasharray: 520;
+    stroke-dashoffset: 520;
+    animation: draw 700ms ease-out 400ms forwards;
+  }
+}
+
+.why .closing {
+  margin-top: 14px;
+  max-width: 46rem;
+  p {
+    margin: 0;
+  }
+  p + p {
+    margin-top: 6px;
+  }
+}
+
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ring path {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}

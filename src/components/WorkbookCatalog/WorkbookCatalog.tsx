@@ -61,7 +61,7 @@ export function WorkbookCatalog({ layout }: { layout: "carousel" | "grid" }) {
               <span className={styles.tag}>CLASS 01 · AI 도구 준비하기부터</span>
               <Heading>AI와 만드는 나의 첫 웹페이지</Heading>
               <p>AI 도구 준비부터 내 홈페이지 기획, 첫 제작과 수정까지.</p>
-              <small>{workbookTrial.label} · 기본 17수업 · PC 제작 실습</small>
+              <small>{workbookTrial.label} · 기본 18수업 · PC 제작 실습</small>
               <strong>클래스 알아보기 ↗</strong>
             </div>
           </Link>

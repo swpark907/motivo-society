@@ -1,7 +1,7 @@
 "use client";
 
 import { workbookLearningExample } from "@/lib/workbook-learning-example";
-import { workbookLessonLabel } from "@/lib/workbook-course";
+import { workbookLessonLabel, workbookLessonId } from "@/lib/workbook-course";
 import { WorkbookLessonHeader } from "./WorkbookLessonHeader";
 import { WorkbookLessonPrevious } from "./WorkbookLessonPrevious";
 
@@ -101,7 +101,7 @@ export function WorkbookFirstFileLesson({
   function update(patch: Partial<PracticeRecord>) {
     setCopyStatus("");
     onChange({ ...record, ...patch });
-    p.dispatchProjectWorkflow({ type: "learn", unit: "ai-5", status: "in-progress" });
+    p.dispatchProjectWorkflow({ type: "learn", unit: "ai-6", status: "in-progress" });
   }
   async function copy(value: string) {
     try {
@@ -559,7 +559,7 @@ export function WorkbookFirstFileLesson({
                     setAnswer(index);
                     p.dispatchProjectWorkflow({
                       type: "learn",
-                      unit: "ai-5",
+                      unit: "ai-6",
                       status: "in-progress",
                     });
                   }}
@@ -710,14 +710,15 @@ export function WorkbookFirstFileLesson({
                 );
                 p.dispatchProjectWorkflow({
                   type: "learn",
-                  unit: "ai-5",
+                  unit: "ai-6",
                   status: "confirmed",
                   source: computer ? "computer" : "example",
                 });
                 onComplete();
               }}
             >
-              {[0, 1, 2, 3].every((index) => p.completed.includes(index))
+              {p.completed.filter((index) => index !== workbookLessonId.firstFile).length ===
+              workbookLessonId.aiCount - 1
                 ? "1단원 마치고 다음 학습 보기 →"
                 : "수업 마치고 단원 지도로 →"}
             </button>

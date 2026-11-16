@@ -50,7 +50,7 @@ import { type PracticalStage } from "@/lib/workbook-practical-labs";
 
 import { workbookCurriculum as curriculum, workbookPointTopics } from "@/lib/workbook-curriculum";
 
-import { workbookTrial, workbookCourse } from "@/lib/workbook-course";
+import { workbookTrial, workbookCourse, workbookLessonId } from "@/lib/workbook-course";
 
 /** One line per unit: what the learner does there (journey list and map panel). */
 const UNIT_GOALS = [
@@ -60,6 +60,8 @@ const UNIT_GOALS = [
   "입력과 저장, 다른 기기에서 읽는 범위를 알아봐요.",
   "공개 전 점검과 공개 뒤 문제 해결을 익혀요.",
 ];
+
+const L = workbookLessonId;
 
 export function WorkbookClass() {
   useWorkbookLessonRoute();
@@ -177,7 +179,7 @@ export function WorkbookClass() {
   }
   // URL로 수업·인트로를 직접 열어도 일반 진입과 같은 읽기 공간을 확보한다.
   useEffect(() => {
-    if ((scene === 2 && lesson !== null && lesson <= 8) || scene === 3) collapseMenu?.();
+    if ((scene === 2 && lesson !== null && lesson <= L.publish) || scene === 3) collapseMenu?.();
   }, [scene, lesson, projectStop, experienceStop, dataStop, publishStop, collapseMenu]);
   const page = useRef<HTMLElement>(null);
   const mapSidebar = useRef<HTMLElement>(null);
@@ -203,8 +205,8 @@ export function WorkbookClass() {
   ].every((value) => !!value.trim());
   const requestReady = planReady && !!project.request.trim() && project.mode !== null;
   function canOpenPractical(stage: PracticalStage) {
-    if (stage === "agent") return mapWorld === "ai" && completed.includes(4);
-    if (completed.length !== 5) return false;
+    if (stage === "agent") return mapWorld === "ai" && completed.includes(L.firstFile);
+    if (completed.length !== L.aiCount) return false;
     if (stage === "project") return mapWorld === "project" && planReady;
     if (!projectCompleted) return false;
     if (stage === "experience")
@@ -213,15 +215,18 @@ export function WorkbookClass() {
     if (stage === "data") return mapWorld === "data" && dataProgress(data).stored;
     return mapWorld === "publish" && dataCompleted && publishProgress(publish).addressed;
   }
-  const coverUnit = workbookCourse[lesson !== null && lesson < 5 ? 0 : (lesson ?? 5) - 4];
+  const coverUnit =
+    workbookCourse[
+      lesson !== null && lesson < L.aiCount ? 0 : (lesson ?? L.project) - L.aiCount + 1
+    ];
   const coverPoint =
-    lesson !== null && lesson < 5
+    lesson !== null && lesson < L.aiCount
       ? lesson
-      : lesson === 5
+      : lesson === L.project
         ? projectStop
-        : lesson === 6
+        : lesson === L.experience
           ? experienceStop
-          : lesson === 7
+          : lesson === L.data
             ? dataStop
             : publishStop;
   const openedPractical = practicalView && canOpenPractical(practicalView) ? practicalView : null;
@@ -234,11 +239,12 @@ export function WorkbookClass() {
         id: "ai",
         image: "ai-beginner-five-places-v1.png",
         count: completed.length,
-        total: 5,
+        total: L.aiCount,
         available: true,
         reason: "",
         next: workbookCourse[0].lessons.map((item) => `${item.number} ${item.title}`)[
-          Array.from({ length: 5 }, (_, i) => i).find((i) => !completed.includes(i)) ?? 5
+          Array.from({ length: L.aiCount }, (_, i) => i).find((i) => !completed.includes(i)) ??
+            L.aiCount
         ],
       },
       {
@@ -246,8 +252,8 @@ export function WorkbookClass() {
         image: "map.png",
         count: [planReady, requestReady, projectCompleted].filter(Boolean).length,
         total: 3,
-        available: completed.length === 5,
-        reason: "AI 도구 준비하기의 다섯 수업을 마치면 열려요",
+        available: completed.length === L.aiCount,
+        reason: "AI 도구 준비하기의 여섯 수업을 마치면 열려요",
         next: workbookCourse[1].lessons.map((item) => `${item.number} ${item.title}`)[
           [planReady, requestReady, projectCompleted].findIndex((value) => !value)
         ],
@@ -315,7 +321,7 @@ export function WorkbookClass() {
     (stage) => stage.available && stage.count < stage.total,
   );
   const learningDone = {
-    ai: Array.from({ length: 5 }, (_, index) => completed.includes(index)),
+    ai: Array.from({ length: L.aiCount }, (_, index) => completed.includes(index)),
     project: [planReady, requestReady, projectCompleted],
     experience: [
       experienceProgress(experience).observed,
@@ -347,16 +353,16 @@ export function WorkbookClass() {
       setLesson(step);
     } else if (world === "project") {
       setProjectStop(step);
-      setLesson(5);
+      setLesson(L.project);
     } else if (world === "experience") {
       setExperienceStop(step);
-      setLesson(6);
+      setLesson(L.experience);
     } else if (world === "data") {
       setDataStop(step);
-      setLesson(7);
+      setLesson(L.data);
     } else {
       setPublishStop(step);
-      setLesson(8);
+      setLesson(L.publish);
     }
     requestAnimationFrame(() => {
       const heading = Array.from(
@@ -440,13 +446,13 @@ export function WorkbookClass() {
     if (!projectCompleted || !experienceProgress(experience).available[step]) return;
     setMapWorld("experience");
     setExperienceStop(step);
-    setLesson(6);
+    setLesson(L.experience);
   }
   function enterData(step: number) {
     if (!projectCompleted || !experienceCompleted || !dataProgress(data).available[step]) return;
     setMapWorld("data");
     setDataStop(step);
-    setLesson(7);
+    setLesson(L.data);
   }
   function enterPublish(step: number) {
     if (
@@ -458,7 +464,7 @@ export function WorkbookClass() {
       return;
     setMapWorld("publish");
     setPublishStop(step);
-    setLesson(8);
+    setLesson(L.publish);
   }
   function go(next: number) {
     if (next === 2 || next === 3) collapseMenu?.();
@@ -595,7 +601,7 @@ export function WorkbookClass() {
                   ))}
                 </div>
                 <p>
-                  기본 수업은 총 17개예요. 번호가 붙은 항목은 실제 수업이며, 아래 작은 글씨는 그
+                  기본 수업은 총 18개예요. 번호가 붙은 항목은 실제 수업이며, 아래 작은 글씨는 그
                   수업에서 다룰 주제예요. 단원별 선택 심화는 기본 수업 번호와 완료 조건에서 분리해
                   두었어요.
                 </p>
@@ -643,7 +649,7 @@ export function WorkbookClass() {
               <dl className={styles.classFacts}>
                 <div>
                   <dt>학습 구성</dt>
-                  <dd>AI 도구 준비하기 5수업 + 제작 실습 12개 · 선택 심화 5개</dd>
+                  <dd>AI 도구 준비하기 6수업 + 제작 실습 12개 · 선택 심화 5개</dd>
                 </div>
                 <div>
                   <dt>시작 수준</dt>
@@ -876,7 +882,7 @@ export function WorkbookClass() {
                           panelTarget={mapPanelTarget}
                           onEnter={(step) => {
                             setProjectStop(step);
-                            setLesson(5);
+                            setLesson(L.project);
                           }}
                         />
                       )}
@@ -888,19 +894,19 @@ export function WorkbookClass() {
                         setupStatus={setupStatus}
                         practice={practice}
                         onEnter={(next) => {
-                          if (next === 8) {
+                          if (next === L.publish) {
                             enterPublish(availablePublishStep(publish, publishStop));
                             return;
                           }
-                          if (next === 7) {
+                          if (next === L.data) {
                             enterData(availableDataStep(data, dataStop));
                             return;
                           }
-                          if (next === 6) {
+                          if (next === L.experience) {
                             enterExperience(availableExperienceStep(experience, experienceStop));
                             return;
                           }
-                          if (next === 5) {
+                          if (next === L.project) {
                             setMapWorld("project");
                             setProjectStop(0);
                           }
@@ -1141,10 +1147,10 @@ export function WorkbookClass() {
                   onPreviousLesson={
                     coverUnit.number > 1 && coverPoint > 0
                       ? () => {
-                          if (lesson === 5) setProjectStop(coverPoint - 1);
-                          else if (lesson === 6) setExperienceStop(coverPoint - 1);
-                          else if (lesson === 7) setDataStop(coverPoint - 1);
-                          else if (lesson === 8) setPublishStop(coverPoint - 1);
+                          if (lesson === L.project) setProjectStop(coverPoint - 1);
+                          else if (lesson === L.experience) setExperienceStop(coverPoint - 1);
+                          else if (lesson === L.data) setDataStop(coverPoint - 1);
+                          else if (lesson === L.publish) setPublishStop(coverPoint - 1);
                         }
                       : undefined
                   }
@@ -1153,7 +1159,7 @@ export function WorkbookClass() {
                     requestAnimationFrame(() => title.current?.focus());
                   }}
                 >
-                  {lesson === 8 ? (
+                  {lesson === L.publish ? (
                     <WorkbookPublishLesson
                       step={publishStop}
                       onStep={setPublishStop}
@@ -1175,7 +1181,7 @@ export function WorkbookClass() {
                         requestAnimationFrame(() => title.current?.focus());
                       }}
                     />
-                  ) : lesson === 7 ? (
+                  ) : lesson === L.data ? (
                     <WorkbookDataLesson
                       step={dataStop}
                       onStep={setDataStop}
@@ -1196,7 +1202,7 @@ export function WorkbookClass() {
                         requestAnimationFrame(() => title.current?.focus());
                       }}
                     />
-                  ) : lesson === 6 ? (
+                  ) : lesson === L.experience ? (
                     <WorkbookExperienceLesson
                       step={experienceStop}
                       onStep={setExperienceStop}
@@ -1217,7 +1223,7 @@ export function WorkbookClass() {
                         requestAnimationFrame(() => title.current?.focus());
                       }}
                     />
-                  ) : lesson === 5 ? (
+                  ) : lesson === L.project ? (
                     <WorkbookProjectLesson
                       step={projectStop}
                       onStep={setProjectStop}
@@ -1234,7 +1240,7 @@ export function WorkbookClass() {
                         requestAnimationFrame(() => title.current?.focus());
                       }}
                     />
-                  ) : lesson === 2 ? (
+                  ) : lesson === L.setup ? (
                     <WorkbookSetupLesson
                       initialStatus={setupStatus}
                       onBack={() => {
@@ -1244,13 +1250,13 @@ export function WorkbookClass() {
                       onComplete={(status) => {
                         setSetupStatus(status);
                         setCompleted((previous) =>
-                          previous.includes(2) ? previous : [...previous, 2],
+                          previous.includes(L.setup) ? previous : [...previous, L.setup],
                         );
                         setLesson(null);
                         requestAnimationFrame(() => title.current?.focus());
                       }}
                     />
-                  ) : lesson === 3 || lesson === 4 ? (
+                  ) : lesson === L.firstRequest || lesson === L.firstFile ? (
                     <WorkbookPracticeLesson
                       key={lesson}
                       lesson={lesson}
