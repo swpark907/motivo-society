@@ -22,7 +22,6 @@ import { WorkbookDataMap } from "./WorkbookDataMap";
 import { availableDataStep, dataProgress } from "@/lib/workbook-data";
 import { WorkbookExperienceMap } from "./WorkbookExperienceMap";
 import { availableExperienceStep, experienceProgress } from "@/lib/workbook-experience";
-import { WorkbookSetupLesson } from "./WorkbookSetupLesson";
 import { WorkbookPracticeLesson } from "./WorkbookPracticeLesson";
 import { WorkbookPracticalLesson } from "./WorkbookPracticalLesson";
 import { useWorkbookLessonState } from "./useWorkbookLessonState";
@@ -103,7 +102,6 @@ export function WorkbookClass() {
     currentStop,
     setCurrentStop,
     setupStatus,
-    setSetupStatus,
     practice,
     setPractice,
     completed,
@@ -1236,22 +1234,6 @@ export function WorkbookClass() {
                       }}
                       onComplete={() => {
                         setProjectCompleted(true);
-                        setLesson(null);
-                        requestAnimationFrame(() => title.current?.focus());
-                      }}
-                    />
-                  ) : lesson === L.setup ? (
-                    <WorkbookSetupLesson
-                      initialStatus={setupStatus}
-                      onBack={() => {
-                        setLesson(null);
-                        requestAnimationFrame(() => title.current?.focus());
-                      }}
-                      onComplete={(status) => {
-                        setSetupStatus(status);
-                        setCompleted((previous) =>
-                          previous.includes(L.setup) ? previous : [...previous, L.setup],
-                        );
                         setLesson(null);
                         requestAnimationFrame(() => title.current?.focus());
                       }}

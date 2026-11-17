@@ -100,7 +100,7 @@ export function WorkbookAgentComic() {
           <div className={styles.window}>
             <span className={styles.tag}>코드 에이전트</span>
             <span className={styles.folder}>
-              my-site / <strong>index.html</strong> 만들었어요
+              my-first-web / <strong>index.html</strong> 만들었어요
             </span>
             <span className={styles.page}>
               <strong>안녕하세요, 카피바라예요</strong>

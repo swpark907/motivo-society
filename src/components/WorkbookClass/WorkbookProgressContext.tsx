@@ -29,7 +29,7 @@ import { emptyProject, type ProjectRecord } from "./WorkbookProjectLesson";
 import { emptyData } from "./WorkbookDataLesson";
 import { emptyPublish } from "./WorkbookPublishLesson";
 import { emptyExperience } from "./WorkbookExperienceLesson";
-import { type SetupStatus } from "./WorkbookSetupLesson";
+import { type SetupStatus } from "./workbook-setup-status";
 import { WorkbookRoomProvider } from "@/components/WorkbookSpacePreview/WorkbookRoomProvider";
 import { eligibleRoomRewards } from "@/lib/workbook-room-rewards";
 

@@ -1,0 +1,142 @@
+// 1-4 화면 6: 목걸이 출입증으로 정리한다(1-1 카드, 1-2 공책, 1-3 영수증과 다른 형식).
+// 들어올 때 한 번 흔들리고 멈춘다. 모션 줄이기에서는 멈춘 모습만.
+// 오렌지는 다음 수업 표의 띠 한 곳. 수업 공통 p·h3·ol 규칙보다 우선하도록 .recap 아래에서 지정한다.
+$paper: #f6efe2;
+$ink: #2b2925;
+
+.recap {
+  word-break: keep-all;
+}
+.recap .title {
+  margin: 0;
+}
+.layout {
+  margin-top: 26px;
+  display: grid;
+  gap: 18px;
+  @include up(md) {
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+    gap: 36px;
+    align-items: start;
+  }
+}
+.pass {
+  position: relative;
+  padding: 18px 20px 20px;
+  border: 2px solid $ink;
+  border-radius: 10px;
+  background: #fffdf8;
+  color: $ink;
+  rotate: -0.6deg;
+  // 목걸이에 걸려 한 번 흔들리고 멈춘다(들어올 때 한 번).
+  transform-origin: 50% -22px;
+  animation: sway 900ms ease-out both;
+}
+// 목걸이 줄과 구멍
+.strap {
+  position: absolute;
+  top: -22px;
+  left: 50%;
+  width: 22px;
+  height: 30px;
+  translate: -50% 0;
+  border: 2px solid $ink;
+  border-bottom: 0;
+  border-radius: 6px 6px 0 0;
+  background: $ink;
+}
+.passHead {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1.5px dashed $ink;
+}
+.recap .passHead p {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  line-height: 1.2;
+  span {
+    display: block;
+    margin-top: 2px;
+    font-family: ui-monospace, Menlo, monospace;
+    font-size: 0.8rem;
+  }
+}
+.photo {
+  width: 56px;
+  height: 64px;
+  padding: 4px 6px 0;
+  border: 1.5px solid $ink;
+  background: $paper;
+  object-fit: contain;
+  object-position: bottom;
+}
+.recap ol.lines {
+  margin: 12px 0 0;
+  padding: 0 0 0 1.3em;
+  display: grid;
+  gap: 8px;
+  font-size: 1rem;
+  line-height: 1.55;
+  font-weight: 700;
+}
+
+.ticket {
+  position: relative;
+  padding: 16px 18px 16px 30px;
+  border: 1.5px solid $ink;
+  background: $paper;
+  color: $ink;
+  rotate: 0.8deg;
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 12px;
+    background: var(--accent);
+    border-right: 1.5px dashed $ink;
+  }
+}
+.ticketLabel {
+  font-size: 0.78rem;
+  color: #5a554d;
+}
+.recap .ticket h3 {
+  margin: 2px 0 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+  span {
+    font-family: var(--font-display);
+    font-weight: 400;
+    margin-right: 4px;
+  }
+}
+.recap .ticket p {
+  margin: 6px 0 0;
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+@keyframes sway {
+  0% {
+    opacity: 0;
+    rotate: -5deg;
+  }
+  30% {
+    opacity: 1;
+    rotate: 2.5deg;
+  }
+  60% {
+    rotate: -1.8deg;
+  }
+  100% {
+    rotate: -0.6deg;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pass {
+    animation: none;
+  }
+}

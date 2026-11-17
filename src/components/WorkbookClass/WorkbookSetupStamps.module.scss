@@ -1,0 +1,116 @@
+// 1-4의 준비 도장 카드: 워크북 밖(내 컴퓨터)에서 한 일을 학습자가 직접 찍는다.
+// 찍힌 도장은 먹색, 방금 찍은 하나만 오렌지(한 화면에 주황은 한 곳). 수업 공통 p·ul·button 규칙보다 우선하도록 .card 아래에서 지정한다.
+$paper: #f6efe2;
+$ink: #2b2925;
+
+.card {
+  padding: 14px 16px 16px;
+  border: 1.5px dashed $ink;
+  border-radius: var(--workbook-card-radius, 12px);
+  background: $paper;
+  color: $ink;
+  word-break: keep-all;
+}
+.card[data-compact] {
+  padding: 10px 14px 12px;
+}
+.card .head {
+  margin: 0 0 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 0.9rem;
+  span {
+    font-family: ui-monospace, Menlo, monospace;
+    font-size: 0.8rem;
+  }
+}
+.card ul.stamps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+.card .stamp {
+  --workbook-button-hover: transparent;
+  width: 100%;
+  min-height: 0;
+  padding: 4px 0;
+  border: 0;
+  background: transparent;
+  color: $ink;
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+}
+.mark {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border: 2px dashed #8a8377;
+  border-radius: 50%;
+  background: #fffdf8;
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  color: #8a8377;
+}
+.card[data-compact] .mark {
+  width: 44px;
+  height: 44px;
+  font-size: 1rem;
+}
+.stamp[aria-pressed="true"] .mark {
+  border: 3px solid $ink;
+  color: $ink;
+  rotate: -10deg;
+  font-size: 1rem;
+  // 도장이 쿵 찍힌다(누를 때 한 번).
+  animation: press 220ms cubic-bezier(0.3, 1.6, 0.5, 1) both;
+}
+.card[data-compact] .stamp[aria-pressed="true"] .mark {
+  font-size: 0.85rem;
+}
+// 방금 찍은 도장 하나만 강조색.
+.stamp[aria-pressed="true"][data-latest] .mark {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+// 이 화면에서 누를 수 없는 도장은 흐리게(찍힌 것은 그대로 보인다).
+.stamp:disabled {
+  cursor: default;
+}
+.stamp:disabled[aria-pressed="false"] {
+  opacity: 0.45;
+}
+// 이미 찍은 도장은 이 화면에서 누를 수 없어도 또렷하게 보인다(공통 비활성 버튼의 흐림을 덮는다).
+.card ul.stamps .stamp:disabled[aria-pressed="true"][type] {
+  opacity: 1;
+}
+.name {
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+.card .note {
+  margin: 8px 0 0;
+  font-size: 0.8rem;
+  color: #5a554d;
+}
+
+@keyframes press {
+  from {
+    opacity: 0.2;
+    scale: 1.5;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stamp[aria-pressed="true"] .mark {
+    animation: none;
+  }
+}

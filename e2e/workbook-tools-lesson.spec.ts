@@ -36,7 +36,7 @@ test("1-2는 종류→4컷 만화→연습 창→비교표→이름표와 흐름
   await advance();
   await expect(page.getByRole("heading", { name: "코드 에이전트, 이렇게 써요" })).toBeVisible();
   const tryout = page.getByRole("region", { name: "연습용 코드 에이전트 창" });
-  await tryout.getByRole("button", { name: "my-site" }).click();
+  await tryout.getByRole("button", { name: "my-first-web" }).click();
   await expect(tryout).toContainText("index.html 파일을 만들어도 될까요?");
   await tryout.getByRole("button", { name: "거절", exact: true }).click();
   await expect(tryout).toContainText("파일을 만들지 않았어요.");

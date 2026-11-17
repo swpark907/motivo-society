@@ -9,7 +9,7 @@ import styles from "./WorkbookAgentTryout.module.scss";
 /** 0 folder not picked · 1 asking to make the file · 2 declined · 3 allowed and made. */
 type Stage = 0 | 1 | 2 | 3;
 
-const FOLDERS = ["사진", "my-site", "문서"] as const;
+const FOLDERS = ["사진", "my-first-web", "문서"] as const;
 
 /**
  * What changes for the learner with a code agent, from their side. Checked against the Claude Code
@@ -62,7 +62,7 @@ export function WorkbookAgentTryout() {
           <header className={styles.bar}>
             <span className={styles.dots} aria-hidden="true" />
             <span>
-              작업 폴더 <strong>{stage === 0 ? "고르기 전" : "my-site"}</strong>
+              작업 폴더 <strong>{stage === 0 ? "고르기 전" : "my-first-web"}</strong>
             </span>
           </header>
 
@@ -76,8 +76,8 @@ export function WorkbookAgentTryout() {
                     <li key={folder}>
                       <button
                         type="button"
-                        className={folder === "my-site" ? styles.folderMain : styles.folder}
-                        disabled={folder !== "my-site"}
+                        className={folder === "my-first-web" ? styles.folderMain : styles.folder}
+                        disabled={folder !== "my-first-web"}
                         onClick={() => setStage(1)}
                       >
                         <FolderIcon />
@@ -90,7 +90,7 @@ export function WorkbookAgentTryout() {
                 <ul aria-live="polite">
                   <li className={styles.openFolder}>
                     <FolderIcon />
-                    my-site
+                    my-first-web
                   </li>
                   {stage === 3 ? (
                     <li className={styles.newFile}>
@@ -107,7 +107,7 @@ export function WorkbookAgentTryout() {
             <div className={styles.work} aria-live="polite">
               {stage === 0 ? (
                 <p className={styles.hint}>
-                  왼쪽에서 일할 폴더를 골라 주세요. 소개 페이지를 만들 폴더는 my-site예요.
+                  왼쪽에서 일할 폴더를 골라 주세요. 소개 페이지를 만들 폴더는 my-first-web예요.
                 </p>
               ) : (
                 <>

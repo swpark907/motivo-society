@@ -1,0 +1,262 @@
+// 1-4 화면 4(이 수업의 큰 장면): 같은 책상의 카피바라를 두 번 그린다. 폴더가 내 컴퓨터에 있을 때와,
+// 인터넷으로 멀리 있는 컴퓨터를 빌려 쓸 때(클라우드).
+// 오렌지는 "이 클래스는 여기서 해요" 표시 한 곳. 들어올 때 한 번 붙고, 인터넷 선의 점이 한 번 다녀온다.
+// 수업 공통 p·h3·ol·button 규칙보다 우선하도록 .folder 아래에서 지정한다.
+$paper: #f6efe2;
+$ink: #2b2925;
+
+.folder {
+  word-break: keep-all;
+}
+.folder .title {
+  margin: 0;
+}
+.folder .lead {
+  margin-top: 10px;
+  max-width: 48rem;
+  p {
+    margin: 0;
+  }
+}
+
+.places {
+  margin-top: 12px;
+  display: grid;
+  gap: 10px;
+  @include up(md) {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+    gap: 16px;
+  }
+}
+.place {
+  position: relative;
+  border: 2.5px solid $ink;
+  background: #fffdf8;
+  color: $ink;
+  // 들어올 때 한 번: 내 컴퓨터 → 빌려 쓰는 컴퓨터 순서로 붙는다.
+  animation: place 280ms cubic-bezier(0.3, 1.6, 0.5, 1) both;
+}
+.place:nth-child(2) {
+  animation-delay: 220ms;
+}
+.place[data-ours] {
+  background: $paper;
+}
+// 한 줄 장면: 책상의 카피바라 → (인터넷 선) → 폴더가 있는 곳
+.row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 4px;
+  height: 104px;
+  padding: 8px 10px 0;
+  @include up(md) {
+    height: 112px;
+  }
+}
+.capy {
+  flex: none;
+  width: auto;
+  height: 100%;
+}
+// 내 컴퓨터: 폴더가 노트북 바로 옆에 붙어 있다.
+.here {
+  align-self: center;
+  margin-left: -6px;
+}
+.chip {
+  display: block;
+  width: 92px;
+  height: auto;
+  @include up(md) {
+    width: 108px;
+  }
+}
+// 인터넷 선: 점선 위를 점 하나가 한 번 다녀온다.
+.wire {
+  flex: 1 1 60px;
+  min-width: 48px;
+  max-width: 150px;
+  height: 70px;
+  align-self: center;
+}
+.wireLabel {
+  font-size: 12px;
+  font-weight: 700;
+  fill: $ink;
+}
+.dash {
+  fill: none;
+  stroke: $ink;
+  stroke-width: 2;
+  stroke-dasharray: 5 6;
+}
+.runner {
+  fill: $ink;
+  animation: trip 2400ms ease-in-out 700ms both;
+}
+.remote {
+  flex: none;
+  width: auto;
+  height: 92%;
+  align-self: center;
+}
+.wall {
+  fill: #fffdf8;
+  stroke: $ink;
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+.stroke {
+  fill: none;
+  stroke: $ink;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.light {
+  fill: $ink;
+}
+.paper {
+  fill: #e8c9a0;
+  stroke: $ink;
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+.name {
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  fill: $ink;
+}
+// 장소 이름표: 그림 아래 띠
+.caption {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 8px;
+  padding: 4px 10px;
+  border-top: 2.5px solid $ink;
+  background: #fffdf8;
+  font-size: 0.8rem;
+  line-height: 1.35;
+  strong {
+    font-weight: 700;
+  }
+  > span:not(.pick) {
+    color: #5a554d;
+  }
+}
+.pick {
+  padding: 1px 8px;
+  border-radius: 4px;
+  background: var(--accent);
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 700;
+  animation: pick 220ms cubic-bezier(0.3, 1.6, 0.5, 1) 520ms both;
+}
+.folder .explain {
+  margin: 8px 0 0;
+  font-size: 0.95rem;
+}
+
+.foot {
+  margin-top: 10px;
+  display: grid;
+  gap: 12px;
+  @include up(md) {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+  }
+}
+.make {
+  padding: 12px 16px;
+  border-radius: var(--workbook-support-radius, 8px);
+  background: var(--surface-2);
+}
+.makeHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.folder .make h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+}
+.os {
+  display: inline-flex;
+  border: 1.5px solid $ink;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.folder .os button {
+  --workbook-button-hover: var(--workbook-button-neutral-hover);
+  min-height: 0;
+  padding: 3px 12px;
+  border: 0;
+  border-radius: 0;
+  background: white;
+  color: $ink;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+.folder .os button[aria-pressed="true"] {
+  background: $ink;
+  color: $paper;
+}
+.folder .make ol {
+  margin: 8px 0 0;
+  padding: 0 0 0 1.3em;
+  display: grid;
+  gap: 2px;
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+@keyframes place {
+  from {
+    opacity: 0;
+    scale: 1.04;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+@keyframes pick {
+  from {
+    opacity: 0;
+    scale: 1.4;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+// 인터넷 선 위의 점: 갔다가 돌아온다(한 번).
+@keyframes trip {
+  0% {
+    translate: 0 0;
+  }
+  45% {
+    translate: 96px 0;
+  }
+  55% {
+    translate: 96px 0;
+  }
+  100% {
+    translate: 0 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .place,
+  .pick,
+  .runner {
+    animation: none;
+  }
+}

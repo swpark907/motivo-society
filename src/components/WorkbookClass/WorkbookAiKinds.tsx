@@ -229,7 +229,7 @@ function CodeArt() {
     <svg viewBox="0 0 160 110" role="presentation">
       <path d="M6 14h34l6 7h44v72H6z" fill="#e8c9a0" stroke="#2b2925" strokeWidth="1.6" />
       <text x="12" y="34" fontFamily={MONO} fontSize="8" fill="#2b2925">
-        my-site
+        my-first-web
       </text>
       <rect x="12" y="42" width="70" height="14" fill="#fffdf8" stroke="#2b2925" />
       <text x="17" y="52" fontFamily={MONO} fontSize="7.5" fill="#2b2925">

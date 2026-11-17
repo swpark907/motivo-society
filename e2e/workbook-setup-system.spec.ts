@@ -1,88 +1,88 @@
 import { expect, test } from "./workbook-test";
 
-for (const mode of ["ready", "pending", "review"] as const) {
-  test(`3강은 전체 화면 번호와 실제 준비·복습 상태를 구분한다: ${mode}`, async ({
-    page,
-  }, testInfo) => {
-    if (testInfo.project.name === "desktop")
-      await page.setViewportSize({ width: 1280, height: 720 });
-    await page.goto("/workbook/classes/vibe-web/lessons/tool-setup");
-    const progress = page.getByLabel("현재 학습 단계", { exact: true });
-    const body = page.getByLabel("수업 내용", { exact: true });
-    const next = page.getByRole("button", { name: "다음으로", exact: true });
-    for (let screen = 1; screen <= 9; screen++) {
-      await expect(progress).toHaveText(new RegExp(`화면 ${screen} / 12$`));
-      await expect(body.getByRole("heading", { level: 2 })).toHaveCount(1);
-      await expect(body.getByText("내 목적과 연결하기", { exact: true })).toHaveCount(0);
-      if (screen === 3) {
-        await expect(next).toBeDisabled();
-        await page
-          .getByRole("button", {
-            name: mode === "review" ? "모바일에서 복습하기" : "컴퓨터에서 준비하기",
-            exact: true,
-          })
-          .click();
-      }
-      if (screen === 4) {
-        await page.getByRole("button", { name: "Mac 안내", exact: true }).click();
-        await expect(progress).toContainText("4 / 12");
-        await expect(body.getByRole("link", { name: "공식 데스크톱 설치 안내 ↗" })).toHaveAttribute(
-          "href",
-          "https://learn.chatgpt.com/docs/app",
-        );
-        await page.getByRole("button", { name: "Windows 안내", exact: true }).click();
-      }
-      if (testInfo.project.name === "desktop") {
-        await expect
-          .poll(() => body.evaluate((el) => el.scrollHeight - el.clientHeight))
-          .toBeLessThanOrEqual(2);
-      }
-      if (mode === "ready")
-        await page.screenshot({ path: testInfo.outputPath(`setup-${screen}.png`) });
-      await next.click();
-    }
-    await expect(progress).toHaveText("화면 10 / 12");
-    await expect(next).toBeDisabled();
-    await page
-      .getByRole("button", { name: "버튼의 정확한 위치와 모든 이용 조건", exact: true })
-      .click();
-    await expect(next).toBeDisabled();
-    await expect(body.locator('[data-answer="incorrect"]')).toContainText("오답");
-    await page
-      .getByRole("button", {
-        name: "작업 폴더 → 요청 → 파일 변경 → 실행·확인 → 수정 요청",
-        exact: true,
-      })
-      .click();
+test("1-4는 도장 카드→설치→둘러보기→폴더→확인→정리로 이어진다", async ({ page }, testInfo) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  if (testInfo.project.name === "desktop") await page.setViewportSize({ width: 1280, height: 720 });
+  await page.goto("/workbook/classes/vibe-web/lessons/tool-setup");
+  const next = page.getByRole("button", { name: /^다음으로/ });
+  const progress = page.getByLabel("현재 학습 단계", { exact: true });
+  const body = page.getByLabel("수업 내용", { exact: true });
+  const card = page.getByRole("region", { name: "준비 도장 카드" });
+  let screen = 1;
+  await expect(progress).toHaveText("1 / 6");
+  async function advance() {
     await next.click();
-    await expect(progress).toHaveText("화면 11 / 12");
-    const review = page.getByRole("button", { name: "학습 정리 보기", exact: true });
-    if (mode !== "review") {
-      await expect(review).toBeDisabled();
-      const ready = page.getByRole("button", { name: "컴퓨터 준비 확인", exact: true });
-      await expect(ready).toBeDisabled();
-      if (mode === "ready") {
-        for (const checkbox of await body.getByRole("checkbox").all()) await checkbox.check();
-        await ready.click();
-        await expect(review).toBeEnabled();
-        const lastCheck = body.getByRole("checkbox").last();
-        await lastCheck.uncheck();
-        await expect(review).toBeDisabled();
-        await lastCheck.check();
-        await ready.click();
-      } else await page.getByRole("button", { name: "아직 준비가 필요해요", exact: true }).click();
-    } else await expect(body.getByRole("checkbox")).toHaveCount(0);
-    await review.click();
-    await expect(progress).toHaveText("화면 12 / 12");
-    await expect(body).toContainText(
-      mode === "ready"
-        ? "컴퓨터 준비 확인 · 본인 확인"
-        : mode === "pending"
-          ? "설명 확인 · 컴퓨터 준비 필요"
-          : "복습 확인 · 컴퓨터 준비 필요",
-    );
-    if (mode === "ready") await page.screenshot({ path: testInfo.outputPath("setup-recap.png") });
-    await page.getByRole("button", { name: "학습 마치고 단원 지도로 →", exact: true }).click();
-    await expect(page).toHaveURL(/\?view=map$/);
-  });
-}
+    screen += 1;
+    await expect(progress).toHaveText(new RegExp(`^${screen} / 6$`));
+  }
+  // 짧은 설명 화면은 PC에서 본문과 이동 버튼이 한 화면에 보여야 한다.
+  async function capture(name: string) {
+    await page.screenshot({ path: testInfo.outputPath(`${name}.png`) });
+    if (testInfo.project.name === "desktop") {
+      await expect
+        .poll(() => body.evaluate((element) => element.scrollHeight - element.clientHeight))
+        .toBeLessThanOrEqual(2);
+    }
+  }
+
+  await expect(page.getByRole("heading", { name: "오늘 준비할 네 가지" })).toBeVisible();
+  await expect(body).toContainText("유료 요금제");
+  // 첫 화면은 순서만 보여주고 누르는 도장은 없다.
+  await expect(page.getByRole("heading", { name: "오늘의 순서" })).toBeVisible();
+  await expect(card).toHaveCount(0);
+  await capture("1-start");
+
+  await advance();
+  await expect(page.getByRole("heading", { name: "Claude를 설치해요" })).toBeVisible();
+  await page.getByRole("button", { name: "Mac", exact: true }).click();
+  await expect(body).toContainText("응용 프로그램 폴더에서 Claude를 찾아 열어요.");
+  await card.getByRole("button", { name: "Claude 앱을 설치했어요" }).click();
+  await card.getByRole("button", { name: "로그인했어요" }).click();
+  await expect(card).toContainText("2 / 4");
+  await capture("2-install");
+
+  await advance();
+  await expect(page.getByRole("heading", { name: "화면을 둘러봐요" })).toBeVisible();
+  await page.getByRole("button", { name: "4. 허락 묻는 창" }).click();
+  await expect(body).toContainText("파일을 만들거나 고치기 전에 대화 중간에 물어봐요.");
+  await card.getByRole("button", { name: "Code 탭을 열었어요" }).click();
+  await capture("3-tour");
+
+  await advance();
+  await expect(page.getByRole("heading", { name: "작업할 폴더를 정해요" })).toBeVisible();
+  // 설치 화면에서 고른 컴퓨터가 이어진다.
+  await expect(page.getByRole("button", { name: "Mac", exact: true })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  await expect(body).toContainText("이름을 my-first-web 로 적어요.");
+  await capture("4-folder");
+
+  await advance();
+  await expect(page.getByRole("heading", { name: "준비됐는지 확인해요" })).toBeVisible();
+  await expect(body).toContainText("남은 것 1가지");
+  await card.getByRole("button", { name: "작업 폴더를 정했어요" }).click();
+  await expect(body).toContainText("준비가 끝났어요");
+  await expect(card).toContainText("4 / 4");
+  await capture("5-check");
+
+  await advance();
+  await expect(page.getByRole("heading", { name: "오늘 알게 된 것" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /1-5\s*요청 잘하기/ })).toBeVisible();
+  await capture("6-recap");
+  await page.getByRole("button", { name: "학습 마치고 단원 지도로 →", exact: true }).click();
+  await expect(page).toHaveURL(/\?view=map$/);
+  // 네 도장을 다 찍으면 지도에 본인 확인으로 남는다.
+  await expect(page.getByText("컴퓨터 준비 확인 · 본인 확인").first()).toBeAttached();
+});
+
+test("1-4는 도장을 찍지 않아도 마칠 수 있다", async ({ page }) => {
+  await page.goto("/workbook/classes/vibe-web/lessons/tool-setup");
+  const next = page.getByRole("button", { name: /^다음으로/ });
+  for (let i = 0; i < 4; i++) await next.click();
+  await expect(page.getByLabel("수업 내용", { exact: true })).toContainText("남은 것 4가지");
+  await next.click();
+  await page.getByRole("button", { name: "학습 마치고 단원 지도로 →", exact: true }).click();
+  await expect(page).toHaveURL(/\?view=map$/);
+  await expect(page.getByText("1 / 6 학습 확인")).toBeVisible();
+});

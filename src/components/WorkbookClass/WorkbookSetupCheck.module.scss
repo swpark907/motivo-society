@@ -1,0 +1,82 @@
+// 1-4 화면 5: 도장 카드와 준비 상태. 움직임 없음.
+// 수업 공통 p·ul 규칙보다 우선하도록 .check 아래에서 지정한다.
+$ink: #2b2925;
+
+.check {
+  word-break: keep-all;
+}
+.check .title {
+  margin: 0;
+}
+.check .lead {
+  margin: 10px 0 0;
+}
+.layout {
+  margin-top: 18px;
+  display: grid;
+  gap: 16px;
+  @include up(md) {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: 28px;
+    align-items: start;
+  }
+}
+.result {
+  overflow: hidden;
+  position: relative;
+  min-height: 7.5rem;
+  padding: 16px 18px;
+  border: 1.5px solid $ink;
+  border-radius: var(--workbook-card-radius, 12px);
+  background: #fffdf8;
+  color: $ink;
+  strong {
+    font-size: 1.15rem;
+  }
+}
+.check .result p {
+  margin: 6px 0 0;
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+.check .result ul {
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  li {
+    padding: 1px 10px;
+    border: 1.5px dashed #8a8377;
+    border-radius: 999px;
+    font-size: 0.85rem;
+  }
+}
+// 다 찍으면 엄지 든 카피바라가 한 번 올라온다.
+.result[data-ready] {
+  padding-right: 110px;
+}
+.capy {
+  position: absolute;
+  right: 14px;
+  bottom: 0;
+  width: auto;
+  height: 112px;
+  animation: rise 260ms cubic-bezier(0.3, 1.6, 0.5, 1) both;
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    translate: 0 14px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .capy {
+    animation: none;
+  }
+}

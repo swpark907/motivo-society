@@ -26,11 +26,11 @@ export const workbookLessonCovers: Record<string, { goals: string[]; summary: st
   },
   "tool-setup": {
     goals: [
-      "내 컴퓨터의 실습 도구와 작업 폴더 준비하기",
-      "AI의 코드 답변과 실제 파일 작업 구분하기",
-      "도구에 맡길 작업 범위와 권한 확인하기",
+      "내 컴퓨터에 Claude 앱을 설치하고 로그인하기",
+      "앱에서 Claude Code를 여는 곳과 화면 구성 알기",
+      "작업할 폴더를 만들고 연결하기",
     ],
-    summary: "실습 도구와 작업 폴더를 준비하고, AI에게 맡길 범위를 정해요.",
+    summary: "Claude Code를 설치하고, 작업할 폴더를 정해요.",
   },
   "first-request": {
     goals: [

@@ -10,7 +10,7 @@ import { WorkbookMapTopics } from "./WorkbookMapTopics";
 import { useWorkbookLessonState } from "./useWorkbookLessonState";
 import { createPortal } from "react-dom";
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
-import { setupStatusLabels, type SetupStatus } from "./WorkbookSetupLesson";
+import { setupStatusLabels, type SetupStatus } from "./workbook-setup-status";
 import { type PracticeRecord } from "./WorkbookPracticeLesson";
 import type { DataRecord } from "./WorkbookDataLesson";
 import type { PublishRecord } from "./WorkbookPublishLesson";

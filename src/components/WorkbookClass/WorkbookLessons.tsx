@@ -19,6 +19,12 @@ import { WorkbookUsageCups } from "./WorkbookUsageCups";
 import { WorkbookPlanMenu } from "./WorkbookPlanMenu";
 import { WorkbookSavingHabits } from "./WorkbookSavingHabits";
 import { WorkbookUsageRecap } from "./WorkbookUsageRecap";
+import { WorkbookSetupStart } from "./WorkbookSetupStart";
+import { WorkbookSetupInstall } from "./WorkbookSetupInstall";
+import { WorkbookSetupTour } from "./WorkbookSetupTour";
+import { WorkbookSetupFolder } from "./WorkbookSetupFolder";
+import { WorkbookSetupCheck } from "./WorkbookSetupCheck";
+import { WorkbookSetupRecap } from "./WorkbookSetupRecap";
 import { WorkbookLessonHeader } from "./WorkbookLessonHeader";
 import { WorkbookLessonPrevious } from "./WorkbookLessonPrevious";
 
@@ -30,7 +36,7 @@ import { useWorkbookProgress } from "./WorkbookProgressContext";
 import styles from "./WorkbookClass.module.scss";
 import system from "./WorkbookLesson.module.scss";
 
-// 1-1·1-2·1-3은 같은 틀이다: 다섯 장을 차례로 펼치는 첫 단계 + 정리 화면.
+// 1-1~1-4는 같은 틀이다: 다섯 장을 차례로 펼치는 첫 단계 + 정리 화면.
 // 퀴즈·정답 판정은 두지 않는다(docs/product/workbook-unit-1-plan.md).
 const LAST_STEP = 1;
 const LAST_PART = 4;
@@ -46,7 +52,7 @@ export function WorkbookLessons({
   onComplete: (lesson: number) => void;
 }) {
   const p = useWorkbookProgress();
-  const learningUnit = `ai-${initialLesson + 1}` as "ai-1" | "ai-2" | "ai-3";
+  const learningUnit = `ai-${initialLesson + 1}` as "ai-1" | "ai-2" | "ai-3" | "ai-4";
   const lesson = initialLesson;
   const ui = system;
   const [step, setStep] = useWorkbookLessonState(`ai-${lesson}-step`, 0);
@@ -125,6 +131,14 @@ export function WorkbookLessons({
         {lesson === workbookLessonId.usage && gradual && part === 3 && <WorkbookPlanMenu />}
         {lesson === workbookLessonId.usage && gradual && part === 4 && <WorkbookSavingHabits />}
         {lesson === workbookLessonId.usage && !gradual && <WorkbookUsageRecap />}
+
+        {/* 1-4 도구와 작업 공간 준비: 도장 카드 → 설치 설명서 → 화면 둘러보기 → 폴더(두 장소) → 확인 → 출입증 */}
+        {lesson === workbookLessonId.setup && gradual && part === 0 && <WorkbookSetupStart />}
+        {lesson === workbookLessonId.setup && gradual && part === 1 && <WorkbookSetupInstall />}
+        {lesson === workbookLessonId.setup && gradual && part === 2 && <WorkbookSetupTour />}
+        {lesson === workbookLessonId.setup && gradual && part === 3 && <WorkbookSetupFolder />}
+        {lesson === workbookLessonId.setup && gradual && part === 4 && <WorkbookSetupCheck />}
+        {lesson === workbookLessonId.setup && !gradual && <WorkbookSetupRecap />}
       </div>
       <aside className={ui.lessonPanel} aria-label="학습 안내">
         <div className={ui.panelNotes}>
@@ -136,6 +150,7 @@ export function WorkbookLessons({
                 "AI의 도움과 확인할 일 구분하기",
                 "챗봇과 코드 에이전트 구분하기",
                 "AI가 읽고 쓰는 양 알아보기",
+                "Claude Code와 작업 폴더 준비하기",
               ][lesson]
             }
           </h2>

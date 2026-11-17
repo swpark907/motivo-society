@@ -1,0 +1,120 @@
+// 1-4 화면 1: 오늘의 순서(누르는 것이 없는 번호 목록)와 시작 전에 필요한 것. 조용한 화면, 움직임 없음.
+// 도장 카드는 다음 화면부터 나온다. 오렌지는 도장 예시 한 곳.
+// 수업 공통 p·h3·ul 규칙보다 우선하도록 .start 아래에서 지정한다.
+$ink: #2b2925;
+
+.start {
+  word-break: keep-all;
+}
+.start .title {
+  margin: 0;
+}
+.start .lead {
+  margin-top: 10px;
+  max-width: 46rem;
+  p {
+    margin: 0;
+  }
+}
+.layout {
+  margin-top: 18px;
+  display: grid;
+  gap: 16px;
+  @include up(md) {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 28px;
+    align-items: start;
+  }
+}
+// 오늘의 순서: 버튼처럼 보이지 않게 줄글 목록으로
+.plan {
+  padding: 16px 18px;
+  border: 1.5px solid $ink;
+  border-radius: var(--workbook-card-radius, 12px);
+  background: #fffdf8;
+  color: $ink;
+}
+.start .plan h3 {
+  margin: 0 0 10px;
+  font-size: 1rem;
+  font-weight: 700;
+}
+.start .plan ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 10px;
+  li {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 12px;
+    align-items: baseline;
+  }
+  strong {
+    display: block;
+    font-size: 1rem;
+  }
+  li div span {
+    font-size: 0.86rem;
+    color: #5a554d;
+  }
+}
+.number {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  line-height: 1;
+}
+.start .plan .how {
+  margin: 14px 0 0;
+  padding-top: 12px;
+  border-top: 1.5px dashed $ink;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.88rem;
+}
+.sample {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 3px solid var(--accent);
+  border-radius: 50%;
+  color: var(--accent);
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  rotate: -10deg;
+}
+.needs {
+  padding: 16px 18px;
+  border-radius: var(--workbook-support-radius, 8px);
+  background: var(--surface-2);
+}
+.start .needs h3 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+  font-weight: 700;
+}
+.start .needs ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+  li {
+    display: grid;
+    grid-template-columns: 6.2em minmax(0, 1fr);
+    gap: 10px;
+    font-size: 0.92rem;
+    line-height: 1.55;
+  }
+}
+.start .needs p {
+  margin: 12px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+  font-size: 0.88rem;
+  color: var(--ink-muted);
+}
