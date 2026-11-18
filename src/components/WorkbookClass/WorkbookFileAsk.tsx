@@ -9,6 +9,12 @@ import { WorkbookDoneStamp } from "./WorkbookDoneStamp";
 import { useFirstFilePractice } from "./useFirstFilePractice";
 import { useWorkbookLessonState } from "./useWorkbookLessonState";
 import { WorkbookCopyFallback } from "./WorkbookCopyFallback";
+import { useWorkbookProgress } from "./WorkbookProgressContext";
+
+/** 1-6에서 붙여 넣은 소개 글을 담는 프로젝트 기록의 이름. 2-1이 같은 이름으로 읽는다. */
+export const FIRST_INTRO_NOTE = "first-intro";
+/** 1-6 메모가 첫 파일 맨 위에 넣어 달라고 한 제목. */
+export const FIRST_PAGE_TITLE = "내 소개";
 import styles from "./WorkbookFileAsk.module.scss";
 
 const hand = Nanum_Pen_Script({ weight: "400", subsets: ["latin"], display: "swap" });
@@ -22,8 +28,8 @@ function memoLines(text: string) {
     {
       label: "조건",
       line: intro
-        ? `맨 위에 제목 “내 소개”를 넣고, 그 아래에 이 글을 그대로 넣어줘: ${intro}`
-        : "맨 위에 제목 “내 소개”를 넣고, 그 아래에는 소개 글이 들어갈 자리만 비워 둬.",
+        ? `맨 위에 제목 “${FIRST_PAGE_TITLE}”를 넣고, 그 아래에 이 글을 그대로 넣어줘: ${intro}`
+        : `맨 위에 제목 “${FIRST_PAGE_TITLE}”를 넣고, 그 아래에는 소개 글이 들어갈 자리만 비워 둬.`,
     },
     { label: "하지 말 것", line: "다른 파일은 만들지 마. 꾸미지 말고 단순하게 해줘." },
   ];
@@ -36,6 +42,7 @@ function memoLines(text: string) {
  */
 export function WorkbookFileAsk() {
   const { record, save } = useFirstFilePractice();
+  const { dispatchProjectWorkflow } = useWorkbookProgress();
   const [intro, setIntro] = useWorkbookLessonState("ai-6-ask-intro", "");
   const [copied, setCopied] = useState<"done" | "failed" | null>(null);
   const lines = memoLines(intro);
@@ -88,6 +95,13 @@ export function WorkbookFileAsk() {
               onChange={(event) => {
                 setCopied(null);
                 setIntro(event.target.value);
+                // 2-1이 첫 화면을 다시 꺼낼 때 읽는다. 화면 상태가 아니라 프로젝트 기록에 둔다.
+                dispatchProjectWorkflow({
+                  type: "note",
+                  key: FIRST_INTRO_NOTE,
+                  text: event.target.value.trim(),
+                  stage: "setup",
+                });
               }}
             />
           </label>

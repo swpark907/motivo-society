@@ -1,6 +1,8 @@
 "use client";
 
-import { workbookLessonId } from "@/lib/workbook-course";
+import { workbookCourse, workbookLessonId } from "@/lib/workbook-course";
+import { canOpenWorkbookUnit, workbookTrialAccess } from "@/lib/workbook-access";
+import { isUnitOneDone } from "@/lib/workbook-lesson-records";
 import { WorkbookChatGrowth } from "./WorkbookChatGrowth";
 import { WorkbookCodeIsText } from "./WorkbookCodeIsText";
 import { WorkbookLessonRecap } from "./WorkbookLessonRecap";
@@ -40,6 +42,7 @@ import { useRecordFirstProjectResult } from "./WorkbookFirstProjectResult";
 import { WorkbookVagueMemo } from "./WorkbookVagueMemo";
 import { WorkbookLessonHeader } from "./WorkbookLessonHeader";
 import { WorkbookLessonPrevious } from "./WorkbookLessonPrevious";
+import { WorkbookLessonFinish } from "./WorkbookLessonFinish";
 
 // 설명 화면의 위치를 방문 중 유지한다(지도에 다녀와도 보던 화면에서 이어간다).
 import { WorkbookActionReturn } from "./WorkbookActionReturn";
@@ -59,10 +62,16 @@ export function WorkbookLessons({
   initialLesson,
   onBack,
   onComplete,
+  onNextUnit,
+  onNextLesson,
 }: {
   initialLesson: number;
   onBack: () => void;
   onComplete: (lesson: number) => void;
+  /** 1단원을 다 마쳤을 때 1-6 정리에서 2단원 지도로 바로 간다. */
+  onNextUnit?: () => void;
+  /** 정리에서 같은 단원의 다음 수업으로 바로 간다(모든 수업이 같은 넘어가기 방식). */
+  onNextLesson?: (lesson: number) => void;
 }) {
   const p = useWorkbookProgress();
   const recordResult = useRecordFirstProjectResult();
@@ -100,6 +109,34 @@ export function WorkbookLessons({
   function move(next: number) {
     setStep(next);
     requestAnimationFrame(() => heading.current?.focus());
+  }
+  // 1-6을 마치면서 1단원이 끝나고 2단원을 열 수 있으면, 1단원 지도를 거치지 않고 2단원 지도로 간다.
+  // 같은 단원의 다음 수업. 1단원 마지막 수업이면 없다(그때는 다음 단원 또는 지도).
+  const nextLesson = workbookCourse[0].lessons[lesson + 1] ?? null;
+  const toNextUnit =
+    !!onNextUnit &&
+    lesson === workbookLessonId.firstFile &&
+    isUnitOneDone(p.completed, lesson) &&
+    canOpenWorkbookUnit(workbookTrialAccess, workbookCourse[1].number);
+  function finish() {
+    // 첫 코드 만들기: 도장 세 개를 실제 파일의 본인 확인으로 남긴다(다음 단원이 읽는다).
+    // 근거는 학습자가 적은 관찰뿐이다. 적은 것이 없으면 기록하지 않는다.
+    if (lesson === workbookLessonId.firstFile) {
+      const record = p.practice[lesson];
+      recordResult(
+        "setup",
+        record.mode === "computer",
+        p.setupStatus === "ready" && record.checks.every(Boolean),
+        record.observation,
+      );
+    }
+    p.dispatchProjectWorkflow({
+      type: "learn",
+      unit: learningUnit,
+      status: "confirmed",
+      source: p.practice[lesson]?.mode === "computer" ? "computer" : "example",
+    });
+    onComplete(lesson);
   }
   return (
     <section className={system.lesson}>
@@ -224,33 +261,41 @@ export function WorkbookLessons({
             >
               다음으로
             </button>
-          ) : (
-            <button
-              data-action-role="lesson-next"
-              onClick={() => {
-                // 첫 코드 만들기: 도장 세 개를 실제 파일의 본인 확인으로 남긴다(다음 단원이 읽는다).
-                // 근거는 학습자가 적은 관찰뿐이다. 적은 것이 없으면 기록하지 않는다.
-                if (lesson === workbookLessonId.firstFile) {
-                  const record = p.practice[lesson];
-                  recordResult(
-                    "setup",
-                    record.mode === "computer",
-                    p.setupStatus === "ready" && record.checks.every(Boolean),
-                    record.observation,
-                  );
-                }
-                p.dispatchProjectWorkflow({
-                  type: "learn",
-                  unit: learningUnit,
-                  status: "confirmed",
-                  source: p.practice[lesson]?.mode === "computer" ? "computer" : "example",
-                });
-                onComplete(lesson);
+          ) : nextLesson && onNextLesson ? (
+            <WorkbookLessonFinish
+              label={`다음: ${nextLesson.number} ${nextLesson.title} →`}
+              shortLabel="다음 수업 →"
+              ariaLabel={`다음 수업 ${nextLesson.number} ${nextLesson.title} 시작`}
+              onNext={() => {
+                finish();
+                onNextLesson(lesson + 1);
+              }}
+              onMap={() => {
+                finish();
                 onBack();
               }}
-            >
-              학습 마치고 단원 지도로 →
-            </button>
+            />
+          ) : toNextUnit ? (
+            <WorkbookLessonFinish
+              label={`${workbookCourse[1].number}단원 시작하기 →`}
+              shortLabel={`${workbookCourse[1].number}단원 시작 →`}
+              onNext={() => {
+                finish();
+                onNextUnit?.();
+              }}
+              onMap={() => {
+                finish();
+                onBack();
+              }}
+            />
+          ) : (
+            <WorkbookLessonFinish
+              label="학습 마치고 단원 지도로 →"
+              onNext={() => {
+                finish();
+                onBack();
+              }}
+            />
           )}
         </nav>
       </aside>

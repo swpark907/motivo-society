@@ -1,0 +1,181 @@
+// 2-1 화면 4: 가운데 카드 더미에서 한 장씩 나오는 카드를 왼쪽 "나중에", 오른쪽 "지금"으로 보낸다.
+// 새 카드는 들어올 때 한 번 뒤집히듯 나온다. 오렌지는 "지금 넣기" 버튼 한 곳.
+// 모바일은 더미 → 지금 → 나중에 순서로 쌓는다. 수업 공통 p·ul·button 규칙보다 우선하도록 .content 아래에서 지정한다.
+$ink: var(--workbook-ink, #2b2925);
+$paper: var(--workbook-paper, #f6efe2);
+$memo: var(--workbook-memo, #fbe9a6);
+$kraft: #e9d3a4;
+
+.content {
+  word-break: keep-all;
+}
+.content .title {
+  margin: 0;
+}
+.content .lead {
+  margin-top: 10px;
+  max-width: 58rem;
+  p {
+    margin: 0;
+  }
+}
+
+.table {
+  margin-top: 20px;
+  display: grid;
+  gap: 16px;
+  grid-template-areas:
+    "deck"
+    "now"
+    "later";
+  @include up(md) {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr) minmax(0, 1fr);
+    grid-template-areas: "later deck now";
+    gap: 24px;
+    align-items: start;
+  }
+}
+.pile {
+  min-height: 150px;
+  padding: 12px;
+  border: 1.5px solid $ink;
+  background: $kraft;
+  color: $ink;
+  &[data-pile="now"] {
+    grid-area: now;
+  }
+  &[data-pile="later"] {
+    grid-area: later;
+    background: transparent;
+    border-style: dashed;
+  }
+}
+.content .pile h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 800;
+}
+.content .pile .blank {
+  margin: 12px 0 0;
+  font-size: 0.85rem;
+  color: rgb(43 41 37 / 0.55);
+}
+.content .pile ul {
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  li {
+    margin: 0;
+    padding: 0;
+    animation: land 160ms ease-out both;
+  }
+  button {
+    --workbook-button-hover: #{$memo};
+    min-height: 36px;
+    padding: 4px 10px;
+    border: 1px solid rgb(43 41 37 / 0.35);
+    border-radius: 4px;
+    background: #fffdf8;
+    color: $ink;
+    font-size: 0.88rem;
+  }
+}
+
+// 가운데 카드 더미
+.deck {
+  grid-area: deck;
+  // 뒤에 깔린 카드(::before·::after)가 더미 안에서만 뒤로 가도록 쌓임 맥락을 만든다.
+  isolation: isolate;
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+}
+.content .deck .count {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--ink-muted);
+}
+.card {
+  position: relative;
+  width: min(100%, 240px);
+  min-height: 130px;
+  padding: 18px;
+  display: grid;
+  place-items: center;
+  border: 1.5px solid $ink;
+  border-radius: 10px;
+  background: #fffdf8;
+  color: $ink;
+  font-size: 1.25rem;
+  font-weight: 800;
+  text-align: center;
+  animation: deal 200ms ease-out both;
+  // 뒤에 깔린 카드 두 장
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border: 1.5px solid $ink;
+    border-radius: 10px;
+    background: $paper;
+  }
+  &::before {
+    rotate: -4deg;
+  }
+  &::after {
+    rotate: 3deg;
+  }
+}
+.toss {
+  display: flex;
+  gap: 8px;
+}
+.content .toss button {
+  min-height: 44px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-weight: 700;
+}
+.content .toss .later {
+  --workbook-button-hover: #{$paper};
+  border: 1.5px solid $ink;
+  background: transparent;
+  color: $ink;
+}
+.content .toss .now {
+  border: 0;
+  background: var(--accent);
+  color: white;
+}
+.content .deck .done {
+  margin: 0;
+  padding: 18px 14px;
+  border: 1.5px dashed var(--line);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+@keyframes deal {
+  from {
+    opacity: 0;
+    rotate: -6deg;
+    translate: 0 8px;
+  }
+}
+@keyframes land {
+  from {
+    opacity: 0;
+    scale: 0.9;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .content .pile ul li {
+    animation: none;
+  }
+}

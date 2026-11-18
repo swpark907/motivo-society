@@ -9,7 +9,7 @@ import { WorkbookMapTopics } from "./WorkbookMapTopics";
 import { useWorkbookLessonState } from "./useWorkbookLessonState";
 import { createPortal } from "react-dom";
 import type { ReactNode } from "react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useWorkbookProgress } from "./WorkbookProgressContext";
 import styles from "./WorkbookMap.module.scss";
 
@@ -36,8 +36,11 @@ export function WorkbookProjectMap({
   onEnter,
   panelTarget,
   onPractical,
+  arrived = false,
 }: {
   onEnter: (step: number) => void;
+  /** 1-6 정리에서 바로 넘어왔는지. 패널 맨 위에 1단원 마침을 알리고 첫 수업 시작에 포커스를 둔다. */
+  arrived?: boolean;
   onPractical?: () => void;
   panelTarget?: HTMLElement | null;
 }) {
@@ -62,6 +65,9 @@ export function WorkbookProjectMap({
   const startButton = useRef<HTMLButtonElement>(null);
   const current = stops[projectStop];
   const selectedStep = selected !== null && available[selected] ? selected : projectStop;
+  useEffect(() => {
+    if (arrived) requestAnimationFrame(() => startButton.current?.focus());
+  }, [arrived]);
   const renderPanel = (content: ReactNode) =>
     panelTarget ? createPortal(content, panelTarget) : content;
   return (
@@ -141,6 +147,12 @@ export function WorkbookProjectMap({
       </div>
       {renderPanel(
         <div className={styles.mapPanel}>
+          {arrived && (
+            <p className={styles.arrival}>
+              <strong>1단원을 마쳤어요.</strong> 여기서부터는 1단원에서 만든 폴더와 파일을 내
+              페이지로 키워요.
+            </p>
+          )}
           <WorkbookMapLessonCard
             completed={done[selectedStep]}
             hidden={selected === null || practicalSelected}

@@ -74,7 +74,7 @@ test("1-3은 토큰→컨텍스트→계량컵→요금표→습관→정리로 
   await expect(body.getByRole("listitem")).toHaveCount(3);
   await expect(page.getByRole("heading", { name: /1-4\s*도구와 작업 공간 준비/ })).toBeVisible();
   await capture("6-recap");
-  await page.getByRole("button", { name: "학습 마치고 단원 지도로 →", exact: true }).click();
+  await page.getByRole("button", { name: "단원 지도로", exact: true }).click();
   await expect(page).toHaveURL(/\?view=map$/);
   await expect(page.getByText("1 / 6 학습 확인")).toBeVisible();
 });

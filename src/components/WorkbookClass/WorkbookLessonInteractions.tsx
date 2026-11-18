@@ -5,7 +5,7 @@ import {
   workbookLearningExample as example,
   findWorkbookRequestExcerpt,
 } from "@/lib/workbook-learning-example";
-import type { WorkbookPagePlan } from "@/lib/workbook-page-plan";
+import { PLAN_CONTENT_HEADING, type WorkbookPagePlan } from "@/lib/workbook-page-plan";
 import { useWorkbookLessonState } from "./useWorkbookLessonState";
 import styles from "./WorkbookLessonInteractions.module.scss";
 
@@ -149,8 +149,8 @@ export function WorkbookPlanRequestBridge({
     {
       label: "담을 내용",
       value: plan.content,
-      prefix: "소개할 내용:\n",
-      why: "AI가 추측하지 않도록 실제로 넣을 재료를 전달해요.",
+      prefix: PLAN_CONTENT_HEADING,
+      why: "담을 것의 종류를 알려 주고, 실제 내용은 AI가 나에게 물어보게 해요.",
     },
     {
       label: "작업 대상",

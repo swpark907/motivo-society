@@ -1,4 +1,4 @@
-import { expect, test } from "./workbook-test";
+import { expect, test, fillPlanWithExample } from "./workbook-test";
 
 // 새 상호작용은 복습용 표시 상태다. 새 필수 과제나 실제 제작 판정이 되지 않아야 한다.
 test("1-1 메모와 결과를 연결하고 다음 화면 왕복에도 설명 위치가 남는다", async ({ page }, info) => {
@@ -77,26 +77,18 @@ test("2-2 연결을 펼쳐도 원문과 기존 진행 조건을 바꾸지 않는
   if (info.project.name === "mobile") await page.setViewportSize({ width: 320, height: 740 });
   await page.goto("/workbook/classes/vibe-web/lessons/page-planning");
   const next = page.getByRole("button", { name: "다음으로", exact: true });
-  await next.click();
-  await page.getByRole("button", { name: "빈 항목에 구성 예시 넣기", exact: true }).click();
-  await page.getByRole("textbox", { name: "누가 읽나요?", exact: true }).fill("친구");
-  await next.click();
-  await page
-    .getByRole("textbox", { name: "홈페이지 제목", exact: true })
-    .fill("친구에게 소개하는 장소");
-  await next.click();
-  await next.click();
-  await page.getByRole("button", { name: "제작 요청 다듬기로 →", exact: true }).click();
+  await fillPlanWithExample(page, { title: "친구에게 소개하는 장소" });
+  await page.getByRole("button", { name: /^다음 수업 2-2/ }).click();
   await page.getByRole("button", { name: "내 기획으로 요청 초안 만들기", exact: true }).click();
   await next.click();
   const editor = page.getByRole("textbox", { name: "내 제작 요청", exact: true });
   const original = await editor.inputValue();
   const excerpt = page.getByRole("region", { name: "현재 요청에서 찾은 문장", exact: true });
-  await expect(excerpt.locator("mark")).toHaveText("친구");
-  await expect(excerpt).toContainText("읽을 사람: 친구");
+  await expect(excerpt.locator("mark")).toHaveText("작은 웹 작업을 맡길 사람을 찾는 채용 담당자");
+  await expect(excerpt).toContainText("읽을 사람: 작은 웹 작업을 맡길 사람을 찾는 채용 담당자");
   await expect(excerpt).not.toContainText("제목:");
   await page.getByRole("button", { name: "바라는 행동", exact: true }).press("Enter");
-  await expect(excerpt.locator("mark")).toHaveText("세 장소를 비교해 가볼 곳 고르기");
+  await expect(excerpt.locator("mark")).toHaveText("페이지를 보고 연락하기");
   await page.getByRole("button", { name: "전체 연결 보기", exact: true }).click();
   await expect(excerpt.locator("mark")).toHaveCount(4);
   await expect(editor).toHaveValue(original);

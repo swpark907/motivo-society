@@ -10,6 +10,8 @@ export type ProjectRecord = {
   purpose: string;
   intro: string;
   content: string;
+  /** 2-1에서 "나중에 채울 것"으로 미뤄 둔 내용. 이번 페이지에는 넣지 않는다. */
+  later: string;
   request: string;
   basedOn: string;
   mode: "computer" | "example" | null;
@@ -23,6 +25,7 @@ export const emptyProject = (): ProjectRecord => ({
   purpose: "",
   intro: "",
   content: "",
+  later: "",
   request: "",
   basedOn: "",
   mode: null,

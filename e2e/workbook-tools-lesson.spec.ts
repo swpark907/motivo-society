@@ -72,6 +72,6 @@ test("1-2는 종류→4컷 만화→연습 창→비교표→이름표와 흐름
   await expect(body.getByRole("listitem")).toHaveCount(3);
   await expect(page.getByRole("heading", { name: /1-3\s*AI를 쓰는 만큼/ })).toBeVisible();
   await capture("6-recap");
-  await page.getByRole("button", { name: "학습 마치고 단원 지도로 →", exact: true }).click();
+  await page.getByRole("button", { name: "단원 지도로", exact: true }).click();
   await expect(page).toHaveURL(/\?view=map$/);
 });

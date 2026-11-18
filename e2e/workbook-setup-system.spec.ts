@@ -70,7 +70,7 @@ test("1-4는 도장 카드→설치→둘러보기→폴더→확인→정리로
   await expect(page.getByRole("heading", { name: "오늘 알게 된 것" })).toBeVisible();
   await expect(page.getByRole("heading", { name: /1-5\s*요청 잘하기/ })).toBeVisible();
   await capture("6-recap");
-  await page.getByRole("button", { name: "학습 마치고 단원 지도로 →", exact: true }).click();
+  await page.getByRole("button", { name: "단원 지도로", exact: true }).click();
   await expect(page).toHaveURL(/\?view=map$/);
   // 네 도장을 다 찍으면 지도에 본인 확인으로 남는다.
   await expect(page.getByText("컴퓨터 준비 확인 · 본인 확인").first()).toBeAttached();
@@ -82,7 +82,7 @@ test("1-4는 도장을 찍지 않아도 마칠 수 있다", async ({ page }) => 
   for (let i = 0; i < 4; i++) await next.click();
   await expect(page.getByLabel("수업 내용", { exact: true })).toContainText("남은 것 4가지");
   await next.click();
-  await page.getByRole("button", { name: "학습 마치고 단원 지도로 →", exact: true }).click();
+  await page.getByRole("button", { name: "단원 지도로", exact: true }).click();
   await expect(page).toHaveURL(/\?view=map$/);
   await expect(page.getByText("1 / 6 학습 확인")).toBeVisible();
 });

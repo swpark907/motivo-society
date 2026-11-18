@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
-import { workbookLessonLabel } from "@/lib/workbook-course";
+import { workbookCourse, workbookLessonId, workbookLessonLabel } from "@/lib/workbook-course";
 import { makeWorkbookPageRequest, workbookPlanFields } from "@/lib/workbook-page-plan";
 import type { ProjectLessonProps, ProjectRecord } from "./WorkbookProjectLesson";
 import { WorkbookPlanRequestBridge } from "./WorkbookLessonInteractions";
@@ -13,6 +13,10 @@ import { useWorkbookLessonState } from "./useWorkbookLessonState";
 import { useWorkbookProgress } from "./WorkbookProgressContext";
 import styles from "./WorkbookClass.module.scss";
 import system from "./WorkbookLesson.module.scss";
+
+// 1단원 수업 번호는 workbook-course.ts에서 읽는다(수업이 늘어도 문구를 고치지 않게).
+const setupLesson = workbookCourse[0].lessons[workbookLessonId.setup];
+const fileLesson = workbookCourse[0].lessons[workbookLessonId.firstFile];
 
 const titles = [
   "내 기획을 같은 파일의 제작 요청으로",
@@ -42,6 +46,23 @@ export function WorkbookProjectRequestLesson({
   const modeReady = computer ? ready : record.mode === "example";
   const planBasis = JSON.stringify(workbookPlanFields.map(([key]) => record[key]));
   const blocked = !planReady || !record.request.trim() || (screen >= 2 && !modeReady);
+  // 실습 방식은 1단원 첫 코드 만들기에서 정한 것을 이어받는다(다시 고르게 하지 않는다). 바꾸는 것은 자유다.
+  const firstFileMode = p.practice[workbookLessonId.firstFile]?.mode ?? null;
+  const inherited =
+    record.mode !== null
+      ? null
+      : firstFileMode === "computer" && ready
+        ? "computer"
+        : firstFileMode === "example"
+          ? "example"
+          : null;
+  const [modeCarried, setModeCarried] = useWorkbookLessonState("project-mode-carried", false);
+  const { setProject } = p;
+  useEffect(() => {
+    if (!inherited) return;
+    setModeCarried(true);
+    setProject((current) => (current.mode === null ? { ...current, mode: inherited } : current));
+  }, [inherited, setModeCarried, setProject]);
   useEffect(() => {
     body.current?.scrollTo({ top: 0 });
   }, [screen]);
@@ -153,7 +174,11 @@ export function WorkbookProjectRequestLesson({
         )}
         {screen === 2 && (
           <section className={system.practiceStage}>
-            <p>지금 가능한 실습 방식 하나를 골라주세요.</p>
+            <p>
+              {modeCarried && record.mode !== null
+                ? `${fileLesson.number} ${fileLesson.title}에서 고른 방식을 이어서 골라 뒀어요. 바꿔도 돼요.`
+                : "지금 가능한 실습 방식 하나를 골라주세요."}
+            </p>
             <div className={system.choices} aria-label="실습 방식 선택">
               <button
                 className={system.choice}
@@ -181,8 +206,8 @@ export function WorkbookProjectRequestLesson({
             </div>
             {!ready && (
               <p className={system.planningHint}>
-                내 파일 실습은 1-3 도구 준비 확인 후 이용해요. 파일이 없다면 1-5 첫 파일 만들기부터
-                이어가세요.
+                내 파일 실습은 {setupLesson.number} {setupLesson.title}의 준비 도장을 다 찍은 뒤
+                이용해요. 파일이 없다면 {fileLesson.number} {fileLesson.title}부터 이어가세요.
               </p>
             )}
           </section>
@@ -210,8 +235,8 @@ export function WorkbookProjectRequestLesson({
                 <details className={system.preparationMore}>
                   <summary>index.html이 없다고 해요</summary>
                   <p>
-                    1-5에서 첫 파일을 만든 뒤 이어가세요. 이번 요청은 새 폴더를 만드는 대신 같은
-                    파일을 고치기 위한 요청이에요.
+                    {fileLesson.number} {fileLesson.title}에서 첫 파일을 만든 뒤 이어가세요. 이번
+                    요청은 새 폴더를 만드는 대신 같은 파일을 고치기 위한 요청이에요.
                   </p>
                 </details>
               </>

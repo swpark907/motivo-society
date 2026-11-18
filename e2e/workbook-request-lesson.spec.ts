@@ -131,7 +131,8 @@ test("1-5는 심부름 메모→네 가지→보내기→확인→다시 부탁�
   await expect(body).not.toContainText("첫 번째, 세 번째 문장은 그대로 둬.");
   await expect(body).toContainText("1-6 첫 코드 만들기");
   await capture("6-recap");
-  await expect(page.getByRole("button", { name: /^학습 마치고 단원 지도로/ })).toBeVisible();
+  await expect(page.getByRole("button", { name: /^다음 수업 1-6 첫 코드 만들기/ })).toBeVisible();
+  await expect(page.getByRole("button", { name: "단원 지도로", exact: true })).toBeVisible();
 });
 
 test("1-5는 아무것도 쓰지 않아도 끝까지 넘어간다", async ({ page }) => {

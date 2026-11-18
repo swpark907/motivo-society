@@ -323,6 +323,15 @@ $parchment-ink: #2b2116;
 .wrapper {
   display: contents;
 }
+// 1-6 정리에서 2단원으로 넘어온 직후 한 번 보이는 줄. 강조는 굵은 글씨만 쓴다(오렌지는 지도의 다음 목표).
+.mapPanel .arrival {
+  margin: 0 0 var(--space-3);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--line);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  word-break: keep-all;
+}
 .mapPanel,
 .recordPanel {
   min-width: 0;

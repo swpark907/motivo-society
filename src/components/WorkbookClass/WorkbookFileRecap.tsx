@@ -3,6 +3,7 @@
 // Client component: reads the visit's progress to say whether unit 1 is really finished, whether
 // the first-file check was recorded, and to pin what the learner wrote in this lesson.
 import { workbookCourse, workbookLessonId } from "@/lib/workbook-course";
+import { isUnitOneDone, unitOneRemaining } from "@/lib/workbook-lesson-records";
 import { useFirstFilePractice } from "./useFirstFilePractice";
 import { useWorkbookProgress } from "./WorkbookProgressContext";
 import styles from "./WorkbookFileRecap.module.scss";
@@ -24,9 +25,8 @@ export function WorkbookFileRecap() {
   const { record } = useFirstFilePractice();
   const next = workbookCourse[1];
   const setup = workbookCourse[0].lessons[workbookLessonId.setup];
-  const unitDone =
-    completed.filter((index) => index !== workbookLessonId.firstFile).length ===
-    workbookLessonId.aiCount - 1;
+  const unitDone = isUnitOneDone(completed, workbookLessonId.firstFile);
+  const remaining = unitOneRemaining(completed, workbookLessonId.firstFile);
   const observation = record.observation.trim();
   const revision = record.revision.trim();
   const allStamps = record.mode === "computer" && record.checks.every(Boolean);
@@ -88,6 +88,14 @@ export function WorkbookFileRecap() {
               <span>{next.number}단원</span> {next.title}
             </h3>
             <p>오늘 만든 폴더와 파일을 그대로 이어서, 내 페이지를 기획하고 첫 화면을 만들어요.</p>
+            {!unitDone && (
+              <p className={styles.remaining}>
+                남은 수업 ·{" "}
+                {remaining.map((lesson) => `${lesson.number} ${lesson.title}`).join(", ")}
+                <br />
+                1단원을 다 마치면 열려요.
+              </p>
+            )}
           </aside>
         </div>
       </div>

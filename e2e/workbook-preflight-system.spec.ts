@@ -1,4 +1,4 @@
-import { expect, test } from "./workbook-test";
+import { expect, test, fillPlanWithExample } from "./workbook-test";
 
 for (const ownPlan of [false, true]) {
   test(`5-1은 공개할 내용과 두 화면·버튼을 점검한다: ${ownPlan ? "내 기획" : "준비된 예시"}`, async ({
@@ -10,12 +10,7 @@ for (const ownPlan of [false, true]) {
     const next = page.getByRole("button", { name: "다음으로", exact: true });
     if (ownPlan) {
       await page.goto("/workbook/classes/vibe-web/lessons/page-planning");
-      await next.click();
-      await page.getByRole("button", { name: "빈 항목에 구성 예시 넣기", exact: true }).click();
-      await next.click();
-      await page
-        .getByRole("textbox", { name: "홈페이지 제목", exact: true })
-        .fill("직접 써본 도구 모음");
+      await fillPlanWithExample(page, { title: "직접 써본 도구 모음" });
       await page.evaluate(() => {
         history.pushState(null, "", "/workbook/classes/vibe-web/lessons/publish-check");
         window.dispatchEvent(new PopStateEvent("popstate"));

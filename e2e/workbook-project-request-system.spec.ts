@@ -1,4 +1,4 @@
-import { expect, test, goToPreviousLesson } from "./workbook-test";
+import { expect, test, goToPreviousLesson, fillPlanWithExample } from "./workbook-test";
 
 test("기획에서 요청을 만들고 미리보기로 이어간다", async ({ page }, testInfo) => {
   if (testInfo.project.name === "desktop") await page.setViewportSize({ width: 1280, height: 720 });
@@ -9,12 +9,7 @@ test("기획에서 요청을 만들고 미리보기로 이어간다", async ({ p
     page.getByRole("button", { name: "내 기획으로 요청 초안 만들기", exact: true }),
   ).toBeDisabled();
   await goToPreviousLesson(page);
-  await next.click();
-  await page.getByRole("button", { name: "빈 항목에 구성 예시 넣기", exact: true }).click();
-  await next.click();
-  await next.click();
-  await next.click();
-  await page.getByRole("button", { name: "제작 요청 다듬기로 →", exact: true }).click();
+  await fillPlanWithExample(page, { toRequest: true });
   await page.getByRole("button", { name: "내 기획으로 요청 초안 만들기", exact: true }).click();
   for (let screen = 1; screen <= 5; screen++) {
     await expect(page.getByLabel("현재 학습 단계", { exact: true })).toHaveText(
@@ -22,7 +17,7 @@ test("기획에서 요청을 만들고 미리보기로 이어간다", async ({ p
     );
     if (screen === 2)
       await expect(page.getByRole("textbox", { name: "내 제작 요청", exact: true })).toHaveValue(
-        /혼자 책 읽기 좋은 세 곳/,
+        /AI와 함께 만든 작업들/,
       );
     if (screen === 3) {
       await expect(next).toBeDisabled();
@@ -117,12 +112,7 @@ test("준비된 컴퓨터는 요청 복사 안내에서 실제 파일 확인으�
     window.dispatchEvent(new PopStateEvent("popstate"));
   });
   const forward = page.getByRole("button", { name: "다음으로", exact: true });
-  await forward.click();
-  await page.getByRole("button", { name: "빈 항목에 구성 예시 넣기", exact: true }).click();
-  await forward.click();
-  await forward.click();
-  await forward.click();
-  await page.getByRole("button", { name: "제작 요청 다듬기로 →", exact: true }).click();
+  await fillPlanWithExample(page, { toRequest: true });
   await page.getByRole("button", { name: "내 기획으로 요청 초안 만들기", exact: true }).click();
   await forward.click();
   await forward.click();

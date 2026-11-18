@@ -174,3 +174,10 @@ $ink: var(--workbook-ink, #2b2925);
     animation: none;
   }
 }
+
+// 1단원이 남았을 때 표 아래에 남은 수업을 적는다.
+.recap .ticket p.remaining {
+  margin-top: 8px;
+  font-size: 0.84rem;
+  color: rgb(43 41 37 / 0.7);
+}

@@ -23,6 +23,10 @@ export const workbookPlanExample = {
 
 export type WorkbookPagePlan = Record<(typeof workbookPlanFields)[number][0], string>;
 
+/** 요청에서 담을 내용 목록 앞에 붙는 줄. 2-2의 기획↔요청 연결 표시가 같은 줄로 찾는다. */
+export const PLAN_CONTENT_HEADING =
+  "소개할 내용(종류만 적었어. 각 항목에 들어갈 실제 내용은 만들기 전에 나에게 하나씩 물어보고 채워줘):\n";
+
 export function makeWorkbookPageRequest(record: WorkbookPagePlan) {
-  return `앞서 작업한 my-first-web 폴더의 index.html을 먼저 읽고 같은 파일을 내 주제의 소개 페이지로 수정해줘. 새 폴더나 별도 예제를 만들지 마.\n\n내 기획은 다음과 같아.\n제목: ${record.title.trim()}\n읽을 사람: ${record.audience.trim()}\n페이지의 목적: ${record.purpose.trim()}\n첫 소개 문장: ${record.intro.trim()}\n\n소개할 내용:\n${record.content.trim()}\n\n화면은 제목 → 소개 → ‘내용 보기’ 버튼 → 내용 목록 순서로 배치해줘. 버튼을 누르면 내용 목록으로 이동하게 해줘. 알려주지 않은 실적이나 숫자는 추가하지 마.\n\n기존 내용 중 기획과 맞는 부분은 유지하고 임시 내용만 교체해줘. index.html만 바꾸고 다른 파일·외부 서비스·설치·로그인·배포는 건드리지 마. 파일이 없으면 만들기 전에 알려줘. 브라우저에서 여는 방법과 바뀐 파일, 확인할 것을 알려줘.`;
+  return `앞서 작업한 my-first-web 폴더의 index.html을 먼저 읽고 같은 파일을 내 주제의 소개 페이지로 수정해줘. 새 폴더나 별도 예제를 만들지 마.\n\n내 기획은 다음과 같아.\n제목: ${record.title.trim()}\n읽을 사람: ${record.audience.trim()}\n페이지의 목적: ${record.purpose.trim()}\n첫 소개 문장: ${record.intro.trim()}\n\n${PLAN_CONTENT_HEADING}${record.content.trim()}\n\n화면은 제목 → 소개 → ‘내용 보기’ 버튼 → 내용 목록 순서로 배치해줘. 버튼을 누르면 내용 목록으로 이동하게 해줘. 알려주지 않은 실적이나 숫자는 추가하지 마.\n\n기존 내용 중 기획과 맞는 부분은 유지하고 임시 내용만 교체해줘. index.html만 바꾸고 다른 파일·외부 서비스·설치·로그인·배포는 건드리지 마. 파일이 없으면 만들기 전에 알려줘. 브라우저에서 여는 방법과 바뀐 파일, 확인할 것을 알려줘.`;
 }

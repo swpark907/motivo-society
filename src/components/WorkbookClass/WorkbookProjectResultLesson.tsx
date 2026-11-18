@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
-import { workbookLessonLabel } from "@/lib/workbook-course";
+import { workbookLessonLabel, workbookCourse, workbookLessonId } from "@/lib/workbook-course";
 import { workbookPlanFields } from "@/lib/workbook-page-plan";
 import type { ProjectLessonProps, ProjectRecord } from "./WorkbookProjectLesson";
 import { WorkbookLessonHeader } from "./WorkbookLessonHeader";
@@ -31,6 +31,9 @@ const checkLabels = [
 const checkKeys = ["project.plan", "project.content", "project.actions"] as const;
 const revisionExample =
   "my-first-web의 index.html에서 확인한 문제: [어느 부분이 어떻게 보이거나 동작하는지]. 기대한 결과: [원하는 내용이나 동작]. 이 부분만 고치고 나머지 제목·소개·내용과 버튼 동작은 유지해줘. index.html만 수정하고, 바뀐 부분과 다시 확인할 방법을 알려줘.";
+
+// 1단원 수업 번호는 workbook-course.ts에서 읽는다.
+const fileLesson = workbookCourse[0].lessons[workbookLessonId.firstFile];
 
 export function WorkbookProjectResultLesson({
   record,
@@ -184,10 +187,10 @@ export function WorkbookProjectResultLesson({
                   <details className={system.preparationMore}>
                     <summary>파일이 없거나 예전 화면이 보여요</summary>
                     <p>
-                      같은 폴더의 파일인지 먼저 확인해요. 파일이 없다면 1-5 첫 파일 만들기부터
-                      이어가세요. 열리지 않으면 ‘연결 프로그램’(Windows)·‘다음으로 열기’(Mac)에서
-                      브라우저를 선택해요. 예전 화면이면 새로고침하고, 계속 다르면 파일 위치와
-                      보이는 문제를 AI 앱에 알려주세요.
+                      같은 폴더의 파일인지 먼저 확인해요. 파일이 없다면 {fileLesson.number}{" "}
+                      {fileLesson.title}부터 이어가세요. 열리지 않으면 ‘연결
+                      프로그램’(Windows)·‘다음으로 열기’(Mac)에서 브라우저를 선택해요. 예전 화면이면
+                      새로고침하고, 계속 다르면 파일 위치와 보이는 문제를 AI 앱에 알려주세요.
                     </p>
                   </details>
                 )}

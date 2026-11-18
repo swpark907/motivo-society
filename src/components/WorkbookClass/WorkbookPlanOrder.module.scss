@@ -1,0 +1,140 @@
+// 2-1 화면 4: 휴대폰 틀 안에 제목·소개 아래로 "지금" 카드가 쌓이고, 첫 화면이 끝나는 곳에 점선이 그어진다.
+// 카드를 ↑↓로 옮기면 점선 위·아래가 바뀐다. 오렌지는 휴대폰 맨 아래 버튼 한 곳.
+// 수업 공통 p·ol·button 규칙보다 우선하도록 .order 아래에서 지정한다.
+$ink: var(--workbook-ink, #2b2925);
+$paper: var(--workbook-paper, #f6efe2);
+$memo: var(--workbook-memo, #fbe9a6);
+$kraft: #e9d3a4;
+
+.order {
+  word-break: keep-all;
+}
+.order .title {
+  margin: 0;
+}
+.order .lead {
+  margin-top: 10px;
+  max-width: 58rem;
+  p {
+    margin: 0;
+  }
+}
+.layout {
+  margin-top: 18px;
+  display: grid;
+  gap: 20px;
+  @include up(md) {
+    grid-template-columns: 300px minmax(0, 1fr);
+    gap: 40px;
+    align-items: start;
+  }
+}
+
+// 휴대폰 틀
+.phone {
+  width: min(100%, 300px);
+  padding: 22px 14px 16px;
+  border: 2px solid $ink;
+  border-radius: 26px;
+  background: #fffdf8;
+  color: $ink;
+  display: grid;
+  gap: 8px;
+  justify-self: center;
+}
+.pageTitle {
+  font-size: 1.05rem;
+  line-height: 1.3;
+}
+.introBar {
+  height: 8px;
+  border-radius: 3px;
+  background: rgb(43 41 37 / 0.14);
+}
+.order .phone .empty {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--ink-muted);
+}
+.order .phone ol.cards {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 6px;
+  li {
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 4px;
+    &[data-below="true"] .card {
+      opacity: 0.6;
+    }
+  }
+}
+.fold {
+  grid-column: 1 / -1;
+  margin: 2px 0;
+  padding-top: 4px;
+  border-top: 2px dashed $ink;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: $ink;
+}
+.card {
+  padding: 8px 10px;
+  border: 1px solid rgb(43 41 37 / 0.3);
+  background: $kraft;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+.moves {
+  display: flex;
+  gap: 2px;
+}
+.order .phone .moves button {
+  --workbook-button-hover: #{$paper};
+  min-width: 32px;
+  min-height: 32px;
+  padding: 0;
+  border: 1px solid rgb(43 41 37 / 0.3);
+  border-radius: 6px;
+  background: #fffdf8;
+  color: $ink;
+  font-size: 0.9rem;
+  &:disabled {
+    opacity: 0.3;
+  }
+}
+.cta {
+  justify-self: center;
+  margin-top: 6px;
+  padding: 8px 20px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: white;
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.side {
+  display: grid;
+  gap: 10px;
+  max-width: 30rem;
+  p {
+    margin: 0;
+  }
+}
+.order .side .voice {
+  padding: 8px 12px;
+  border-left: 3px solid $ink;
+  background: $memo;
+  font-size: 1.35rem;
+  line-height: 1.15;
+}
+.order .side .note {
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+}

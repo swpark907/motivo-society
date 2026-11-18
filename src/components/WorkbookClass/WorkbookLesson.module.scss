@@ -1127,3 +1127,32 @@
     margin-left: 8px;
   }
 }
+
+// 정리 화면의 "단원 지도로": 다음 수업 버튼 옆의 조용한 글자 버튼(WorkbookLessonFinish).
+.lesson .lessonNavigation > button[data-action-role="lesson-map"]:not([data-step-ui]) {
+  flex: 0 0 auto;
+  min-width: 0;
+  margin-left: auto;
+  padding: 4px 10px;
+  border: 0;
+  background: transparent;
+  color: var(--ink-muted);
+  font-size: 0.85rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.lesson .lessonNavigation > button[data-action-role="lesson-map"] + button {
+  margin-left: 8px;
+}
+// 다음 수업 버튼의 긴 문구는 넓은 화면에서만, 좁은 화면은 "다음 수업 →".
+.lesson .lessonNavigation [data-finish-label="short"] {
+  display: none;
+}
+@media (max-width: 767px) {
+  .lesson .lessonNavigation [data-finish-label="long"] {
+    display: none;
+  }
+  .lesson .lessonNavigation [data-finish-label="short"] {
+    display: inline;
+  }
+}

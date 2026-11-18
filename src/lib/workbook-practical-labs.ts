@@ -314,7 +314,7 @@ export const practicalMapStops: Record<
     x: 42,
     y: 52,
     path: "44,68 41,63 42,58 42,52",
-    requires: "1-5 첫 파일 만들기 수업을 마치면 열려요",
+    requires: "첫 코드 만들기 수업을 마치면 열려요",
   },
   project: {
     name: "기능 범위 정하기",
