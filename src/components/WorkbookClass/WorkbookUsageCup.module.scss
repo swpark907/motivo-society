@@ -1,5 +1,5 @@
 // 1-3의 계량컵: 숫자 없이 "쓴 양"을 보여준다. 채워지는 높이만 부드럽게 바뀐다.
-$ink: #2b2925;
+$ink: var(--workbook-ink, #2b2925);
 
 .cup {
   display: block;

@@ -1,10 +1,6 @@
-"use client";
-
-// 기록 형태는 유지하고 각 수업은 전용 학습 화면을 소유한다.
-import { workbookLessonId } from "@/lib/workbook-course";
-import { WorkbookConversationLesson } from "./WorkbookConversationLesson";
-import { WorkbookFirstFileLesson } from "./WorkbookFirstFileLesson";
-
+// 실습 기록의 형태를 소유한다. "요청 잘하기"와 "첫 코드 만들기" 수업의 화면들이
+// 공통 수업 틀(WorkbookLessons) 안에서 이 기록을 직접 읽고 쓴다.
+// 파일 이름은 예전 실습 화면에서 왔고, 지금은 기록 형태만 남아 있다.
 export type PracticeRecord = {
   mode: "computer" | "example" | null;
   request: string;
@@ -19,19 +15,3 @@ export const emptyPractice = (): PracticeRecord => ({
   revision: "",
   checks: [false, false, false],
 });
-export type PracticeLessonProps = {
-  lesson: number;
-  record: PracticeRecord;
-  ready: boolean;
-  onChange: (record: PracticeRecord) => void;
-  onBack: () => void;
-  onComplete: () => void;
-};
-
-export function WorkbookPracticeLesson(props: PracticeLessonProps) {
-  return props.lesson === workbookLessonId.firstRequest ? (
-    <WorkbookConversationLesson {...props} />
-  ) : (
-    <WorkbookFirstFileLesson {...props} />
-  );
-}

@@ -1,8 +1,8 @@
 // 1-4 화면 6: 목걸이 출입증으로 정리한다(1-1 카드, 1-2 공책, 1-3 영수증과 다른 형식).
 // 들어올 때 한 번 흔들리고 멈춘다. 모션 줄이기에서는 멈춘 모습만.
 // 오렌지는 다음 수업 표의 띠 한 곳. 수업 공통 p·h3·ol 규칙보다 우선하도록 .recap 아래에서 지정한다.
-$paper: #f6efe2;
-$ink: #2b2925;
+$paper: var(--workbook-paper, #f6efe2);
+$ink: var(--workbook-ink, #2b2925);
 
 .recap {
   word-break: keep-all;

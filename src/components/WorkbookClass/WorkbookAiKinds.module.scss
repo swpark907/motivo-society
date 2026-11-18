@@ -1,8 +1,8 @@
 // 1-2 화면 1: AI 종류 여섯 장. 조용한 화면(이 수업의 큰 연출은 화면 2).
 // 수업 공통 p·ul 규칙(.lesson .lessonBody p)보다 우선하도록 .kinds 아래에서 지정한다.
 // 들어올 때 한 번만 카드가 차례로 붙는다(반복 없음). 모션 줄이기에서는 완성된 화면만 보인다.
-$paper: #f6efe2;
-$ink: #2b2925;
+$paper: var(--workbook-paper, #f6efe2);
+$ink: var(--workbook-ink, #2b2925);
 $pop: cubic-bezier(0.3, 1.6, 0.5, 1);
 
 .kinds .title {

@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { workbookCourse, workbookLessonId } from "@/lib/workbook-course";
 import styles from "./WorkbookSetupRecap.module.scss";
 
 /** What 1-4 covered, in the order the screens showed it. */
@@ -14,6 +15,7 @@ const LEARNED = [
  * src/lib/workbook-course.ts.
  */
 export function WorkbookSetupRecap() {
+  const next = workbookCourse[0].lessons[workbookLessonId.firstRequest];
   return (
     <div data-lesson-wide className={styles.recap}>
       <h2 id="lesson-screen-title" className={styles.title}>
@@ -46,7 +48,7 @@ export function WorkbookSetupRecap() {
         <aside className={styles.ticket} aria-labelledby="setup-next-title">
           <span className={styles.ticketLabel}>다음 수업</span>
           <h3 id="setup-next-title">
-            <span>1-5</span> 요청 잘하기
+            <span>{next.number}</span> {next.title}
           </h3>
           <p>원하는 결과를 말로 잘 전하는 법을 익혀요.</p>
         </aside>

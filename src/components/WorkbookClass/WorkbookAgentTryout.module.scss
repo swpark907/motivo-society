@@ -1,8 +1,8 @@
 // 1-2 화면 3: 연습용 에이전트 창을 직접 눌러 보는 화면.
-// 창은 특정 서비스 화면을 흉내 내지 않은 종이 창이다. 오렌지는 "허락" 버튼 한 곳.
+// 창은 특정 서비스 화면을 흉내 내지 않은 종이 창이다. 오렌지는 "승인" 버튼 한 곳.
 // 수업 공통 p·ol·button 규칙(.lesson .lessonBody ...)보다 우선하도록 .tryout 아래에서 지정한다.
-$paper: #f6efe2;
-$ink: #2b2925;
+$paper: var(--workbook-paper, #f6efe2);
+$ink: var(--workbook-ink, #2b2925);
 $mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
 
 .tryout {
@@ -169,7 +169,7 @@ $mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
   color: var(--ink-muted);
 }
 
-// 허락 쪽지: 테이프로 붙인 종이. 답하면 도장이 찍힌다.
+// 승인 쪽지: 테이프로 붙인 종이. 답하면 도장이 찍힌다.
 .slip {
   position: relative;
   padding: 14px 14px 12px;
@@ -210,7 +210,7 @@ $mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
   background: white;
   color: $ink;
 }
-// 도장: 허락은 강조색(이때는 허락 버튼이 사라져 화면의 오렌지는 여전히 한 곳), 거절은 먹색.
+// 도장: 승인은 강조색(이때는 승인 버튼이 사라져 화면의 오렌지는 여전히 한 곳), 거절은 먹색.
 .stamp {
   position: absolute;
   right: 12px;

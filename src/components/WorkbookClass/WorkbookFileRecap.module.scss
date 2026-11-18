@@ -1,0 +1,176 @@
+// 1-6 화면 6: 액자에 넣은 첫 화면 한 장과 세 줄로 정리한다(카드 · 공책 · 영수증 · 출입증 · 메모판과 다른 형식).
+// 액자는 들어올 때 한 번 걸리고 멈춘다. 모션 줄이기에서는 멈춘 모습만.
+// 오렌지는 다음 단원 표의 띠 한 곳. 수업 공통 p·h3·ol 규칙보다 우선하도록 .recap 아래에서 지정한다.
+$paper: var(--workbook-paper, #f6efe2);
+$ink: var(--workbook-ink, #2b2925);
+
+.recap {
+  word-break: keep-all;
+}
+.recap .title {
+  margin: 0;
+}
+.layout {
+  margin-top: 26px;
+  display: grid;
+  gap: 22px;
+  @include up(md) {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    gap: 40px;
+    align-items: start;
+  }
+}
+.wall {
+  display: grid;
+  gap: 22px;
+  @include up(md) {
+    grid-template-columns: 240px minmax(0, 1fr);
+    gap: 32px;
+    align-items: center;
+  }
+}
+// 액자: 두꺼운 먹색 테두리와 흰 속지
+.frame {
+  margin: 0;
+  width: min(100%, 240px);
+  padding: 14px 14px 10px;
+  border: 8px solid $ink;
+  background: #fffdf8;
+  color: $ink;
+  rotate: -1.2deg;
+  animation: hang 220ms ease-out both;
+}
+.picture {
+  padding: 14px 14px 18px;
+  border: 1.5px solid $ink;
+  display: grid;
+  gap: 7px;
+  strong {
+    font-size: 1.2rem;
+  }
+  i {
+    height: 6px;
+    border-radius: 3px;
+    background: rgb(43 41 37 / 0.2);
+  }
+  i:last-child {
+    width: 60%;
+  }
+}
+.recap .frame figcaption {
+  margin-top: 8px;
+  font-size: 0.75rem;
+  text-align: center;
+  color: rgb(43 41 37 / 0.7);
+}
+.recap ol.lines {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: line;
+  display: grid;
+  gap: 12px;
+}
+.recap ol.lines li {
+  margin: 0;
+  padding-left: 2.4rem;
+  position: relative;
+  counter-increment: line;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.5;
+  &::before {
+    content: counter(line);
+    position: absolute;
+    left: 0;
+    top: -0.05em;
+    width: 1.7rem;
+    height: 1.7rem;
+    display: grid;
+    place-items: center;
+    border: 1.5px solid var(--ink);
+    border-radius: 50%;
+    font-size: 0.9rem;
+  }
+}
+
+.aside {
+  display: grid;
+  gap: 16px;
+  align-content: start;
+}
+.recap dl.mine {
+  margin: 0;
+  padding: 12px 14px;
+  border: 1.5px dashed $ink;
+  background: #fffdf8;
+  color: $ink;
+  dt {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: rgb(43 41 37 / 0.7);
+  }
+  dd {
+    margin: 2px 0 8px;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+.recap .mine .check {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+.ticket {
+  position: relative;
+  padding: 16px 18px 16px 30px;
+  border: 1.5px solid $ink;
+  background: $paper;
+  color: $ink;
+  rotate: 0.8deg;
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 12px;
+    background: var(--accent);
+    border-right: 1.5px dashed $ink;
+  }
+}
+.ticketLabel {
+  font-size: 0.78rem;
+  color: #5a554d;
+}
+.recap .ticket h3 {
+  margin: 2px 0 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+  span {
+    font-family: var(--font-display);
+    font-weight: 400;
+    margin-right: 4px;
+  }
+}
+.recap .ticket p {
+  margin: 6px 0 0;
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+@keyframes hang {
+  from {
+    opacity: 0;
+    translate: 0 -8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .frame {
+    animation: none;
+  }
+}

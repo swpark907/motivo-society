@@ -1,0 +1,245 @@
+// 1-5 화면 4: 예시 답을 메모와 맞춰 보며 빨간 펜으로 표시한다. 카피바라는 땀 → 엄지로 한 번 바뀐다. 이 화면의 강조색은 빨간 펜 하나이고
+// 오렌지는 쓰지 않는다. 수업 공통 규칙보다 우선하도록 .check 아래에서 지정한다.
+$ink: var(--workbook-ink, #2b2925);
+$memo: var(--workbook-memo, #fbe9a6);
+$pen: #c63b2b;
+
+.check {
+  word-break: keep-all;
+}
+.check .title {
+  margin: 0;
+}
+.check .lead {
+  margin-top: 10px;
+  max-width: 58rem;
+  p {
+    margin: 0;
+  }
+}
+
+.desk {
+  margin-top: 18px;
+  display: grid;
+  gap: 22px;
+  @include up(md) {
+    grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
+    gap: 36px;
+    align-items: start;
+  }
+}
+
+// 좁은 화면에서는 메모 → 답 종이와 내 답 체크 → 한 줄 적기 순서가 되도록 칸을 푼다.
+.side {
+  display: contents;
+  @include up(md) {
+    display: grid;
+    gap: 18px;
+  }
+}
+.memoRow {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+.memo {
+  flex: 1;
+  min-width: 0;
+  padding: 14px 18px 16px;
+  background: $memo;
+  color: $ink;
+  rotate: -1deg;
+}
+.check .side .memo h3 {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 400;
+  line-height: 1;
+  color: $ink;
+}
+.check .side .memo ul {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 4px;
+}
+.check .side .memo ul li {
+  margin: 0;
+  padding-left: 1.1em;
+  position: relative;
+  font-size: 0.92rem;
+  color: $ink;
+  &::before {
+    content: "·";
+    position: absolute;
+    left: 0.2em;
+    font-weight: 700;
+  }
+}
+.capy {
+  flex: none;
+  width: 64px;
+  height: auto;
+  animation: react 120ms ease-out both;
+  @include up(md) {
+    width: 72px;
+  }
+}
+// 직접 보낸 사람: 내 답을 네 가지로 맞춰 보는 체크(워크북은 확인하지 않는다).
+.right {
+  min-width: 0;
+  display: grid;
+  gap: 14px;
+}
+.check .right fieldset.mineChecks {
+  margin: 0;
+  padding: 10px 12px 10px;
+  border: 1.5px dashed var(--ink-muted);
+  border-radius: 0;
+  display: grid;
+  gap: 6px 12px;
+  @include up(md) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px 12px;
+  }
+  legend {
+    padding: 0 4px;
+    font-size: 0.85rem;
+    font-weight: 700;
+  }
+  label {
+    margin: 0;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    font-size: 0.88rem;
+    line-height: 1.4;
+    strong {
+      flex: none;
+    }
+  }
+  input {
+    flex: none;
+    margin: 0;
+  }
+}
+.check .side label.mine {
+  order: 3;
+  margin: 0;
+  display: grid;
+  gap: 6px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  small {
+    font-weight: 400;
+    color: var(--ink-muted);
+  }
+}
+.check .side .mine input {
+  width: 100%;
+  margin: 0;
+  padding: 8px 10px;
+  border: 1.5px solid var(--ink);
+  border-radius: 2px;
+  background: #fffdf8;
+  color: $ink;
+  font: inherit;
+  font-weight: 400;
+}
+
+// 오른쪽: 답 종이
+.paper {
+  min-width: 0;
+  padding: 14px 18px 16px;
+  border: 1.5px solid $ink;
+  background: #fffdf8;
+  color: $ink;
+}
+.paperHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 14px;
+  strong {
+    font-size: 0.85rem;
+  }
+}
+.pen {
+  color: $pen;
+  font-size: 1.35rem;
+  line-height: 1.1;
+}
+.check .paper ol.sentences {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 4px;
+}
+.check .paper ol.sentences li {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 12px;
+  min-height: 40px;
+}
+.check .paper ol.sentences li button.sentence {
+  --workbook-button-hover: #f3ecdd;
+  margin: 0 0 0 -8px;
+  padding: 5px 8px;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  color: $ink;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.45;
+  text-align: left;
+  @media (pointer: coarse) {
+    min-height: 44px;
+  }
+  // 빨간 펜 동그라미
+  &[aria-pressed="true"] {
+    --workbook-button-hover: transparent;
+    border-color: $pen;
+    rotate: -0.4deg;
+  }
+}
+.fine {
+  font-size: 0.82rem;
+  color: rgb(43 41 37 / 0.66);
+}
+.check .paper .status {
+  margin: 10px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid rgb(43 41 37 / 0.18);
+  font-size: 0.92rem;
+  color: $ink;
+}
+.check .paper .reveal {
+  --workbook-button-hover: transparent;
+  margin-top: 4px;
+  padding: 4px 0;
+  border: 0;
+  background: transparent;
+  color: rgb(43 41 37 / 0.66);
+  font-size: 0.85rem;
+  font-weight: 400;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@keyframes react {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .capy {
+    animation: none;
+  }
+}

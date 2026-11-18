@@ -3,9 +3,9 @@
 // 신문 같은 흑백 망점 사진 + 오렌지 색 종이(한 화면 오렌지 하나), 손그림 말풍선, 종이 질감.
 // 수업 연출 예외(검토 중): 조각이 툭 붙는 짧은 움직임. 모션 줄이기에서는 완성 장면만 보인다.
 $board: #24221f;
-$paper: #f6efe2;
+$paper: var(--workbook-paper, #f6efe2);
 $kraft: #c9a77c;
-$ink: #2b2925;
+$ink: var(--workbook-ink, #2b2925);
 $pop: cubic-bezier(0.3, 1.6, 0.5, 1);
 
 .board {

@@ -1,7 +1,7 @@
 // 1-3 화면 1: 문장 띠를 가위로 자르는 화면. 오렌지는 "가위로 자르기" 버튼 한 곳.
 // 수업 공통 p·button 규칙보다 우선하도록 .tokens 아래에서 지정한다.
-$paper: #f6efe2;
-$ink: #2b2925;
+$paper: var(--workbook-paper, #f6efe2);
+$ink: var(--workbook-ink, #2b2925);
 $mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
 
 .tokens {

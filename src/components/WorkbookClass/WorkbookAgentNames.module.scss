@@ -3,8 +3,8 @@
 // 도는 그림은 들어올 때 한 번, 일하는 순서대로 그려지고 점 하나가 한 바퀴 돈다(반복 없음, "다시 보기").
 // 모션 줄이기에서는 완성된 그림만 보인다.
 // 수업 공통 p·ul 규칙보다 우선하도록 .names 아래에서 지정한다.
-$paper: #f6efe2;
-$ink: #2b2925;
+$paper: var(--workbook-paper, #f6efe2);
+$ink: var(--workbook-ink, #2b2925);
 
 .names {
   word-break: keep-all;

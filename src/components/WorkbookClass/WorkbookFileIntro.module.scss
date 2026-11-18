@@ -1,0 +1,207 @@
+// 1-6 화면 1: 빈 폴더 → 파일 한 개 → 브라우저 화면, 그림 세 칸이 차례로 한 번 나타난다.
+// 누를 것은 없다. 오렌지는 새로 생긴 파일의 접힌 귀퉁이 한 곳.
+// 수업 공통 p·ol·code 규칙보다 우선하도록 .intro 아래에서 지정한다.
+$ink: var(--workbook-ink, #2b2925);
+$folder: #e9d3a4;
+$folder-dark: #d9bd83;
+
+.intro {
+  word-break: keep-all;
+}
+.intro .title {
+  margin: 0;
+}
+.intro .lead {
+  margin-top: 10px;
+  max-width: 58rem;
+  p {
+    margin: 0;
+  }
+}
+
+.intro ol.row {
+  margin: 26px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 30px;
+  @include up(md) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 56px;
+    align-items: end;
+  }
+}
+.intro ol.row li.step {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+  animation: appear 220ms ease-out both;
+  &:nth-child(2) {
+    animation-delay: 200ms;
+  }
+  &:nth-child(3) {
+    animation-delay: 400ms;
+  }
+  // 다음 칸으로 가는 화살표
+  &:not(:last-child)::after {
+    content: "↓";
+    position: absolute;
+    left: 50%;
+    bottom: -28px;
+    translate: -50% 0;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--ink);
+    @include up(md) {
+      content: "→";
+      left: auto;
+      right: -40px;
+      bottom: 50%;
+      translate: 0 50%;
+    }
+  }
+}
+.when {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--ink-muted);
+}
+
+// 폴더
+.folder {
+  position: relative;
+  width: min(100%, 170px);
+  @include up(md) {
+    width: min(100%, 230px);
+  }
+  padding-top: 16px;
+}
+.tab {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 42%;
+  height: 18px;
+  background: $folder-dark;
+}
+.inside {
+  position: relative;
+  height: 96px;
+  @include up(md) {
+    height: 140px;
+  }
+  display: grid;
+  place-items: center;
+  background: $folder;
+  color: $ink;
+}
+.intro .folder .empty {
+  margin: 0;
+  font-size: 0.85rem;
+  color: rgb(43 41 37 / 0.6);
+}
+.file {
+  display: grid;
+  gap: 6px;
+  justify-items: center;
+}
+.sheet {
+  position: relative;
+  width: 38px;
+  height: 46px;
+  @include up(md) {
+    width: 54px;
+    height: 68px;
+  }
+  background: #fffdf8;
+  border: 1.5px solid $ink;
+  // 접힌 귀퉁이
+  &::after {
+    content: "";
+    position: absolute;
+    top: -1.5px;
+    right: -1.5px;
+    width: 16px;
+    height: 16px;
+    background: var(--accent);
+    border-left: 1.5px solid $ink;
+    border-bottom: 1.5px solid $ink;
+  }
+}
+.intro code {
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font-size: 0.88em;
+  white-space: nowrap;
+}
+
+// 브라우저 창
+.browser {
+  width: min(100%, 260px);
+  @include up(md) {
+    width: min(100%, 300px);
+  }
+  border: 1.5px solid $ink;
+  background: #fffdf8;
+  color: $ink;
+}
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 8px;
+  border-bottom: 1.5px solid $ink;
+  i {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: rgb(43 41 37 / 0.35);
+  }
+  span {
+    margin-left: 6px;
+    padding: 1px 8px;
+    flex: 1;
+    background: rgb(43 41 37 / 0.08);
+    font-size: 0.7rem;
+  }
+}
+.page {
+  padding: 12px 14px 14px;
+  strong {
+    font-size: 1.15rem;
+  }
+}
+.intro .browser .page p {
+  margin: 4px 0 0;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: $ink;
+}
+.intro .step .caption {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 700;
+  text-align: center;
+}
+.intro .closing {
+  margin: 24px 0 0;
+  max-width: 52rem;
+  font-size: 0.95rem;
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+    translate: 0 6px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro ol.row li.step {
+    animation: none;
+  }
+}

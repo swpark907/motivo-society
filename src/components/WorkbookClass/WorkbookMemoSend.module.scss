@@ -1,0 +1,255 @@
+// 1-5 화면 3: 한 줄만 채운 메모를 떼어 가서(복사) 앱에 붙여 넣고, 보냈으면 도장을 찍는다.
+// 오렌지는 "메모 떼어 가기" 버튼 한 곳. 수업 공통 규칙보다 우선하도록 .send 아래에서 지정한다.
+$ink: var(--workbook-ink, #2b2925);
+$memo: var(--workbook-memo, #fbe9a6);
+$memo-line: var(--workbook-memo-line, #e6cf7c);
+
+.send {
+  word-break: keep-all;
+}
+.send .title {
+  margin: 0;
+}
+.send .lead {
+  margin-top: 10px;
+  max-width: 58rem;
+  p {
+    margin: 0;
+  }
+}
+
+.desk {
+  margin-top: 18px;
+  display: grid;
+  gap: 22px;
+  @include up(md) {
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    gap: 36px;
+    align-items: start;
+  }
+}
+
+// 왼쪽: 떼어 가는 메모
+.memo {
+  position: relative;
+  padding: 14px 16px 0;
+  background: $memo;
+  color: $ink;
+  @include up(md) {
+    padding: 14px 22px 0;
+  }
+}
+.to {
+  font-size: 1.7rem;
+  line-height: 1;
+}
+.send .memo ol.rows {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.send .memo ol.rows li.row {
+  margin: 0;
+  padding: 7px 0;
+  border-top: 1.5px solid $memo-line;
+  display: grid;
+  gap: 4px;
+  justify-items: start;
+  @include up(md) {
+    grid-template-columns: 6.2rem minmax(0, 1fr);
+    column-gap: 14px;
+    align-items: start;
+  }
+}
+.send .memo ol.rows li.row strong.tag {
+  padding: 2px 8px;
+  background: $ink;
+  color: #fffdf8;
+  font-size: 0.82rem;
+}
+.send .memo .row .line {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: $ink;
+}
+.send .memo .row .line small {
+  display: block;
+  font-size: 0.75rem;
+  color: rgb(43 41 37 / 0.7);
+}
+.mine {
+  display: grid;
+  gap: 3px;
+  width: 100%;
+  font-size: 0.95rem;
+  small {
+    font-size: 0.75rem;
+    color: rgb(43 41 37 / 0.7);
+  }
+}
+.send .memo .row .mine input {
+  width: 100%;
+  margin: 0;
+  padding: 5px 8px;
+  border: 1.5px dashed $ink;
+  border-radius: 2px;
+  background: #fffdf8;
+  color: $ink;
+  font: inherit;
+  &::placeholder {
+    color: rgb(43 41 37 / 0.45);
+  }
+  &:focus-visible {
+    outline: 2px solid $ink;
+    outline-offset: 2px;
+  }
+}
+// 절취선 아래 떼어 가는 칸
+.tear {
+  margin: 4px -16px 0;
+  padding: 10px 16px 12px;
+  border-top: 2px dashed rgb(43 41 37 / 0.55);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+  @include up(md) {
+    margin: 4px -22px 0;
+    padding: 10px 22px 12px;
+  }
+}
+.send .memo .tear .copy {
+  padding: 8px 18px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--accent);
+  color: white;
+  font-weight: 700;
+}
+.send .memo .tear .copied {
+  margin: 0;
+  font-size: 0.85rem;
+  color: $ink;
+}
+
+// 오른쪽: 보내는 순서와 도장
+.side {
+  min-width: 0;
+  display: grid;
+  gap: 10px;
+}
+.send .side ol.steps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+  display: grid;
+  gap: 6px;
+}
+.send .side ol.steps li {
+  margin: 0;
+  padding-left: 2rem;
+  position: relative;
+  counter-increment: step;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  &::before {
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    top: 0.15em;
+    width: 1.35rem;
+    height: 1.35rem;
+    display: grid;
+    place-items: center;
+    border: 1.5px solid var(--ink);
+    border-radius: 50%;
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+}
+.send .side ol.steps code {
+  white-space: nowrap;
+}
+.sketch {
+  width: calc(100% - 2rem);
+  max-width: 340px;
+  height: auto;
+  margin-left: 2rem;
+}
+.frame {
+  fill: #fffdf8;
+  stroke: rgb(43 41 37 / 0.35);
+  stroke-width: 1;
+}
+.block {
+  fill: rgb(43 41 37 / 0.16);
+}
+.box {
+  fill: #fffdf8;
+  stroke: $ink;
+  stroke-width: 2.5;
+}
+.label {
+  font-size: 9px;
+  font-weight: 700;
+  fill: $ink;
+}
+.send .side .note {
+  margin: 0 0 0 2rem;
+  font-size: 0.75rem;
+  color: var(--ink-muted);
+}
+
+.back {
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+  display: grid;
+  gap: 4px;
+  justify-items: start;
+}
+.send .side .back .stamp {
+  --workbook-button-hover: transparent;
+  padding: 2px 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 700;
+  text-align: left;
+}
+.mark {
+  flex: none;
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border: 2px dashed var(--ink-muted);
+  border-radius: 50%;
+  font-size: 0.85rem;
+}
+.stamp[aria-pressed="true"] .mark {
+  border: 3px double var(--ink);
+  rotate: -10deg;
+}
+.send .side .back .later {
+  --workbook-button-hover: transparent;
+  padding: 4px 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink-muted);
+  font-size: 0.85rem;
+  font-weight: 400;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-align: left;
+}
+.send .side .back .next {
+  margin: 0;
+  min-height: 1.4em;
+  font-size: 0.88rem;
+}

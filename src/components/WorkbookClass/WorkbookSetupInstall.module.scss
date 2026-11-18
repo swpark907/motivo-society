@@ -1,8 +1,8 @@
 // 1-4 화면 2: 조립 설명서처럼 번호와 화면 약도로 보여주는 설치 순서. 움직임 없음.
 // 오렌지는 단계마다 "누를 곳" 테두리(같은 뜻의 표시 한 종류).
 // 수업 공통 p·ol·ul·button 규칙보다 우선하도록 .install 아래에서 지정한다.
-$paper: #f6efe2;
-$ink: #2b2925;
+$paper: var(--workbook-paper, #f6efe2);
+$ink: var(--workbook-ink, #2b2925);
 
 .install {
   word-break: keep-all;

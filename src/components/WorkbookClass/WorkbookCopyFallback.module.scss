@@ -1,0 +1,23 @@
+// 복사가 안 될 때 보여 주는 글 상자. 붙여 넣을 글만 담는다.
+.fallback {
+  flex-basis: 100%;
+  margin: 4px 0 0;
+  display: grid;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: var(--workbook-ink, #2b2925);
+}
+.fallback textarea {
+  width: 100%;
+  margin: 0;
+  padding: 8px 10px;
+  border: 1.5px solid var(--workbook-ink, #2b2925);
+  border-radius: 2px;
+  background: #fffdf8;
+  color: var(--workbook-ink, #2b2925);
+  font: inherit;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  resize: vertical;
+}

@@ -2,6 +2,11 @@
   margin-block: var(--space-3);
 }
 .page {
+  // 워크북 수업 그림의 종이 · 먹 · 메모지 색. 수업 컴포넌트는 이 값을 $ink 등으로 받아 쓴다.
+  --workbook-ink: #2b2925;
+  --workbook-paper: #f6efe2;
+  --workbook-memo: #fbe9a6;
+  --workbook-memo-line: #e6cf7c;
   --workbook-card-radius: var(--space-3);
   --workbook-support-radius: var(--space-2);
   --workbook-button-action-hover: color-mix(in srgb, var(--accent) 82%, var(--ink));

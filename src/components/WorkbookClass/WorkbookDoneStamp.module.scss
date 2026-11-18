@@ -1,0 +1,27 @@
+// 내 컴퓨터에서 한 일을 스스로 확인하는 도장. 빈 동그라미는 점선, 찍으면 겹선으로 기울어진다.
+.stamp[type] {
+  --workbook-button-hover: transparent;
+  padding: 2px 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 700;
+  text-align: left;
+}
+.mark {
+  flex: none;
+  width: 50px;
+  height: 50px;
+  display: grid;
+  place-items: center;
+  border: 2px dashed var(--ink-muted);
+  border-radius: 50%;
+  font-size: 0.82rem;
+}
+.stamp[aria-pressed="true"] .mark {
+  border: 3px double var(--ink);
+  rotate: -10deg;
+}

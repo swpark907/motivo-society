@@ -43,7 +43,7 @@ test("1-4는 도장 카드→설치→둘러보기→폴더→확인→정리로
 
   await advance();
   await expect(page.getByRole("heading", { name: "화면을 둘러봐요" })).toBeVisible();
-  await page.getByRole("button", { name: "4. 허락 묻는 창" }).click();
+  await page.getByRole("button", { name: "4. 승인을 묻는 창" }).click();
   await expect(body).toContainText("파일을 만들거나 고치기 전에 대화 중간에 물어봐요.");
   await card.getByRole("button", { name: "Code 탭을 열었어요" }).click();
   await capture("3-tour");

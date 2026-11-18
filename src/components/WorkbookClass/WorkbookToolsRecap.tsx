@@ -1,5 +1,6 @@
 import Image from "next/image";
 import type { CSSProperties } from "react";
+import { workbookCourse, workbookLessonId } from "@/lib/workbook-course";
 import styles from "./WorkbookToolsRecap.module.scss";
 
 /** What 1-2 covered, in the order the screens showed it. */
@@ -14,7 +15,7 @@ const LEARNED = [
   },
   {
     term: "바꾸기 전에 묻고, 확인은 내가 해요",
-    text: "폴더를 정하고, 허락하고, 결과를 보고 다시 부탁해요.",
+    text: "폴더를 정하고, 승인하고, 결과를 보고 다시 부탁해요.",
   },
 ] as const;
 
@@ -25,6 +26,7 @@ const LEARNED = [
  * docs/product/workbook-unit-1-plan.md. CSS-only motion; reduced motion shows the finished page.
  */
 export function WorkbookToolsRecap() {
+  const next = workbookCourse[0].lessons[workbookLessonId.usage];
   return (
     <div data-lesson-wide className={styles.recap}>
       <h2 id="lesson-screen-title" className={styles.title}>
@@ -63,7 +65,7 @@ export function WorkbookToolsRecap() {
         <aside className={styles.ticket} aria-labelledby="tools-next-title">
           <span className={styles.ticketLabel}>다음 수업</span>
           <h3 id="tools-next-title">
-            <span>1-3</span> AI를 쓰는 만큼
+            <span>{next.number}</span> {next.title}
           </h3>
           <p>AI가 얼마나 읽고 쓰는지, 그게 왜 요금과 이어지는지 알아봐요.</p>
         </aside>

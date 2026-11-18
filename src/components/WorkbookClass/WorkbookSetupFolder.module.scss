@@ -2,8 +2,8 @@
 // 인터넷으로 멀리 있는 컴퓨터를 빌려 쓸 때(클라우드).
 // 오렌지는 "이 클래스는 여기서 해요" 표시 한 곳. 들어올 때 한 번 붙고, 인터넷 선의 점이 한 번 다녀온다.
 // 수업 공통 p·h3·ol·button 규칙보다 우선하도록 .folder 아래에서 지정한다.
-$paper: #f6efe2;
-$ink: #2b2925;
+$paper: var(--workbook-paper, #f6efe2);
+$ink: var(--workbook-ink, #2b2925);
 
 .folder {
   word-break: keep-all;

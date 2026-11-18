@@ -1,8 +1,8 @@
 // 1-2 화면 4: 조용한 비교표. 웹사이트 빌더를 깎아내리지 않고 이 클래스의 목표에 맞는 쪽을 보여준다.
 // 오렌지는 우리 열 머리에 두른 손그림 동그라미 한 곳(들어올 때 한 번 그려진다).
 // 수업 공통 p·table 규칙보다 우선하도록 .why 아래에서 지정한다.
-$paper: #f6efe2;
-$ink: #2b2925;
+$paper: var(--workbook-paper, #f6efe2);
+$ink: var(--workbook-ink, #2b2925);
 
 .why {
   word-break: keep-all;

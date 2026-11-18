@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { workbookCourse, workbookLessonId } from "@/lib/workbook-course";
 import styles from "./WorkbookUsageRecap.module.scss";
 
 /** What 1-3 covered, in the order the screens showed it. */
@@ -15,6 +16,8 @@ const LEARNED = [
  * The next lesson is 1-4 from src/lib/workbook-course.ts.
  */
 export function WorkbookUsageRecap() {
+  const current = workbookCourse[0].lessons[workbookLessonId.usage];
+  const next = workbookCourse[0].lessons[workbookLessonId.setup];
   return (
     <div data-lesson-wide className={styles.recap}>
       <h2 id="lesson-screen-title" className={styles.title}>
@@ -24,8 +27,8 @@ export function WorkbookUsageRecap() {
       <div className={styles.layout}>
         <div className={styles.receipt}>
           <p className={styles.head}>
-            AI를 쓰는 만큼
-            <span>LESSON 1-3</span>
+            {current.title}
+            <span>LESSON {current.number}</span>
           </p>
           <ol className={styles.lines}>
             {LEARNED.map((item, index) => (
@@ -45,7 +48,7 @@ export function WorkbookUsageRecap() {
         <aside className={styles.ticket} aria-labelledby="usage-next-title">
           <span className={styles.ticketLabel}>다음 수업</span>
           <h3 id="usage-next-title">
-            <span>1-4</span> 도구와 작업 공간 준비
+            <span>{next.number}</span> {next.title}
           </h3>
           <p>Claude Code를 설치하고, 작업할 폴더를 정해요.</p>
         </aside>

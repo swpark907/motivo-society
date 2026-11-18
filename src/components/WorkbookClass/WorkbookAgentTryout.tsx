@@ -25,7 +25,7 @@ const POINTS = [
   },
   {
     title: "바꾸기 전에 물어봐요",
-    text: "기본 설정에서는 파일을 만들거나 고치기 전, 명령을 실행하기 전에 허락을 구해요. 폴더 밖의 파일도 따로 물어봐요.",
+    text: "기본 설정에서는 파일을 만들거나 고치기 전, 명령을 실행하기 전에 승인을 받아요. 폴더 밖의 파일도 따로 물어봐요.",
     chat: "챗봇이었다면 코드를 글로 줄 뿐, 내 파일에는 손대지 않아요.",
   },
   {
@@ -103,7 +103,7 @@ export function WorkbookAgentTryout() {
               )}
             </div>
 
-            {/* 오른쪽: 부탁과 허락 쪽지 */}
+            {/* 오른쪽: 부탁과 승인 쪽지 */}
             <div className={styles.work} aria-live="polite">
               {stage === 0 ? (
                 <p className={styles.hint}>
@@ -121,7 +121,7 @@ export function WorkbookAgentTryout() {
                     {stage === 1 && (
                       <div className={styles.askButtons}>
                         <button type="button" className={styles.allow} onClick={() => setStage(3)}>
-                          허락
+                          승인
                         </button>
                         <button
                           type="button"
@@ -134,7 +134,7 @@ export function WorkbookAgentTryout() {
                     )}
                     {stage !== 1 && (
                       <span className={styles.stamp} aria-hidden="true">
-                        {stage === 3 ? "허락" : "거절"}
+                        {stage === 3 ? "승인" : "거절"}
                       </span>
                     )}
                   </div>

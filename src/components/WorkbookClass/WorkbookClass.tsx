@@ -22,7 +22,6 @@ import { WorkbookDataMap } from "./WorkbookDataMap";
 import { availableDataStep, dataProgress } from "@/lib/workbook-data";
 import { WorkbookExperienceMap } from "./WorkbookExperienceMap";
 import { availableExperienceStep, experienceProgress } from "@/lib/workbook-experience";
-import { WorkbookPracticeLesson } from "./WorkbookPracticeLesson";
 import { WorkbookPracticalLesson } from "./WorkbookPracticalLesson";
 import { useWorkbookLessonState } from "./useWorkbookLessonState";
 import { WorkbookLessons } from "./WorkbookLessons";
@@ -103,7 +102,6 @@ export function WorkbookClass() {
     setCurrentStop,
     setupStatus,
     practice,
-    setPractice,
     completed,
     setCompleted,
     project,
@@ -1234,27 +1232,6 @@ export function WorkbookClass() {
                       }}
                       onComplete={() => {
                         setProjectCompleted(true);
-                        setLesson(null);
-                        requestAnimationFrame(() => title.current?.focus());
-                      }}
-                    />
-                  ) : lesson === L.firstRequest || lesson === L.firstFile ? (
-                    <WorkbookPracticeLesson
-                      key={lesson}
-                      lesson={lesson}
-                      record={practice[lesson]}
-                      ready={setupStatus === "ready"}
-                      onChange={(record) => {
-                        setPractice((previous) => ({ ...previous, [lesson]: record }));
-                      }}
-                      onBack={() => {
-                        setLesson(null);
-                        requestAnimationFrame(() => title.current?.focus());
-                      }}
-                      onComplete={() => {
-                        setCompleted((previous) =>
-                          previous.includes(lesson) ? previous : [...previous, lesson],
-                        );
                         setLesson(null);
                         requestAnimationFrame(() => title.current?.focus());
                       }}

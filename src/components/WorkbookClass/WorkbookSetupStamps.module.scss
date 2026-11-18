@@ -1,7 +1,7 @@
 // 1-4의 준비 도장 카드: 워크북 밖(내 컴퓨터)에서 한 일을 학습자가 직접 찍는다.
 // 찍힌 도장은 먹색, 방금 찍은 하나만 오렌지(한 화면에 주황은 한 곳). 수업 공통 p·ul·button 규칙보다 우선하도록 .card 아래에서 지정한다.
-$paper: #f6efe2;
-$ink: #2b2925;
+$paper: var(--workbook-paper, #f6efe2);
+$ink: var(--workbook-ink, #2b2925);
 
 .card {
   padding: 14px 16px 16px;

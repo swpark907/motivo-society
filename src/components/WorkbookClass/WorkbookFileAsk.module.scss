@@ -1,0 +1,212 @@
+// 1-6 화면 2: 파일을 부탁하는 메모를 떼어 가고(복사), 승인을 물으면 볼 두 가지를 쪽지로 본다.
+// 오렌지는 "메모 떼어 가기" 버튼 한 곳. 수업 공통 규칙보다 우선하도록 .ask 아래에서 지정한다.
+$ink: var(--workbook-ink, #2b2925);
+$memo: var(--workbook-memo, #fbe9a6);
+$memo-line: var(--workbook-memo-line, #e6cf7c);
+
+.ask {
+  word-break: keep-all;
+}
+.ask .title {
+  margin: 0;
+}
+.ask .lead {
+  margin-top: 10px;
+  max-width: 58rem;
+  p {
+    margin: 0;
+  }
+}
+.desk {
+  margin-top: 16px;
+  display: grid;
+  gap: 22px;
+  @include up(md) {
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    gap: 36px;
+    align-items: start;
+  }
+}
+
+.memo {
+  padding: 12px 16px 0;
+  background: $memo;
+  color: $ink;
+  @include up(md) {
+    padding: 12px 22px 0;
+  }
+}
+.to {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+.ask .memo ol.rows {
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.ask .memo ol.rows li.row {
+  margin: 0;
+  padding: 6px 0;
+  border-top: 1.5px solid $memo-line;
+  display: grid;
+  gap: 4px;
+  justify-items: start;
+  @include up(md) {
+    grid-template-columns: 6.2rem minmax(0, 1fr);
+    column-gap: 14px;
+  }
+}
+.ask .memo ol.rows li.row strong.tag {
+  align-self: start;
+  padding: 2px 8px;
+  background: $ink;
+  color: #fffdf8;
+  font-size: 0.82rem;
+}
+.ask .memo .row .line {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: $ink;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.ask .memo label.paste {
+  margin: 0;
+  padding: 8px 0 10px;
+  border-top: 1.5px solid $memo-line;
+  display: grid;
+  gap: 4px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: $ink;
+  small {
+    font-weight: 400;
+    color: rgb(43 41 37 / 0.7);
+  }
+}
+.ask .memo .paste input {
+  width: 100%;
+  margin: 0;
+  padding: 5px 8px;
+  border: 1.5px dashed $ink;
+  border-radius: 2px;
+  background: #fffdf8;
+  color: $ink;
+  font: inherit;
+  font-weight: 400;
+}
+.tear {
+  margin: 0 -16px;
+  padding: 10px 16px 12px;
+  border-top: 2px dashed rgb(43 41 37 / 0.55);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+  @include up(md) {
+    margin: 0 -22px;
+    padding: 10px 22px 12px;
+  }
+}
+.ask .memo .tear .copy {
+  padding: 8px 18px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--accent);
+  color: white;
+  font-weight: 700;
+}
+.ask .memo .tear .copied {
+  margin: 0;
+  font-size: 0.85rem;
+  color: $ink;
+}
+
+.side {
+  min-width: 0;
+  display: grid;
+  gap: 14px;
+}
+// 승인 쪽지: 흰 종이에 확인할 두 줄
+.slip {
+  padding: 14px 18px 14px;
+  border: 1.5px solid $ink;
+  background: #fffdf8;
+  color: $ink;
+  rotate: 0.6deg;
+}
+.ask .side .slip h3 {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 400;
+  line-height: 1.1;
+  color: $ink;
+}
+.ask .side .slip ol {
+  counter-reset: slip;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 4px;
+}
+.ask .side .slip ol li {
+  margin: 0;
+  padding-left: 1.5em;
+  position: relative;
+  font-weight: 700;
+  color: $ink;
+  counter-increment: slip;
+  &::before {
+    content: counter(slip) ".";
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-weight: 700;
+  }
+}
+.ask .side .slip p {
+  margin: 8px 0 0;
+  font-size: 0.92rem;
+  color: $ink;
+}
+.ask .side .slip small {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.75rem;
+  color: rgb(43 41 37 / 0.66);
+}
+.ask code {
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font-size: 0.9em;
+  white-space: nowrap;
+}
+.back {
+  display: grid;
+  gap: 4px;
+  justify-items: start;
+}
+.ask .side .back .later {
+  --workbook-button-hover: transparent;
+  padding: 4px 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink-muted);
+  font-size: 0.85rem;
+  font-weight: 400;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-align: left;
+}
+.ask .side .back .next {
+  margin: 0;
+  min-height: 1.4em;
+  font-size: 0.88rem;
+}

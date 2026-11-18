@@ -49,7 +49,7 @@ export function WorkbookCompletionSummary({ stage }: { stage: keyof typeof learn
       ? [
           "내가 확인한 점",
           p.practice[workbookLessonId.firstFile].observation,
-          "다음 수정 요청",
+          "적어 둔 수정 요청",
           p.practice[workbookLessonId.firstFile].revision,
         ]
       : stage === "project"

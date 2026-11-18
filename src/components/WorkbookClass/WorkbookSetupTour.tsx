@@ -28,8 +28,8 @@ const PINS = [
     text: "아래쪽 입력 칸이에요. 만들고 싶은 것, 고치고 싶은 것을 말로 적어서 보냅니다.",
   },
   {
-    name: "허락 묻는 창",
-    text: "파일을 만들거나 고치기 전에 대화 중간에 물어봐요. 내용을 보고 허락하거나 거절하면 됩니다.",
+    name: "승인을 묻는 창",
+    text: "파일을 만들거나 고치기 전에 대화 중간에 물어봐요. 내용을 보고 승인하거나 거절하면 됩니다.",
   },
 ] as const;
 
@@ -67,7 +67,7 @@ export function WorkbookSetupTour() {
             <rect x="4" y="80" width="76" height="14" rx="4" className={styles.block} />
             <rect x="8" y="104" width="48" height="5" rx="2.5" className={styles.block} />
             <rect x="8" y="118" width="58" height="5" rx="2.5" className={styles.block} />
-            {/* 가운데: 대화와 허락 묻는 창 */}
+            {/* 가운데: 대화와 승인을 묻는 창 */}
             <rect x="100" y="38" width="170" height="5" rx="2.5" className={styles.block} />
             <rect x="100" y="50" width="140" height="5" rx="2.5" className={styles.block} />
             <rect x="100" y="62" width="156" height="5" rx="2.5" className={styles.block} />
@@ -77,7 +77,7 @@ export function WorkbookSetupTour() {
             </text>
             <rect x="110" y="124" width="46" height="18" rx="4" className={styles.active} />
             <text x="133" y="136" textAnchor="middle" className={styles.labelOn}>
-              허락
+              승인
             </text>
             <rect x="162" y="124" width="46" height="18" rx="4" className={styles.outline} />
             <text x="185" y="136" textAnchor="middle" className={styles.label}>

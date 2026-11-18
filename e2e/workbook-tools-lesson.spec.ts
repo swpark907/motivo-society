@@ -41,7 +41,7 @@ test("1-2는 종류→4컷 만화→연습 창→비교표→이름표와 흐름
   await tryout.getByRole("button", { name: "거절", exact: true }).click();
   await expect(tryout).toContainText("파일을 만들지 않았어요.");
   await tryout.getByRole("button", { name: "다시 물어보기", exact: true }).click();
-  await tryout.getByRole("button", { name: "허락", exact: true }).click();
+  await tryout.getByRole("button", { name: "승인", exact: true }).click();
   await expect(tryout).toContainText("새 파일");
   await capture("3-tryout-done");
 

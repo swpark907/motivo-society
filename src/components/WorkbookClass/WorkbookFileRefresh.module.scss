@@ -1,0 +1,205 @@
+// 1-6 화면 4: 연습용 브라우저 창. 메모를 보내도 화면은 그대로이고, 새로고침을 눌러야 제목이 바뀐다.
+// 오렌지는 "지금 누를 곳" 하나(메모 보내기 → 새로고침 단추)로 옮겨 간다.
+// 수업 공통 규칙보다 우선하도록 .refresh 아래에서 지정한다.
+$ink: var(--workbook-ink, #2b2925);
+$memo: var(--workbook-memo, #fbe9a6);
+
+.refresh {
+  word-break: keep-all;
+}
+.refresh .title {
+  margin: 0;
+}
+.refresh .lead {
+  margin-top: 10px;
+  max-width: 58rem;
+  p {
+    margin: 0;
+  }
+}
+.desk {
+  margin-top: 18px;
+  display: grid;
+  gap: 22px;
+  @include up(md) {
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    gap: 36px;
+    align-items: start;
+  }
+}
+
+.browser {
+  min-width: 0;
+  border: 1.5px solid $ink;
+  background: #fffdf8;
+  color: $ink;
+}
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-bottom: 1.5px solid $ink;
+  span {
+    flex: 1;
+    padding: 3px 10px;
+    background: rgb(43 41 37 / 0.08);
+    font-size: 0.8rem;
+  }
+}
+.refresh .browser .bar button.reload {
+  --workbook-button-hover: transparent;
+  width: 34px;
+  height: 34px;
+  min-height: 34px;
+  padding: 0;
+  border: 1.5px solid $ink;
+  border-radius: 50%;
+  background: transparent;
+  color: $ink;
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1;
+  @media (pointer: coarse) {
+    width: 44px;
+    height: 44px;
+  }
+  &[data-call] {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: white;
+  }
+}
+.page {
+  position: relative;
+  padding: 22px 24px 30px;
+  min-height: 210px;
+  strong {
+    display: block;
+    font-size: 1.7rem;
+    line-height: 1.25;
+    animation: swap 120ms ease-out both;
+  }
+}
+.refresh .browser .page p {
+  margin: 8px 0 0;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: $ink;
+}
+.huh {
+  position: absolute;
+  top: 16px;
+  right: 18px;
+  font-size: 1.45rem;
+  line-height: 1;
+  color: rgb(43 41 37 / 0.75);
+  rotate: 3deg;
+}
+
+.side {
+  min-width: 0;
+  display: grid;
+  gap: 12px;
+}
+.memo {
+  margin: 0;
+  padding: 12px 16px 14px;
+  background: $memo;
+  color: $ink;
+  rotate: -0.8deg;
+}
+.refresh .side .memo figcaption {
+  font-size: 0.75rem;
+  color: rgb(43 41 37 / 0.66);
+}
+.refresh .side .memo blockquote {
+  margin: 4px 0 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  font-size: 0.98rem;
+  line-height: 1.5;
+  color: $ink;
+}
+.act {
+  min-height: 84px;
+  display: grid;
+  gap: 4px;
+  justify-items: start;
+  align-content: start;
+}
+.refresh .side .act p {
+  margin: 0;
+  font-size: 0.95rem;
+}
+.refresh .side .act .go {
+  padding: 8px 18px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--accent);
+  color: white;
+  font-weight: 700;
+}
+.refresh .side .act .again {
+  --workbook-button-hover: transparent;
+  padding: 4px 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink-muted);
+  font-size: 0.85rem;
+  font-weight: 400;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.refresh .side label.mine {
+  margin: 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  display: grid;
+  gap: 6px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  small {
+    font-weight: 400;
+    color: var(--ink-muted);
+  }
+}
+.refresh .side .mine input {
+  width: 100%;
+  margin: 0;
+  padding: 8px 10px;
+  border: 1.5px solid var(--ink);
+  border-radius: 2px;
+  background: #fffdf8;
+  color: $ink;
+  font: inherit;
+  font-weight: 400;
+}
+
+@keyframes swap {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page strong {
+    animation: none;
+  }
+}
+
+.refresh .side .mine .how {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--ink-muted);
+}
+
+.refresh .side .later {
+  margin: 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  font-size: 0.92rem;
+  color: var(--ink-muted);
+}

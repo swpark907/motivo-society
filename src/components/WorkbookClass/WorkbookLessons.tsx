@@ -25,6 +25,19 @@ import { WorkbookSetupTour } from "./WorkbookSetupTour";
 import { WorkbookSetupFolder } from "./WorkbookSetupFolder";
 import { WorkbookSetupCheck } from "./WorkbookSetupCheck";
 import { WorkbookSetupRecap } from "./WorkbookSetupRecap";
+import { WorkbookMemoParts } from "./WorkbookMemoParts";
+import { WorkbookMemoSend } from "./WorkbookMemoSend";
+import { WorkbookAnswerCheck } from "./WorkbookAnswerCheck";
+import { WorkbookAskAgain } from "./WorkbookAskAgain";
+import { WorkbookRequestRecap } from "./WorkbookRequestRecap";
+import { WorkbookFileIntro } from "./WorkbookFileIntro";
+import { WorkbookFileAsk } from "./WorkbookFileAsk";
+import { WorkbookFileOpen } from "./WorkbookFileOpen";
+import { WorkbookFileRefresh } from "./WorkbookFileRefresh";
+import { WorkbookFileTrouble } from "./WorkbookFileTrouble";
+import { WorkbookFileRecap } from "./WorkbookFileRecap";
+import { useRecordFirstProjectResult } from "./WorkbookFirstProjectResult";
+import { WorkbookVagueMemo } from "./WorkbookVagueMemo";
 import { WorkbookLessonHeader } from "./WorkbookLessonHeader";
 import { WorkbookLessonPrevious } from "./WorkbookLessonPrevious";
 
@@ -36,7 +49,7 @@ import { useWorkbookProgress } from "./WorkbookProgressContext";
 import styles from "./WorkbookClass.module.scss";
 import system from "./WorkbookLesson.module.scss";
 
-// 1-1~1-4는 같은 틀이다: 다섯 장을 차례로 펼치는 첫 단계 + 정리 화면.
+// 1-1~1-6은 같은 틀이다: 다섯 장을 차례로 펼치는 첫 단계 + 정리 화면.
 // 퀴즈·정답 판정은 두지 않는다(docs/product/workbook-unit-1-plan.md).
 const LAST_STEP = 1;
 const LAST_PART = 4;
@@ -52,7 +65,9 @@ export function WorkbookLessons({
   onComplete: (lesson: number) => void;
 }) {
   const p = useWorkbookProgress();
-  const learningUnit = `ai-${initialLesson + 1}` as "ai-1" | "ai-2" | "ai-3" | "ai-4";
+  const recordResult = useRecordFirstProjectResult();
+  const learningUnit = `ai-${initialLesson + 1}` as
+    "ai-1" | "ai-2" | "ai-3" | "ai-4" | "ai-5" | "ai-6";
   const lesson = initialLesson;
   const ui = system;
   const [step, setStep] = useWorkbookLessonState(`ai-${lesson}-step`, 0);
@@ -139,6 +154,24 @@ export function WorkbookLessons({
         {lesson === workbookLessonId.setup && gradual && part === 3 && <WorkbookSetupFolder />}
         {lesson === workbookLessonId.setup && gradual && part === 4 && <WorkbookSetupCheck />}
         {lesson === workbookLessonId.setup && !gradual && <WorkbookSetupRecap />}
+
+        {/* 1-5 요청 잘하기: 메모 건네기 → 네 가지 이름표 메모 → 내 메모 보내기 → 빨간 펜 확인 → 포스트잇 수정 요청 → 메모판 정리 */}
+        {lesson === workbookLessonId.firstRequest && gradual && part === 0 && <WorkbookVagueMemo />}
+        {lesson === workbookLessonId.firstRequest && gradual && part === 1 && <WorkbookMemoParts />}
+        {lesson === workbookLessonId.firstRequest && gradual && part === 2 && <WorkbookMemoSend />}
+        {lesson === workbookLessonId.firstRequest && gradual && part === 3 && (
+          <WorkbookAnswerCheck />
+        )}
+        {lesson === workbookLessonId.firstRequest && gradual && part === 4 && <WorkbookAskAgain />}
+        {lesson === workbookLessonId.firstRequest && !gradual && <WorkbookRequestRecap />}
+
+        {/* 1-6 첫 코드 만들기: 그림 세 칸 → 부탁과 승인 → 파일 열기 → 고치고 새로고침 → 안 될 때 → 액자 정리 */}
+        {lesson === workbookLessonId.firstFile && gradual && part === 0 && <WorkbookFileIntro />}
+        {lesson === workbookLessonId.firstFile && gradual && part === 1 && <WorkbookFileAsk />}
+        {lesson === workbookLessonId.firstFile && gradual && part === 2 && <WorkbookFileOpen />}
+        {lesson === workbookLessonId.firstFile && gradual && part === 3 && <WorkbookFileRefresh />}
+        {lesson === workbookLessonId.firstFile && gradual && part === 4 && <WorkbookFileTrouble />}
+        {lesson === workbookLessonId.firstFile && !gradual && <WorkbookFileRecap />}
       </div>
       <aside className={ui.lessonPanel} aria-label="학습 안내">
         <div className={ui.panelNotes}>
@@ -151,6 +184,8 @@ export function WorkbookLessons({
                 "챗봇과 코드 에이전트 구분하기",
                 "AI가 읽고 쓰는 양 알아보기",
                 "Claude Code와 작업 폴더 준비하기",
+                "구체적으로 요청하고, 확인하고, 다시 부탁하기",
+                "AI에게 부탁해 첫 파일을 만들고 화면으로 확인하기",
               ][lesson]
             }
           </h2>
@@ -193,11 +228,22 @@ export function WorkbookLessons({
             <button
               data-action-role="lesson-next"
               onClick={() => {
+                // 첫 코드 만들기: 도장 세 개를 실제 파일의 본인 확인으로 남긴다(다음 단원이 읽는다).
+                // 근거는 학습자가 적은 관찰뿐이다. 적은 것이 없으면 기록하지 않는다.
+                if (lesson === workbookLessonId.firstFile) {
+                  const record = p.practice[lesson];
+                  recordResult(
+                    "setup",
+                    record.mode === "computer",
+                    p.setupStatus === "ready" && record.checks.every(Boolean),
+                    record.observation,
+                  );
+                }
                 p.dispatchProjectWorkflow({
                   type: "learn",
                   unit: learningUnit,
                   status: "confirmed",
-                  source: "example",
+                  source: p.practice[lesson]?.mode === "computer" ? "computer" : "example",
                 });
                 onComplete(lesson);
                 onBack();

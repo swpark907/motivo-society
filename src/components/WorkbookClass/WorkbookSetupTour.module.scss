@@ -1,8 +1,8 @@
 // 1-4 화면 3: 그려 넣은 앱 약도 위의 번호 핀. 실제 데스크톱 앱의 배치를 따라 그린 우리 그림이다(로고·실제 내용 없음).
 // 오렌지는 고른 핀(같은 뜻의 표시 한 종류). 움직임 없음.
 // 수업 공통 p·button 규칙보다 우선하도록 .tour 아래에서 지정한다.
-$paper: #f6efe2;
-$ink: #2b2925;
+$paper: var(--workbook-paper, #f6efe2);
+$ink: var(--workbook-ink, #2b2925);
 
 .tour {
   word-break: keep-all;

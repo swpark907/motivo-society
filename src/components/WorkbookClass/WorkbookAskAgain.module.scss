@@ -1,0 +1,284 @@
+// 1-5 화면 5: 답 종이에 포스트잇 두 색(바꿀 것 · 그대로 둘 것)을 붙이면 다시 건넬 메모가 써진다.
+// 바꿀 것은 분홍, 그대로 둘 것은 연두(주황 계열 버튼과 헷갈리지 않게). 오렌지는 직접 보낸 사람에게만 보이는 "내 수정 요청 복사하기" 버튼 한 곳. 두 포스트잇 색은 뜻(바꿈 · 그대로)을 구분하는 데만 쓴다.
+// 수업 공통 규칙보다 우선하도록 .again 아래에서 지정한다.
+$ink: var(--workbook-ink, #2b2925);
+$memo: var(--workbook-memo, #fbe9a6);
+$memo-line: var(--workbook-memo-line, #e6cf7c);
+$change: #f2bccb;
+$keep: #c3dfb4;
+
+.again {
+  word-break: keep-all;
+}
+.again .title {
+  margin: 0;
+}
+.again .lead {
+  margin-top: 10px;
+  max-width: 58rem;
+  p {
+    margin: 0;
+  }
+}
+
+.desk {
+  margin-top: 18px;
+  display: grid;
+  gap: 22px;
+  @include up(md) {
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    gap: 36px;
+    align-items: start;
+  }
+}
+
+// 왼쪽: 답 종이
+.paper {
+  min-width: 0;
+  padding: 14px 18px 16px;
+  border: 1.5px solid $ink;
+  background: #fffdf8;
+  color: $ink;
+}
+.paperHead {
+  display: grid;
+  gap: 2px;
+  strong {
+    font-size: 0.85rem;
+  }
+  span {
+    font-size: 0.85rem;
+    color: rgb(43 41 37 / 0.7);
+  }
+}
+.again .paper ol.sentences {
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 6px;
+}
+.again .paper ol.sentences li {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  min-height: 42px;
+}
+.flawed {
+  padding: 5px 0;
+  font-size: 1rem;
+  line-height: 1.45;
+  color: rgb(43 41 37 / 0.62);
+}
+.again .paper ol.sentences li button.sentence {
+  --workbook-button-hover: #f3ecdd;
+  margin: 0 0 0 -8px;
+  padding: 5px 8px;
+  border: 1.5px dashed rgb(43 41 37 / 0.45);
+  border-radius: 2px;
+  background: transparent;
+  color: $ink;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.45;
+  text-align: left;
+  @media (pointer: coarse) {
+    min-height: 44px;
+  }
+  &[aria-pressed="true"] {
+    --workbook-button-hover: transparent;
+    border-style: solid;
+    border-color: $ink;
+  }
+}
+// 포스트잇
+.note {
+  padding: 3px 10px 4px;
+  font-size: 1.25rem;
+  line-height: 1.1;
+  color: $ink;
+  rotate: -2deg;
+  &[data-kind="change"] {
+    background: $change;
+  }
+  &[data-kind="keep"] {
+    background: $keep;
+    rotate: 1.5deg;
+    animation: stick 120ms ease-out both;
+  }
+}
+
+// 오른쪽: 다시 건넬 메모
+.side {
+  min-width: 0;
+  display: grid;
+  gap: 12px;
+}
+.memo {
+  padding: 12px 18px 4px;
+  background: $memo;
+  color: $ink;
+}
+.again .side .memo header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 14px;
+  font-size: 1.6rem;
+  line-height: 1;
+  s {
+    color: rgb(43 41 37 / 0.5);
+  }
+}
+.again .side .memo ul {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.again .side .memo ul li {
+  margin: 0;
+  padding: 7px 0 7px 16px;
+  border-top: 1.5px solid $memo-line;
+  position: relative;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: $ink;
+  // 포스트잇과 같은 색의 띠로 어느 쪽 말인지 잇는다.
+  &[data-kind]::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 9px;
+    bottom: 9px;
+    width: 6px;
+  }
+  &[data-kind="change"]::before {
+    background: $change;
+  }
+  &[data-kind="keep"]::before {
+    background: $keep;
+  }
+}
+.again .side .memo ul li.written {
+  animation: stick 120ms ease-out both;
+}
+.again .side .memo ul li.blank {
+  padding-left: 0;
+  font-size: 0.85rem;
+  color: rgb(43 41 37 / 0.66);
+  text-decoration: underline dashed rgb(43 41 37 / 0.5) 1.5px;
+  text-underline-offset: 5px;
+}
+// 좁은 화면에서는 메모가 답 종이 아래 화면 밖에 있어, 한 줄이 더해졌다고 종이 안에서 알려 준다.
+.again .paper .added {
+  margin: 10px 0 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: $ink;
+  @include up(md) {
+    display: none;
+  }
+}
+// 예시 답 아래, 종이 안의 구분선 밑에 둔다.
+.again .paper .why {
+  margin: 12px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid rgb(43 41 37 / 0.18);
+  font-size: 0.88rem;
+  color: $ink;
+}
+// 직접 보낸 사람: 바꿀 것 · 그대로 둘 것 두 칸과 복사
+.mine {
+  display: grid;
+  gap: 6px;
+}
+.again .side .mine .mineLead {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 700;
+  small {
+    font-weight: 400;
+    color: var(--ink-muted);
+  }
+}
+.again .side .mine label {
+  margin: 0;
+  display: grid;
+  grid-template-columns: 6.4rem minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  span {
+    padding: 4px 8px;
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: $ink;
+    text-align: center;
+    &[data-kind="change"] {
+      background: $change;
+    }
+    &[data-kind="keep"] {
+      background: $keep;
+    }
+  }
+}
+.again .side .mine input,
+.again .side .single input {
+  width: 100%;
+  margin: 0;
+  padding: 7px 10px;
+  border: 1.5px solid var(--ink);
+  border-radius: 2px;
+  background: #fffdf8;
+  color: $ink;
+  font: inherit;
+  font-weight: 400;
+}
+.copyRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+}
+.again .side .mine .copy {
+  padding: 7px 18px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--accent);
+  color: white;
+  font-weight: 700;
+  &:disabled {
+    opacity: 0.4;
+  }
+}
+.again .side .mine .copied {
+  margin: 0;
+  font-size: 0.85rem;
+}
+.again .side label.single {
+  margin: 0;
+  display: grid;
+  gap: 6px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  small {
+    font-weight: 400;
+    color: var(--ink-muted);
+  }
+}
+
+@keyframes stick {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .note[data-kind="keep"],
+  .again .side .memo ul li.written {
+    animation: none;
+  }
+}

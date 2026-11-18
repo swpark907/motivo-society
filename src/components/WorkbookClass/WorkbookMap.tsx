@@ -371,20 +371,35 @@ export function WorkbookMap({
                 AI의 도움과 한계, 챗봇과 코드 에이전트, 준비, 첫 대화, 파일 작업의 흐름을 배웠어요.
                 <strong>예시 복습과 실제 컴퓨터 실습 기록은 구분</strong>해요.
               </p>
-              {[workbookLessonId.firstRequest, workbookLessonId.firstFile].map((index) => (
-                <details key={index}>
-                  <summary>
-                    {stops[index].name} ·{" "}
-                    {practice[index].mode === "computer" ? "실제 실습 본인 확인" : "예시 복습"}
-                  </summary>
-                  <h3>첫 요청</h3>
-                  <p>{practice[index].request}</p>
-                  <h3>확인한 점</h3>
-                  <p>{practice[index].observation}</p>
-                  <h3>수정 요청</h3>
-                  <p>{practice[index].revision}</p>
-                </details>
-              ))}
+              {[workbookLessonId.firstRequest, workbookLessonId.firstFile].map((index) => {
+                const record = practice[index];
+                // 학습자가 실제로 남긴 것만 보인다. 고르지 않은 방식을 "예시 복습"으로 적지 않고,
+                // 빈 칸은 제목도 띄우지 않는다.
+                const lines = (
+                  [
+                    ["첫 요청", record.request],
+                    ["확인한 점", record.observation],
+                    ["수정 요청", record.revision],
+                  ] as const
+                ).filter(([, text]) => text.trim());
+                if (record.mode === null && lines.length === 0) return null;
+                return (
+                  <details key={index}>
+                    <summary>
+                      {stops[index].name}
+                      {record.mode === "computer" && " · 실제 실습 본인 확인"}
+                      {record.mode === "example" && " · 예시로 따라가기"}
+                    </summary>
+                    {lines.length === 0 && <p>남긴 기록이 없어요.</p>}
+                    {lines.map(([label, text]) => (
+                      <div key={label}>
+                        <h3>{label}</h3>
+                        <p>{text}</p>
+                      </div>
+                    ))}
+                  </details>
+                );
+              })}
               <WorkbookApplicationSummary />
               <h3>같은 공방에서 내 홈페이지로</h3>
               <p>

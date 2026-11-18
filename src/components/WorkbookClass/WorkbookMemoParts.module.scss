@@ -1,0 +1,171 @@
+// 1-5 화면 2: 메모 한 장에 이름표 네 개. 버튼을 누르면 이름표는 그대로고 줄에 적힌 글만 바뀐다.
+// 오렌지는 메모 머리 전환에서 아직 안 본 "AI에게" 한 곳. 수업 공통 p·button·ol 규칙보다 우선하도록 .parts 아래에서 지정한다.
+$ink: var(--workbook-ink, #2b2925);
+$memo: var(--workbook-memo, #fbe9a6);
+$memo-line: var(--workbook-memo-line, #e6cf7c);
+
+.parts {
+  word-break: keep-all;
+}
+.parts .title {
+  margin: 0;
+}
+.parts .lead {
+  margin-top: 10px;
+  max-width: 58rem;
+  p {
+    margin: 0;
+  }
+}
+
+.desk {
+  margin-top: 22px;
+  display: grid;
+  gap: 20px;
+  @include up(md) {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
+    gap: 36px;
+    align-items: start;
+  }
+}
+
+.memo {
+  position: relative;
+  padding: 18px 16px 8px;
+  background: $memo;
+  color: $ink;
+  rotate: -0.6deg;
+  // 테이프
+  &::before {
+    content: "";
+    position: absolute;
+    top: -11px;
+    left: 50%;
+    width: 84px;
+    height: 22px;
+    translate: -50% 0;
+    rotate: 2deg;
+    background: rgb(255 255 255 / 0.65);
+    border: 1px solid rgb(43 41 37 / 0.12);
+  }
+  @include up(md) {
+    padding: 20px 26px 10px;
+  }
+}
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+.to {
+  font-size: 1.9rem;
+  line-height: 1;
+}
+// 조수에게 ⇄ AI에게 전환. 고른 쪽은 먹색으로 채우고, 아직 안 고른 "AI에게"는 오렌지 밑줄 글씨로 부른다.
+.switch {
+  display: inline-flex;
+  border: 1.5px solid $ink;
+}
+.parts .memo .head .switch button[type] {
+  --workbook-button-hover: rgb(255 255 255 / 0.5);
+  min-height: 34px;
+  padding: 4px 14px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: $ink;
+  font-size: 0.88rem;
+  font-weight: 700;
+  @media (pointer: coarse) {
+    min-height: 44px;
+  }
+  &[aria-pressed="true"] {
+    --workbook-button-hover: #{$ink};
+    background: $ink;
+    color: #fffdf8;
+  }
+  &:last-child[aria-pressed="false"] {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+}
+.parts .memo ol.rows {
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.parts .memo ol.rows li.row {
+  margin: 0;
+  padding: 10px 0;
+  border-top: 1.5px solid $memo-line;
+  display: grid;
+  gap: 4px;
+  @include up(md) {
+    grid-template-columns: 9.5rem minmax(0, 1fr);
+    column-gap: 18px;
+    align-items: center;
+    min-height: 66px;
+  }
+}
+// 이름표: 먹색 띠에 흰 글씨
+.tag {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 8px;
+  small {
+    font-size: 0.75rem;
+    color: rgb(43 41 37 / 0.7);
+    @include up(md) {
+      flex-basis: 100%;
+      padding-left: 1.3em;
+    }
+  }
+}
+// 수업 공통 strong 색보다 우선하도록 깊게 지정한다.
+.parts .memo ol.rows li.row .tag strong {
+  padding: 2px 8px;
+  background: $ink;
+  color: #fffdf8;
+  font-size: 0.92rem;
+}
+.no {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: rgb(43 41 37 / 0.6);
+}
+.parts .memo .row .line {
+  margin: 0;
+  font-size: 1.02rem;
+  line-height: 1.5;
+  color: $ink;
+  animation: write 120ms ease-out both;
+}
+
+.side {
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+  align-content: start;
+  @include up(md) {
+    padding-top: 56px;
+  }
+}
+.parts .side p {
+  margin: 0;
+}
+
+@keyframes write {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .parts .memo .row .line {
+    animation: none;
+  }
+}

@@ -1,8 +1,8 @@
 // 1-3 화면 6: 영수증으로 정리한다(1-1 카드 세 장, 1-2 공책 한 장과 다른 형식).
 // 줄이 차례로 찍힌다(들어올 때 한 번). 오렌지는 다음 수업 표의 띠 한 곳.
 // 수업 공통 p·h3·ol 규칙보다 우선하도록 .recap 아래에서 지정한다.
-$paper: #f6efe2;
-$ink: #2b2925;
+$paper: var(--workbook-paper, #f6efe2);
+$ink: var(--workbook-ink, #2b2925);
 $mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
 
 .recap {
