@@ -1,0 +1,99 @@
+// 2-3 화면 2: 연습 화면의 버튼을 누르면 아무 일도 없고 카피바라가 갸웃한다. 오른쪽에 버튼의 두 부분
+// (보이는 모양 · 눌렀을 때 하는 일)을 나눠 보여 준다. 오렌지는 페이지 속 버튼 한 곳.
+// 수업 공통 p·dl 규칙보다 우선하도록 .button 아래에서 지정한다.
+$ink: var(--workbook-ink, #2b2925);
+$paper: var(--workbook-paper, #f6efe2);
+$memo: var(--workbook-memo, #fbe9a6);
+
+.button {
+  word-break: keep-all;
+}
+.button .title {
+  margin: 0;
+}
+.button .lead {
+  margin-top: 10px;
+  max-width: 58rem;
+  p {
+    margin: 0;
+  }
+}
+.desk {
+  margin-top: 16px;
+  display: grid;
+  gap: 18px;
+  @include up(md) {
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    gap: 32px;
+    align-items: start;
+  }
+}
+.stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 84px;
+  gap: 10px;
+  align-items: end;
+}
+.capy {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  img {
+    width: 100%;
+    height: auto;
+  }
+}
+.button .capy .bubble {
+  margin: 0;
+  padding: 5px 8px;
+  border: 2px solid $ink;
+  border-radius: 12px 12px 2px 12px;
+  background: #fffdf8;
+  color: $ink;
+  font-size: 1.05rem;
+  line-height: 1.12;
+  text-align: center;
+  animation: pop 160ms ease-out both;
+}
+.explain {
+  display: grid;
+  gap: 10px;
+  p {
+    margin: 0;
+  }
+}
+.button .explain .wait {
+  color: var(--ink-muted);
+}
+.button dl.parts {
+  margin: 0;
+  display: grid;
+  gap: 8px;
+  div {
+    padding: 10px 14px;
+    border: 1.5px solid $ink;
+    background: #fffdf8;
+    &[data-state="later"] {
+      border-style: dashed;
+      background: transparent;
+    }
+  }
+  dt {
+    font-weight: 800;
+  }
+  dd {
+    margin: 2px 0 0;
+    font-size: 0.88rem;
+  }
+}
+@keyframes pop {
+  from {
+    opacity: 0;
+    translate: 0 4px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .button .capy .bubble {
+    animation: none;
+  }
+}

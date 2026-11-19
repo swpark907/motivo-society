@@ -1,0 +1,115 @@
+// 2-3 화면 1: 왼쪽은 설계도 조각 목록(조각마다 ✓있어요 / ✗달라요), 오른쪽은 연습 화면 또는 내 화면 띄우는 방법.
+// "달라요"를 누른 조각은 연필로 그은 듯한 점선 테두리. 오렌지는 연습 화면의 버튼 한 곳.
+// 수업 공통 p·ol·button 규칙보다 우선하도록 .compare 아래에서 지정한다.
+$ink: var(--workbook-ink, #2b2925);
+$paper: var(--workbook-paper, #f6efe2);
+$memo: var(--workbook-memo, #fbe9a6);
+
+.compare {
+  word-break: keep-all;
+}
+.compare .title {
+  margin: 0;
+}
+.compare .lead {
+  margin-top: 10px;
+  max-width: 60rem;
+  p {
+    margin: 0;
+  }
+}
+.desk {
+  margin-top: 12px;
+  display: grid;
+  gap: 18px;
+  @include up(md) {
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    gap: 32px;
+    align-items: start;
+  }
+}
+.left {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+.compare ol.pieces {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+  li {
+    margin: 0;
+    padding: 6px 10px;
+    border: 1.5px solid $ink;
+    background: #fffdf8;
+    display: grid;
+    grid-template-columns: 5.5rem minmax(0, 1fr) auto;
+    gap: 4px 10px;
+    align-items: center;
+    &[data-mark="same"] {
+      background: $paper;
+    }
+    &[data-mark="diff"] {
+      border-style: dashed;
+      background: $memo;
+    }
+  }
+}
+.name {
+  font-size: 0.8rem;
+  color: var(--ink-muted);
+}
+.plan {
+  font-size: 0.86rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+.choices {
+  display: flex;
+  gap: 4px;
+}
+.compare .choices button {
+  --workbook-button-hover: #{$paper};
+  padding: 2px 10px;
+  border: 1px solid rgb(43 41 37 / 0.35);
+  border-radius: 6px;
+  background: #fffdf8;
+  color: $ink;
+  font-size: 0.82rem;
+  &[aria-pressed="true"] {
+    --workbook-button-hover: #{$ink};
+    border-color: $ink;
+    background: $ink;
+    color: #fffdf8;
+  }
+}
+.how {
+  padding: 12px 16px;
+  border: 1.5px solid $ink;
+  background: $paper;
+}
+.compare .how h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+.compare .how ol {
+  margin: 8px 0 0;
+  padding-left: 1.3em;
+  display: grid;
+  gap: 4px;
+  li {
+    margin: 0;
+    font-size: 0.9rem;
+  }
+}
+.practice {
+  display: grid;
+  gap: 8px;
+}
+.compare .left .note {
+  margin: 0;
+  font-size: 0.88rem;
+}

@@ -1,0 +1,77 @@
+// 2-2의 네 칸 메모. 1-5·1-6 메모와 같은 노란 메모지 · 검은 이름표 · 줄선. 줄은 채워질 때 한 번 붙는다.
+$ink: var(--workbook-ink, #2b2925);
+$memo: var(--workbook-memo, #fbe9a6);
+$memo-line: var(--workbook-memo-line, #e6cf7c);
+
+.memo {
+  padding: 10px 16px 4px;
+  background: $memo;
+  color: $ink;
+  word-break: keep-all;
+  @include up(md) {
+    padding: 12px 20px 6px;
+  }
+}
+.to {
+  font-family: var(--font-hand, inherit);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+.memo ol.rows {
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.memo ol.rows li.row {
+  margin: 0;
+  padding: 6px 0;
+  border-top: 1.5px solid $memo-line;
+  display: grid;
+  gap: 4px;
+  justify-items: start;
+  @include up(md) {
+    grid-template-columns: 6.2rem minmax(0, 1fr);
+    column-gap: 14px;
+  }
+}
+.tag {
+  align-self: start;
+  padding: 2px 8px;
+  background: $ink;
+  color: #fffdf8;
+  font-size: 0.8rem;
+}
+.body {
+  display: grid;
+  gap: 2px;
+  animation: stick 200ms ease-out both;
+}
+.line {
+  font-size: 0.87rem;
+  line-height: 1.5;
+}
+.memo[data-compact="true"] .line {
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+.from {
+  font-size: 0.74rem;
+  color: rgb(43 41 37 / 0.62);
+}
+.empty {
+  width: 100%;
+  height: 1.4em;
+  border-bottom: 1.5px dashed rgb(43 41 37 / 0.25);
+}
+
+@keyframes stick {
+  from {
+    opacity: 0;
+    translate: -8px 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .body {
+    animation: none;
+  }
+}

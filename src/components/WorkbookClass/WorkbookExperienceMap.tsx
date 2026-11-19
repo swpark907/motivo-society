@@ -1,4 +1,5 @@
 "use client";
+import { WorkbookUnitArrival } from "./WorkbookUnitArrival";
 import { getWorkbookCourseLesson } from "@/lib/workbook-course";
 import { WorkbookMapLessonCard } from "./WorkbookMapLessonCard";
 
@@ -9,7 +10,7 @@ import { WorkbookMapTopics } from "./WorkbookMapTopics";
 import { useWorkbookLessonState } from "./useWorkbookLessonState";
 import { createPortal } from "react-dom";
 import type { ReactNode } from "react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { experienceProgress } from "@/lib/workbook-experience";
 import { useWorkbookProgress } from "./WorkbookProgressContext";
 import styles from "./WorkbookMap.module.scss";
@@ -42,8 +43,11 @@ export function WorkbookExperienceMap({
   onEnter,
   panelTarget,
   onPractical,
+  arrived = false,
 }: {
   onEnter: (step: number) => void;
+  /** 2-3 정리에서 바로 넘어왔는지. 패널 맨 위에 2단원 마침을 알리고 첫 수업 시작에 포커스를 둔다. */
+  arrived?: boolean;
   onPractical?: () => void;
   panelTarget?: HTMLElement | null;
 }) {
@@ -59,6 +63,9 @@ export function WorkbookExperienceMap({
   );
   const pointButtons = useRef<Array<HTMLButtonElement | null>>([]);
   const startButton = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (arrived) requestAnimationFrame(() => startButton.current?.focus());
+  }, [arrived]);
   const current = stops[experienceStop];
   const selectedStep = selected !== null && available[selected] ? selected : experienceStop;
   const renderPanel = (content: ReactNode) =>
@@ -141,6 +148,12 @@ export function WorkbookExperienceMap({
       </div>
       {renderPanel(
         <div className={styles.mapPanel}>
+          {arrived && (
+            <WorkbookUnitArrival
+              finished={2}
+              next="2단원에서 고친 내 페이지를 이번에는 휴대폰과 넓은 화면에서 살펴봐요."
+            />
+          )}
           <WorkbookMapLessonCard
             completed={done[selectedStep]}
             hidden={selected === null || practicalSelected}

@@ -16,6 +16,8 @@ export type ProjectRecord = {
   basedOn: string;
   mode: "computer" | "example" | null;
   observation: string;
+  /** 2-2에서 바뀌는 부분을 보고 승인했다고 학습자가 찍은 도장(컴퓨터 실습일 때만). */
+  approved: boolean;
   previewConfirmed: boolean;
   checks: boolean[];
 };
@@ -30,6 +32,7 @@ export const emptyProject = (): ProjectRecord => ({
   basedOn: "",
   mode: null,
   observation: "",
+  approved: false,
   previewConfirmed: false,
   checks: [false, false, false],
 });
@@ -41,6 +44,8 @@ export type ProjectLessonProps = {
   onComplete: () => void;
   step: number;
   onStep: (step: number) => void;
+  /** 2-3 정리에서 다음 단원(3단원) 지도로 바로 간다. */
+  onNextUnit?: () => void;
 };
 
 export function WorkbookProjectLesson(props: ProjectLessonProps) {

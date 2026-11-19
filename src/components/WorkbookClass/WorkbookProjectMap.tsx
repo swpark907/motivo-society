@@ -1,6 +1,7 @@
 "use client";
 import { getWorkbookCourseLesson } from "@/lib/workbook-course";
 import { WorkbookMapLessonCard } from "./WorkbookMapLessonCard";
+import { WorkbookUnitArrival } from "./WorkbookUnitArrival";
 
 // 지도 지점은 기존 수업 단계로 바로 연결한다. 입력과 위치는 방문 context가 소유한다.
 import Image from "next/image";
@@ -148,10 +149,10 @@ export function WorkbookProjectMap({
       {renderPanel(
         <div className={styles.mapPanel}>
           {arrived && (
-            <p className={styles.arrival}>
-              <strong>1단원을 마쳤어요.</strong> 여기서부터는 1단원에서 만든 폴더와 파일을 내
-              페이지로 키워요.
-            </p>
+            <WorkbookUnitArrival
+              finished={1}
+              next="여기서부터는 1단원에서 만든 폴더와 파일을 내 페이지로 키워요."
+            />
           )}
           <WorkbookMapLessonCard
             completed={done[selectedStep]}

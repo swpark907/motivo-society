@@ -127,7 +127,7 @@ export function WorkbookPlanningLesson({ record, onBack, onStep }: ProjectLesson
         {safeScreen === 3 && (
           <WorkbookPlanOrder record={record} reader={reader} button={button} update={update} />
         )}
-        {safeScreen === 4 && <WorkbookPlanGrill record={record} button={button} />}
+        {safeScreen === 4 && <WorkbookPlanGrill record={record} />}
         {safeScreen === 5 && (
           <WorkbookPlanRecap
             record={record}

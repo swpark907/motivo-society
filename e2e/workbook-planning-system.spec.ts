@@ -137,12 +137,13 @@ test("2-1은 쓰지 않고 고르며 기획의 다섯 가지를 배운다", asyn
   await capture("plan-6");
   await page.getByRole("button", { name: /^다음 수업 2-2/ }).click();
   await expect(page).toHaveURL(/page-request$/);
-  await page.getByRole("button", { name: "내 기획으로 요청 초안 만들기", exact: true }).click();
-  await next.click();
-  const request = page.getByRole("textbox", { name: "내 제작 요청", exact: true });
-  await expect(request).toHaveValue(/처음 오신 분을 위한 안내/);
-  await expect(request).toHaveValue(/신청 방법\n무엇을 해 주는지|무엇을 해 주는지\n신청 방법/);
-  await expect(request).toHaveValue(/나에게 하나씩 물어보고 채워줘/);
+  await page.getByRole("button", { name: "메모로 옮기기 →", exact: true }).click();
+  const memo = page.getByRole("region", { name: "기획을 옮긴 메모" });
+  await expect(memo).toContainText("처음 오신 분을 위한 안내");
+  await expect(memo).toContainText(
+    /이 순서로 넣어줘: (무엇을 해 주는지, 신청 방법|신청 방법, 무엇을 해 주는지)/,
+  );
+  await expect(memo).toContainText("나에게 하나씩 물어보고 채워줘");
 });
 
 test("비어 있는 곳이 있으면 다음 수업 대신 고르러 갈 곳을 알려 준다", async ({ page }) => {

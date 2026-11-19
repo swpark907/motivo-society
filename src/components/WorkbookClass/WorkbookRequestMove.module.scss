@@ -1,0 +1,87 @@
+// 2-2 화면 1: 왼쪽은 2-1에서 정한 기획 한 장, 오른쪽은 1-5의 네 칸 메모. "메모로 옮기기"를 누르면
+// 메모 줄이 차례로 붙고 왼쪽 기획은 옅어진다. 오렌지는 "메모로 옮기기" 버튼 한 곳.
+// 수업 공통 p·dl·button 규칙보다 우선하도록 .move 아래에서 지정한다.
+$ink: var(--workbook-ink, #2b2925);
+$paper: var(--workbook-paper, #f6efe2);
+
+.move {
+  word-break: keep-all;
+}
+.move .title {
+  margin: 0;
+}
+.move .lead {
+  margin-top: 10px;
+  max-width: 58rem;
+  p {
+    margin: 0;
+  }
+}
+.desk {
+  margin-top: 14px;
+  display: grid;
+  gap: 18px;
+  @include up(md) {
+    grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
+    gap: 32px;
+    align-items: start;
+  }
+}
+.left {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+}
+.plan {
+  padding: 14px 16px;
+  border: 1.5px solid $ink;
+  background: #fffdf8;
+  color: $ink;
+  rotate: -0.5deg;
+  transition: opacity 120ms ease-out;
+  &[data-moved="true"] {
+    opacity: 0.55;
+  }
+}
+.move .plan h3 {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--ink-muted);
+}
+.move .plan dl {
+  margin: 6px 0 0;
+  display: grid;
+  gap: 4px;
+  div {
+    display: grid;
+    gap: 1px;
+  }
+  dt {
+    font-size: 0.74rem;
+    color: var(--ink-muted);
+  }
+  dd {
+    margin: 0;
+    font-size: 0.84rem;
+    font-weight: 700;
+  }
+}
+.move .plan .go {
+  margin-top: 12px;
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--accent);
+  color: white;
+  font-weight: 700;
+}
+.move .closing {
+  margin: 0;
+  font-size: 0.9rem;
+}
+@media (prefers-reduced-motion: reduce) {
+  .plan {
+    transition: none;
+  }
+}

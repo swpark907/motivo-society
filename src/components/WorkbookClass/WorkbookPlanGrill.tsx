@@ -6,33 +6,15 @@
 // in the workbook — nothing is sent anywhere; answering for real happens in 2-2 with the AI app.
 // Skill facts were checked on 2026-11-18 (Claude Code docs: code.claude.com/docs/en/skills;
 // grill-me by Matt Pocock, github.com/mattpocock/skills).
-import { planLines, type PlanButton } from "@/lib/workbook-plan-readers";
+import { planQuestions } from "@/lib/workbook-plan-memo";
 import type { ProjectRecord } from "./WorkbookProjectLesson";
 import { useWorkbookLessonState } from "./useWorkbookLessonState";
 import styles from "./WorkbookPlanGrill.module.scss";
 
 /** 2-1 screen 5: let the AI grill the plan. Questions come from the learner's blueprint. */
-export function WorkbookPlanGrill({
-  record,
-  button,
-}: {
-  record: ProjectRecord;
-  button: PlanButton | null;
-}) {
+export function WorkbookPlanGrill({ record }: { record: ProjectRecord }) {
   const [asked, setAsked] = useWorkbookLessonState("plan-grill-asked", 0);
-  const now = planLines(record.content);
-  const later = planLines(record.later);
-  const questions = [
-    now[0]
-      ? `‘${now[0]}’에는 구체적으로 어떤 내용을 적을까요? 하나만 고른다면요?`
-      : "이 페이지에서 가장 먼저 보여줄 것은 무엇인가요?",
-    button
-      ? `‘${button.label}’ 버튼을 누르면 어떤 화면으로 가야 하나요?`
-      : "다 읽은 사람이 마지막에 무엇을 했으면 하나요?",
-    later[0]
-      ? `‘${later[0]}’ 내용은 언제쯤 채울 수 있나요? 그전까지는 페이지에서 빼 둘까요?`
-      : "다 읽은 사람이 딱 하나만 기억한다면, 무엇이었으면 하나요?",
-  ];
+  const questions = planQuestions(record).map((item) => item.question);
   const shown = Math.min(asked, questions.length);
 
   return (

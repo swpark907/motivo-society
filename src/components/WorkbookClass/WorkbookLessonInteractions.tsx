@@ -1,11 +1,7 @@
 "use client";
 
 import { useId, useRef } from "react";
-import {
-  workbookLearningExample as example,
-  findWorkbookRequestExcerpt,
-} from "@/lib/workbook-learning-example";
-import { PLAN_CONTENT_HEADING, type WorkbookPagePlan } from "@/lib/workbook-page-plan";
+import { workbookLearningExample as example } from "@/lib/workbook-learning-example";
 import { useWorkbookLessonState } from "./useWorkbookLessonState";
 import styles from "./WorkbookLessonInteractions.module.scss";
 
@@ -119,128 +115,6 @@ export function WorkbookAiOpening() {
         )}
       </div>
       <small>미리 만든 학습 예시예요. 실제 AI를 호출하지 않아요.</small>
-    </section>
-  );
-}
-
-export function WorkbookPlanRequestBridge({
-  plan,
-  request,
-}: {
-  plan: WorkbookPagePlan;
-  request: string;
-}) {
-  const [selected, setSelected] = useWorkbookLessonState("plan-request-highlight", 0);
-  const [all, setAll] = useWorkbookLessonState("plan-request-show-all", false);
-  const id = useId();
-  const parts = [
-    {
-      label: "읽을 사람",
-      value: plan.audience,
-      prefix: "읽을 사람: ",
-      why: "누구에게 필요한 정보를 먼저 보여줄지 알려줘요.",
-    },
-    {
-      label: "바라는 행동",
-      value: plan.purpose,
-      prefix: "페이지의 목적: ",
-      why: "읽은 뒤 할 일을 정하면 화면을 구성할 기준이 생겨요.",
-    },
-    {
-      label: "담을 내용",
-      value: plan.content,
-      prefix: PLAN_CONTENT_HEADING,
-      why: "담을 것의 종류를 알려 주고, 실제 내용은 AI가 나에게 물어보게 해요.",
-    },
-    {
-      label: "작업 대상",
-      value: "my-first-web",
-      prefix: "",
-      why: "같은 폴더의 파일에서 작업을 이어가도록 해요.",
-    },
-  ];
-  return (
-    <section className={`${styles.interaction} ${styles.bridge}`} aria-label="기획과 요청 연결">
-      <div className={styles.selectionGroup} role="group" aria-label="기획 항목 선택">
-        <span className={styles.groupLabel}>비교할 기획 항목</span>
-        <div className={styles.selections}>
-          {parts.map((part, index) => (
-            <button
-              type="button"
-              key={part.label}
-              className={styles.selection}
-              aria-label={part.label}
-              aria-pressed={!all && selected === index}
-              aria-controls={`${id}-excerpt`}
-              onClick={() => {
-                setSelected(index);
-                setAll(false);
-              }}
-            >
-              {!all && selected === index && <span aria-hidden="true">✓ </span>}
-              {part.label}
-            </button>
-          ))}
-        </div>
-      </div>
-      <div className={`${styles.scene} ${all ? styles.allConnections : ""}`} id={`${id}-excerpt`}>
-        <section className={styles.panel}>
-          <h3>{parts[selected].label}</h3>
-          <p className={styles.preserveLines}>
-            {parts[selected].value || "아직 적은 내용이 없어요."}
-          </p>
-        </section>
-        <section className={styles.panel} aria-label="현재 요청에서 찾은 문장">
-          <h3>현재 요청에서 찾은 문장</h3>
-          {(all ? parts : [parts[selected]]).map((part) => {
-            const excerpt = findWorkbookRequestExcerpt(request, part.value, part.prefix);
-            return (
-              <div key={part.label}>
-                {all && <h4>{part.label}</h4>}
-                {excerpt ? (
-                  <p className={styles.preserveLines}>
-                    {excerpt.before}
-                    <mark>{excerpt.match}</mark>
-                    {excerpt.after}
-                  </p>
-                ) : (
-                  <p>
-                    기획의 ‘{part.label}’: {part.value || "아직 적은 내용이 없어요."}
-                    <br />
-                    현재 요청에서 연결된 항목을 찾지 못했어요. 직접 편집한 원문은 그대로예요. 다른
-                    표현으로 바꿨다면 그대로 진행해도 괜찮아요.
-                  </p>
-                )}
-              </div>
-            );
-          })}
-        </section>
-      </div>
-      <p className={styles.feedback} role="status">
-        {all
-          ? "네 항목의 연결을 함께 보고 있어요. 항목을 고르면 한 부분씩 다시 볼 수 있어요."
-          : parts[selected].why}
-      </p>
-      <div className={styles.supportActions} aria-label="연결 보기 방식">
-        <button
-          className={styles.secondaryAction}
-          type="button"
-          onClick={() => {
-            setSelected((selected + 1) % parts.length);
-            setAll(false);
-          }}
-        >
-          다음 연결 살펴보기
-        </button>
-        <button
-          className={styles.secondaryAction}
-          type="button"
-          aria-expanded={all}
-          onClick={() => setAll(!all)}
-        >
-          {all ? "한 부분씩 보기" : "전체 연결 보기"}
-        </button>
-      </div>
     </section>
   );
 }

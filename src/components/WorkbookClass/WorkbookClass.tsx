@@ -116,7 +116,7 @@ export function WorkbookClass() {
     null,
   );
   // 1-6 정리에서 "2단원 시작하기"로 넘어왔을 때만 2단원 지도에 "1단원을 마쳤어요"를 한 번 보여 준다.
-  const [unitArrival, setUnitArrival] = useWorkbookLessonState<"project" | null>(
+  const [unitArrival, setUnitArrival] = useWorkbookLessonState<"project" | "experience" | null>(
     "unit-arrival",
     null,
   );
@@ -870,10 +870,14 @@ export function WorkbookClass() {
                       )}
                       {mapWorld === "experience" && (
                         <WorkbookExperienceMap
+                          arrived={unitArrival === "experience"}
                           onPractical={() => enterPractical("experience")}
                           key={experienceStop}
                           panelTarget={mapPanelTarget}
-                          onEnter={enterExperience}
+                          onEnter={(step) => {
+                            setUnitArrival(null);
+                            enterExperience(step);
+                          }}
                         />
                       )}
                       {mapWorld === "project" && (
@@ -1241,6 +1245,14 @@ export function WorkbookClass() {
                         setProjectCompleted(true);
                         setLesson(null);
                         requestAnimationFrame(() => title.current?.focus());
+                      }}
+                      onNextUnit={() => {
+                        setReviewView(null);
+                        setPracticalView(null);
+                        setMapWorld("experience");
+                        setExperienceStop(0);
+                        setUnitArrival("experience");
+                        setLesson(null);
                       }}
                     />
                   ) : (

@@ -1,0 +1,144 @@
+// 2-2 화면 3: 왼쪽은 보낼 메모와 복사 버튼, 오른쪽은 AI 질문과 정직한 대답 예시, 아래 보냄 도장.
+// 오렌지는 "메모 복사하기" 버튼 한 곳. 수업 공통 p·ol·button 규칙보다 우선하도록 .send 아래에서 지정한다.
+$ink: var(--workbook-ink, #2b2925);
+$paper: var(--workbook-paper, #f6efe2);
+$memo: var(--workbook-memo, #fbe9a6);
+
+.send {
+  word-break: keep-all;
+}
+.send .title {
+  margin: 0;
+}
+.send .lead {
+  margin-top: 10px;
+  max-width: 60rem;
+  p {
+    margin: 0;
+  }
+}
+.desk {
+  margin-top: 16px;
+  display: grid;
+  gap: 18px;
+  @include up(md) {
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    gap: 32px;
+    align-items: start;
+  }
+}
+.left,
+.right {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  min-width: 0;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+}
+.send .actions .copy {
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--accent);
+  color: white;
+  font-weight: 700;
+}
+
+.chat {
+  padding: 12px 14px;
+  border: 1.5px solid $ink;
+  background: #fffdf8;
+}
+.send .chat h3 {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--ink-muted);
+}
+.send .chat ol {
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+  li {
+    margin: 0;
+    display: grid;
+    gap: 3px;
+  }
+}
+.send .chat .ai,
+.send .chat .me {
+  margin: 0;
+  max-width: 92%;
+  padding: 5px 10px;
+  font-size: 0.83rem;
+  line-height: 1.4;
+}
+.send .chat .ai {
+  justify-self: start;
+  border: 1px solid rgb(43 41 37 / 0.3);
+  border-radius: 12px 12px 12px 2px;
+  background: $paper;
+}
+.send .chat .me {
+  justify-self: end;
+  border-radius: 12px 12px 2px 12px;
+  background: $memo;
+}
+.send .chat .rule {
+  margin: 10px 0 0;
+  padding-top: 8px;
+  border-top: 1px dashed rgb(43 41 37 / 0.3);
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.send .actions .stamp {
+  --workbook-button-hover: transparent;
+  padding: 2px 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 700;
+  text-align: left;
+}
+.mark {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border: 2px dashed var(--ink-muted);
+  border-radius: 50%;
+  font-size: 0.82rem;
+}
+.stamp[aria-pressed="true"] .mark {
+  border: 3px double var(--ink);
+  rotate: -10deg;
+}
+.send .actions .later {
+  --workbook-button-hover: transparent;
+  padding: 4px 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink-muted);
+  font-size: 0.85rem;
+  font-weight: 400;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-align: left;
+}
+.send .left .next {
+  margin: 0;
+  min-height: 1.4em;
+  font-size: 0.85rem;
+}
