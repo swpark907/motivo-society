@@ -4,16 +4,18 @@
 // from 1-5 on the right, one row after another, when the learner presses the button. Each row says
 // which part of the plan it came from. Whether the rows were moved is the visit's lesson state; the
 // memo text itself is derived from the plan (workbook-plan-memo.ts).
-import { workbookCourse, workbookLessonId } from "@/lib/workbook-course";
+import { workbookCourse, workbookLessonId, workbookProjectStep } from "@/lib/workbook-course";
 import { planMemo } from "@/lib/workbook-plan-memo";
 import { findPlanButton, planLines } from "@/lib/workbook-plan-readers";
+import { layoutLabel, moodLabel } from "@/lib/workbook-plan-options";
 import type { ProjectRecord } from "./WorkbookProjectLesson";
 import { useWorkbookLessonState } from "./useWorkbookLessonState";
 import { WorkbookPlanMemoCard } from "./WorkbookPlanMemoCard";
 import styles from "./WorkbookRequestMove.module.scss";
 
 const requestLesson = workbookCourse[0].lessons[workbookLessonId.firstRequest];
-const planLesson = workbookCourse[1].lessons[0];
+const planLesson = workbookCourse[1].lessons[workbookProjectStep.audience];
+const briefLesson = workbookCourse[1].lessons[workbookProjectStep.brief];
 
 /** 2-2 screen 1: the plan becomes a request by moving it into the memo learned in 1-5. */
 export function WorkbookRequestMove({ record }: { record: ProjectRecord }) {
@@ -23,7 +25,11 @@ export function WorkbookRequestMove({ record }: { record: ProjectRecord }) {
   const pieces: [string, string][] = [
     ["제목", record.title.trim()],
     ["읽을 사람", record.audience.trim()],
-    ["맨 아래 버튼", button?.label ?? record.purpose.trim()],
+    ["맨 아래 버튼", record.buttonLabel.trim() || button?.label || record.purpose.trim()],
+    [
+      "배치 · 분위기",
+      [layoutLabel(record.layout), moodLabel(record.mood)].filter(Boolean).join(" · "),
+    ],
     ["넣을 내용", planLines(record.content).join(" · ")],
     ["나중에 채울 내용", planLines(record.later).join(" · ")],
   ];
@@ -43,7 +49,9 @@ export function WorkbookRequestMove({ record }: { record: ProjectRecord }) {
       <div className={styles.desk}>
         <div className={styles.left}>
           <section className={styles.plan} data-moved={moved} aria-label="지난 수업에서 정한 기획">
-            <h3>{planLesson.number}에서 정한 기획</h3>
+            <h3>
+              {planLesson.number}~{briefLesson.number}에서 정한 기획
+            </h3>
             <dl>
               {pieces.map(([label, value]) => (
                 <div key={label}>
@@ -69,6 +77,7 @@ export function WorkbookRequestMove({ record }: { record: ProjectRecord }) {
           rows={rows}
           label="기획을 옮긴 메모"
           showFrom
+          compact
           shown={moved ? rows.length : 0}
         />
       </div>

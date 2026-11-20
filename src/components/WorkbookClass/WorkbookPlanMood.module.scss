@@ -1,0 +1,104 @@
+// 2-4 화면 2: 같은 페이지를 세 분위기로 그린 카드 셋. 미리보기 안의 색은 분위기 견본 데이터라 인라인으로 칠한다.
+// 화면 자체의 오렌지는 쓰지 않는다(견본 색이 주인공). 수업 공통 p·ul·button 규칙보다 우선하도록 .mood 아래에서 지정한다.
+$ink: var(--workbook-ink, #2b2925);
+$paper: var(--workbook-paper, #f6efe2);
+$memo: var(--workbook-memo, #fbe9a6);
+
+.mood {
+  word-break: keep-all;
+}
+.mood .title {
+  margin: 0;
+}
+.mood .lead {
+  margin-top: 10px;
+  max-width: 60rem;
+  p {
+    margin: 0;
+  }
+}
+.mood ul.options {
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 12px;
+  @include up(md) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+  }
+  li {
+    margin: 0;
+  }
+  button {
+    --workbook-button-hover: #{$paper};
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+    border: 1.5px solid rgb(43 41 37 / 0.35);
+    border-radius: 8px;
+    background: #fffdf8;
+    color: $ink;
+    display: grid;
+    align-content: start;
+    gap: 6px;
+    text-align: left;
+    strong {
+      font-size: 1rem;
+    }
+    small {
+      font-size: 0.8rem;
+      line-height: 1.45;
+      color: var(--ink-muted);
+    }
+    &[aria-pressed="true"] {
+      --workbook-button-hover: #{$memo};
+      border: 2px solid $ink;
+      background: $memo;
+    }
+  }
+}
+.preview {
+  display: grid;
+  gap: 6px;
+  padding: 14px;
+  border: 1px solid rgb(0 0 0 / 0.15);
+  min-height: 120px;
+  b {
+    font-size: 1rem;
+    line-height: 1.3;
+  }
+  i {
+    height: 6px;
+    border-radius: 3px;
+    opacity: 0.25;
+  }
+  i:nth-of-type(2) {
+    width: 70%;
+  }
+  &[data-font="serif"] b {
+    font-family: serif;
+  }
+}
+.cta {
+  justify-self: start;
+  margin-top: 4px;
+  padding: 4px 12px;
+  border-radius: 6px;
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+.swatches {
+  display: flex;
+  gap: 4px;
+  i {
+    width: 18px;
+    height: 18px;
+    border: 1px solid rgb(0 0 0 / 0.2);
+    border-radius: 50%;
+  }
+}
+.mood .options .font {
+  font-size: 0.74rem;
+}

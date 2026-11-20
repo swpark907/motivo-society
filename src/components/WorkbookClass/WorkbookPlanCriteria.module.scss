@@ -1,0 +1,82 @@
+// 2-1 화면 4: 클립보드에 꽂힌 검수표. 줄을 누르면 네모 칸에 체크가 들어간다. 오렌지는 쓰지 않는다.
+// 수업 공통 p·ul·button 규칙보다 우선하도록 .criteria 아래에서 지정한다.
+$ink: var(--workbook-ink, #2b2925);
+$paper: var(--workbook-paper, #f6efe2);
+$memo: var(--workbook-memo, #fbe9a6);
+
+.criteria {
+  word-break: keep-all;
+}
+.criteria .title {
+  margin: 0;
+}
+.criteria .lead {
+  margin-top: 10px;
+  max-width: 58rem;
+  p {
+    margin: 0;
+  }
+}
+.sheet {
+  margin-top: 18px;
+  max-width: 40rem;
+  padding: 14px 16px 16px;
+  border: 1.5px solid $ink;
+  border-top-width: 10px;
+  background: #fffdf8;
+  color: $ink;
+  rotate: -0.3deg;
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 0.9rem;
+    span {
+      font-size: 0.8rem;
+      color: var(--ink-muted);
+    }
+  }
+}
+.criteria .sheet ul {
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 4px;
+  li {
+    margin: 0;
+    border-top: 1px dashed rgb(43 41 37 / 0.25);
+  }
+}
+.criteria .sheet button {
+  --workbook-button-hover: #{$paper};
+  width: 100%;
+  min-height: 44px;
+  padding: 6px 4px;
+  border: 0;
+  background: transparent;
+  color: $ink;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  font-size: 0.95rem;
+  small {
+    margin-left: auto;
+    padding: 1px 8px;
+    background: $memo;
+    font-size: 0.74rem;
+  }
+  &[aria-pressed="true"] {
+    font-weight: 700;
+  }
+}
+.box {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border: 1.5px solid $ink;
+  font-weight: 800;
+}

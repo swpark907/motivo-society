@@ -89,7 +89,7 @@ export function WorkbookPlanReaders({
       {picked && (
         <p className={styles.closing}>
           지금 페이지에는 제목과 소개 글뿐이라, 페이지의 점선 칸이 비어 있어요. 읽을 사람이 정해지면
-          그 빈칸에 <strong>무엇을 채워야 할지</strong>가 보입니다. 이번 수업에서는 이 홈페이지를
+          그 빈칸에 <strong>무엇을 채워야 할지</strong>가 보입니다. 이번 단원에서는 이 홈페이지를
           누가 방문할지에 대해서 생각해 보고, 그 목적에 맞게 여러 시각적 요소들을 구성하는 것을
           기획해 볼게요.
         </p>

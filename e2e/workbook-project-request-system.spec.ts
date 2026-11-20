@@ -1,9 +1,9 @@
 import { expect, test, fillPlanWithExample } from "./workbook-test";
-import { workbookCourse } from "../src/lib/workbook-course";
+import { workbookCourse, workbookProjectStep } from "../src/lib/workbook-course";
 
-const plan = workbookCourse[1].lessons[0];
+const brief = workbookCourse[1].lessons[workbookProjectStep.brief];
 
-test("2-2는 기획을 메모로 옮기고, 고쳐 달라고 하고, 답하는 법과 바뀌는 부분 읽기를 배운다", async ({
+test("2-5 제작 요청 다듬기는 기획을 메모로 옮기고, 고쳐 달라고 하고, 답하는 법과 바뀌는 부분 읽기를 배운다", async ({
   page,
 }, testInfo) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
@@ -28,7 +28,7 @@ test("2-2는 기획을 메모로 옮기고, 고쳐 달라고 하고, 답하는 �
   await expect(memo).not.toContainText("AI와 함께 만든 작업들");
   await page.getByRole("button", { name: "메모로 옮기기 →", exact: true }).click();
   await expect(memo).toContainText("“AI와 함께 만든 작업들”");
-  await expect(memo).toContainText(`← ${plan.number} 제목`);
+  await expect(memo).toContainText(`← ${brief.number} 제목`);
   await expect(memo).toContainText("나에게 하나씩 물어보고 채워줘");
   await capture("request-1");
 
@@ -58,25 +58,25 @@ test("2-2는 기획을 메모로 옮기고, 고쳐 달라고 하고, 답하는 �
   await expect(body).toContainText("찾았어요. 이럴 땐 승인하지 말고 거절한 뒤");
   await capture("request-4");
 
-  // 5. 오늘 알게 된 것 + 보낸 메모 → 다음 수업 2-3.
+  // 5. 오늘 알게 된 것 + 보낸 메모 → 다음 수업 2-6.
   await next.click();
   await expect(
     page.getByRole("list", { name: "오늘 알게 된 것" }).getByRole("listitem"),
   ).toHaveCount(4);
   await expect(body).toContainText("예시로 따라왔어요");
   await capture("request-5");
-  await page.getByRole("button", { name: /^다음 수업 2-3/ }).click();
+  await page.getByRole("button", { name: /^다음 수업 2-6/ }).click();
   await expect(page).toHaveURL(/page-building$/);
 });
 
-test("2-2에서 실습 방식을 고르지 않았으면 다음 수업 대신 보내기 화면을 알려 준다", async ({
+test("2-5에서 실습 방식을 고르지 않았으면 다음 수업 대신 보내기 화면을 알려 준다", async ({
   page,
 }) => {
   await page.goto("/workbook/classes/vibe-web/lessons/page-planning");
   await fillPlanWithExample(page, { toRequest: true });
   const next = page.getByRole("button", { name: /^다음으로/ });
   for (let i = 0; i < 4; i++) await next.click();
-  await page.getByRole("button", { name: /^다음 수업 2-3/ }).click();
+  await page.getByRole("button", { name: /^다음 수업 2-6/ }).click();
   await expect(page).toHaveURL(/page-request$/);
   await expect(
     page.getByRole("alert").filter({ hasText: "메모를 보냈는지 예시로 따라갈지" }),

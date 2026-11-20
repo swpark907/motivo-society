@@ -237,3 +237,8 @@ $memo: var(--workbook-memo, #fbe9a6);
     animation: none;
   }
 }
+.sign .controls .missing {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--ink-muted);
+}

@@ -5,7 +5,7 @@
 // 입력 칸은 없다. 실제 대답과 승인은 Claude 앱에서 하고, 워크북에는 학습자가 찍은 도장만 남긴다.
 // 실습 방식은 1-6에서 고른 것을 이어받는다. 메모 글은 기획에서 만든다(workbook-plan-memo.ts).
 import { useCallback, useEffect, useRef } from "react";
-import { workbookCourse, workbookLessonId } from "@/lib/workbook-course";
+import { workbookCourse, workbookLessonId, workbookProjectStep } from "@/lib/workbook-course";
 import { planMemoText } from "@/lib/workbook-plan-memo";
 import { workbookPlanFields } from "@/lib/workbook-page-plan";
 import type { ProjectLessonProps, ProjectRecord } from "./WorkbookProjectLesson";
@@ -23,7 +23,7 @@ import styles from "./WorkbookClass.module.scss";
 import system from "./WorkbookLesson.module.scss";
 
 const LAST = 4;
-const nextLesson = workbookCourse[1].lessons[2];
+const nextLesson = workbookCourse[1].lessons[workbookProjectStep.result];
 
 export function WorkbookProjectRequestLesson({
   record,
@@ -90,14 +90,14 @@ export function WorkbookProjectRequestLesson({
     const planBasis = JSON.stringify(workbookPlanFields.map(([key]) => record[key]));
     if (p.projectWorkflow.changes.plan !== planBasis)
       p.dispatchProjectWorkflow({ type: "change", values: { plan: planBasis } });
-    onStep(2);
+    onStep(workbookProjectStep.result);
   }
 
   return (
     <section className={system.lesson}>
       <WorkbookLessonHeader
         stage="project"
-        point={1}
+        point={workbookProjectStep.request}
         headingRef={heading}
         onBack={onBack}
         current={safeScreen + 1}
@@ -107,7 +107,7 @@ export function WorkbookProjectRequestLesson({
         {!planReady && safeScreen < LAST && (
           <p className={system.planningHint} role="status">
             지난 수업의 기획에 비어 있는 곳이 있어요. 비어 있는 칸은 메모에 괄호로 남아요.{" "}
-            <button type="button" onClick={() => onStep(0)}>
+            <button type="button" onClick={() => onStep(workbookProjectStep.brief)}>
               기획 수업으로 가기
             </button>
           </p>

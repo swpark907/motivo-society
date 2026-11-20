@@ -1,0 +1,156 @@
+// 2-3 화면 3: 연필 선으로 그린 듯한 와이어프레임. 왼쪽 틀 세 가지, 오른쪽 종이 위에 고른 틀을 크게.
+// 색 없이 회색 상자와 먹색 선만 쓴다(와이어프레임이니까). 오렌지는 쓰지 않는다.
+// 수업 공통 p·ul·button 규칙보다 우선하도록 .sketch 아래에서 지정한다.
+$ink: var(--workbook-ink, #2b2925);
+$paper: var(--workbook-paper, #f6efe2);
+$memo: var(--workbook-memo, #fbe9a6);
+
+.sketch {
+  word-break: keep-all;
+}
+.sketch > .title {
+  margin: 0;
+}
+.sketch .lead {
+  margin-top: 10px;
+  max-width: 60rem;
+  p {
+    margin: 0;
+  }
+}
+.desk {
+  margin-top: 16px;
+  display: grid;
+  gap: 18px;
+  @include up(md) {
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    gap: 32px;
+    align-items: start;
+  }
+}
+.sketch ul.options {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  li {
+    margin: 0;
+  }
+  button {
+    --workbook-button-hover: #{$paper};
+    width: 100%;
+    height: 100%;
+    padding: 8px;
+    border: 1.5px solid rgb(43 41 37 / 0.35);
+    border-radius: 6px;
+    background: #fffdf8;
+    color: $ink;
+    display: grid;
+    align-content: start;
+    gap: 6px;
+    text-align: left;
+    strong {
+      font-size: 0.88rem;
+    }
+    small {
+      font-size: 0.74rem;
+      line-height: 1.4;
+      color: var(--ink-muted);
+    }
+    &[aria-pressed="true"] {
+      --workbook-button-hover: #{$memo};
+      border: 2px solid $ink;
+      background: $memo;
+    }
+  }
+}
+
+// 와이어프레임 한 장
+.wire {
+  display: grid;
+  gap: 4px;
+  padding: 6px;
+  border: 1.5px solid $ink;
+  background: #fffdf8;
+  font-size: 0.6rem;
+  &[data-big="true"] {
+    gap: 8px;
+    padding: 14px;
+    font-size: 0.85rem;
+  }
+}
+.photo {
+  display: grid;
+  place-items: center;
+  height: 2.6em;
+  border: 1.5px dashed $ink;
+  color: var(--ink-muted);
+}
+.wire[data-big="true"] .photo {
+  height: 6em;
+}
+.title {
+  font-size: 1.1em;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.intro {
+  height: 0.6em;
+  background: rgb(43 41 37 / 0.2);
+}
+.cards {
+  display: grid;
+  gap: 3px;
+  span {
+    padding: 2px 4px;
+    border: 1px solid rgb(43 41 37 / 0.45);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+}
+.wire[data-layout="two"] {
+  grid-template-columns: 1fr 1fr;
+  .title,
+  .intro {
+    grid-column: 1;
+  }
+  .cards {
+    grid-column: 2;
+    grid-row: 1 / span 3;
+  }
+  .cta {
+    grid-column: 1 / -1;
+  }
+}
+.cta {
+  justify-self: center;
+  padding: 1px 8px;
+  border: 1.5px solid $ink;
+  border-radius: 4px;
+}
+.wire[data-big="true"] .cta {
+  padding: 4px 16px;
+}
+
+.paper {
+  margin: 0;
+  padding: 16px;
+  border: 1px solid var(--line);
+  background: #fffdf8;
+  display: grid;
+  gap: 8px;
+  figcaption {
+    font-size: 0.8rem;
+    color: var(--ink-muted);
+  }
+}
+.sketch .paper .empty {
+  margin: 0;
+  padding: 40px 10px;
+  text-align: center;
+  color: var(--ink-muted);
+}

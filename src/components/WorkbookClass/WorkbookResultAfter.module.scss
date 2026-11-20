@@ -61,7 +61,8 @@ $paper: var(--workbook-paper, #f6efe2);
   gap: 12px;
   align-content: start;
 }
-.checks {
+.checks,
+.criteria {
   margin: 0;
   padding: 10px 14px;
   border: 1.5px solid $ink;
@@ -108,4 +109,8 @@ $paper: var(--workbook-paper, #f6efe2);
   margin: 0;
   padding: 12px 14px;
   border: 1.5px dashed $ink;
+}
+.criteria {
+  border-style: dashed;
+  background: #fffdf8;
 }

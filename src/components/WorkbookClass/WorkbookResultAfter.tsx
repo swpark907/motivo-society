@@ -5,6 +5,8 @@
 // the learner stamps three checks on their own page (same file only · looks like the blueprint · the
 // button is there) and may leave one line about what they saw; that line is the evidence the record
 // keeps (no line, no "confirmed"). Slider position is the visit's lesson state.
+import { planLines } from "@/lib/workbook-plan-readers";
+import { workbookCourse, workbookProjectStep } from "@/lib/workbook-course";
 import type { ProjectRecord } from "./WorkbookProjectLesson";
 import { useWorkbookLessonState } from "./useWorkbookLessonState";
 import { WorkbookPracticePage } from "./WorkbookPracticePage";
@@ -27,6 +29,9 @@ export function WorkbookResultAfter({
   onObserve: (text: string) => void;
 }) {
   const [split, setSplit] = useWorkbookLessonState("result-split", 50);
+  const [met, setMet] = useWorkbookLessonState<string[]>("result-criteria-met", []);
+  const criteria = planLines(record.criteria);
+  const audienceLesson = workbookCourse[1].lessons[workbookProjectStep.audience];
   const computer = record.mode === "computer";
   return (
     <div data-lesson-wide className={styles.after}>
@@ -78,6 +83,25 @@ export function WorkbookResultAfter({
         </div>
 
         <div className={styles.side}>
+          {criteria.length > 0 && (
+            <fieldset className={styles.criteria}>
+              <legend>{audienceLesson.number}에서 정한 잘 됐다는 기준</legend>
+              {criteria.map((line) => (
+                <label key={line}>
+                  <input
+                    type="checkbox"
+                    checked={met.includes(line)}
+                    onChange={(event) =>
+                      setMet(
+                        event.target.checked ? [...met, line] : met.filter((item) => item !== line),
+                      )
+                    }
+                  />
+                  <span>{line}</span>
+                </label>
+              ))}
+            </fieldset>
+          )}
           {computer ? (
             <>
               <fieldset className={styles.checks}>

@@ -5,7 +5,7 @@
 // 기록은 예전 2-3과 같다: 도장 셋은 project.plan · project.content · project.actions, 본 것 한 줄이 근거이고
 // 적은 것이 없으면 기록하지 않는다(useRecordFirstProjectResult). 3단원은 이 기록을 읽는다.
 import { useEffect, useRef } from "react";
-import { workbookCourse } from "@/lib/workbook-course";
+import { workbookCourse, workbookProjectStep } from "@/lib/workbook-course";
 import { workbookPlanFields } from "@/lib/workbook-page-plan";
 import { canOpenWorkbookUnit, workbookTrialAccess } from "@/lib/workbook-access";
 import type { PieceId } from "@/lib/workbook-result-check";
@@ -27,7 +27,7 @@ import system from "./WorkbookLesson.module.scss";
 const LAST = 4;
 const checkKeys = ["project.plan", "project.content", "project.actions"] as const;
 const nextUnit = workbookCourse[2];
-const requestLesson = workbookCourse[1].lessons[1];
+const requestLesson = workbookCourse[1].lessons[workbookProjectStep.request];
 
 export function WorkbookProjectResultLesson({
   record,
@@ -103,7 +103,7 @@ export function WorkbookProjectResultLesson({
     <section className={system.lesson}>
       <WorkbookLessonHeader
         stage="project"
-        point={2}
+        point={workbookProjectStep.result}
         headingRef={heading}
         onBack={onBack}
         current={safeScreen + 1}
@@ -114,7 +114,7 @@ export function WorkbookProjectResultLesson({
           <p className={system.planningHint} role="status">
             {requestLesson.number}에서 메모를 보냈는지, 예시로 따라갈지 아직 고르지 않았어요. 지금은
             연습 화면으로 따라가요.{" "}
-            <button type="button" onClick={() => onStep(1)}>
+            <button type="button" onClick={() => onStep(workbookProjectStep.request)}>
               {requestLesson.number}로 가기
             </button>
           </p>

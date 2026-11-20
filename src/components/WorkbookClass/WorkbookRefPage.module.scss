@@ -1,0 +1,156 @@
+// 2-2 예시 페이지: 칸과 막대로 그린 브라우저 창. 누를 수 있는 부분은 점선 테두리, 찾은 부분은 메모지색과 꼬리표.
+// 버튼은 먹색으로 그린다(화면의 오렌지는 각 화면이 정한 한 곳에만).
+$ink: var(--workbook-ink, #2b2925);
+$paper: var(--workbook-paper, #f6efe2);
+$memo: var(--workbook-memo, #fbe9a6);
+$photo: #cfc6b4;
+
+.page {
+  margin: 0;
+  display: grid;
+  gap: 6px;
+  word-break: keep-all;
+  figcaption {
+    font-size: 0.8rem;
+    color: var(--ink-muted);
+    text-align: center;
+  }
+}
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 8px;
+  border: 1.5px solid $ink;
+  border-bottom: 0;
+  border-radius: 6px 6px 0 0;
+  background: $paper;
+  i {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    border: 1px solid $ink;
+  }
+  span {
+    margin-left: 6px;
+    font-size: 0.7rem;
+    font-weight: 700;
+  }
+}
+.body {
+  padding: 10px;
+  border: 1.5px solid $ink;
+  border-radius: 0 0 6px 6px;
+  background: #fffdf8;
+  display: grid;
+  gap: 8px;
+  min-height: 170px;
+  align-content: start;
+}
+.page[data-compact="true"] .body {
+  min-height: 130px;
+  gap: 6px;
+}
+.part {
+  position: relative;
+  display: grid;
+  gap: 4px;
+  padding: 2px;
+  border: 1.5px dashed transparent;
+  border-radius: 4px;
+  background: transparent;
+  color: $ink;
+  text-align: left;
+}
+// 수업 공통 버튼 색(오렌지 면 · 흰 글자)보다 우선하도록 .page .body 아래에서 지정한다.
+.page .body button.part {
+  --workbook-button-hover: #{$paper};
+  min-height: 0;
+  padding: 2px;
+  border: 1.5px dashed rgb(43 41 37 / 0.35);
+  border-radius: 4px;
+  background: transparent;
+  color: $ink;
+  font-weight: 400;
+  cursor: pointer;
+  &[data-found="true"] {
+    --workbook-button-hover: #{$memo};
+    border-style: solid;
+    border-color: $ink;
+    background: $memo;
+  }
+}
+.wide {
+  width: 100%;
+}
+.center {
+  justify-self: center;
+}
+.photo {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 70px;
+  background: $photo;
+  font-size: 0.75rem;
+  color: rgb(43 41 37 / 0.7);
+}
+.cta {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: 4px;
+  background: $ink;
+  color: #fffdf8;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+.line,
+.titleBar,
+.quote,
+.footer {
+  display: block;
+  height: 8px;
+  border-radius: 3px;
+  background: rgb(43 41 37 / 0.2);
+}
+.titleBar {
+  width: 60%;
+  height: 12px;
+  background: rgb(43 41 37 / 0.45);
+}
+.quote {
+  width: 75%;
+  font-style: normal;
+}
+.footer {
+  height: 6px;
+  width: 50%;
+}
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  i {
+    height: 34px;
+    background: $paper;
+    border: 1px solid rgb(43 41 37 / 0.3);
+  }
+}
+.big {
+  display: grid;
+  gap: 6px;
+  padding: 10px 0;
+  i {
+    height: 16px;
+    background: rgb(43 41 37 / 0.55);
+  }
+  i:last-child {
+    width: 70%;
+  }
+}
+.label {
+  font-style: normal;
+  font-size: 0.74rem;
+  line-height: 1.35;
+  font-weight: 700;
+}

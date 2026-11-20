@@ -1,30 +1,32 @@
 "use client";
 
-// Client component: everything picked in this lesson lands on the page as paper pieces, one after
-// another — title sticker, the intro from 1-6 (or a dashed slot the AI will ask about), the "지금"
-// cards, and the bottom button. That page is the plan. Missing pieces are named with a jump back
-// to their screen. One optional disclosure lets the learner rewrite the title and the intro.
+// Client component: 2-4 recap, the plan on one page. Everything picked in the four planning lessons
+// lands on the page as paper pieces — title sticker, the intro from 1-6 (or a dashed slot the AI will
+// ask about), the "지금" cards, the bottom button — with the situation, criteria, layout and mood noted
+// under it. Missing pieces are named with a jump back to the lesson that fills them. One optional
+// disclosure lets the learner rewrite the title and the intro.
 import type { Ref } from "react";
-import { workbookCourse } from "@/lib/workbook-course";
+import { workbookCourse, workbookProjectStep } from "@/lib/workbook-course";
 import {
   ASK_INTRO,
   planLines,
   type PlanButton,
   type PlanReader,
 } from "@/lib/workbook-plan-readers";
+import { layoutLabel, moodLabel, situationLabel } from "@/lib/workbook-plan-options";
 import type { ProjectRecord } from "./WorkbookProjectLesson";
 import styles from "./WorkbookPlanRecap.module.scss";
 
-/** 2-1에서 배운 것. 화면 순서대로. */
+/** 기획서 한 장 만들기에서 배운 것. 화면 순서대로. */
 const LEARNED = [
-  "홈페이지를 볼 사람을 먼저 정하면, 어떤 내용을 넣을지 정하기 쉬워져요.",
-  "제목은 무엇을 소개하는지, 맨 아래 버튼은 다 읽은 뒤 할 일을 알려 줘요.",
-  "지금 소개할 수 있는 내용만 넣고, 준비 안 된 내용은 나중에 채워요.",
-  "가장 중요한 내용은 휴대폰 첫 화면 안에 들어오도록 위쪽에 둬요.",
+  "제목은 무엇을 소개하는지, 버튼 문구는 누르면 무엇이 되는지 알려 줘요.",
+  "분위기를 정해 두면 “예쁘게 해 줘” 대신 분명하게 부탁할 수 있어요.",
   "내가 놓친 부분은 AI에게 질문해 달라고 해서 찾을 수 있어요.",
+  "기획 네 수업에서 정한 것을 한 장으로 모으면, 그대로 요청이 돼요.",
 ] as const;
 
-export type PlanBlank = { label: string; screen: number };
+/** 비어 있는 기획 칸과, 그 칸을 채우는 수업(2단원 순번) · 화면. */
+export type PlanBlank = { label: string; step: number; screen: number };
 
 /** 2-1 screen 5: the page assembles itself. The button to 2-2 is never disabled. */
 export function WorkbookPlanRecap({
@@ -44,10 +46,16 @@ export function WorkbookPlanRecap({
   blanksRef: Ref<HTMLDivElement>;
   /** 비어 있는 곳이 남은 채로 다음 수업을 누른 적이 있으면 그 안내를 앞세운다. */
   asked: boolean;
-  onJump: (screen: number) => void;
+  onJump: (blank: PlanBlank) => void;
   update: (patch: Partial<ProjectRecord>) => void;
 }) {
-  const next = workbookCourse[1].lessons[1];
+  const next = workbookCourse[1].lessons[workbookProjectStep.request];
+  const situation = [
+    situationLabel("entry", record.entry),
+    situationLabel("device", record.device),
+    situationLabel("pace", record.pace),
+  ].filter(Boolean);
+  const criteria = planLines(record.criteria);
   const now = planLines(record.content);
   const later = planLines(record.later);
   const intro = record.intro.trim();
@@ -93,12 +101,29 @@ export function WorkbookPlanRecap({
           </ul>
           <div className={styles.piece} data-part="button" style={{ animationDelay: "480ms" }}>
             {button ? (
-              <span className={styles.cta}>{button.label}</span>
+              <span className={styles.cta}>{record.buttonLabel.trim() || button.label}</span>
             ) : (
               <span className={styles.missing}>버튼 자리</span>
             )}
           </div>
           {later.length > 0 && <p className={styles.later}>나중에 채울 것 · {later.join(" · ")}</p>}
+          <dl className={styles.notes}>
+            <div>
+              <dt>상황</dt>
+              <dd>{situation.length ? situation.join(" · ") : "고르지 않았어요"}</dd>
+            </div>
+            <div>
+              <dt>잘 됐다는 기준</dt>
+              <dd>{criteria.length ? `${criteria.length}가지` : "고르지 않았어요"}</dd>
+            </div>
+            <div>
+              <dt>배치 · 분위기</dt>
+              <dd>
+                {layoutLabel(record.layout) ?? "배치 미정"} ·{" "}
+                {moodLabel(record.mood) ?? "분위기 미정"}
+              </dd>
+            </div>
+          </dl>
         </article>
 
         <div className={styles.aside}>
@@ -118,7 +143,7 @@ export function WorkbookPlanRecap({
               <ul>
                 {blanks.map((blank) => (
                   <li key={blank.label}>
-                    <button type="button" onClick={() => onJump(blank.screen)}>
+                    <button type="button" onClick={() => onJump(blank)}>
                       {blank.label} 고르러 가기
                     </button>
                   </li>

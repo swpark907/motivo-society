@@ -22,7 +22,11 @@ export function resultPieces(plan: PlanForMemo): ResultPiece[] {
     {
       id: "button",
       label: "맨 아래 버튼",
-      plan: findPlanButton(plan.purpose)?.label ?? (plan.purpose.trim() || "(버튼)"),
+      plan:
+        plan.buttonLabel?.trim() ||
+        findPlanButton(plan.purpose)?.label ||
+        plan.purpose.trim() ||
+        "(버튼)",
     },
   ];
 }
@@ -35,7 +39,8 @@ export function practiceDifference(plan: PlanForMemo): PieceId {
 /** "바꿀 것 / 그대로 둘 것" 요청 한 장. */
 export function fixRequest(plan: PlanForMemo, piece: PieceId) {
   const now = planLines(plan.content);
-  const button = findPlanButton(plan.purpose)?.label ?? plan.purpose.trim();
+  const button =
+    plan.buttonLabel?.trim() || findPlanButton(plan.purpose)?.label || plan.purpose.trim();
   const change: Record<PieceId, string> = {
     title: `제목이 설계도와 달라. 제목을 “${plan.title.trim()}”로 바꿔줘.`,
     intro: "소개 글이 내가 답한 내용과 달라. 소개 글만 나에게 다시 물어보고 고쳐줘.",

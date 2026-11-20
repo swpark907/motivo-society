@@ -20,7 +20,10 @@ const units = [
     stage: "project",
     title: "기획하고 첫 화면 만들기",
     lessons: [
-      { slug: "page-planning", title: "홈페이지 기획하기" },
+      { slug: "page-planning", title: "누구를 위한 페이지인가" },
+      { slug: "page-references", title: "남의 페이지에서 배우기" },
+      { slug: "page-structure", title: "무엇을 어떤 순서로" },
+      { slug: "page-brief", title: "기획서 한 장 만들기" },
       { slug: "page-request", title: "제작 요청 다듬기" },
       { slug: "page-building", title: "첫 화면 확인하기" },
     ],
@@ -70,6 +73,17 @@ export const workbookLessonId = {
   experience: aiCount + 1,
   data: aiCount + 2,
   publish: aiCount + 3,
+} as const;
+// 2단원 수업의 순서. 수업이 늘거나 순서가 바뀌어도 다른 파일의 숫자를 고치지 않도록 이름으로 찾는다.
+const projectIndex = (slug: string) => units[1].lessons.findIndex((item) => item.slug === slug);
+export const workbookProjectStep = {
+  audience: projectIndex("page-planning"),
+  references: projectIndex("page-references"),
+  structure: projectIndex("page-structure"),
+  brief: projectIndex("page-brief"),
+  request: projectIndex("page-request"),
+  result: projectIndex("page-building"),
+  count: units[1].lessons.length,
 } as const;
 export const workbookCourse = units.map((unit, index) => ({
   ...unit,

@@ -5,13 +5,16 @@ import {
   workbookPointTopics,
 } from "./workbook-curriculum";
 import { practicalLabs, practicalMapStops } from "./workbook-practical-labs";
+import { workbookCourse } from "./workbook-course";
+
+const workbookCurriculumLessonCount = (unit: number) => workbookCourse[unit].lessons.length;
 
 describe("커리큘럼과 실제 지도 지점의 대응", () => {
   it("소개 주제가 빠지거나 중복되지 않고 각 단원의 기본 지점에 연결된다", () => {
     for (const [unit, stage] of workbookCurriculumStages.entries()) {
       const topics = workbookPointTopics[stage].flat().sort((a, b) => a - b);
       expect(topics).toEqual(workbookCurriculum[unit].lessons.map((_, index) => index));
-      expect(workbookPointTopics[stage]).toHaveLength(stage === "agent" ? 6 : 3);
+      expect(workbookPointTopics[stage]).toHaveLength(workbookCurriculumLessonCount(unit));
     }
   });
   it("단원마다 독립 심화 장소와 실제 상황 활동이 대응한다", () => {

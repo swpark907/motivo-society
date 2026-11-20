@@ -29,6 +29,7 @@ import { WorkbookDataLesson } from "./WorkbookDataLesson";
 import { WorkbookPublishLesson } from "./WorkbookPublishLesson";
 import { WorkbookExperienceLesson } from "./WorkbookExperienceLesson";
 import { WorkbookProjectLesson } from "./WorkbookProjectLesson";
+import { projectStepsDone } from "@/lib/workbook-project-steps";
 import { useWorkbookProgress } from "./WorkbookProgressContext";
 import { useWorkbookRoom } from "@/components/WorkbookSpacePreview/WorkbookRoomProvider";
 import { slotItems } from "@/lib/workbook-room-slots";
@@ -204,7 +205,8 @@ export function WorkbookClass() {
     project.intro,
     project.content,
   ].every((value) => !!value.trim());
-  const requestReady = planReady && !!project.request.trim() && project.mode !== null;
+  // 2단원 여섯 수업을 마쳤는지는 workbook-project-steps.ts 한 곳에서 계산한다.
+  const projectDone = projectStepsDone(project, projectCompleted);
   function canOpenPractical(stage: PracticalStage) {
     if (stage === "agent") return mapWorld === "ai" && completed.includes(L.firstFile);
     if (completed.length !== L.aiCount) return false;
@@ -251,12 +253,12 @@ export function WorkbookClass() {
       {
         id: "project",
         image: "map.png",
-        count: [planReady, requestReady, projectCompleted].filter(Boolean).length,
-        total: 3,
+        count: projectDone.filter(Boolean).length,
+        total: projectDone.length,
         available: completed.length === L.aiCount,
         reason: "AI 도구 준비하기의 여섯 수업을 마치면 열려요",
         next: workbookCourse[1].lessons.map((item) => `${item.number} ${item.title}`)[
-          [planReady, requestReady, projectCompleted].findIndex((value) => !value)
+          projectDone.findIndex((value) => !value)
         ],
       },
       {
@@ -323,7 +325,7 @@ export function WorkbookClass() {
   );
   const learningDone = {
     ai: Array.from({ length: L.aiCount }, (_, index) => completed.includes(index)),
-    project: [planReady, requestReady, projectCompleted],
+    project: projectDone,
     experience: [
       experienceProgress(experience).observed,
       experienceProgress(experience).requested,

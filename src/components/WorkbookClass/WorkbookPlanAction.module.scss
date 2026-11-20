@@ -1,0 +1,137 @@
+// 2-1 화면 3: 페이지 맨 아래 비어 있는 버튼 자리에 버튼 조각을 끼운다. 끼워질 때 한 번 툭.
+// 오렌지는 끼워진 버튼 한 곳. 수업 공통 p·ul·button 규칙보다 우선하도록 .action 아래에서 지정한다.
+$ink: var(--workbook-ink, #2b2925);
+$paper: var(--workbook-paper, #f6efe2);
+$memo: var(--workbook-memo, #fbe9a6);
+
+.action {
+  word-break: keep-all;
+}
+.action .title {
+  margin: 0;
+}
+.action .lead {
+  margin-top: 10px;
+  max-width: 58rem;
+  p {
+    margin: 0;
+  }
+}
+.layout {
+  margin-top: 18px;
+  display: grid;
+  gap: 20px;
+  @include up(md) {
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    gap: 40px;
+    align-items: start;
+  }
+}
+.page {
+  padding: 18px 22px 22px;
+  border: 1.5px solid $ink;
+  background: #fffdf8;
+  display: grid;
+  gap: 10px;
+  rotate: -0.4deg;
+}
+.bar {
+  height: 8px;
+  border-radius: 3px;
+  background: rgb(43 41 37 / 0.14);
+  &:first-child {
+    width: 55%;
+    height: 12px;
+  }
+  &:nth-of-type(3) {
+    width: 70%;
+  }
+}
+.slot {
+  margin-top: 8px;
+  min-height: 52px;
+  display: grid;
+  place-items: center;
+  border: 1.5px dashed rgb(43 41 37 / 0.4);
+  &[data-filled="true"] {
+    border-color: transparent;
+  }
+}
+.hole {
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+}
+.cta {
+  padding: 10px 26px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: white;
+  font-weight: 800;
+  animation: snap 180ms ease-out both;
+}
+.side {
+  display: grid;
+  gap: 14px;
+}
+.action ul.pieces {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  li {
+    margin: 0;
+    padding: 0;
+  }
+}
+.action .pieces .piece {
+  --workbook-button-hover: #{$memo};
+  width: 100%;
+  min-height: 56px;
+  padding: 8px 10px;
+  border: 1.5px solid $ink;
+  border-radius: 8px;
+  background: $paper;
+  color: $ink;
+  font-weight: 700;
+  display: grid;
+  gap: 2px;
+  justify-items: center;
+  small {
+    font-size: 0.72rem;
+    font-weight: 400;
+    color: var(--ink-muted);
+  }
+  &[aria-pressed="true"] {
+    border-style: dashed;
+    opacity: 0.5;
+  }
+}
+.action .side .voice {
+  margin: 0;
+  padding: 8px 12px;
+  border-left: 3px solid $ink;
+  background: $memo;
+  color: $ink;
+  font-size: 1.4rem;
+  line-height: 1.15;
+  animation: appear 160ms ease-out both;
+}
+@keyframes snap {
+  from {
+    opacity: 0;
+    translate: 0 12px;
+  }
+}
+@keyframes appear {
+  from {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cta,
+  .action .side .voice {
+    animation: none;
+  }
+}

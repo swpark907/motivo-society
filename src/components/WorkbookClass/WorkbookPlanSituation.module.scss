@@ -1,0 +1,130 @@
+// 2-1 화면 2: 왼쪽 세 질문(칩 고르기), 오른쪽 기기 틀(휴대폰 · 노트북 모양이 바뀐다) 안에 첫 화면에 먼저 보여야 할 것.
+// 오렌지는 쓰지 않는다(고른 칩은 검정). 수업 공통 p·ol·button 규칙보다 우선하도록 .situation 아래에서 지정한다.
+$ink: var(--workbook-ink, #2b2925);
+$paper: var(--workbook-paper, #f6efe2);
+$memo: var(--workbook-memo, #fbe9a6);
+
+.situation {
+  word-break: keep-all;
+}
+.situation .title {
+  margin: 0;
+}
+.situation .lead {
+  margin-top: 10px;
+  max-width: 58rem;
+  p {
+    margin: 0;
+  }
+}
+.desk {
+  margin-top: 18px;
+  display: grid;
+  gap: 20px;
+  @include up(md) {
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    gap: 36px;
+    align-items: start;
+  }
+}
+.questions {
+  display: grid;
+  gap: 14px;
+}
+.group {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  legend {
+    padding: 0;
+    font-weight: 700;
+  }
+}
+.chips {
+  margin-top: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.situation .chips button {
+  --workbook-button-hover: #{$paper};
+  min-height: 40px;
+  padding: 6px 14px;
+  border: 1.5px solid $ink;
+  border-radius: 20px;
+  background: #fffdf8;
+  color: $ink;
+  font-size: 0.9rem;
+  &[aria-pressed="true"] {
+    --workbook-button-hover: #{$ink};
+    background: $ink;
+    color: #fffdf8;
+  }
+}
+.device {
+  margin: 0;
+  display: grid;
+  gap: 6px;
+  justify-items: center;
+  figcaption {
+    font-size: 0.8rem;
+    color: var(--ink-muted);
+  }
+}
+.screen {
+  width: 100%;
+  padding: 18px 16px;
+  border: 2px solid $ink;
+  background: #fffdf8;
+  color: $ink;
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  transition: max-width 120ms ease-out;
+  strong {
+    font-size: 0.85rem;
+  }
+}
+.device[data-device="phone"] .screen {
+  max-width: 230px;
+  min-height: 280px;
+  border-radius: 24px;
+}
+.device[data-device="desktop"] .screen {
+  max-width: 420px;
+  min-height: 200px;
+  border-radius: 8px;
+  border-bottom-width: 10px;
+}
+.situation .screen ol {
+  margin: 0;
+  padding-left: 1.2em;
+  display: grid;
+  gap: 6px;
+  li {
+    margin: 0;
+    padding: 4px 8px;
+    background: $memo;
+    font-size: 0.86rem;
+    line-height: 1.45;
+    animation: appear 160ms ease-out both;
+  }
+}
+.situation .screen .empty {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+}
+@keyframes appear {
+  from {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .screen {
+    transition: none;
+  }
+  .situation .screen ol li {
+    animation: none;
+  }
+}

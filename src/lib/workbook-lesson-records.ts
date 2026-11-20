@@ -28,6 +28,14 @@ type PlanLike = {
   intro: string;
   content: string;
   later: string;
+  entry: string;
+  device: string;
+  pace: string;
+  criteria: string;
+  references: string;
+  layout: string;
+  mood: string;
+  buttonLabel: string;
   request: string;
   mode: "computer" | "example" | null;
   observation: string;
@@ -37,8 +45,8 @@ export type WorkbookProgressSnapshot = {
   completed: readonly number[];
   practice: Readonly<Record<number, PracticeLike | undefined>>;
   project: PlanLike;
-  /** 2단원 각 수업을 마쳤는지. */
-  projectDone: readonly [boolean, boolean, boolean];
+  /** 2단원 각 수업을 마쳤는지(수업 순서대로, workbook-project-steps.ts가 계산한다). */
+  projectDone: readonly boolean[];
 };
 
 /** 1단원 순번 → 수업 이름. 범위를 벗어나면 null. */
@@ -75,29 +83,38 @@ export function toWorkbookLessonRows(snapshot: WorkbookProgressSnapshot): Workbo
     };
   });
   const plan = snapshot.project;
-  const projectFields = [
-    filled({
+  // 수업마다 그 수업에서 정한 칸만 담는다(수업 이름으로 찾는다).
+  const projectFields: Record<string, Record<string, string>> = {
+    "page-planning": filled({
       audience: plan.audience,
+      entry: plan.entry,
+      device: plan.device,
+      pace: plan.pace,
       purpose: plan.purpose,
-      title: plan.title,
       intro: plan.intro,
-      content: plan.content,
-      later: plan.later,
+      criteria: plan.criteria,
     }),
-    filled({ request: plan.request }),
-    filled({ observation: plan.observation }),
-  ];
-  const unitTwo = workbookCourse[1].lessons.map((lesson, index): WorkbookLessonRow => ({
-    classSlug: WORKBOOK_CLASS_SLUG,
-    lesson: lesson.slug,
-    status: snapshot.projectDone[index]
-      ? "done"
-      : Object.keys(projectFields[index]).length > 0
-        ? "in-progress"
-        : "unstarted",
-    mode: index === 0 ? null : plan.mode,
-    fields: projectFields[index],
-  }));
+    "page-references": filled({ references: plan.references }),
+    "page-structure": filled({ content: plan.content, later: plan.later, layout: plan.layout }),
+    "page-brief": filled({ title: plan.title, buttonLabel: plan.buttonLabel, mood: plan.mood }),
+    "page-request": filled({ request: plan.request }),
+    "page-building": filled({ observation: plan.observation }),
+  };
+  const unitTwo = workbookCourse[1].lessons.map((lesson, index): WorkbookLessonRow => {
+    const fields = projectFields[lesson.slug] ?? {};
+    const practiced = lesson.slug === "page-request" || lesson.slug === "page-building";
+    return {
+      classSlug: WORKBOOK_CLASS_SLUG,
+      lesson: lesson.slug,
+      status: snapshot.projectDone[index]
+        ? "done"
+        : Object.keys(fields).length > 0
+          ? "in-progress"
+          : "unstarted",
+      mode: practiced ? plan.mode : null,
+      fields,
+    };
+  });
   return [...unitOne, ...unitTwo];
 }
 

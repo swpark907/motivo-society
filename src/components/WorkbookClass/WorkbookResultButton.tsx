@@ -7,7 +7,7 @@
 import Image from "next/image";
 import { Nanum_Pen_Script } from "next/font/google";
 import { resultPieces } from "@/lib/workbook-result-check";
-import { workbookCourse } from "@/lib/workbook-course";
+import { workbookCourse, workbookProjectStep } from "@/lib/workbook-course";
 import type { ProjectRecord } from "./WorkbookProjectLesson";
 import { useWorkbookLessonState } from "./useWorkbookLessonState";
 import { WorkbookPracticePage } from "./WorkbookPracticePage";
@@ -15,7 +15,7 @@ import styles from "./WorkbookResultButton.module.scss";
 
 const hand = Nanum_Pen_Script({ weight: "400", subsets: ["latin"], display: "swap" });
 const behaviorUnit = workbookCourse[3];
-const requestLesson = workbookCourse[1].lessons[1];
+const requestLesson = workbookCourse[1].lessons[workbookProjectStep.request];
 
 /** 2-3 screen 2: a button is a look and an action. */
 export function WorkbookResultButton({ record }: { record: ProjectRecord }) {

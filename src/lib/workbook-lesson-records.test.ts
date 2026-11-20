@@ -15,6 +15,14 @@ const emptyPlan = {
   intro: "",
   content: "",
   later: "",
+  entry: "",
+  device: "",
+  pace: "",
+  criteria: "",
+  references: "",
+  layout: "",
+  mood: "",
+  buttonLabel: "",
   request: "",
   mode: null,
   observation: "",
@@ -37,8 +45,8 @@ describe("workbook lesson records", () => {
           revision: "",
         },
       },
-      project: { ...emptyPlan, audience: "채용 담당자", later: "작업 캡처" },
-      projectDone: [false, false, false],
+      project: { ...emptyPlan, audience: "채용 담당자", entry: "insta", later: "작업 캡처" },
+      projectDone: [false, false, false, false, false, false],
     });
     const total = workbookCourse[0].lessons.length + workbookCourse[1].lessons.length;
     expect(rows).toHaveLength(total);
@@ -50,7 +58,10 @@ describe("workbook lesson records", () => {
     });
     const planning = rows.find((row) => row.lesson === "page-planning")!;
     expect(planning).toMatchObject({ status: "in-progress", mode: null });
-    expect(planning.fields).toEqual({ audience: "채용 담당자", later: "작업 캡처" });
+    expect(planning.fields).toEqual({ audience: "채용 담당자", entry: "insta" });
+    expect(rows.find((row) => row.lesson === "page-structure")!.fields).toEqual({
+      later: "작업 캡처",
+    });
     expect(rows.find((row) => row.lesson === "ai-tools")!.status).toBe("unstarted");
   });
 

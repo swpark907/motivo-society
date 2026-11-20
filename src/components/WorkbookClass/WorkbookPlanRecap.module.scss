@@ -219,3 +219,24 @@ $kraft: #e9d3a4;
     animation: none;
   }
 }
+// 설계도 아래 작은 메모: 상황 · 기준 · 배치와 분위기
+.recap .page dl.notes {
+  margin: 6px 0 0;
+  padding-top: 8px;
+  border-top: 1px dashed rgb(43 41 37 / 0.3);
+  display: grid;
+  gap: 2px;
+  div {
+    display: flex;
+    gap: 8px;
+    font-size: 0.78rem;
+  }
+  dt {
+    flex: none;
+    width: 7.5em;
+    color: var(--ink-muted);
+  }
+  dd {
+    margin: 0;
+  }
+}

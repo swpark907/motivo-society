@@ -52,7 +52,8 @@ $paper: var(--workbook-paper, #f6efe2);
 .move .plan dl {
   margin: 6px 0 0;
   display: grid;
-  gap: 4px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 12px;
   div {
     display: grid;
     gap: 1px;

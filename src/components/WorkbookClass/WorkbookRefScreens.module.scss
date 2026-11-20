@@ -1,0 +1,152 @@
+// 2-2 남의 페이지에서 배우기 네 화면. 예시 세 장은 나란히(좁은 화면은 세로로), 고르기는 예시별 묶음,
+// 찾는 법은 쪽지 세 장. 오렌지는 "부탁 문장 복사하기" 버튼 한 곳(화면 4).
+// 수업 공통 p·ul·h3·button 규칙보다 우선하도록 .screen 아래에서 지정한다.
+$ink: var(--workbook-ink, #2b2925);
+$paper: var(--workbook-paper, #f6efe2);
+$memo: var(--workbook-memo, #fbe9a6);
+
+.screen {
+  word-break: keep-all;
+}
+.screen .title {
+  margin: 0;
+}
+.screen .lead {
+  margin-top: 10px;
+  max-width: 60rem;
+  p {
+    margin: 0;
+  }
+}
+.screen .closing {
+  margin: 14px 0 0;
+  max-width: 60rem;
+}
+.gallery {
+  margin-top: 16px;
+  display: grid;
+  gap: 14px;
+  @include up(md) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+    align-items: start;
+  }
+}
+
+// ③ 고르기
+.pickGrid {
+  margin-top: 16px;
+  display: grid;
+  gap: 12px;
+  @include up(md) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    align-items: start;
+  }
+}
+.pickGroup {
+  padding: 10px 12px;
+  border: 1.5px solid $ink;
+  background: #fffdf8;
+}
+.screen .pickGroup h3 {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--ink-muted);
+}
+.screen .pickGroup ul {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 6px;
+  li {
+    margin: 0;
+    padding: 6px 8px;
+    border: 1px solid rgb(43 41 37 / 0.2);
+    display: grid;
+    gap: 6px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    &[data-state="take"] {
+      background: $memo;
+    }
+    &[data-state="drop"] {
+      color: rgb(43 41 37 / 0.45);
+      text-decoration: line-through;
+    }
+  }
+}
+.toggle {
+  display: flex;
+  gap: 4px;
+}
+.screen .toggle button {
+  --workbook-button-hover: #{$paper};
+  padding: 2px 10px;
+  border: 1px solid rgb(43 41 37 / 0.35);
+  border-radius: 6px;
+  background: #fffdf8;
+  color: $ink;
+  font-size: 0.8rem;
+  font-weight: 400;
+  text-decoration: none;
+  &[aria-pressed="true"] {
+    --workbook-button-hover: #{$ink};
+    border-color: $ink;
+    background: $ink;
+    color: #fffdf8;
+  }
+}
+
+// ④ 찾는 법
+.tips {
+  margin-top: 16px;
+  display: grid;
+  gap: 12px;
+  @include up(md) {
+    grid-template-columns: minmax(0, 4fr) minmax(0, 6fr) minmax(0, 4fr);
+    gap: 16px;
+    align-items: start;
+  }
+}
+.tip {
+  padding: 12px 14px;
+  border: 1.5px solid $ink;
+  background: #fffdf8;
+  &[data-kind="rule"] {
+    background: $memo;
+  }
+}
+.screen .tip h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+.screen .tip p {
+  margin: 6px 0 0;
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+.screen .tip .ask {
+  padding: 8px 10px;
+  background: $paper;
+  font-size: 0.86rem;
+}
+.copyRow {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+}
+.screen .copy {
+  padding: 6px 14px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--accent);
+  color: white;
+  font-weight: 700;
+}

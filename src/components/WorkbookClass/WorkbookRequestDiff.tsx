@@ -38,7 +38,7 @@ export function WorkbookRequestDiff({
     },
     ...now.map((item): Line => ({ sign: "+", text: `${item}: (물어보고 채운 내용)` })),
     { sign: "+", text: PLANTED, planted: true },
-    { sign: "+", text: `버튼: ${button?.label ?? "(맨 아래 버튼)"}` },
+    { sign: "+", text: `버튼: ${record.buttonLabel.trim() || button?.label || "(맨 아래 버튼)"}` },
   ];
   const plantedIndex = lines.findIndex((line) => line.planted);
   const found = checked.includes(plantedIndex);

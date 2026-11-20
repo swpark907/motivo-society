@@ -23,6 +23,22 @@ describe("workbook plan memo", () => {
     expect(rows[3].line).toContain("이건 아직 넣지 마: 이용 후기.");
   });
 
+  it("상황 · 배치 · 분위기 · 버튼 문구를 고르면 메모에 들어간다", () => {
+    const text = planMemoText({
+      ...plan,
+      entry: "insta",
+      device: "phone",
+      pace: "short",
+      layout: "stack",
+      mood: "warm",
+      buttonLabel: "이번 달 수업 신청하기",
+    });
+    expect(text).toContain("이 사람은 인스타그램 링크를 타고 들어와요. 주로 휴대폰으로 봐요.");
+    expect(text).toContain("‘이번 달 수업 신청하기’ 버튼");
+    expect(text).toContain("배치는 위에서 아래로 한 줄로 쌓아 줘.");
+    expect(text).toContain("분위기는 따뜻하게.");
+  });
+
   it("1-6에서 받은 소개 글이 있으면 그대로 쓰라고 한다", () => {
     expect(planMemoText({ ...plan, intro: "안녕하세요." })).toContain(
       "소개 글은 이 글을 그대로 써 줘: 안녕하세요.",

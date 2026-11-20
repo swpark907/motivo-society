@@ -4,7 +4,7 @@
 // still open: if the learner hasn't said whether they sent it or are following the example, the
 // recap names that and jumps back. The ticket points to 2-3 (number and title from workbook-course).
 import type { Ref } from "react";
-import { workbookCourse } from "@/lib/workbook-course";
+import { workbookCourse, workbookProjectStep } from "@/lib/workbook-course";
 import { planMemo } from "@/lib/workbook-plan-memo";
 import type { ProjectRecord } from "./WorkbookProjectLesson";
 import { WorkbookPlanMemoCard } from "./WorkbookPlanMemoCard";
@@ -31,7 +31,7 @@ export function WorkbookPageRequestRecap({
   blanksRef: Ref<HTMLDivElement>;
   onJump: (screen: number) => void;
 }) {
-  const next = workbookCourse[1].lessons[2];
+  const next = workbookCourse[1].lessons[workbookProjectStep.result];
   const status =
     record.mode === "computer"
       ? record.approved

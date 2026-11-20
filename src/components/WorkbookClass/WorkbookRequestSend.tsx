@@ -87,15 +87,6 @@ export function WorkbookRequestSend({
             )}
           </div>
           {copied === "failed" && <WorkbookCopyFallback text={memo} />}
-          <p className={styles.next} aria-live="polite">
-            {copied === "done" && "복사했어요. 같은 대화의 입력 칸에 붙여 넣고 Enter를 눌러요. "}
-            {carried &&
-              record.mode !== null &&
-              `${fileLesson.number}에서 고른 방식대로 골라 뒀어요. `}
-            {record.mode === "example" && "다음 화면에서 예시로 바뀌는 부분을 함께 봐요."}
-            {sent &&
-              "Claude 앱은 띄워 둔 채 다음 화면으로 가요. 승인하기 전에 볼 것을 알려 드려요."}
-          </p>
         </div>
 
         <div className={styles.right}>
@@ -113,6 +104,15 @@ export function WorkbookRequestSend({
               아는 것만 답하고, 없으면 없다고, 못 정했으면 비워 두라고 말해요.
             </p>
           </section>
+          <p className={styles.next} aria-live="polite">
+            {copied === "done" && "복사했어요. 같은 대화의 입력 칸에 붙여 넣고 Enter를 눌러요. "}
+            {carried &&
+              record.mode !== null &&
+              `${fileLesson.number}에서 고른 방식대로 골라 뒀어요. `}
+            {record.mode === "example" && "다음 화면에서 예시로 바뀌는 부분을 함께 봐요."}
+            {sent &&
+              "Claude 앱은 띄워 둔 채 다음 화면으로 가요. 승인하기 전에 볼 것을 알려 드려요."}
+          </p>
         </div>
       </div>
     </div>

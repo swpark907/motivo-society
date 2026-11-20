@@ -1,7 +1,11 @@
-import { workbookCourse, workbookLessonId } from "./workbook-course";
+import { workbookCourse, workbookLessonId, workbookProjectStep } from "./workbook-course";
 import { ASK_INTRO, findPlanButton, planLines } from "./workbook-plan-readers";
+import { layoutSentence, moodSentence, situationSentence } from "./workbook-plan-options";
 
-const PLAN = workbookCourse[1].lessons[0].number;
+const lessonNumber = (step: number) => workbookCourse[1].lessons[step].number;
+const AUDIENCE = lessonNumber(workbookProjectStep.audience);
+const STRUCTURE = lessonNumber(workbookProjectStep.structure);
+const BRIEF = lessonNumber(workbookProjectStep.brief);
 const REQUEST = workbookCourse[0].lessons[workbookLessonId.firstRequest].number;
 
 // 2-1 기획을 1-5의 네 칸 메모(무엇을 · 어디에 쓸지 · 조건 · 하지 말 것)로 옮긴다. 2-2가 보여 주고, 복사해서
@@ -14,6 +18,12 @@ export type PlanForMemo = {
   intro: string;
   content: string;
   later: string;
+  entry?: string;
+  device?: string;
+  pace?: string;
+  layout?: string;
+  mood?: string;
+  buttonLabel?: string;
 };
 export type MemoRow = {
   label: "무엇을" | "어디에 쓸지" | "조건" | "하지 말 것";
@@ -32,16 +42,28 @@ export function planMemo(plan: PlanForMemo): MemoRow[] {
   const intro = plan.intro.trim();
   const ownIntro = intro && intro !== ASK_INTRO;
   const title = plan.title.trim() || "(제목)";
+  const buttonText = plan.buttonLabel?.trim() || button?.label || plan.purpose.trim();
+  const situation = [
+    situationSentence.entry[plan.entry ?? ""],
+    situationSentence.device[plan.device ?? ""],
+    situationSentence.pace[plan.pace ?? ""],
+  ].filter(Boolean);
   return [
     {
       label: "무엇을",
       line: `my-first-web 폴더의 index.html을 먼저 읽고, 같은 파일을 내 홈페이지로 고쳐줘. 제목은 “${title}”로 해 줘.`,
-      from: `${PLAN} 제목`,
+      from: `${BRIEF} 제목`,
     },
     {
       label: "어디에 쓸지",
-      line: `이 페이지는 ${plan.audience.trim() || "(읽을 사람)"}에게 보여줄 거야. 다 읽은 사람이 맨 아래 ‘${button?.label ?? plan.purpose.trim()}’ 버튼을 누르게 하고 싶어.`,
-      from: `${PLAN} 읽을 사람 · 맨 아래 버튼`,
+      line: [
+        `이 페이지는 ${plan.audience.trim() || "(읽을 사람)"}에게 보여줄 거야.`,
+        situation.length ? `이 사람은 ${situation.join(" ")}` : "",
+        `다 읽은 사람이 맨 아래 ‘${buttonText}’ 버튼을 누르게 하고 싶어.`,
+      ]
+        .filter(Boolean)
+        .join(" "),
+      from: `${AUDIENCE} 읽을 사람 · 상황 · 버튼, ${BRIEF} 버튼 문구`,
     },
     {
       label: "조건",
@@ -49,8 +71,12 @@ export function planMemo(plan: PlanForMemo): MemoRow[] {
         `제목과 소개 글 아래에 이 순서로 넣어줘: ${now.length ? now.join(", ") : "(넣을 내용)"}.`,
         "각 항목에 들어갈 실제 내용은 만들기 전에 나에게 하나씩 물어보고 채워줘.",
         ownIntro ? `소개 글은 이 글을 그대로 써 줘: ${intro}` : "소개 글도 나에게 물어보고 채워줘.",
-      ].join(" "),
-      from: `${PLAN} 넣을 내용 · 순서`,
+        layoutSentence[plan.layout ?? ""] ?? "",
+        moodSentence[plan.mood ?? ""] ?? "",
+      ]
+        .filter(Boolean)
+        .join(" "),
+      from: `${STRUCTURE} 넣을 내용 · 순서 · 배치, ${BRIEF} 분위기`,
     },
     {
       label: "하지 말 것",
@@ -61,7 +87,7 @@ export function planMemo(plan: PlanForMemo): MemoRow[] {
       ]
         .filter(Boolean)
         .join(" "),
-      from: later.length ? `${PLAN} 나중에 채울 내용` : `${REQUEST}에서 배운 것`,
+      from: later.length ? `${STRUCTURE} 나중에 채울 내용` : `${REQUEST}에서 배운 것`,
     },
   ];
 }

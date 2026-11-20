@@ -3,7 +3,7 @@ import { workbookCourse } from "../src/lib/workbook-course";
 
 const [, unitTwo, unitThree] = workbookCourse;
 
-/** 2-1을 예시로 채우고 2-2를 "예시로 따라가기"로 마친 뒤 2-3에 들어간다. */
+/** 기획 네 수업을 예시로 채우고 2-5를 "예시로 따라가기"로 마친 뒤 2-6에 들어간다. */
 async function reachResult(page: Page) {
   await page.goto("/workbook/classes/vibe-web/lessons/page-planning");
   await fillPlanWithExample(page, { toRequest: true });
@@ -14,11 +14,11 @@ async function reachResult(page: Page) {
   await page.getByRole("button", { name: /예시로 따라갈게요$/ }).click();
   await next.click();
   await next.click();
-  await page.getByRole("button", { name: /^다음 수업 2-3/ }).click();
+  await page.getByRole("button", { name: /^다음 수업 2-6/ }).click();
   await expect(page).toHaveURL(/page-building$/);
 }
 
-test("2-3은 설계도와 대조하고, 버튼을 알고, 한 곳만 고치고, 전후를 비교한 뒤 3단원으로 간다", async ({
+test("2-6 첫 화면 확인하기는 설계도와 대조하고, 버튼을 알고, 한 곳만 고치고, 전후를 비교한 뒤 3단원으로 간다", async ({
   page,
 }, testInfo) => {
   test.setTimeout(90000);
@@ -50,7 +50,7 @@ test("2-3은 설계도와 대조하고, 버튼을 알고, 한 곳만 고치고, 
 
   // 2. 맨 아래 버튼을 눌러도 아무 일이 없고, 버튼은 모양과 하는 일로 나뉜다.
   await next.click();
-  await page.getByRole("button", { name: "연락하기", exact: true }).click();
+  await page.getByRole("button", { name: "작업 의뢰 문의하기", exact: true }).click();
   await expect(body).toContainText("아무 일도 안 일어나네");
   await expect(body).toContainText(`${unitThree.number + 1}단원`);
   await capture("result-2");
@@ -66,7 +66,11 @@ test("2-3은 설계도와 대조하고, 버튼을 알고, 한 곳만 고치고, 
   // 4. 전후 비교. 예시로 따라가면 도장 대신 나중에 해 볼 순서를 알려 준다.
   await next.click();
   await expect(page.getByRole("slider", { name: "고치기 전과 고친 뒤 비교" })).toBeVisible();
-  await expect(page.getByRole("checkbox")).toHaveCount(0);
+  // 예시로 따라가면 확인 도장은 없고, 2-1에서 정한 기준만 체크해 본다.
+  await expect(page.getByRole("group", { name: /도장을 찍어요/ })).toHaveCount(0);
+  await expect(page.getByRole("group", { name: /잘 됐다는 기준/ })).toContainText(
+    "3초 안에 무슨 페이지인지",
+  );
   await expect(body).toContainText("컴퓨터가 준비되면");
   await capture("result-4");
 
