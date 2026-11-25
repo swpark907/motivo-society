@@ -14,14 +14,26 @@ import { WorkbookPlanReaders } from "./WorkbookPlanReaders";
 import { WorkbookPlanSituation } from "./WorkbookPlanSituation";
 import { WorkbookPlanAction } from "./WorkbookPlanAction";
 import { WorkbookPlanCriteria } from "./WorkbookPlanCriteria";
-import { WorkbookPlanStepRecap } from "./WorkbookPlanStepRecap";
+import { WorkbookAudienceRecap, type RecapLine } from "./WorkbookPlanRecaps";
 
-const LEARNED = [
-  "같은 페이지라도 보는 사람에 따라 찾는 것이 달라요.",
-  "그 사람이 어디서, 무엇으로, 얼마나 보는지에 따라 첫 화면이 달라져요.",
-  "페이지의 목적은 다 읽은 사람이 누를 버튼 하나로 나타나요.",
-  "만들기 전에 잘 됐다는 기준을 먼저 정해요.",
-] as const;
+const LEARNED: readonly RecapLine[] = [
+  {
+    term: "보는 사람에 따라 찾는 것이 달라요",
+    text: "같은 페이지라도 채용 담당자는 해 본 작업을, 손님은 신청 방법을 먼저 찾아요.",
+  },
+  {
+    term: "상황이 첫 화면을 바꿔요",
+    text: "어디서 들어와, 무엇으로, 얼마나 보는지에 따라 먼저 보여야 할 것이 달라져요.",
+  },
+  {
+    term: "목적은 버튼 하나로 나타나요",
+    text: "다 읽은 사람이 누를 맨 아래 버튼이 이 페이지가 바라는 일이에요.",
+  },
+  {
+    term: "기준은 만들기 전에 정해요",
+    text: "잘 됐다는 기준을 먼저 정해 두면, 다 만든 뒤 무엇을 보면 되는지 알 수 있어요.",
+  },
+];
 
 export function WorkbookPlanningLesson({ onBack, onStep }: ProjectLessonProps) {
   const { record, picked, reader, purposeId, firstIntro, button, update } = usePlanContext();
@@ -55,19 +67,18 @@ export function WorkbookPlanningLesson({ onBack, onStep }: ProjectLessonProps) {
             }
           />
         ),
-        () => <WorkbookPlanSituation record={record} reader={picked} update={update} />,
+        () => <WorkbookPlanSituation record={record} update={update} />,
         () => <WorkbookPlanAction record={record} reader={picked ?? reader} update={update} />,
         () => <WorkbookPlanCriteria record={record} update={update} />,
         () => (
-          <WorkbookPlanStepRecap
+          <WorkbookAudienceRecap
             point={workbookProjectStep.audience}
-            learned={LEARNED}
-            decided={[
-              ["읽을 사람", record.audience],
-              ["상황", situation.join(" · ")],
-              ["맨 아래 버튼", button?.label ?? ""],
-              ["잘 됐다는 기준", planLines(record.criteria).join(" / ")],
-            ]}
+            lines={LEARNED}
+            reader={picked}
+            audience={record.audience}
+            situation={situation.filter((label): label is string => Boolean(label))}
+            button={button?.label ?? ""}
+            criteria={planLines(record.criteria)}
           />
         ),
       ]}

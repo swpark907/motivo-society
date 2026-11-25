@@ -44,8 +44,8 @@ export function WorkbookPracticePage({
         <strong className={styles.title}>{pieces[0].plan}</strong>
         <p className={styles.intro}>{pieces[1].plan}</p>
         <ul className={styles.cards}>
-          {shownCards.slice(0, MAX_CARDS).map((card) => (
-            <li key={card}>{card}</li>
+          {shownCards.slice(0, MAX_CARDS).map((card, index) => (
+            <li key={`${card}-${index}`}>{card}</li>
           ))}
           {shownCards.length > MAX_CARDS && (
             <li className={styles.more}>그 밖에 {shownCards.length - MAX_CARDS}가지</li>

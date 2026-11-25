@@ -6,6 +6,7 @@
 // 적은 것이 없으면 기록하지 않는다(useRecordFirstProjectResult). 3단원은 이 기록을 읽는다.
 import { useEffect, useRef } from "react";
 import { workbookCourse, workbookProjectStep } from "@/lib/workbook-course";
+import { isPlanReady } from "@/lib/workbook-project-steps";
 import { workbookPlanFields } from "@/lib/workbook-page-plan";
 import { canOpenWorkbookUnit, workbookTrialAccess } from "@/lib/workbook-access";
 import type { PieceId } from "@/lib/workbook-result-check";
@@ -47,7 +48,7 @@ export function WorkbookProjectResultLesson({
   const body = useRef<HTMLDivElement>(null);
   const safeScreen = Math.min(screen, LAST);
   const computer = record.mode === "computer";
-  const planReady = workbookPlanFields.every(([key]) => record[key].trim());
+  const planReady = isPlanReady(record);
   const planApplied =
     p.projectWorkflow.changes.plan ===
     JSON.stringify(workbookPlanFields.map(([key]) => record[key]));

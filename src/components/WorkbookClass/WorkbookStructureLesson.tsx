@@ -9,15 +9,25 @@ import type { ProjectLessonProps } from "./WorkbookProjectLesson";
 import { WorkbookPlanLessonFrame } from "./WorkbookPlanLessonFrame";
 import { usePlanContext } from "./usePlanContext";
 import { WorkbookPlanContent } from "./WorkbookPlanContent";
-import { WorkbookPlanOrder } from "./WorkbookPlanOrder";
+import { FOLD, WorkbookPlanOrder } from "./WorkbookPlanOrder";
 import { WorkbookPlanSketch } from "./WorkbookPlanSketch";
-import { WorkbookPlanStepRecap } from "./WorkbookPlanStepRecap";
+import { WorkbookStructureRecap, type RecapLine } from "./WorkbookPlanRecaps";
+import { FIRST_PAGE_TITLE } from "./WorkbookFileAsk";
 
-const LEARNED = [
-  "지금 소개할 수 있는 내용만 넣고, 나머지는 나중에 채워요.",
-  "가장 중요한 내용은 휴대폰 첫 화면 안에 들어오게 위쪽에 둬요.",
-  "만들기 전에 칸만 그려 배치를 정하는 그림을 와이어프레임이라고 해요.",
-] as const;
+const LEARNED: readonly RecapLine[] = [
+  {
+    term: "지금 소개할 수 있는 내용만 넣어요",
+    text: "아직 없는 내용은 나중에 채울 칸으로 남겨 두고, 지어서 채우지 않아요.",
+  },
+  {
+    term: "중요한 내용은 위쪽에 둬요",
+    text: "휴대폰은 처음에 화면 한 장만큼만 보여요. 이렇게 순서와 자리를 정하는 일을 정보 구조라고 해요.",
+  },
+  {
+    term: "칸만 그려 배치를 정해요",
+    text: "만들기 전에 상자만 그린 그림을 와이어프레임이라고 해요. 빠르게 여러 번 바꿔 볼 수 있어요.",
+  },
+];
 
 export function WorkbookStructureLesson({ onBack, onStep }: ProjectLessonProps) {
   const { record, reader, button, update } = usePlanContext();
@@ -36,14 +46,15 @@ export function WorkbookStructureLesson({ onBack, onStep }: ProjectLessonProps) 
         () => <WorkbookPlanOrder record={record} reader={reader} button={button} update={update} />,
         () => <WorkbookPlanSketch record={record} update={update} />,
         () => (
-          <WorkbookPlanStepRecap
+          <WorkbookStructureRecap
             point={workbookProjectStep.structure}
-            learned={LEARNED}
-            decided={[
-              ["지금 넣을 것", planLines(record.content).join(" → ")],
-              ["나중에 채울 것", planLines(record.later).join(" · ")],
-              ["배치", layoutLabel(record.layout) ?? ""],
-            ]}
+            lines={LEARNED}
+            title={record.title.trim() || FIRST_PAGE_TITLE}
+            content={planLines(record.content)}
+            later={planLines(record.later)}
+            layout={record.layout}
+            layoutLabel={layoutLabel(record.layout) ?? ""}
+            fold={FOLD}
           />
         ),
       ]}

@@ -1,5 +1,5 @@
-// 2-3 정리: 왼쪽은 알게 된 것 네 줄, 오른쪽은 2단원 세 수업을 잇는 한 장(기획 → 요청 → 확인)과 다음 단원 표.
-// 다음 단원 표 왼쪽 띠만 오렌지(1-6 정리의 다음 단원 표와 같은 모양).
+// 2-6 정리: 왼쪽은 완성된 내 페이지와 엄지를 든 카피바라, 오른쪽은 알게 된 것 네 줄 · 2단원 한 장(기획서 → 요청 → 확인)
+// · 다음 단원 표. 오렌지는 다음 단원 표 왼쪽 띠 한 곳(내 페이지는 고른 분위기 색, 고르지 않았으면 차분한 색).
 $ink: var(--workbook-ink, #2b2925);
 $paper: var(--workbook-paper, #f6efe2);
 
@@ -14,24 +14,60 @@ $paper: var(--workbook-paper, #f6efe2);
   display: grid;
   gap: 20px;
   @include up(md) {
-    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
-    gap: 36px;
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    gap: 32px;
     align-items: start;
   }
 }
-.recap ol.learned {
-  margin: 0;
-  padding-left: 1.3em;
+.scene {
   display: grid;
-  gap: 6px;
-  li {
-    margin: 0;
-    font-weight: 700;
+  gap: 12px;
+  @include up(md) {
+    grid-template-columns: minmax(0, 1fr) 7.5rem;
+    align-items: end;
   }
+}
+// 좁은 화면에서는 페이지 아래에 말풍선과 카피바라를 한 줄로 둔다.
+.pageWrap {
+  position: relative;
+  min-width: 0;
+}
+.capy {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  img {
+    width: auto;
+    height: 7rem;
+  }
+  @include up(md) {
+    display: grid;
+    justify-items: center;
+    gap: 6px;
+    img {
+      height: 10rem;
+    }
+  }
+}
+.recap .capy .bubble {
+  margin: 0;
+  padding: 6px 8px;
+  border: 2px solid $ink;
+  border-radius: 12px 12px 12px 2px;
+  background: #fffdf8;
+  color: $ink;
+  font-size: 1.1rem;
+  line-height: 1.15;
+  text-align: center;
 }
 .side {
   display: grid;
-  gap: 14px;
+  gap: 10px;
+}
+// 알게 된 것 네 줄 · 2단원 한 장 · 다음 단원 표가 한 화면에 들어가도록 줄 간격을 좁힌다.
+.recap .side ol:first-child {
+  gap: 6px;
 }
 .recap ol.unit {
   margin: 0;
@@ -92,6 +128,6 @@ $paper: var(--workbook-paper, #f6efe2);
   }
 }
 .recap .ticket p {
-  margin: 6px 0 0;
+  margin: 4px 0 0;
   font-size: 0.88rem;
 }

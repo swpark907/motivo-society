@@ -1,18 +1,21 @@
 "use client";
 
 // Client components: 2-2 남의 페이지에서 배우기. ① 예시 세 장 보기 ② 한 장을 뜯어보기(부분을 누르면 하는 일)
-// ③ 가져올 것과 뺄 것 고르기(기획 기록 references) ④ 실제로 찾는 법(검색어 · AI에게 부탁하기 · 지킬 것).
-// 예시 페이지는 칸과 막대로 그린 가상의 페이지다. 뜯어보기에서 찾은 부분은 방문 중 화면 상태다.
+// ③ 가져올 것과 뺄 것 고르기(기획 기록 references). 가져온 부분은 오려 낸 스티커처럼 스크랩북에 붙는다.
+// ④ 실제로 찾는 법(검색어 · AI에게 부탁하기 · 지킬 것). 예시 페이지는 실제 사이트처럼 그린 가상의 페이지다. 뜯어보기에서 찾은 부분은 방문 중 화면 상태다.
+import Image from "next/image";
+import { Nanum_Pen_Script } from "next/font/google";
 import { useState } from "react";
-import { referenceExamples, referencePart } from "@/lib/workbook-plan-options";
+import { referenceExamples } from "@/lib/workbook-plan-options";
 import { planLines, type PlanReader } from "@/lib/workbook-plan-readers";
 import type { ProjectRecord } from "./WorkbookProjectLesson";
 import { useWorkbookLessonState } from "./useWorkbookLessonState";
-import { WorkbookRefPage } from "./WorkbookRefPage";
+import { WorkbookRefPage, WorkbookRefPartContent } from "./WorkbookRefPage";
 import { WorkbookCopyFallback } from "./WorkbookCopyFallback";
 import styles from "./WorkbookRefScreens.module.scss";
 
 const LETTERS = ["A", "B", "C"] as const;
+const hand = Nanum_Pen_Script({ weight: "400", subsets: ["latin"], display: "swap" });
 
 /** ① 처음부터 발명하지 않아요. */
 export function WorkbookRefGallery() {
@@ -34,8 +37,8 @@ export function WorkbookRefGallery() {
         ))}
       </div>
       <p className={styles.closing}>
-        셋 다 무언가를 소개하는 한 페이지예요. 같은 일을 하는데도 시작하는 방법이 다르죠. 다음
-        화면에서 한 장씩 뜯어봐요.
+        세 페이지 모두 무언가를 소개하지만, 첫 화면을 시작하는 방법은 서로 달라요. 다음 화면에서 한
+        장씩 뜯어봐요.
       </p>
     </div>
   );
@@ -93,7 +96,8 @@ export function WorkbookRefPick({
       references: [...rest, ...(state(id) === value ? [] : [`${value}:${id}`])].join("\n"),
     });
   }
-  const taken = lines.filter((line) => line.startsWith("take:")).length;
+  const takenIds = lines.filter((line) => line.startsWith("take:")).map((line) => line.slice(5));
+  const taken = takenIds.length;
   return (
     <div data-lesson-wide className={styles.screen}>
       <h2 id="lesson-screen-title" className={styles.title}>
@@ -143,6 +147,34 @@ export function WorkbookRefPick({
           </section>
         ))}
       </div>
+      <section className={styles.scrap} aria-label="내 페이지 스크랩북">
+        <h3 className={hand.className}>내 페이지 스크랩북</h3>
+        {takenIds.length > 0 ? (
+          <ul className={styles.stickers}>
+            {takenIds.map((id) => {
+              const index = referenceExamples.findIndex((example) =>
+                example.parts.some((item) => item.id === id),
+              );
+              const meta = referenceExamples[index].parts.find((item) => item.id === id)!;
+              return (
+                <li key={id}>
+                  <span className={styles.sticker} aria-hidden="true">
+                    <WorkbookRefPartContent id={id} />
+                  </span>
+                  <span className={`${styles.stickerLabel} ${hand.className}`}>
+                    예시 {LETTERS[index]} · {meta.label}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        ) : (
+          <p className={styles.scrapEmpty}>가져오기를 누르면 그 부분을 오려서 여기에 붙여요.</p>
+        )}
+        <div className={styles.scrapCapy} aria-hidden="true">
+          <Image src="/images/workbook/lesson-1-4/capy-point.png" alt="" width={261} height={480} />
+        </div>
+      </section>
       <p className={styles.closing}>
         {taken > 0
           ? `가져올 것 ${taken}개를 골랐어요. 다음 수업에서 넣을 내용과 순서를 정할 때 참고해요.`
@@ -163,7 +195,7 @@ export function WorkbookRefSearch({
   const [copied, setCopied] = useState<"done" | "failed" | null>(null);
   const words: Record<string, string> = {
     portfolio: "포트폴리오 사이트 예시",
-    service: "수업 안내 페이지 예시",
+    service: "서비스 소개 페이지 예시",
     personal: "추천 모음 페이지 예시",
   };
   const word = words[reader?.id ?? "portfolio"];
@@ -218,12 +250,4 @@ export function WorkbookRefSearch({
       </div>
     </div>
   );
-}
-
-/** 2-2 정리에 쓸 "가져올 것" 목록. */
-export function takenReferences(record: ProjectRecord) {
-  return planLines(record.references)
-    .filter((line) => line.startsWith("take:"))
-    .map((line) => referencePart(line.slice(5))?.label)
-    .filter((label): label is string => Boolean(label));
 }

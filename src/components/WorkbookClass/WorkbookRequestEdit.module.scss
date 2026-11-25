@@ -39,7 +39,8 @@ $folder: #e9d3a4;
   gap: 10px;
   justify-items: start;
 }
-.tag {
+// 수업 공통 strong 글자색(--ink)보다 우선하도록 .edit 안에서 지정한다(검은 이름표 위 흰 글자).
+.edit .switchCard strong.tag {
   padding: 2px 8px;
   background: $ink;
   color: #fffdf8;

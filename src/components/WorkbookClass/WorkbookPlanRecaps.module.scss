@@ -1,0 +1,503 @@
+// 2-1 · 2-2 · 2-3 정리. 수업마다 물건 하나(방문자 카드 · 스크랩북 펼침면 · 모눈종이 도면).
+// 오렌지는 화면마다 한 곳: 2-1 상황 도장, 2-2 없음, 2-3 "여기까지 첫 화면" 선.
+// 그림자 · 그라디언트 없이 선과 면으로만 그린다(모눈은 SVG 무늬). 수업 공통 p·ol·h3 규칙보다 우선하도록 .recap 아래에서 지정한다.
+$ink: var(--workbook-ink, #2b2925);
+$paper: var(--workbook-paper, #f6efe2);
+$memo: var(--workbook-memo, #fbe9a6);
+$kraft: #e9d3a4;
+$white: #fffdf8;
+
+.recap {
+  word-break: keep-all;
+  color: $ink;
+}
+.recap .title {
+  margin: 0;
+}
+.recap .next {
+  margin: 0;
+  font-size: 0.86rem;
+  color: var(--ink-muted);
+  b {
+    color: $ink;
+  }
+}
+.recap em {
+  font-style: normal;
+  font-weight: 400;
+  color: rgb(43 41 37 / 0.5);
+}
+
+// 알게 된 것 공통: 굵은 한 줄 + 설명
+ol.slipList,
+ol.tapedList,
+ol.callouts {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  li {
+    margin: 0;
+    display: grid;
+    gap: 2px;
+    animation: rise 160ms calc(var(--i) * 90ms) ease-out both;
+  }
+  strong {
+    font-size: 0.96rem;
+    line-height: 1.35;
+  }
+  span {
+    font-size: 0.84rem;
+    line-height: 1.5;
+    color: rgb(43 41 37 / 0.78);
+  }
+}
+
+// ── 2-1 방문자 카드 ──
+.visitor {
+  margin-top: 16px;
+  display: grid;
+  gap: 20px;
+  @include up(md) {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    gap: 32px;
+    align-items: start;
+  }
+}
+.card {
+  border: 2px solid $ink;
+  border-radius: 14px;
+  background: $white;
+  overflow: hidden;
+  rotate: -1deg;
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 14px;
+    background: $ink;
+    color: $white;
+    font-size: 0.74rem;
+    span:first-child {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      letter-spacing: 0.08em;
+    }
+  }
+}
+.cardBody {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+  padding: 14px 14px 6px;
+}
+.photo {
+  display: block;
+  height: 92px;
+  overflow: hidden;
+  border: 1.5px solid $ink;
+  border-radius: 6px;
+  background: $paper;
+  img {
+    width: 100%;
+    height: auto;
+    margin-top: 4px;
+  }
+}
+.who {
+  display: grid;
+  gap: 4px;
+  strong {
+    font-size: 2rem;
+    font-weight: 400;
+    line-height: 1;
+  }
+  small {
+    font-size: 0.82rem;
+    line-height: 1.4;
+    color: rgb(43 41 37 / 0.75);
+  }
+}
+.recap dl.facts {
+  margin: 0;
+  padding: 6px 14px 14px;
+  display: grid;
+  gap: 8px;
+  div {
+    display: grid;
+    grid-template-columns: 6.5em minmax(0, 1fr);
+    gap: 10px;
+    align-items: start;
+    padding-top: 8px;
+    border-top: 1px dashed rgb(43 41 37 / 0.3);
+  }
+  dt {
+    font-size: 0.78rem;
+    color: var(--ink-muted);
+  }
+  dd {
+    margin: 0;
+    font-size: 0.86rem;
+    font-weight: 700;
+  }
+}
+.recap .stamps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  span {
+    padding: 2px 8px;
+    border: 2px solid var(--accent);
+    border-radius: 4px;
+    color: var(--accent);
+    font-size: 0.8rem;
+    rotate: -3deg;
+    animation: stamp 180ms calc(200ms + var(--i) * 140ms) ease-out both;
+  }
+  span:nth-child(2) {
+    rotate: 2deg;
+  }
+}
+.button {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: 6px;
+  background: $ink;
+  color: $white;
+  font-size: 0.8rem;
+}
+.recap ul.checks {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 2px;
+  li {
+    margin: 0;
+    &::before {
+      content: "✓ ";
+    }
+  }
+}
+.slips {
+  display: grid;
+  gap: 14px;
+}
+.recap ol.slipList {
+  gap: 10px;
+  li {
+    position: relative;
+    padding: 10px 14px 10px 32px;
+    border: 1.5px solid $ink;
+    background: $memo;
+    // 종이 집게: 쪽지 왼쪽 위에 끼운 클립
+    &::before {
+      content: "";
+      position: absolute;
+      top: -8px;
+      left: 11px;
+      width: 9px;
+      height: 24px;
+      border: 2px solid $ink;
+      border-radius: 6px;
+    }
+  }
+  li:nth-child(odd) {
+    rotate: 0.6deg;
+  }
+  li:nth-child(even) {
+    rotate: -0.5deg;
+  }
+}
+
+// ── 2-2 스크랩북 펼침면 ──
+.spread {
+  margin-top: 16px;
+  display: grid;
+  border: 2px solid $ink;
+  background: $kraft;
+  @include up(md) {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+.leftPage,
+.rightPage {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  margin: 10px;
+  padding: 14px 16px;
+  background: $white;
+}
+.leftPage {
+  @include up(md) {
+    margin-right: 0;
+    border-right: 1.5px dashed rgb(43 41 37 / 0.4);
+  }
+}
+.rightPage {
+  @include up(md) {
+    margin-left: 0;
+  }
+}
+.recap .leftPage h3 {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 400;
+  line-height: 1;
+}
+.recap ul.stickers {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+  li {
+    margin: 0;
+    display: grid;
+    justify-items: center;
+    gap: 2px;
+    font-size: 1.05rem;
+    animation: stick 180ms calc(var(--i) * 120ms) ease-out both;
+  }
+  li:nth-child(odd) {
+    rotate: -2.5deg;
+  }
+  li:nth-child(even) {
+    rotate: 2deg;
+  }
+}
+.sticker {
+  display: grid;
+  align-content: center;
+  width: 150px;
+  min-height: 52px;
+  padding: 6px;
+  border: 6px solid #ffffff;
+  outline: 1px solid rgb(43 41 37 / 0.25);
+  background: $white;
+  zoom: 0.8;
+}
+.recap .leftPage .blank {
+  margin: 0;
+  font-size: 0.86rem;
+  color: var(--ink-muted);
+}
+.recap dl.tally {
+  margin: 0;
+  padding-top: 8px;
+  border-top: 1px dashed rgb(43 41 37 / 0.3);
+  display: grid;
+  gap: 4px;
+  div {
+    display: grid;
+    grid-template-columns: 5.5em minmax(0, 1fr);
+    gap: 8px;
+  }
+  dt {
+    font-size: 0.78rem;
+    color: var(--ink-muted);
+  }
+  dd {
+    margin: 0;
+    font-size: 0.84rem;
+    font-weight: 700;
+  }
+}
+.recap ol.tapedList {
+  gap: 14px;
+  li {
+    position: relative;
+    padding-top: 6px;
+    // 마스킹 테이프 한 조각
+    &::before {
+      content: "";
+      width: 46px;
+      height: 10px;
+      background: $memo;
+      border: 1px solid rgb(43 41 37 / 0.2);
+      rotate: -3deg;
+      margin-bottom: 2px;
+    }
+  }
+}
+
+// ── 2-3 모눈종이 도면 ──
+.drawing {
+  position: relative;
+  margin-top: 16px;
+  padding: 16px;
+  border: 2px solid $ink;
+  background: $white;
+  display: grid;
+  gap: 20px;
+  @include up(md) {
+    grid-template-columns: minmax(0, 4fr) minmax(0, 6fr);
+    gap: 28px;
+    align-items: start;
+  }
+}
+.grid {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  color: rgb(43 41 37 / 0.12);
+  pointer-events: none;
+}
+.plan {
+  position: relative;
+  margin: 0;
+  padding: 12px;
+  border: 2px solid $ink;
+  background: $white;
+  display: grid;
+  gap: 8px;
+}
+.heroBox,
+.titleBox {
+  display: block;
+  padding: 6px 8px;
+  border: 1.5px solid $ink;
+  font-weight: 800;
+}
+.heroBox {
+  padding: 18px 8px;
+  border-style: dashed;
+  text-align: center;
+  font-weight: 400;
+  font-size: 0.78rem;
+}
+.recap ol.boxes {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 6px;
+  li {
+    position: relative;
+    margin: 0;
+    padding: 6px 8px;
+    border: 1.5px solid $ink;
+    font-size: 0.84rem;
+    &[data-below="true"] {
+      border-style: dashed;
+      color: rgb(43 41 37 / 0.65);
+    }
+    b {
+      display: inline-grid;
+      place-items: center;
+      width: 1.3em;
+      height: 1.3em;
+      margin-right: 4px;
+      border-radius: 50%;
+      background: $ink;
+      color: $white;
+      font-size: 0.72rem;
+    }
+  }
+}
+// 두 칸 배치: 제목 왼쪽, 내용 오른쪽
+.plan[data-layout="two"] {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
+  align-items: start;
+  .titleBox {
+    grid-column: 1;
+  }
+  ol.boxes {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+  }
+}
+.recap ol.boxes li:has(.fold) {
+  margin-bottom: 14px;
+}
+.recap .fold {
+  position: absolute;
+  left: -14px;
+  right: -14px;
+  bottom: -14px;
+  display: block;
+  border-top: 2px dashed var(--accent);
+  font-style: normal;
+  font-size: 0;
+  &::after {
+    content: "여기까지 첫 화면";
+    position: absolute;
+    right: 12px;
+    top: -0.8em;
+    padding: 0 4px;
+    background: $white;
+    font-size: 0.68rem;
+    color: var(--accent);
+    font-weight: 700;
+  }
+}
+.notes {
+  position: relative;
+  display: grid;
+  gap: 14px;
+}
+ol.callouts {
+  gap: 12px;
+  li {
+    padding-left: 14px;
+    border-left: 3px solid $ink;
+    background: $white;
+  }
+}
+.recap dl.titleBlock {
+  margin: 0;
+  border: 1.5px solid $ink;
+  background: $white;
+  display: grid;
+  div {
+    display: grid;
+    grid-template-columns: 7em minmax(0, 1fr);
+    border-top: 1px solid $ink;
+  }
+  div:first-child {
+    border-top: 0;
+  }
+  dt,
+  dd {
+    padding: 4px 8px;
+    font-size: 0.8rem;
+  }
+  dt {
+    border-right: 1px solid $ink;
+    color: var(--ink-muted);
+  }
+  dd {
+    margin: 0;
+    font-weight: 700;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    translate: 0 6px;
+  }
+}
+@keyframes stamp {
+  from {
+    opacity: 0;
+    scale: 1.4;
+  }
+}
+@keyframes stick {
+  from {
+    opacity: 0;
+    translate: 0 -10px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .recap ol li,
+  .recap .stamps span,
+  .recap ul.stickers li {
+    animation: none;
+  }
+}

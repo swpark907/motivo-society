@@ -29,7 +29,7 @@ import { WorkbookDataLesson } from "./WorkbookDataLesson";
 import { WorkbookPublishLesson } from "./WorkbookPublishLesson";
 import { WorkbookExperienceLesson } from "./WorkbookExperienceLesson";
 import { WorkbookProjectLesson } from "./WorkbookProjectLesson";
-import { projectStepsDone } from "@/lib/workbook-project-steps";
+import { isPlanReady, projectStepsDone } from "@/lib/workbook-project-steps";
 import { useWorkbookProgress } from "./WorkbookProgressContext";
 import { useWorkbookRoom } from "@/components/WorkbookSpacePreview/WorkbookRoomProvider";
 import { slotItems } from "@/lib/workbook-room-slots";
@@ -198,13 +198,7 @@ export function WorkbookClass() {
   const [mapPanelTarget, setMapPanelTarget] = useState<HTMLDivElement | null>(null);
   const journeyTrigger = useRef<HTMLButtonElement>(null);
   const mapArea = useRef<HTMLDivElement>(null);
-  const planReady = [
-    project.title,
-    project.audience,
-    project.purpose,
-    project.intro,
-    project.content,
-  ].every((value) => !!value.trim());
+  const planReady = isPlanReady(project);
   // 2단원 여섯 수업을 마쳤는지는 workbook-project-steps.ts 한 곳에서 계산한다.
   const projectDone = projectStepsDone(project, projectCompleted);
   function canOpenPractical(stage: PracticalStage) {

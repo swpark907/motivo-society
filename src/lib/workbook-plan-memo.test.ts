@@ -32,7 +32,9 @@ describe("workbook plan memo", () => {
       layout: "stack",
       mood: "warm",
       buttonLabel: "이번 달 수업 신청하기",
+      references: "take:card-list\ndrop:big-sentence\ntake:review",
     });
+    expect(text).toContain("참고할 구성: 카드 목록, 후기 한 줄.");
     expect(text).toContain("이 사람은 인스타그램 링크를 타고 들어와요. 주로 휴대폰으로 봐요.");
     expect(text).toContain("‘이번 달 수업 신청하기’ 버튼");
     expect(text).toContain("배치는 위에서 아래로 한 줄로 쌓아 줘.");

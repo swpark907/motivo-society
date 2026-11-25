@@ -948,16 +948,25 @@
   color: var(--ink);
   border: 0;
 }
+// 아직 넘어갈 수 없는 다음 수업 버튼: 흐리게 두고 이유를 버튼 글자로 적는다. 누르면 화면의 빈 곳으로 안내한다.
+.lesson .lessonNavigation button[data-action-role="lesson-next"][aria-disabled="true"] {
+  opacity: 0.45;
+  &::after {
+    content: none;
+  }
+}
 .lesson .lessonNavigation > button[data-action-role="lesson-back"] {
   background: transparent;
   color: var(--ink-muted);
   border: 0;
 }
 
-// 본문 조작의 공통 크기. 수업 이동·표지·퀴즈 선택 카드는 기존 크기를 유지한다.
+// 본문 조작의 공통 크기. 수업 이동·표지·퀴즈 선택 카드·글자 링크(data-text-link)는 기존 크기를 유지한다.
 .lesson
   .lessonBody
-  button:not(.choice):not([data-action-role="lesson-back"]):not([data-action-role="lesson-next"]) {
+  button:not(.choice):not([data-action-role="lesson-back"]):not(
+    [data-action-role="lesson-next"]
+  ):not([data-text-link]) {
   min-height: 44px;
   padding: var(--space-1) var(--space-3);
   font-size: 0.875rem;

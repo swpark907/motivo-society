@@ -1,0 +1,208 @@
+// 내 페이지 미리보기: 브라우저 창 안의 실제 웹페이지처럼 그린다(바깥 수업 화면과 구분되는 흰 페이지).
+// 분위기를 고르면 --my-* 색이 바뀐다. 오렌지(기본 버튼 색)는 페이지 안 버튼 한 곳.
+$frame: var(--workbook-ink, #2b2925);
+
+.window {
+  --my-paper: #ffffff;
+  --my-ink: #222222;
+  --my-accent: var(--accent);
+  margin: 0;
+  display: grid;
+  word-break: keep-all;
+  figcaption {
+    margin-top: 8px;
+    font-size: 0.8rem;
+    color: var(--ink-muted);
+  }
+}
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 12px;
+  border: 1.5px solid $frame;
+  border-bottom: 0;
+  border-radius: 10px 10px 0 0;
+  background: #ece6da;
+  i {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: rgb(43 41 37 / 0.25);
+  }
+  span {
+    margin-left: 8px;
+    padding: 2px 10px;
+    border-radius: 999px;
+    background: #fffdf8;
+    font-size: 0.72rem;
+    color: rgb(43 41 37 / 0.7);
+  }
+}
+.page {
+  position: relative;
+  padding: 18px 24px 20px;
+  border: 1.5px solid $frame;
+  border-radius: 0 0 10px 10px;
+  background: var(--my-paper);
+  color: var(--my-ink);
+  display: grid;
+  gap: 8px;
+  align-content: start;
+  transition:
+    background-color 120ms,
+    color 120ms;
+}
+.pageTitle {
+  font-size: 1.45rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+.page .intro,
+.page .introEmpty {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+.page .introEmpty {
+  color: rgb(43 41 37 / 0.45);
+}
+.page ul.sections {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  @include up(md) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  li {
+    margin: 0;
+    min-height: 50px;
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    line-height: 1.35;
+    transition:
+      background-color 120ms,
+      border-color 120ms;
+  }
+  li[data-state="empty"],
+  li[data-state="wanted"] {
+    border: 1.5px dashed rgb(43 41 37 / 0.28);
+    display: grid;
+    place-items: center;
+    text-align: center;
+  }
+  li[data-state="wanted"] {
+    border-color: $frame;
+    font-weight: 700;
+    small {
+      display: block;
+      font-size: 0.7rem;
+      font-weight: 400;
+      color: rgb(43 41 37 / 0.6);
+    }
+  }
+  li[data-state="filled"] {
+    padding: 0;
+    animation: land 160ms ease-out both;
+  }
+}
+// 채운 칸(누를 수 있으면 버튼). 수업 공통 버튼 색보다 우선하도록 .page 아래에서 지정한다.
+.page .filled {
+  --workbook-button-hover: rgb(43 41 37 / 0.1);
+  width: 100%;
+  height: 100%;
+  min-height: inherit;
+  padding: 10px;
+  border: 1px solid currentColor;
+  border-color: rgb(43 41 37 / 0.18);
+  border-radius: 6px;
+  background: rgb(43 41 37 / 0.04);
+  color: inherit;
+  display: grid;
+  gap: 8px;
+  align-content: start;
+  text-align: left;
+  font: inherit;
+  b {
+    font-size: 0.86rem;
+  }
+}
+.head {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+}
+.hero {
+  display: grid;
+  place-items: center;
+  height: 84px;
+  border: 1.5px dashed rgb(43 41 37 / 0.35);
+  border-radius: 6px;
+  background: rgb(43 41 37 / 0.06);
+  font-size: 0.75rem;
+  color: rgb(43 41 37 / 0.6);
+}
+// 두 칸: 넓은 화면에서 왼쪽 제목 · 소개, 오른쪽 내용 목록
+.window[data-layout="two"] .page {
+  @include up(md) {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+    column-gap: 18px;
+    .head {
+      grid-column: 1;
+      grid-row: 1 / span 2;
+    }
+    ul.sections {
+      grid-column: 2;
+      margin-top: 0;
+      grid-template-columns: 1fr;
+    }
+    .cta {
+      grid-column: 1;
+      justify-self: start;
+    }
+  }
+}
+@keyframes land {
+  from {
+    opacity: 0;
+  }
+}
+.blank {
+  font-size: 0.72rem;
+  color: rgb(43 41 37 / 0.4);
+}
+.text {
+  display: grid;
+  gap: 5px;
+  i {
+    height: 5px;
+    border-radius: 3px;
+    background: currentColor;
+    opacity: 0.18;
+  }
+  i:last-child {
+    width: 65%;
+  }
+}
+.cta {
+  justify-self: center;
+  margin-top: 6px;
+  padding: 8px 18px;
+  border-radius: 6px;
+  background: var(--my-accent);
+  color: #fff;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page,
+  .page ul.sections li {
+    transition: none;
+    animation: none;
+  }
+}

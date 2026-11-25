@@ -5,18 +5,15 @@
 // frame on the right changes shape (phone or laptop) and lists what the first screen has to show for
 // that situation. Picks go to the plan record (entry · device · pace).
 import { situationGroups } from "@/lib/workbook-plan-options";
-import type { PlanReader } from "@/lib/workbook-plan-readers";
 import type { ProjectRecord } from "./WorkbookProjectLesson";
 import styles from "./WorkbookPlanSituation.module.scss";
 
 /** 2-1 screen 2: the same reader in a different situation needs a different first screen. */
 export function WorkbookPlanSituation({
   record,
-  reader,
   update,
 }: {
   record: ProjectRecord;
-  reader: PlanReader | null;
   update: (patch: Partial<ProjectRecord>) => void;
 }) {
   const needs = situationGroups
@@ -30,7 +27,7 @@ export function WorkbookPlanSituation({
       </h2>
       <div className={styles.lead}>
         <p>
-          같은 {reader?.tag ?? "사람"}이라도 어디서, 무엇으로, 얼마나 보느냐에 따라{" "}
+          같은 사람이라도 어디서, 무엇으로, 얼마나 보느냐에 따라{" "}
           <strong>첫 화면에서 먼저 보여야 할 것</strong>이 달라져요. 가장 흔할 것 같은 상황을 하나씩
           골라 볼까요?
         </p>

@@ -96,6 +96,15 @@ export const referenceExamples: readonly ReferenceExample[] = [
     ],
   },
 ];
+/** 기획 기록의 references에서 "가져오기"로 고른 부분의 이름들. */
+export function takenReferenceLabels(references: string) {
+  return references
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line.startsWith("take:"))
+    .map((line) => referencePart(line.slice(5))?.label)
+    .filter((label): label is string => Boolean(label));
+}
 export function referencePart(id: string) {
   for (const example of referenceExamples) {
     const part = example.parts.find((item) => item.id === id);

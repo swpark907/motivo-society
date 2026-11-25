@@ -63,11 +63,14 @@ $memo: var(--workbook-memo, #fbe9a6);
   gap: 6px;
   li {
     margin: 0;
-    padding: 6px 8px;
+    padding: 4px 4px 4px 8px;
     border: 1px solid rgb(43 41 37 / 0.2);
-    display: grid;
-    gap: 6px;
-    font-size: 0.9rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px 8px;
+    font-size: 0.88rem;
     font-weight: 700;
     &[data-state="take"] {
       background: $memo;
@@ -97,6 +100,91 @@ $memo: var(--workbook-memo, #fbe9a6);
     border-color: $ink;
     background: $ink;
     color: #fffdf8;
+  }
+}
+
+// ③ 스크랩북: 가져온 부분을 두꺼운 흰 테두리로 오려 낸 스티커처럼 삐뚤게 붙인다. 붙을 때 한 번 툭 떨어진다.
+.scrap {
+  position: relative;
+  margin-top: 10px;
+  padding: 10px 150px 10px 16px;
+  min-height: 120px;
+  border: 1.5px solid $ink;
+  background: #e9d3a4;
+  color: $ink;
+  @include up(md) {
+    padding-right: 170px;
+  }
+}
+.screen .scrap h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 400;
+  line-height: 1;
+}
+.screen .scrap ul.stickers {
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  li {
+    margin: 0;
+    display: grid;
+    justify-items: center;
+    gap: 4px;
+    animation: stick 180ms ease-out both;
+  }
+  li:nth-child(odd) {
+    rotate: -2.5deg;
+  }
+  li:nth-child(even) {
+    rotate: 2deg;
+  }
+}
+.sticker {
+  display: grid;
+  align-content: center;
+  width: 150px;
+  min-height: 56px;
+  padding: 6px;
+  border: 6px solid #ffffff;
+  outline: 1px solid rgb(43 41 37 / 0.25);
+  background: #fffdf8;
+  color: $ink;
+  pointer-events: none;
+  // 예시 페이지의 부분을 그대로 오려 붙이되 스크랩북에서는 조금 작게 보인다.
+  zoom: 0.82;
+}
+.stickerLabel {
+  font-size: 1.05rem;
+  line-height: 1;
+}
+.screen .scrap .scrapEmpty {
+  margin: 14px 0 0;
+  font-size: 0.88rem;
+  color: rgb(43 41 37 / 0.7);
+}
+.scrapCapy {
+  position: absolute;
+  right: 12px;
+  bottom: 0;
+  img {
+    display: block;
+    width: auto;
+    height: 118px;
+  }
+}
+@keyframes stick {
+  from {
+    opacity: 0;
+    translate: 0 -10px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .screen .scrap ul.stickers li {
+    animation: none;
   }
 }
 

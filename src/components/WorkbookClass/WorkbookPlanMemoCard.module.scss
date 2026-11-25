@@ -34,7 +34,8 @@ $memo-line: var(--workbook-memo-line, #e6cf7c);
     column-gap: 14px;
   }
 }
-.tag {
+// 수업 공통 strong 글자색(--ink)보다 우선하도록 .memo 안에서 지정한다(검은 이름표 위 흰 글자).
+.memo ol.rows .tag {
   align-self: start;
   padding: 2px 8px;
   background: $ink;

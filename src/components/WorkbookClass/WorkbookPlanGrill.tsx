@@ -33,7 +33,7 @@ export function WorkbookPlanGrill({ record }: { record: ProjectRecord }) {
       <div className={styles.layout}>
         <section className={styles.chat} aria-label="AI가 질문하는 예시">
           <p className={styles.me}>
-            지금까지 정한 내 홈페이지 기획이야. 빠진 부분이 있으면 하나씩 물어봐줘.
+            지금까지 정한 내 홈페이지 기획이야. 빠진 부분이 있으면 나에게 하나씩 물어보고 채워줘.
           </p>
           <ol className={styles.questions} aria-live="polite">
             {questions.slice(0, shown).map((question) => (
@@ -72,8 +72,8 @@ export function WorkbookPlanGrill({ record }: { record: ProjectRecord }) {
             </p>
             <p className={styles.later}>
               스킬을 설치하고 직접 만드는 방법은 뒤의 심화 강의에서 자세히 다룰 거예요. 오늘은 설치
-              없이, 다음 수업의 요청에 “나에게 하나씩 물어봐줘”라는 문장을 넣어서 같은 방법을 써
-              볼게요.
+              없이, 다음 수업의 요청에 “나에게 하나씩 물어보고 채워줘”라는 문장을 넣어서 같은 방법을
+              써 볼게요.
             </p>
             <small>2026-11-18 확인</small>
           </section>

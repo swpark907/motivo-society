@@ -11,16 +11,27 @@ import {
   WorkbookRefGallery,
   WorkbookRefPick,
   WorkbookRefSearch,
-  takenReferences,
 } from "./WorkbookRefScreens";
-import { WorkbookPlanStepRecap } from "./WorkbookPlanStepRecap";
+import { WorkbookReferencesRecap, type RecapLine } from "./WorkbookPlanRecaps";
 
-const LEARNED = [
-  "기획은 빈 종이가 아니라 비슷한 페이지를 보는 데서 시작해요.",
-  "페이지는 하는 일이 다른 부분들로 이루어져 있어요.",
-  "가져올 것과 뺄 것은 읽을 사람과 목적에 맞는지로 골라요.",
-  "구조와 순서만 참고하고, 남의 글 · 사진 · 로고는 쓰지 않아요.",
-] as const;
+const LEARNED: readonly RecapLine[] = [
+  {
+    term: "기획은 비슷한 페이지를 보는 데서 시작해요",
+    text: "같은 목적의 페이지를 여러 개 보고 좋은 점을 골라 와요. 이런 페이지를 레퍼런스라고 해요.",
+  },
+  {
+    term: "페이지는 하는 일이 다른 부분들로 이루어져 있어요",
+    text: "사진 · 한 줄 소개 · 목록 · 후기 · 버튼은 저마다 맡은 일이 있어요.",
+  },
+  {
+    term: "가져올 것은 읽을 사람과 목적으로 골라요",
+    text: "예쁜지보다, 내 페이지를 볼 사람에게 필요한지가 기준이에요.",
+  },
+  {
+    term: "구조와 순서만 참고해요",
+    text: "남의 글 · 사진 · 로고는 가져오지 않아요.",
+  },
+];
 
 export function WorkbookReferencesLesson({ onBack, onStep }: ProjectLessonProps) {
   const { record, picked, update } = usePlanContext();
@@ -41,13 +52,13 @@ export function WorkbookReferencesLesson({ onBack, onStep }: ProjectLessonProps)
         () => <WorkbookRefPick record={record} update={update} />,
         () => <WorkbookRefSearch record={record} reader={picked} />,
         () => (
-          <WorkbookPlanStepRecap
+          <WorkbookReferencesRecap
             point={workbookProjectStep.references}
-            learned={LEARNED}
-            decided={[
-              ["가져올 것", takenReferences(record).join(" · ")],
-              ["뺄 것", dropped ? `${dropped}가지` : ""],
-            ]}
+            lines={LEARNED}
+            takenIds={planLines(record.references)
+              .filter((line) => line.startsWith("take:"))
+              .map((line) => line.slice(5))}
+            dropped={dropped}
           />
         ),
       ]}

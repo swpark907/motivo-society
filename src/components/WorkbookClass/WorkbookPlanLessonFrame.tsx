@@ -35,6 +35,7 @@ export function WorkbookPlanLessonFrame({
   onBack,
   onStep,
   beforeFinish,
+  blocked,
 }: {
   /** 2단원 안에서 이 수업의 순번(workbookProjectStep). */
   point: number;
@@ -44,6 +45,8 @@ export function WorkbookPlanLessonFrame({
   onStep: (step: number) => void;
   /** 마치기 전에 확인할 것. false를 돌려주면 다음 수업으로 가지 않는다(이유는 수업이 화면에 보여 준다). */
   beforeFinish?: () => boolean;
+  /** 아직 넘어갈 수 없을 때 마지막 화면의 다음 수업 버튼에 적는 짧은 이유(버튼은 흐려진다). */
+  blocked?: { label: string; short: string };
 }) {
   const p = useWorkbookProgress();
   const lesson = workbookCourse[1].lessons[point];
@@ -108,6 +111,7 @@ export function WorkbookPlanLessonFrame({
               label={`다음: ${next.number} ${next.title} →`}
               shortLabel="다음 수업 →"
               ariaLabel={`다음 수업 ${next.number} ${next.title} 시작`}
+              blocked={blocked}
               onNext={() => {
                 if (beforeFinish && !beforeFinish()) return;
                 markDone();

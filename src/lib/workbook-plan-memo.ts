@@ -1,9 +1,15 @@
 import { workbookCourse, workbookLessonId, workbookProjectStep } from "./workbook-course";
 import { ASK_INTRO, findPlanButton, planLines } from "./workbook-plan-readers";
-import { layoutSentence, moodSentence, situationSentence } from "./workbook-plan-options";
+import {
+  layoutSentence,
+  moodSentence,
+  situationSentence,
+  takenReferenceLabels,
+} from "./workbook-plan-options";
 
 const lessonNumber = (step: number) => workbookCourse[1].lessons[step].number;
 const AUDIENCE = lessonNumber(workbookProjectStep.audience);
+const REFERENCES = lessonNumber(workbookProjectStep.references);
 const STRUCTURE = lessonNumber(workbookProjectStep.structure);
 const BRIEF = lessonNumber(workbookProjectStep.brief);
 const REQUEST = workbookCourse[0].lessons[workbookLessonId.firstRequest].number;
@@ -24,6 +30,7 @@ export type PlanForMemo = {
   layout?: string;
   mood?: string;
   buttonLabel?: string;
+  references?: string;
 };
 export type MemoRow = {
   label: "무엇을" | "어디에 쓸지" | "조건" | "하지 말 것";
@@ -72,11 +79,14 @@ export function planMemo(plan: PlanForMemo): MemoRow[] {
         "각 항목에 들어갈 실제 내용은 만들기 전에 나에게 하나씩 물어보고 채워줘.",
         ownIntro ? `소개 글은 이 글을 그대로 써 줘: ${intro}` : "소개 글도 나에게 물어보고 채워줘.",
         layoutSentence[plan.layout ?? ""] ?? "",
+        takenReferenceLabels(plan.references ?? "").length
+          ? `참고할 구성: ${takenReferenceLabels(plan.references ?? "").join(", ")}.`
+          : "",
         moodSentence[plan.mood ?? ""] ?? "",
       ]
         .filter(Boolean)
         .join(" "),
-      from: `${STRUCTURE} 넣을 내용 · 순서 · 배치, ${BRIEF} 분위기`,
+      from: `${REFERENCES} 레퍼런스, ${STRUCTURE} 넣을 내용 · 순서 · 배치, ${BRIEF} 분위기`,
     },
     {
       label: "하지 말 것",

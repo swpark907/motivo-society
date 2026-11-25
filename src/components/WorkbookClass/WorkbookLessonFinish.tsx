@@ -11,6 +11,7 @@ export function WorkbookLessonFinish({
   ariaLabel,
   onNext,
   onMap,
+  blocked,
 }: {
   label: string;
   /** 좁은 화면에서 대신 보일 짧은 문구. 읽기 도구에는 ariaLabel(없으면 label)이 읽힌다. */
@@ -18,6 +19,9 @@ export function WorkbookLessonFinish({
   ariaLabel?: string;
   onNext: () => void;
   onMap?: () => void;
+  /** 아직 넘어갈 수 없을 때 버튼에 대신 적는 짧은 이유. 버튼은 흐리게 보이지만 누르면 onNext가
+   * 수업 화면의 빈 곳으로 안내한다. */
+  blocked?: { label: string; short: string };
 }) {
   return (
     <>
@@ -29,10 +33,22 @@ export function WorkbookLessonFinish({
       <button
         type="button"
         data-action-role="lesson-next"
-        aria-label={ariaLabel ?? (shortLabel ? label : undefined)}
+        aria-disabled={blocked ? true : undefined}
+        aria-label={
+          blocked
+            ? `${ariaLabel ?? label} · ${blocked.label}`
+            : (ariaLabel ?? (shortLabel ? label : undefined))
+        }
         onClick={onNext}
       >
-        {shortLabel ? (
+        {blocked ? (
+          <>
+            <span data-finish-label="long">{blocked.label}</span>
+            <span data-finish-label="short" aria-hidden="true">
+              {blocked.short}
+            </span>
+          </>
+        ) : shortLabel ? (
           <>
             <span data-finish-label="long">{label}</span>
             <span data-finish-label="short" aria-hidden="true">

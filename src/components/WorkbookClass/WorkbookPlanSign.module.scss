@@ -194,9 +194,11 @@ $memo: var(--workbook-memo, #fbe9a6);
     font-weight: 400;
     color: var(--ink-muted);
   }
+  // 고른 문구는 흐리게 하지 않고 메모 색 바탕과 굵은 선으로 표시한다.
   &[aria-pressed="true"] {
-    border-style: dashed;
-    opacity: 0.5;
+    --workbook-button-hover: #{$memo};
+    border: 2px solid $ink;
+    background: $memo;
   }
 }
 .sign .controls .voice {

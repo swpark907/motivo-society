@@ -6,6 +6,7 @@
 // 실습 방식은 1-6에서 고른 것을 이어받는다. 메모 글은 기획에서 만든다(workbook-plan-memo.ts).
 import { useCallback, useEffect, useRef } from "react";
 import { workbookCourse, workbookLessonId, workbookProjectStep } from "@/lib/workbook-course";
+import { isPlanReady } from "@/lib/workbook-project-steps";
 import { planMemoText } from "@/lib/workbook-plan-memo";
 import { workbookPlanFields } from "@/lib/workbook-page-plan";
 import type { ProjectLessonProps, ProjectRecord } from "./WorkbookProjectLesson";
@@ -38,7 +39,7 @@ export function WorkbookProjectRequestLesson({
   const body = useRef<HTMLDivElement>(null);
   const blanksRef = useRef<HTMLDivElement>(null);
   const safeScreen = Math.min(screen, LAST);
-  const planReady = workbookPlanFields.every(([key]) => record[key].trim());
+  const planReady = isPlanReady(record);
   const { setProject } = p;
   const update = useCallback(
     (patch: Partial<ProjectRecord>) =>
@@ -158,6 +159,14 @@ export function WorkbookProjectRequestLesson({
               label={`다음: ${nextLesson.number} ${nextLesson.title} →`}
               shortLabel="다음 수업 →"
               ariaLabel={`다음 수업 ${nextLesson.number} ${nextLesson.title} 시작`}
+              blocked={
+                record.mode === null
+                  ? {
+                      label: "보냈는지 예시로 갈지 골라야 넘어갈 수 있어요",
+                      short: "실습 방식 먼저 고르기",
+                    }
+                  : undefined
+              }
               onNext={toResult}
               onMap={onBack}
             />

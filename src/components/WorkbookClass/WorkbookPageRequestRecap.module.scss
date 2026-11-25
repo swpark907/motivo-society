@@ -1,5 +1,5 @@
-// 2-2 정리: 왼쪽은 알게 된 것 네 줄 · 지금 상태 · 다음 수업 표, 오른쪽은 보낸 메모 한 장.
-// 오렌지는 쓰지 않는다(다음 수업 버튼이 하단에 있다). 수업 공통 p·ol 규칙보다 우선하도록 .recap 아래에서 지정한다.
+// 2-5 정리: 왼쪽은 네 칸 메모를 담은 봉투(받는 사람 AI · 우표 · 소인), 오른쪽은 알게 된 것 · 지금 상태 · 다음 수업 한 줄.
+// 오렌지는 소인 한 곳. 수업 공통 p·ol 규칙보다 우선하도록 .recap 아래에서 지정한다.
 $ink: var(--workbook-ink, #2b2925);
 $paper: var(--workbook-paper, #f6efe2);
 $memo: var(--workbook-memo, #fbe9a6);
@@ -11,7 +11,7 @@ $memo: var(--workbook-memo, #fbe9a6);
   margin: 0;
 }
 .layout {
-  margin-top: 18px;
+  margin-top: 16px;
   display: grid;
   gap: 20px;
   @include up(md) {
@@ -20,19 +20,170 @@ $memo: var(--workbook-memo, #fbe9a6);
     align-items: start;
   }
 }
-.left {
+// 봉투: 위로 메모 종이가 비죽 나오고, 앞면에 받는 사람 · 내용물 · 우표 · 소인.
+.envelope {
+  position: relative;
+  margin: 0;
+  padding-top: 96px;
+}
+.sheet {
+  position: absolute;
+  top: 0;
+  left: 7%;
+  right: 7%;
+  height: 170px;
+  padding: 12px 14px;
+  border: 1.5px solid $ink;
+  background: $memo;
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  overflow: hidden;
+  rotate: -1.5deg;
+  animation: tuck 260ms ease-out both;
+  p {
+    margin: 0;
+    display: grid;
+    grid-template-columns: 6em minmax(0, 1fr);
+    gap: 8px;
+    font-size: 0.76rem;
+  }
+  b {
+    font-weight: 800;
+  }
+  span {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+}
+.front {
+  position: relative;
+  min-height: 200px;
+  padding: 92px 18px 18px;
+  border: 2px solid $ink;
+  border-radius: 6px;
+  background: #f3e6c9;
+  color: $ink;
+}
+.flap {
+  position: absolute;
+  inset: 0 0 auto;
+  width: 100%;
+  height: 84px;
+  fill: none;
+  stroke: $ink;
+  stroke-width: 1.2;
+  vector-effect: non-scaling-stroke;
+}
+.stampBox {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  width: 54px;
+  height: 64px;
+  padding: 3px;
+  border: 3px dashed #fffdf8;
+  outline: 1.5px solid $ink;
+  background: #fffdf8;
+  overflow: hidden;
+  img {
+    width: 100%;
+    height: auto;
+  }
+}
+.postmark {
+  position: absolute;
+  top: 26px;
+  right: 58px;
+  display: grid;
+  place-items: center;
+  width: 62px;
+  height: 62px;
+  border: 2.5px solid var(--accent);
+  border-radius: 50%;
+  color: var(--accent);
+  font-weight: 800;
+  font-size: 0.95rem;
+  rotate: -14deg;
+  animation: postmark 200ms 300ms ease-out both;
+  &[data-mark="아직"] {
+    border-style: dashed;
+    border-color: rgb(43 41 37 / 0.45);
+    color: rgb(43 41 37 / 0.55);
+  }
+}
+.recap dl.address {
+  margin: 0;
+  display: grid;
+  gap: 8px;
+  div {
+    display: grid;
+    grid-template-columns: 5.5em minmax(0, 1fr);
+    gap: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgb(43 41 37 / 0.35);
+  }
+  dt {
+    font-size: 0.78rem;
+    color: var(--ink-muted);
+  }
+  dd {
+    margin: 0;
+    font-size: 0.88rem;
+    font-weight: 700;
+  }
+}
+.right {
   display: grid;
   gap: 14px;
   align-content: start;
 }
 .recap ol.learned {
   margin: 0;
-  padding-left: 1.3em;
+  padding: 0;
+  list-style: none;
   display: grid;
-  gap: 4px;
+  gap: 10px;
   li {
     margin: 0;
-    font-weight: 700;
+    padding-left: 30px;
+    position: relative;
+    display: grid;
+    gap: 2px;
+    animation: rise 160ms calc(var(--i) * 90ms) ease-out both;
+    // 보내기 전 확인 표시
+    &::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      top: 0;
+      display: grid;
+      place-items: center;
+      width: 20px;
+      height: 20px;
+      border: 1.5px solid $ink;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: 800;
+    }
+  }
+  strong {
+    font-size: 0.96rem;
+    line-height: 1.35;
+  }
+  span {
+    font-size: 0.84rem;
+    line-height: 1.5;
+    color: rgb(43 41 37 / 0.78);
+  }
+}
+.recap .next {
+  margin: 0;
+  font-size: 0.86rem;
+  color: var(--ink-muted);
+  b {
+    color: $ink;
   }
 }
 .recap .status {
@@ -65,23 +216,27 @@ $memo: var(--workbook-memo, #fbe9a6);
   color: $ink;
   font-size: 0.86rem;
 }
-.ticket {
-  padding: 12px 16px;
-  border: 1.5px solid $ink;
-  background: $paper;
-  color: $ink;
-  span {
-    font-size: 0.78rem;
-    color: #5a554d;
+@keyframes tuck {
+  from {
+    translate: 0 -16px;
   }
 }
-.recap .ticket h3 {
-  margin: 2px 0 0;
-  font-size: 1.1rem;
-  font-weight: 800;
+@keyframes postmark {
+  from {
+    opacity: 0;
+    scale: 1.4;
+  }
 }
-.recap .ticket p {
-  margin: 6px 0 0;
-  font-size: 0.88rem;
-  line-height: 1.55;
+@keyframes rise {
+  from {
+    opacity: 0;
+    translate: 0 6px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sheet,
+  .postmark,
+  .recap ol.learned li {
+    animation: none;
+  }
 }

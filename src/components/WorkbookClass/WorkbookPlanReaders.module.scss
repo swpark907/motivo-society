@@ -1,9 +1,8 @@
-// 2-1 화면 1: 같은 페이지, 다른 눈. 이름표를 누르면 소개 글 위로 형광펜이 한 번 칠해지고,
-// 페이지 옆 여백에 손글씨 메모("…찾는데 아직 없네요")가 붙는다.
-// 오렌지는 여백 메모 한 곳. 형광펜은 메모지 노랑. 수업 공통 p·ul·button 규칙보다 우선하도록 .readers 아래에서 지정한다.
+// 2-1 화면 1: 같은 페이지, 다른 눈. 이름표를 누르면 그 사람이 된 카피바라가 페이지 옆에서 갸웃하고,
+// 그 사람이 찾는 세 칸이 "아직 없음"으로 보인다. "다 채우면"을 누르면 칸이 채워지고 엄지를 든다.
+// 오렌지는 채운 모습의 페이지 버튼 한 곳. 수업 공통 p·ul·button 규칙보다 우선하도록 .readers 아래에서 지정한다.
 $ink: var(--workbook-ink, #2b2925);
 $memo: var(--workbook-memo, #fbe9a6);
-$marker: #f5dc5a;
 
 .readers {
   word-break: keep-all;
@@ -20,14 +19,9 @@ $marker: #f5dc5a;
 }
 
 .scene {
-  margin-top: 20px;
+  margin-top: 14px;
   display: grid;
-  gap: 20px;
-  @include up(md) {
-    grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
-    gap: 40px;
-    align-items: start;
-  }
+  gap: 12px;
 }
 
 // 왼쪽: 세 사람의 이름표
@@ -37,6 +31,10 @@ $marker: #f5dc5a;
   list-style: none;
   display: grid;
   gap: 10px;
+  @include up(md) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    max-width: 52rem;
+  }
   li {
     margin: 0;
     padding: 0;
@@ -45,8 +43,8 @@ $marker: #f5dc5a;
 .readers .tags .tag {
   --workbook-button-hover: #{$memo};
   width: 100%;
-  min-height: 56px;
-  padding: 8px 16px;
+  min-height: 46px;
+  padding: 4px 16px;
   border: 1.5px solid $ink;
   border-radius: 4px;
   background: #fffdf8;
@@ -77,112 +75,87 @@ $marker: #f5dc5a;
   rotate: 0.6deg;
 }
 
-// 오른쪽: 1단원 첫 화면과 여백 메모
-.page {
-  margin: 0;
+// 오른쪽: 내 페이지와, 그 사람이 된 카피바라
+.stage {
   display: grid;
-  gap: 8px;
+  gap: 12px;
   @include up(md) {
-    grid-template-columns: minmax(0, 1fr) 11.5rem;
-    column-gap: 16px;
-    align-items: start;
+    grid-template-columns: minmax(0, 1fr) 14rem;
+    gap: 20px;
+    align-items: end;
   }
 }
-.sheet {
-  min-height: 210px;
-  padding: 20px 22px 24px;
-  border: 1.5px solid $ink;
+.capy {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  animation: appear 160ms ease-out both;
+  img {
+    width: auto;
+    height: 9rem;
+  }
+  @include up(md) {
+    img {
+      height: 11rem;
+    }
+  }
+}
+.readers .capy .bubble {
+  margin: 0;
+  padding: 6px 10px;
+  border: 2px solid $ink;
+  border-radius: 12px 12px 12px 2px;
   background: #fffdf8;
   color: $ink;
-  display: grid;
-  align-content: start;
-  gap: 12px;
-  rotate: -0.6deg;
-}
-.pageTitle {
-  font-size: 1.35rem;
-}
-.introLine {
-  position: relative;
-}
-.readers .introLine p {
-  position: relative;
-  margin: 0;
-  font-size: 0.95rem;
-  line-height: 1.6;
-}
-.lines {
-  position: relative;
-  display: grid;
-  gap: 8px;
-  padding: 4px 0;
-  i {
-    height: 7px;
-    border-radius: 3px;
-    background: rgb(43 41 37 / 0.18);
-  }
-  i:last-child {
-    width: 62%;
-  }
-}
-// 형광펜: 소개 글 줄 위를 왼쪽에서 오른쪽으로 한 번 칠한다.
-.marker {
-  position: absolute;
-  inset: -2px -6px;
-  background: $marker;
-  opacity: 0.55;
-  transform-origin: left;
-  animation: mark 220ms ease-out both;
-}
-// 아직 비어 있는 자리: 이 사람이 찾는 것이 들어올 곳
-.empty {
-  display: grid;
-  gap: 6px;
-  padding-top: 10px;
-  border-top: 1px dashed rgb(43 41 37 / 0.3);
-  i {
-    height: 22px;
-    border: 1px dashed rgb(43 41 37 / 0.25);
-  }
-}
-.readers .page .note {
-  margin: 0;
-  padding-top: 6px;
-  color: var(--accent);
-  font-size: 1.55rem;
+  font-size: 1.15rem;
   line-height: 1.15;
-  animation: appear 160ms 200ms ease-out both;
+  text-align: center;
 }
-.readers .page .notePlaceholder {
+.readers .notePlaceholder {
   margin: 0;
+  align-self: center;
   font-size: 0.85rem;
   color: var(--ink-muted);
 }
-.readers .page figcaption {
+.pageColumn {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+.under {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
   font-size: 0.8rem;
   color: var(--ink-muted);
-  @include up(md) {
-    grid-column: 1;
+}
+.readers .under .toggle {
+  --workbook-button-hover: #{$memo};
+  min-height: 40px;
+  padding: 6px 14px;
+  border: 1.5px solid $ink;
+  border-radius: 8px;
+  background: #fffdf8;
+  color: $ink;
+  font-weight: 700;
+  &[aria-pressed="true"] {
+    background: $memo;
   }
 }
 .readers .closing {
-  margin: 18px 0 0;
+  margin: 6px 0 0;
   max-width: 58rem;
 }
 
-@keyframes mark {
-  from {
-    transform: scaleX(0);
-  }
-}
 @keyframes appear {
   from {
     opacity: 0;
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .marker,
-  .readers .page .note {
+  .capy {
     animation: none;
   }
 }

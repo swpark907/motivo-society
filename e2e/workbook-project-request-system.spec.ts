@@ -76,10 +76,12 @@ test("2-5에서 실습 방식을 고르지 않았으면 다음 수업 대신 보
   await fillPlanWithExample(page, { toRequest: true });
   const next = page.getByRole("button", { name: /^다음으로/ });
   for (let i = 0; i < 4; i++) await next.click();
-  await page.getByRole("button", { name: /^다음 수업 2-6/ }).click();
+  const blocked = page.getByRole("button", { name: /^다음 수업 2-6/ });
+  await expect(blocked).toHaveAttribute("aria-disabled", "true");
+  await blocked.click({ force: true });
   await expect(page).toHaveURL(/page-request$/);
   await expect(
-    page.getByRole("alert").filter({ hasText: "메모를 보냈는지 예시로 따라갈지" }),
+    page.getByRole("alert").filter({ hasText: "실습 방식을 아직 안 골랐어요" }),
   ).toBeVisible();
   await page.getByRole("button", { name: "보내기 화면으로 가기", exact: true }).click();
   await expect(page.getByRole("heading", { name: /메모를 보내고/ })).toBeVisible();

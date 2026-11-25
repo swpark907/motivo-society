@@ -1,0 +1,28 @@
+.stamp {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 1;
+  padding: 6px 12px;
+  border: 3px double var(--workbook-ink, #2b2925);
+  border-radius: 6px;
+  background: rgb(255 253 248 / 0.85);
+  color: var(--workbook-ink, #2b2925);
+  font-size: 0.95rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  rotate: 8deg;
+  pointer-events: none;
+  animation: thump 200ms 350ms ease-out both;
+}
+@keyframes thump {
+  from {
+    opacity: 0;
+    scale: 1.5;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stamp {
+    animation: none;
+  }
+}

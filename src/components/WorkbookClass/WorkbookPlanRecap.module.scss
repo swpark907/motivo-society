@@ -3,6 +3,7 @@
 // 오렌지는 페이지 속 버튼 한 곳. 수업 공통 p·h3·ul 규칙보다 우선하도록 .recap 아래에서 지정한다.
 $ink: var(--workbook-ink, #2b2925);
 $paper: var(--workbook-paper, #f6efe2);
+$alert: #c8382c;
 $memo: var(--workbook-memo, #fbe9a6);
 $kraft: #e9d3a4;
 
@@ -74,6 +75,39 @@ $kraft: #e9d3a4;
     background: transparent;
   }
 }
+.forEmpty {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: -6px;
+  font-size: 0.8rem;
+  color: rgb(43 41 37 / 0.6);
+}
+// 빈 칸 표시: 비어 있는 자리마다 붙는 배경 없는 빨간 글자 링크. 누르면 그 칸을 채우는 수업으로 간다.
+// 빨강은 "아직 비어 있음"이라는 뜻에만 이 화면에서 쓴다(워크북 예외 · 2026-11-25 승우 요청).
+.recap .fix {
+  --workbook-button-hover: transparent;
+  display: inline;
+  margin-left: 8px;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: $alert;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  vertical-align: baseline;
+  &:hover {
+    text-decoration-thickness: 2px;
+  }
+}
+.forEmpty .fix {
+  margin-left: 0;
+}
 .missing {
   font-weight: 400;
   font-size: 0.85rem;
@@ -118,7 +152,8 @@ $kraft: #e9d3a4;
 }
 .blanks {
   padding: 12px 14px;
-  border: 1.5px dashed $ink;
+  border: 1.5px solid $ink;
+  background: #fffdf8;
   &[data-asked="true"] {
     background: $memo;
     border-style: solid;
@@ -129,36 +164,11 @@ $kraft: #e9d3a4;
   font-size: 0.9rem;
   font-weight: 700;
 }
-.recap .blanks ul {
-  margin: 8px 0 0;
-  padding: 0;
-  list-style: none;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  li {
-    margin: 0;
-  }
-}
-.recap .blanks button {
-  --workbook-button-hover: #{$paper};
-  padding: 4px 10px;
-  border: 1px solid $ink;
-  border-radius: 6px;
-  background: #fffdf8;
-  color: $ink;
-  font-size: 0.86rem;
-}
-.recap ol.learned {
-  margin: 0;
-  padding-left: 1.3em;
-  display: grid;
-  gap: 3px;
-  li {
-    margin: 0;
-    font-weight: 700;
-    font-size: 0.95rem;
-  }
+.recap .blanks small {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.82rem;
+  color: rgb(43 41 37 / 0.75);
 }
 .rewrite {
   summary {
@@ -186,27 +196,6 @@ $kraft: #e9d3a4;
     font-weight: 400;
   }
 }
-.ticket {
-  padding: 12px 16px;
-  border: 1.5px solid $ink;
-  background: $paper;
-  color: $ink;
-  span {
-    font-size: 0.78rem;
-    color: #5a554d;
-  }
-}
-.recap .ticket h3 {
-  margin: 2px 0 0;
-  font-size: 1.1rem;
-  font-weight: 800;
-}
-.recap .ticket p {
-  margin: 6px 0 0;
-  font-size: 0.88rem;
-  line-height: 1.55;
-}
-
 @keyframes stick {
   from {
     opacity: 0;

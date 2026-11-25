@@ -114,7 +114,10 @@ test("2-1은 읽을 사람 · 상황 · 목적 · 기준을 고르고 2-2로 간
 
   // 정리 → 2-2
   await next.click();
-  const decided = page.getByRole("definition").filter({ hasText: "검색 · 컴퓨터 · 차분히 읽기" });
+  const decided = page
+    .getByRole("article", { name: "방문자 카드" })
+    .getByRole("definition")
+    .filter({ hasText: "차분히 읽기" });
   await expect(decided).toBeVisible();
   await capture("audience-5");
   await page.getByRole("button", { name: /^다음 수업 2-2/ }).click();
@@ -174,7 +177,7 @@ test("2-3은 내용을 고르고 순서를 정하고 칸을 그린다", async ({
   await capture("structure-2");
   await next.click();
   await page.getByRole("button", { name: /두 칸으로 나누기/ }).click();
-  await expect(page.getByText(/두 칸으로 나누기 · 실제 종이와 펜으로/)).toBeVisible();
+  await expect(page.getByText(/두 칸으로 나누기 · 이 틀대로 만들면/)).toBeVisible();
   await capture("structure-3");
   await next.click();
   await expect(page.getByRole("definition").filter({ hasText: "두 칸으로 나누기" })).toBeVisible();
@@ -222,11 +225,16 @@ test("기획 칸이 비어 있으면 2-4를 마치는 대신 채우러 갈 수�
   await page.goto("/workbook/classes/vibe-web/lessons/page-brief");
   const next = page.getByRole("button", { name: /^다음으로/ });
   for (let i = 0; i < 3; i++) await next.click();
-  await page.getByRole("button", { name: /^다음 수업 2-5/ }).click();
+  // 빈 칸이 있으면 다음 수업 버튼은 흐려지고 이유를 적는다. 눌러도 넘어가지 않고 빈 칸 안내로 간다.
+  const blocked = page.getByRole("button", { name: /^다음 수업 2-5/ });
+  await expect(blocked).toHaveAttribute("aria-disabled", "true");
+  await expect(blocked).toContainText("빈 칸을 채워야 넘어갈 수 있어요");
+  await blocked.click({ force: true });
   await expect(page).toHaveURL(/page-brief$/);
-  await expect(
-    page.getByRole("alert").filter({ hasText: "아직 비어 있는 곳을 먼저 골라 주세요" }),
-  ).toContainText("읽을 사람 고르러 가기");
+  await expect(page.getByRole("alert").filter({ hasText: "빈 칸 4곳" })).toBeVisible();
+  // 기획서의 빈 자리마다 채우러 갈 곳이 짧게 붙는다.
+  const sheet = page.getByRole("article", { name: "내 페이지 설계도" });
+  await expect(sheet.getByRole("button", { name: /고르러 가기$/ })).toHaveCount(4);
   await page.getByRole("button", { name: "읽을 사람 고르러 가기", exact: true }).click();
   await expect(page).toHaveURL(/page-planning$/);
 });

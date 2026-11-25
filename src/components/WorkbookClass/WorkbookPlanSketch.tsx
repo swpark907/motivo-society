@@ -1,19 +1,22 @@
 "use client";
 
 // Client component: 2-3 screen 3. Three layout frames (stack · two columns · big photo on top) drawn as
-// wireframes with the learner's own title, cards and button in them. Picking one shows it large. The
+// wireframes with the learner's own title, cards and button in them. Picking one shows the learner's
+// own page (WorkbookMyPage) built in that layout, so the boxes turn into a page. The
 // pick goes to the plan record (layout); the request memo in 2-5 asks for this layout.
 import { layoutOptions } from "@/lib/workbook-plan-options";
 import { findPlanButton, planLines } from "@/lib/workbook-plan-readers";
 import type { ProjectRecord } from "./WorkbookProjectLesson";
 import styles from "./WorkbookPlanSketch.module.scss";
+import { FIRST_PAGE_TITLE } from "./WorkbookFileAsk";
+import { WorkbookMyPage, myPageFromRecord } from "./WorkbookMyPage";
 
-function Wire({ layout, record, big }: { layout: string; record: ProjectRecord; big?: boolean }) {
-  const cards = planLines(record.content).slice(0, big ? 4 : 3);
+function Wire({ layout, record }: { layout: string; record: ProjectRecord }) {
+  const cards = planLines(record.content).slice(0, 3);
   const button = findPlanButton(record.purpose)?.label ?? "버튼";
-  const title = record.title.trim() || "제목";
+  const title = record.title.trim() || FIRST_PAGE_TITLE;
   return (
-    <div className={styles.wire} data-layout={layout} data-big={big}>
+    <div className={styles.wire} data-layout={layout}>
       {layout === "hero" && <span className={styles.photo}>큰 사진</span>}
       <strong className={styles.title}>{title}</strong>
       <i className={styles.intro} />
@@ -54,6 +57,7 @@ export function WorkbookPlanSketch({
               <button
                 type="button"
                 aria-pressed={record.layout === option.id}
+                aria-label={`${option.label} · ${option.note}`}
                 onClick={() => update({ layout: option.id })}
               >
                 <Wire layout={option.id} record={record} />
@@ -66,9 +70,10 @@ export function WorkbookPlanSketch({
         <figure className={styles.paper} aria-live="polite">
           {chosen ? (
             <>
-              <Wire layout={chosen.id} record={record} big />
+              <WorkbookMyPage {...myPageFromRecord(record, 3)} layout={chosen.id} />
               <figcaption>
-                {chosen.label} · 실제 종이와 펜으로 한 번 더 그려 보면 더 좋아요.
+                {chosen.label} · 이 틀대로 만들면 내 페이지가 이렇게 보여요. 실제 종이와 펜으로 한
+                번 더 그려 보면 더 좋아요.
               </figcaption>
             </>
           ) : (

@@ -52,8 +52,9 @@ export function WorkbookRequestSend({
       <div className={styles.lead}>
         <p>
           메모를 복사해서 {fileLesson.number} {fileLesson.title}에서 쓰던 Claude 앱의{" "}
-          <strong>같은 대화</strong>에 붙여 넣고 보내요. 메모에 “하나씩 물어봐줘”를 넣었으니 AI가
-          질문을 할 거예요. 이때 <strong>없는 내용을 지어서 답하지 않는 것</strong>이 중요합니다.
+          <strong>같은 대화</strong>에 붙여 넣고 보내요. 메모에 “하나씩 물어보고 채워줘”를 넣었으니
+          AI가 질문을 할 거예요. 이때 <strong>없는 내용을 지어서 답하지 않는 것</strong>이
+          중요합니다.
         </p>
       </div>
 

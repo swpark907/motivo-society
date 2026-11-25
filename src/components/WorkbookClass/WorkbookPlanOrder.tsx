@@ -8,11 +8,12 @@ import { Nanum_Pen_Script } from "next/font/google";
 import { planLines, type PlanButton, type PlanReader } from "@/lib/workbook-plan-readers";
 import type { ProjectRecord } from "./WorkbookProjectLesson";
 import styles from "./WorkbookPlanOrder.module.scss";
+import { FIRST_PAGE_TITLE } from "./WorkbookFileAsk";
 
 const hand = Nanum_Pen_Script({ weight: "400", subsets: ["latin"], display: "swap" });
 
 /** 휴대폰 첫 화면에 제목·소개 아래로 들어가는 카드 수(설명용 어림값). */
-const FOLD = 2;
+export const FOLD = 2;
 
 /** 2-1 screen 4: information order — what goes above the first-screen line. */
 export function WorkbookPlanOrder({
@@ -49,14 +50,14 @@ export function WorkbookPlanOrder({
 
       <div className={styles.layout}>
         <div className={styles.phone} aria-label="휴대폰 화면 속 내 페이지">
-          <strong className={styles.pageTitle}>{record.title.trim() || "제목"}</strong>
+          <strong className={styles.pageTitle}>{record.title.trim() || FIRST_PAGE_TITLE}</strong>
           <i className={styles.introBar} aria-hidden="true" />
           {cards.length === 0 && (
             <p className={styles.empty}>앞 화면에서 ‘지금 넣기’로 고른 카드가 여기 나와요</p>
           )}
           <ol className={styles.cards}>
             {cards.map((card, index) => (
-              <li key={card} data-below={index >= FOLD}>
+              <li key={`${card}-${index}`} data-below={index >= FOLD}>
                 {index === FOLD && (
                   <span className={styles.fold} aria-hidden="true">
                     여기까지가 첫 화면
