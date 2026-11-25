@@ -11,6 +11,7 @@ import { emptyProject } from "./WorkbookProjectLesson";
 import { emptyExperience } from "@/lib/workbook-experience";
 import base from "./WorkbookClass.module.scss";
 import styles from "./WorkbookCompletionPreview.module.scss";
+import { workbookExperienceStep } from "@/lib/workbook-course";
 
 const records = {
   project: {
@@ -115,7 +116,8 @@ function CompletionPreviewContent() {
       </nav>
       <button
         onClick={() => {
-          setStep(0);
+          // 독립 테스트 기록은 실습 수업(관찰)부터 본다. 앞의 개념 수업은 기록이 필요 없다.
+          setStep(workbookExperienceStep.observation);
           setLesson("experience");
         }}
       >

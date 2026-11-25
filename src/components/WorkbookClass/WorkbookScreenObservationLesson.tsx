@@ -1,5 +1,6 @@
 "use client";
 
+import { workbookExperienceStep } from "@/lib/workbook-course";
 import { useEffect, useId, useRef, useState } from "react";
 import { workbookLessonLabel } from "@/lib/workbook-course";
 import { workbookPlanExample } from "@/lib/workbook-page-plan";
@@ -61,7 +62,7 @@ export function WorkbookScreenObservationLesson({
     <section className={system.lesson}>
       <WorkbookLessonHeader
         stage="experience"
-        point={0}
+        point={workbookExperienceStep.observation}
         headingRef={heading}
         onBack={onBack}
         current={page + 1}
@@ -262,7 +263,7 @@ export function WorkbookScreenObservationLesson({
               다음으로
             </button>
           ) : (
-            <button disabled={!observed} onClick={() => onStep(1)}>
+            <button disabled={!observed} onClick={() => onStep(workbookExperienceStep.improvement)}>
               개선 요청 쓰기로 →
             </button>
           )}

@@ -1,0 +1,165 @@
+// 3-1 화면 2: 기기 다섯 개를 진열대에 나란히. 기기마다 자기 폭으로 그린 내 페이지를 줄여 넣는다(zoom).
+// 기기 몸체는 먹색 테두리 · 둥근 모서리, 진열대는 아래 선 하나. 오렌지는 쓰지 않는다(페이지 버튼은 차분한 색).
+// 수업 공통 p · ul · button 규칙보다 우선하도록 .shelf 아래에서 지정한다.
+$ink: var(--workbook-ink, #2b2925);
+$memo: var(--workbook-memo, #fbe9a6);
+
+.shelf {
+  word-break: keep-all;
+}
+.shelf .title {
+  margin: 0;
+}
+.shelf .lead {
+  margin-top: 10px;
+  max-width: 58rem;
+  p {
+    margin: 0;
+  }
+}
+.shelf ul.devices {
+  margin: 16px 0 0;
+  padding: 0 0 4px;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px 12px;
+  align-items: end;
+  @include up(md) {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 22px;
+    padding-bottom: 0;
+    border-bottom: 2px solid $ink;
+  }
+  li {
+    margin: 0;
+    display: grid;
+    justify-items: center;
+    align-content: end;
+    gap: 4px;
+    text-align: center;
+  }
+  // 좁은 화면에서는 넓은 기기(노트북 · 큰 모니터)가 한 줄씩 차지한다.
+  li:nth-child(n + 4) {
+    grid-column: 1 / -1;
+  }
+  strong {
+    margin-top: 6px;
+    font-size: 0.92rem;
+  }
+  small {
+    max-width: 13rem;
+    font-size: 0.76rem;
+    line-height: 1.4;
+    color: rgb(43 41 37 / 0.75);
+  }
+  .example {
+    font-size: 0.68rem;
+    color: rgb(43 41 37 / 0.55);
+  }
+}
+// 기기 화면: 정해 준 크기 안에서 페이지를 위부터 보여 주고 넘치는 아래는 자른다.
+.screen {
+  display: block;
+  overflow: hidden;
+  background: #ffffff;
+  transition:
+    width 200ms ease-out,
+    height 200ms ease-out;
+}
+.page {
+  display: block;
+}
+.phone,
+.tablet,
+.laptop,
+.monitor {
+  display: inline-block;
+  border: 5px solid $ink;
+  background: $ink;
+}
+.phone {
+  border-width: 6px 4px 10px;
+  border-radius: 14px;
+  .screen {
+    border-radius: 6px;
+  }
+}
+.tablet {
+  border-width: 9px;
+  border-radius: 14px;
+  .screen {
+    border-radius: 4px;
+  }
+}
+.laptop {
+  position: relative;
+  border-width: 7px 7px 9px;
+  border-radius: 8px 8px 0 0;
+  margin-bottom: 8px;
+  // 노트북 받침
+  &::after {
+    content: "";
+    position: absolute;
+    left: -22px;
+    right: -22px;
+    bottom: -17px;
+    height: 8px;
+    border-radius: 0 0 8px 8px;
+    background: $ink;
+  }
+}
+.monitor {
+  position: relative;
+  border-width: 7px;
+  border-radius: 6px;
+  margin-bottom: 26px;
+  // 모니터 받침대
+  &::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -26px;
+    width: 18px;
+    height: 20px;
+    translate: -50% 0;
+    background: $ink;
+  }
+  &::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -30px;
+    width: 90px;
+    height: 6px;
+    translate: -50% 0;
+    border-radius: 3px;
+    background: $ink;
+  }
+}
+.shelf ul.devices .toggle {
+  --workbook-button-hover: #{$memo};
+  min-height: 32px;
+  margin-bottom: 6px;
+  padding: 2px 12px;
+  border: 1.5px solid $ink;
+  border-radius: 8px;
+  background: #fffdf8;
+  color: $ink;
+  font-size: 0.8rem;
+  font-weight: 700;
+  &[aria-pressed="true"] {
+    background: $memo;
+  }
+}
+.shelf .closing {
+  margin: 16px 0 0;
+  max-width: 58rem;
+}
+@media (prefers-reduced-motion: reduce) {
+  .screen {
+    transition: none;
+  }
+}

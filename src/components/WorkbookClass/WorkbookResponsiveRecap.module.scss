@@ -1,0 +1,140 @@
+// 3-1 정리: 노란 줄자(먹색 눈금 · 왼쪽 케이스 · 오른쪽 끝 고리)와 그 아래 매달린 쪽지 네 장.
+// 눈금은 SVG 무늬로 그린다(그라디언트를 쓰지 않는다). 오렌지는 줄자 위 번호 네 개 한 곳.
+// 수업 공통 p · ol 규칙보다 우선하도록 .recap 아래에서 지정한다.
+$ink: var(--workbook-ink, #2b2925);
+$tape: #f3c94a;
+
+.recap {
+  word-break: keep-all;
+  color: $ink;
+}
+.recap .title {
+  margin: 0;
+}
+
+// 줄자: 왼쪽 둥근 케이스에서 오른쪽으로 펼쳐진다.
+.tape {
+  position: relative;
+  margin: 24px 26px 0 34px;
+  height: 46px;
+  border: 1.5px solid $ink;
+  border-left: 0;
+  background: $tape;
+  clip-path: inset(-40px -40px -40px -40px);
+  animation: unroll 420ms ease-out both;
+  b {
+    position: absolute;
+    top: 50%;
+    translate: -50% -50%;
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fffdf8;
+    font-size: 0.85rem;
+  }
+}
+.ruler {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  color: $ink;
+}
+.case {
+  position: absolute;
+  left: -40px;
+  top: 50%;
+  translate: 0 -50%;
+  width: 64px;
+  height: 64px;
+  border: 10px solid #4a463f;
+  outline: 2px solid $ink;
+  border-radius: 50%;
+  background: $ink;
+}
+.hook {
+  position: absolute;
+  right: -12px;
+  top: -6px;
+  width: 12px;
+  height: calc(100% + 12px);
+  border-radius: 2px;
+  background: #8c8577;
+  border: 1.5px solid $ink;
+}
+
+// 쪽지 네 장: 줄자 번호 아래에 하나씩
+.recap ol.lines {
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 12px;
+  counter-reset: line;
+  @include up(md) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+  }
+  li {
+    position: relative;
+    margin: 0;
+    padding: 12px 14px 14px;
+    border: 1.5px solid $ink;
+    background: #fffdf8;
+    display: grid;
+    align-content: start;
+    gap: 4px;
+    counter-increment: line;
+    animation: hang 180ms calc(360ms + var(--i) * 110ms) ease-out both;
+    &::before {
+      content: counter(line);
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: var(--ink-muted);
+    }
+  }
+  li:nth-child(odd) {
+    rotate: -0.8deg;
+  }
+  li:nth-child(even) {
+    rotate: 0.7deg;
+  }
+  strong {
+    font-size: 0.96rem;
+    line-height: 1.35;
+  }
+  span {
+    font-size: 0.84rem;
+    line-height: 1.5;
+    color: rgb(43 41 37 / 0.78);
+  }
+}
+.recap .next {
+  margin: 18px 0 0;
+  font-size: 0.86rem;
+  color: var(--ink-muted);
+  b {
+    color: $ink;
+  }
+}
+
+@keyframes unroll {
+  from {
+    clip-path: inset(-40px 100% -40px -40px);
+  }
+}
+@keyframes hang {
+  from {
+    opacity: 0;
+    translate: 0 -8px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tape,
+  .recap ol.lines li {
+    animation: none;
+  }
+}

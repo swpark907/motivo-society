@@ -5,7 +5,7 @@ import { workbookLessonId } from "@/lib/workbook-course";
 import { useWorkbookProgress } from "@/components/WorkbookClass/WorkbookProgressContext";
 import { workbookLessonRoutes } from "@/lib/workbook-lesson-routes";
 import { getWorkbookPurpose } from "@/lib/workbook-purpose";
-import { experienceProgress } from "@/lib/workbook-experience";
+import { experienceStepsDone } from "@/lib/workbook-experience";
 import { dataProgress } from "@/lib/workbook-data";
 import { publishProgress } from "@/lib/workbook-publish";
 import { applicationProgress } from "@/lib/workbook-application";
@@ -70,13 +70,13 @@ export function WorkbookHome({
     dataCompleted &&
     publishCompleted;
   const { pending } = applicationProgress(applications);
-  const experienceState = experienceProgress(experience);
+  const experienceDone = experienceStepsDone(experience, experienceCompleted);
   const dataState = dataProgress(data);
   const publishState = publishProgress(publish);
   const activeProgress = {
     ai: `${completed.length}/${workbookLessonId.aiCount} 학습 확인`,
     project: projectCompleted ? "첫 화면 확인 완료" : "기획·요청·첫 화면 확인 중",
-    experience: `${[experienceState.observed, experienceState.requested, experienceCompleted].filter(Boolean).length}/3 학습 확인`,
+    experience: `${experienceDone.filter(Boolean).length}/${experienceDone.length} 학습 확인`,
     data: `${[dataState.displayed, dataState.stored, dataCompleted].filter(Boolean).length}/3 학습 확인`,
     publish: `${[publishState.inspected, publishState.addressed, publishCompleted].filter(Boolean).length}/3 학습 확인`,
   }[mapWorld];

@@ -1,5 +1,6 @@
 "use client";
 
+import { workbookCourse, workbookExperienceStep } from "@/lib/workbook-course";
 import { useEffect, useId, useRef, useState } from "react";
 import { workbookLessonLabel } from "@/lib/workbook-course";
 import { experienceProgress, makeExperienceRequest } from "@/lib/workbook-experience";
@@ -11,6 +12,8 @@ import { WorkbookPracticalLab } from "./WorkbookPracticalLab";
 import { useWorkbookLessonState } from "./useWorkbookLessonState";
 import styles from "./WorkbookClass.module.scss";
 import system from "./WorkbookLesson.module.scss";
+
+const observationLesson = workbookCourse[2].lessons[workbookExperienceStep.observation];
 
 const titles = [
   "관찰한 문제를 한 부분의 요청으로",
@@ -62,7 +65,7 @@ export function WorkbookImprovementRequestLesson({
     <section className={system.lesson}>
       <WorkbookLessonHeader
         stage="experience"
-        point={1}
+        point={workbookExperienceStep.improvement}
         headingRef={heading}
         onBack={onBack}
         current={screen + 1}
@@ -72,9 +75,14 @@ export function WorkbookImprovementRequestLesson({
         <h2 className={system.screenTitle}>{titles[screen]}</h2>
         {!observed ? (
           <section className={system.practiceStage}>
-            <p>먼저 3-1에서 두 폭을 비교하고 관찰을 남겨주세요. 기존 요청과 기록은 유지돼요.</p>
+            <p>
+              먼저 {observationLesson.number}에서 두 폭을 비교하고 관찰을 남겨주세요. 기존 요청과
+              기록은 유지돼요.
+            </p>
             <div className={system.practiceActions}>
-              <button onClick={() => onStep(0)}>3-1 관찰로 돌아가기</button>
+              <button onClick={() => onStep(workbookExperienceStep.observation)}>
+                {observationLesson.number} 관찰로 돌아가기
+              </button>
             </div>
           </section>
         ) : (
@@ -89,7 +97,7 @@ export function WorkbookImprovementRequestLesson({
               <section className={system.practiceStage}>
                 <dl className={system.recapPoints}>
                   <div>
-                    <dt>3-1의 관찰</dt>
+                    <dt>{observationLesson.number}의 관찰</dt>
                     <dd>{record.observation}</dd>
                   </div>
                 </dl>
@@ -241,8 +249,12 @@ export function WorkbookImprovementRequestLesson({
         <WorkbookActionReturn body={body} enabled={screen === 1} />
         <nav className={system.lessonNavigation} aria-label="수업 진행">
           <WorkbookLessonPrevious current={screen + 1}>
-            <button onClick={() => (screen > 0 ? move(screen - 1) : onStep(0))}>
-              {screen > 0 ? "이전 설명" : "3-1 관찰로"}
+            <button
+              onClick={() =>
+                screen > 0 ? move(screen - 1) : onStep(workbookExperienceStep.observation)
+              }
+            >
+              {screen > 0 ? "이전 설명" : `${observationLesson.number} 관찰로`}
             </button>
           </WorkbookLessonPrevious>
           {screen < 3 ? (
@@ -250,7 +262,7 @@ export function WorkbookImprovementRequestLesson({
               다음으로
             </button>
           ) : (
-            <button disabled={blocked} onClick={() => onStep(2)}>
+            <button disabled={blocked} onClick={() => onStep(workbookExperienceStep.check)}>
               수정 전후 확인으로 →
             </button>
           )}

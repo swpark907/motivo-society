@@ -50,6 +50,90 @@ export function WorkbookRecapLines({
   );
 }
 
+/** 2-1에서 고른 읽을 사람을 담은 방문자 카드. 2-1 정리와 3-1 화면 5가 같이 쓴다(기준은 줄 때만 그린다). */
+export function WorkbookVisitorCard({
+  reader,
+  audience,
+  situation,
+  button,
+  criteria,
+  className,
+}: {
+  reader: PlanReader | null;
+  audience: string;
+  situation: readonly string[];
+  button: string;
+  criteria?: readonly string[];
+  className?: string;
+}) {
+  return (
+    <div className={`${styles.recap} ${className ?? ""}`}>
+      <article className={styles.card} aria-label="방문자 카드">
+        <header>
+          <span>VISITOR</span>
+          <span>내 페이지의 방문자 카드</span>
+        </header>
+        <div className={styles.cardBody}>
+          <span className={styles.photo} aria-hidden="true">
+            <Image
+              src="/images/workbook/lesson-1-2/capy-thumb.png"
+              alt=""
+              width={295}
+              height={480}
+            />
+          </span>
+          <div className={styles.who}>
+            <strong className={hand.className}>{reader?.tag ?? "읽을 사람"}</strong>
+            <small>{audience || "아직 고르지 않았어요"}</small>
+          </div>
+        </div>
+        <dl className={styles.facts}>
+          <div>
+            <dt>상황</dt>
+            <dd className={styles.stamps}>
+              {situation.length ? (
+                situation.map((label, index) => (
+                  <span key={label} style={{ "--i": index } as CSSProperties}>
+                    {label}
+                  </span>
+                ))
+              ) : (
+                <em>아직 고르지 않았어요</em>
+              )}
+            </dd>
+          </div>
+          <div>
+            <dt>바라는 버튼</dt>
+            <dd>
+              {button ? (
+                <span className={styles.button}>{button}</span>
+              ) : (
+                <em>아직 고르지 않았어요</em>
+              )}
+            </dd>
+          </div>
+          {criteria && (
+            <div>
+              <dt>잘 됐다는 기준</dt>
+              <dd>
+                {criteria.length ? (
+                  <ul className={styles.checks}>
+                    {criteria.map((line) => (
+                      <li key={line}>{line}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  <em>아직 고르지 않았어요</em>
+                )}
+              </dd>
+            </div>
+          )}
+        </dl>
+      </article>
+    </div>
+  );
+}
+
 /** 2-1: 방문자 카드. */
 export function WorkbookAudienceRecap({
   point,
@@ -74,66 +158,13 @@ export function WorkbookAudienceRecap({
         오늘 알게 된 것
       </h2>
       <div className={styles.visitor}>
-        <article className={styles.card} aria-label="방문자 카드">
-          <header>
-            <span>VISITOR</span>
-            <span>내 페이지의 방문자 카드</span>
-          </header>
-          <div className={styles.cardBody}>
-            <span className={styles.photo} aria-hidden="true">
-              <Image
-                src="/images/workbook/lesson-1-2/capy-thumb.png"
-                alt=""
-                width={295}
-                height={480}
-              />
-            </span>
-            <div className={styles.who}>
-              <strong className={hand.className}>{reader?.tag ?? "읽을 사람"}</strong>
-              <small>{audience || "아직 고르지 않았어요"}</small>
-            </div>
-          </div>
-          <dl className={styles.facts}>
-            <div>
-              <dt>상황</dt>
-              <dd className={styles.stamps}>
-                {situation.length ? (
-                  situation.map((label, index) => (
-                    <span key={label} style={{ "--i": index } as CSSProperties}>
-                      {label}
-                    </span>
-                  ))
-                ) : (
-                  <em>아직 고르지 않았어요</em>
-                )}
-              </dd>
-            </div>
-            <div>
-              <dt>바라는 버튼</dt>
-              <dd>
-                {button ? (
-                  <span className={styles.button}>{button}</span>
-                ) : (
-                  <em>아직 고르지 않았어요</em>
-                )}
-              </dd>
-            </div>
-            <div>
-              <dt>잘 됐다는 기준</dt>
-              <dd>
-                {criteria.length ? (
-                  <ul className={styles.checks}>
-                    {criteria.map((line) => (
-                      <li key={line}>{line}</li>
-                    ))}
-                  </ul>
-                ) : (
-                  <em>아직 고르지 않았어요</em>
-                )}
-              </dd>
-            </div>
-          </dl>
-        </article>
+        <WorkbookVisitorCard
+          reader={reader}
+          audience={audience}
+          situation={situation}
+          button={button}
+          criteria={criteria}
+        />
         <div className={styles.slips}>
           <WorkbookRecapLines lines={lines} variant="slip" />
           <WorkbookRecapNext point={point} text="비슷한 페이지 세 장을 보고 가져올 것을 골라요." />

@@ -1,0 +1,202 @@
+// 3-1 화면 4: 같은 페이지의 컴퓨터 · 휴대폰 모양을 나란히 놓고, 고른 부분(칸 수 · 글자 · 그림 · 메뉴)을
+// 두 화면에서 함께 오렌지 테두리로 표시한다(이 화면의 오렌지는 이 표시 한 곳). 페이지는 칸과 글로만 그린 예시다.
+// 수업 공통 p · ul · button 규칙보다 우선하도록 .changes 아래에서 지정한다.
+$ink: var(--workbook-ink, #2b2925);
+$memo: var(--workbook-memo, #fbe9a6);
+
+.changes {
+  word-break: keep-all;
+}
+.changes .title {
+  margin: 0;
+}
+.changes .lead {
+  margin-top: 10px;
+  max-width: 58rem;
+  p {
+    margin: 0;
+  }
+}
+.desk {
+  margin-top: 16px;
+  display: grid;
+  gap: 12px;
+  @include up(md) {
+    grid-template-columns: auto minmax(0, 15rem);
+    justify-content: center;
+    align-items: center;
+    gap: 36px;
+  }
+}
+.pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 9.5rem;
+  gap: 16px;
+  align-items: end;
+  @include up(md) {
+    grid-template-columns: minmax(0, 27rem) 10.5rem;
+    justify-content: center;
+    gap: 40px;
+  }
+  figure {
+    margin: 0;
+    display: grid;
+    gap: 6px;
+    justify-items: center;
+  }
+  figcaption {
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+}
+.wide .site {
+  width: 100%;
+  border: 2px solid $ink;
+  border-radius: 8px;
+}
+.narrow .site {
+  width: 100%;
+  border: 6px solid $ink;
+  border-radius: 18px;
+}
+
+// 예시 페이지
+.site {
+  overflow: hidden;
+  background: #ffffff;
+  color: #222222;
+  display: grid;
+  gap: 8px;
+  padding-bottom: 10px;
+  [data-on="true"] {
+    outline: 2.5px solid var(--accent);
+    outline-offset: 2px;
+  }
+}
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  border-bottom: 1px solid #e4e0d8;
+  b {
+    font-size: 0.72rem;
+  }
+}
+.links {
+  display: flex;
+  gap: 12px;
+  font-size: 0.7rem;
+}
+.burger {
+  display: grid;
+  gap: 3px;
+  i {
+    width: 14px;
+    height: 2px;
+    border-radius: 1px;
+    background: #222222;
+  }
+}
+.picture {
+  position: relative;
+  display: block;
+  margin: 0 10px;
+  aspect-ratio: 16 / 5;
+  overflow: hidden;
+  border-radius: 4px;
+  img {
+    object-fit: cover;
+  }
+}
+.narrow .picture {
+  aspect-ratio: 16 / 10;
+}
+.heading {
+  margin: 0 10px;
+  font-size: 1.35rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+.narrow .heading {
+  font-size: 0.95rem;
+}
+.changes ul.cards {
+  margin: 0 10px;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  li {
+    margin: 0;
+    padding: 4px 6px;
+    border: 1px solid #ddd8cf;
+    border-radius: 4px;
+    display: grid;
+    gap: 4px;
+  }
+  b {
+    font-size: 0.66rem;
+  }
+  i {
+    height: 3px;
+    border-radius: 2px;
+    background: #e2ded6;
+  }
+}
+.narrow ul.cards {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 4px;
+}
+
+// 네 가지 버튼과 설명
+.controls {
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+  @include up(md) {
+    justify-items: start;
+  }
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    @include up(md) {
+      justify-content: flex-start;
+    }
+  }
+  li {
+    margin: 0;
+  }
+}
+.changes .controls button {
+  --workbook-button-hover: #{$memo};
+  min-height: 38px;
+  padding: 4px 16px;
+  border: 1.5px solid $ink;
+  border-radius: 999px;
+  background: #fffdf8;
+  color: $ink;
+  font-weight: 700;
+  &[aria-pressed="true"] {
+    background: $ink;
+    color: #fffdf8;
+  }
+}
+.changes .controls .explain {
+  margin: 0;
+  max-width: 40rem;
+  min-height: 1.6em;
+  text-align: center;
+  @include up(md) {
+    text-align: left;
+  }
+  b {
+    margin-right: 6px;
+  }
+}

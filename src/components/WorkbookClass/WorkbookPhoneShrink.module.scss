@@ -1,0 +1,128 @@
+// 3-1 화면 1: 컴퓨터용 페이지를 휴대폰에 그대로 줄여 넣은 모습. 처음엔 통째로 작게(읽을 수 없음),
+// "크게 키워 보기"를 누르면 원래 크기로 커지고 휴대폰 화면이 실제로 옆으로 밀린다(가로 스크롤).
+// 페이지 안은 컴퓨터 폭(900px)으로 그려야 해서 고정 폭 상자에 넣고 줄인다. 오렌지는 페이지 속 버튼 한 곳.
+// 수업 공통 p · button 규칙보다 우선하도록 .shrink 아래에서 지정한다.
+$ink: var(--workbook-ink, #2b2925);
+$memo: var(--workbook-memo, #fbe9a6);
+$desk: 900px;
+
+.shrink {
+  word-break: keep-all;
+}
+.shrink .title {
+  margin: 0;
+}
+.shrink .lead {
+  margin-top: 10px;
+  max-width: 58rem;
+  p {
+    margin: 0;
+  }
+}
+.stage {
+  margin-top: 18px;
+  display: grid;
+  gap: 20px;
+  justify-items: center;
+  @include up(md) {
+    grid-template-columns: auto minmax(0, 24rem);
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+  }
+}
+
+// 휴대폰: 검은 테두리와 둥근 모서리. 화면 안에서 컴퓨터 폭의 페이지를 줄이거나 그대로 보여 준다.
+.phone {
+  position: relative;
+  margin: 0 0 28px;
+  padding: 12px 10px 18px;
+  border-radius: 30px;
+  background: $ink;
+}
+.screen {
+  width: 236px;
+  height: 300px;
+  overflow: hidden;
+  border-radius: 18px;
+  background: #ffffff;
+  &[data-zoomed="true"] {
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+}
+// zoom은 줄인 크기만큼 자리도 줄어서, 키웠을 때 휴대폰 화면이 실제 페이지 폭만큼만 옆으로 밀린다.
+// 처음 배율 = 휴대폰 화면 폭(236px) ÷ 컴퓨터 폭(900px).
+.desk {
+  width: $desk;
+  zoom: 0.262;
+  .screen[data-zoomed="true"] & {
+    zoom: 0.5;
+  }
+}
+.swipe {
+  position: absolute;
+  left: 50%;
+  bottom: -30px;
+  translate: -50% 0;
+  white-space: nowrap;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--ink-muted);
+}
+
+// 카피바라와 말풍선
+.side {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+}
+.capy {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  animation: appear 160ms ease-out both;
+  img {
+    width: auto;
+    height: 9.5rem;
+  }
+}
+.shrink .capy .bubble {
+  margin: 0;
+  padding: 8px 12px;
+  border: 2px solid $ink;
+  border-radius: 12px 12px 12px 2px;
+  background: #fffdf8;
+  color: $ink;
+  font-size: 1.2rem;
+  line-height: 1.15;
+  text-align: center;
+}
+.shrink .side .toggle {
+  --workbook-button-hover: #{$memo};
+  min-height: 40px;
+  padding: 6px 14px;
+  border: 1.5px solid $ink;
+  border-radius: 8px;
+  background: #fffdf8;
+  color: $ink;
+  font-weight: 700;
+  &[aria-pressed="true"] {
+    background: $memo;
+  }
+}
+.shrink .side .closing {
+  margin: 4px 0 0;
+  text-align: left;
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .capy {
+    animation: none;
+  }
+}

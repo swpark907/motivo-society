@@ -1,6 +1,8 @@
 "use client";
 
 import { workbookPlanExample } from "@/lib/workbook-page-plan";
+import { workbookExperienceStep } from "@/lib/workbook-course";
+import { WorkbookResponsiveLesson } from "./WorkbookResponsiveLesson";
 import { WorkbookImprovementRequestLesson } from "./WorkbookImprovementRequestLesson";
 import { WorkbookScreenObservationLesson } from "./WorkbookScreenObservationLesson";
 import { WorkbookScreenComparisonLesson } from "./WorkbookScreenComparisonLesson";
@@ -19,9 +21,12 @@ export type ExperienceLessonProps = {
 };
 
 export function WorkbookExperienceLesson(props: ExperienceLessonProps) {
-  return props.step === 0 ? (
+  const S = workbookExperienceStep;
+  return props.step === S.basics ? (
+    <WorkbookResponsiveLesson {...props} />
+  ) : props.step === S.observation ? (
     <WorkbookScreenObservationLesson {...props} />
-  ) : props.step === 1 ? (
+  ) : props.step === S.improvement ? (
     <WorkbookImprovementRequestLesson {...props} />
   ) : (
     <WorkbookScreenComparisonLesson

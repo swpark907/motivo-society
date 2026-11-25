@@ -1,5 +1,9 @@
 import { expect, test } from "./workbook-test";
-import { getWorkbookCourseLesson } from "../src/lib/workbook-course";
+import {
+  getWorkbookCourseLesson,
+  workbookLessonId,
+  workbookTrial,
+} from "../src/lib/workbook-course";
 
 test("공개 소개에 가상 후기·평점이 없고 짧은 실험 왕복이 학습 진도를 보존한다", async ({
   page,
@@ -8,24 +12,25 @@ test("공개 소개에 가상 후기·평점이 없고 짧은 실험 왕복이 �
   await page.goto("/workbook/classes/vibe-web");
   await expect(page.getByText("무료 공개 체험", { exact: true })).toBeVisible();
   await expect(page.getByText(/판매 준비 중/)).toHaveCount(0);
-  await expect(
-    page.getByText("기본 17수업과 선택 심화를 무료로 체험해요.", { exact: false }).first(),
-  ).toBeVisible();
+  await expect(page.getByText(workbookTrial.scope, { exact: false }).first()).toBeVisible();
   await expect(page.getByText(/가상 평점|가상 후기|★★★★★|예시 수강평/)).toHaveCount(0);
   await expect(page.locator("#class-reviews")).toHaveCount(0);
   await page.getByRole("button", { name: "강의 시작하기 ↗", exact: true }).click();
-  await page.getByRole("button", { name: "기초강의 시작하기 →", exact: true }).click();
-  const next = page.getByRole("button", { name: "다음으로", exact: true });
-  for (let i = 0; i < 3; i++) await next.click();
-  await page.getByRole("button", { name: "예시 결과 보기", exact: true }).click();
-  await page.getByRole("button", { name: "이미 1만 명이 선택했다는 내용", exact: true }).click();
-  await next.click();
-  await page.getByRole("button", { name: "학습 마치고 단원 지도로 →", exact: true }).click();
-  await expect(page.getByText("1 / 5 학습 확인", { exact: true })).toBeVisible();
-  const lesson = getWorkbookCourseLesson("agent", 4);
+  await page
+    .getByRole("button", { name: /^1-1 AI란 무엇인가 (장소로 이동|학습 패널 열기)$/ })
+    .click();
+  await page.getByRole("button", { name: "AI란 무엇인가 수업 시작", exact: true }).click();
+  const next = page.getByRole("button", { name: /^다음으로/ });
+  const progress = page.getByLabel("현재 학습 단계", { exact: true });
+  await expect(progress).toHaveText(/^1 \/ \d+$/);
+  const total = Number((await progress.textContent())!.split("/")[1]);
+  for (let i = 1; i < total; i++) await next.click();
+  await page.getByRole("button", { name: "단원 지도로", exact: true }).click();
+  await expect(page.getByText("1 / 6 학습 확인", { exact: true })).toBeVisible();
+  const lesson = getWorkbookCourseLesson("agent", workbookLessonId.firstFile);
   await expect(
     page.getByRole("button", {
-      name: new RegExp(`선택 심화.*${lesson.number} ${lesson.title} 수업을 마치면 열려요$`),
+      name: new RegExp(`선택 심화.* · ${lesson.title} 수업을 마치면 열려요$`),
     }),
   ).toBeDisabled();
   await page.evaluate(() => {
@@ -42,7 +47,7 @@ test("공개 소개에 가상 후기·평점이 없고 짧은 실험 왕복이 �
   ).toBe("same-document");
   await expect(page.getByRole("region", { name: "클래스 이어하기", exact: true })).toBeVisible();
   await page.getByRole("link", { name: "클래스 이어가기 →", exact: true }).click();
-  await expect(page.getByText("1 / 5 학습 확인", { exact: true })).toBeVisible();
+  await expect(page.getByText("1 / 6 학습 확인", { exact: true })).toBeVisible();
 });
 
 test("공개 메뉴·작업실·댓글 문구가 실제 기능과 일치한다", async ({ page }) => {
@@ -92,7 +97,7 @@ for (const view of ["summary", "application&stage=publish"]) {
     await page.goto("/workbook/classes/vibe-web?view=" + view);
     const remaining = page.getByRole("region", { name: "남은 기본 학습", exact: true });
     await expect(remaining).toBeVisible();
-    await expect(remaining).toContainText("1-1 AI 이해하기");
+    await expect(remaining).toContainText("1-1 AI란 무엇인가");
     await expect(page.getByText(/앞선 학습 상태가 바뀌었어요/)).toHaveCount(0);
     await remaining
       .getByRole("button", { name: "1단원 AI 도구 준비하기 지도 보기 →", exact: true })

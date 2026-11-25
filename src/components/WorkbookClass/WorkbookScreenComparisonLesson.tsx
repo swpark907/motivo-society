@@ -1,5 +1,6 @@
 "use client";
 
+import { workbookCourse, workbookExperienceStep } from "@/lib/workbook-course";
 import { useEffect, useId, useRef, useState } from "react";
 import { workbookLessonLabel } from "@/lib/workbook-course";
 import { experienceProgress } from "@/lib/workbook-experience";
@@ -13,6 +14,8 @@ import { useWorkbookLessonState } from "./useWorkbookLessonState";
 import { useWorkbookProgress } from "./WorkbookProgressContext";
 import styles from "./WorkbookClass.module.scss";
 import system from "./WorkbookLesson.module.scss";
+
+const improvementLesson = workbookCourse[2].lessons[workbookExperienceStep.improvement];
 
 const titles = [
   "쓴 개선 요청을 다시 확인해요",
@@ -86,7 +89,7 @@ export function WorkbookScreenComparisonLesson({
     <section className={system.lesson}>
       <WorkbookLessonHeader
         stage="experience"
-        point={2}
+        point={workbookExperienceStep.check}
         headingRef={heading}
         onBack={onBack}
         current={page + 1}
@@ -96,9 +99,14 @@ export function WorkbookScreenComparisonLesson({
         <h2 className={system.screenTitle}>{titles[page]}</h2>
         {!progress.requested ? (
           <section className={system.practiceStage}>
-            <p>먼저 3-2에서 관찰을 담은 개선 요청을 준비해주세요. 이전 기록은 유지돼요.</p>
+            <p>
+              먼저 {improvementLesson.number}에서 관찰을 담은 개선 요청을 준비해주세요. 이전 기록은
+              유지돼요.
+            </p>
             <div className={system.practiceActions}>
-              <button onClick={() => onStep(1)}>3-2 요청으로 돌아가기</button>
+              <button onClick={() => onStep(workbookExperienceStep.improvement)}>
+                {improvementLesson.number} 요청으로 돌아가기
+              </button>
             </div>
           </section>
         ) : (
@@ -116,7 +124,7 @@ export function WorkbookScreenComparisonLesson({
                   </div>
                 </dl>
                 <details className={system.preparationMore}>
-                  <summary>3-2에서 쓴 개선 요청 보기</summary>
+                  <summary>{improvementLesson.number}에서 쓴 개선 요청 보기</summary>
                   <p style={{ whiteSpace: "pre-wrap" }}>{record.request}</p>
                 </details>
                 <p className={system.aiKeyTakeaway}>
@@ -299,8 +307,12 @@ export function WorkbookScreenComparisonLesson({
         <WorkbookActionReturn body={body} enabled={page === 4} />
         <nav className={system.lessonNavigation} aria-label="수업 진행">
           <WorkbookLessonPrevious current={page + 1}>
-            <button onClick={() => (page > 0 ? move(page - 1) : onStep(1))}>
-              {page > 0 ? "이전 설명" : "3-2 개선 요청으로"}
+            <button
+              onClick={() =>
+                page > 0 ? move(page - 1) : onStep(workbookExperienceStep.improvement)
+              }
+            >
+              {page > 0 ? "이전 설명" : `${improvementLesson.number} 개선 요청으로`}
             </button>
           </WorkbookLessonPrevious>
           {page < 5 ? (

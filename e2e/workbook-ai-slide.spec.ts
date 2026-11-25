@@ -47,6 +47,6 @@ test("1-1은 생성형 AI에서 LLM까지 차례로 이어진다", async ({ page
   await expect(
     page.getByRole("region", { name: "1단원에서 이어서 배울 것" }).getByRole("listitem"),
   ).toHaveCount(5);
-  await page.getByRole("button", { name: /학습 마치고 단원 지도로/ }).click();
+  await page.getByRole("button", { name: "단원 지도로", exact: true }).click();
   await expect(page).toHaveURL(/\?view=map$/);
 });

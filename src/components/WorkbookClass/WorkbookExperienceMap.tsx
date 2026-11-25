@@ -1,6 +1,6 @@
 "use client";
 import { WorkbookUnitArrival } from "./WorkbookUnitArrival";
-import { getWorkbookCourseLesson } from "@/lib/workbook-course";
+import { getWorkbookCourseLesson, workbookExperienceStep } from "@/lib/workbook-course";
 import { WorkbookMapLessonCard } from "./WorkbookMapLessonCard";
 
 // 지도 지점은 기존 수업 단계로 바로 연결한다. 입력과 위치는 방문 context가 소유한다.
@@ -11,11 +11,17 @@ import { useWorkbookLessonState } from "./useWorkbookLessonState";
 import { createPortal } from "react-dom";
 import type { ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
-import { experienceProgress } from "@/lib/workbook-experience";
+import { experienceStepsAvailable, experienceStepsDone } from "@/lib/workbook-experience";
 import { useWorkbookProgress } from "./WorkbookProgressContext";
 import styles from "./WorkbookMap.module.scss";
 
 const stops = [
+  {
+    x: 9,
+    y: 58,
+
+    task: "같은 페이지가 기기마다 어떻게 다시 놓이는지 봐요.",
+  },
   {
     x: 20,
     y: 26,
@@ -52,9 +58,8 @@ export function WorkbookExperienceMap({
   panelTarget?: HTMLElement | null;
 }) {
   const { experience, experienceCompleted, experienceStop } = useWorkbookProgress();
-  const progress = experienceProgress(experience);
-  const done = [progress.observed, progress.requested, experienceCompleted];
-  const available = progress.available;
+  const done = experienceStepsDone(experience, experienceCompleted);
+  const available = experienceStepsAvailable(done);
   const next = done.findIndex((value) => !value);
   const [selected, setSelected] = useState<number | null>(experienceStop);
   const [practicalSelected, setPracticalSelected] = useWorkbookLessonState(
@@ -106,10 +111,10 @@ export function WorkbookExperienceMap({
             {onPractical && (
               <WorkbookPracticalPoint
                 stage="experience"
-                available={progress.observed}
+                available={done[workbookExperienceStep.observation]}
                 selected={practicalSelected}
                 onSelect={() => {
-                  setSelected(3);
+                  setSelected(stops.length);
                   setPracticalSelected(true);
                 }}
 

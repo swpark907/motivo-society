@@ -33,6 +33,7 @@ const units = [
     stage: "experience",
     title: "반응형 화면 만들기",
     lessons: [
+      { slug: "responsive-basics", title: "반응형 화면이란 무엇인가" },
       { slug: "screen-observation", title: "두 화면에서 문제 찾기" },
       { slug: "screen-improvement", title: "개선 요청 쓰기" },
       { slug: "screen-check", title: "수정 전후 확인" },
@@ -84,6 +85,15 @@ export const workbookProjectStep = {
   request: projectIndex("page-request"),
   result: projectIndex("page-building"),
   count: units[1].lessons.length,
+} as const;
+// 3단원 수업의 순서. 2단원처럼 이름으로 찾는다(3-1 · 3-2를 새로 넣는 중이라 순번이 바뀐다).
+const experienceIndex = (slug: string) => units[2].lessons.findIndex((item) => item.slug === slug);
+export const workbookExperienceStep = {
+  basics: experienceIndex("responsive-basics"),
+  observation: experienceIndex("screen-observation"),
+  improvement: experienceIndex("screen-improvement"),
+  check: experienceIndex("screen-check"),
+  count: units[2].lessons.length,
 } as const;
 export const workbookCourse = units.map((unit, index) => ({
   ...unit,

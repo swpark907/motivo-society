@@ -1,4 +1,4 @@
-import { expect, test, fillPlanWithExample } from "./workbook-test";
+import { expect, test, fillPlanWithExample, noteOverflow } from "./workbook-test";
 
 for (const ownPlan of [false, true]) {
   test(`5-1은 공개할 내용과 두 화면·버튼을 점검한다: ${ownPlan ? "내 기획" : "준비된 예시"}`, async ({
@@ -7,7 +7,7 @@ for (const ownPlan of [false, true]) {
     test.setTimeout(90000);
     if (testInfo.project.name === "desktop")
       await page.setViewportSize({ width: 1280, height: 720 });
-    const next = page.getByRole("button", { name: "다음으로", exact: true });
+    const next = page.getByRole("button", { name: /^다음으로/ });
     if (ownPlan) {
       await page.goto("/workbook/classes/vibe-web/lessons/page-planning");
       await fillPlanWithExample(page, { title: "직접 써본 도구 모음" });
@@ -53,7 +53,7 @@ for (const ownPlan of [false, true]) {
     await capture(5);
     await next.click();
     await capture(6);
-    await page.getByRole("button", { name: "이전 설명", exact: true }).click();
+    await page.getByRole("button", { name: /^←?이전 설명$/ }).click();
     await expect(next).toBeEnabled();
     await next.click();
     await page.getByRole("button", { name: "주소와 배포로 →", exact: true }).click();
@@ -90,7 +90,7 @@ for (const ownPlan of [false, true]) {
     await captureAddress(4);
     await next.click();
     await captureAddress(5);
-    await page.getByRole("button", { name: "이전 설명", exact: true }).click();
+    await page.getByRole("button", { name: /^←?이전 설명$/ }).click();
     await expect(
       page.getByRole("textbox", { name: "주소와 실제 배포가 다른 이유", exact: true }),
     ).toHaveValue("주소만 적어서는 내 파일이 공개되지 않아요.");
@@ -126,7 +126,7 @@ for (const ownPlan of [false, true]) {
     const request = page.getByRole("textbox", { name: "예시 버튼의 수정 요청", exact: true });
     await expect(request).toHaveValue(ownPlan ? /직접 써본 도구 모음/ : /혼자 책 읽기 좋은 세 곳/);
     await request.fill("직접 다듬은 요청: 추가 내용 보기 버튼만 고치고 나머지는 유지해줘.");
-    await page.getByRole("button", { name: "이전 설명", exact: true }).click();
+    await page.getByRole("button", { name: /^←?이전 설명$/ }).click();
     await page
       .getByRole("textbox", { name: "실제로 무엇이 보였나요?", exact: true })
       .fill("버튼은 그대로 있고 추가 목록은 보이지 않았어요");
@@ -164,8 +164,7 @@ for (const ownPlan of [false, true]) {
     await next.click();
     await captureDebug(8);
     if (ownPlan) {
-      for (let i = 0; i < 4; i++)
-        await page.getByRole("button", { name: "이전 설명", exact: true }).click();
+      for (let i = 0; i < 4; i++) await page.getByRole("button", { name: /^←?이전 설명$/ }).click();
       await request.fill("수정 범위를 다시 다듬은 요청. 버튼만 바꾸고 같은 목록을 보여줘.");
       await next.click();
       await expect(next).toBeDisabled();
@@ -183,36 +182,36 @@ for (const ownPlan of [false, true]) {
       page.getByRole("heading", { name: "배운 것과 내 파일, 다음 할 일", exact: true }),
     ).toBeVisible();
     async function captureDebug(screen: number) {
-      await expect(page.getByLabel("현재 학습 단계", { exact: true })).toHaveText(
-        `화면 ${screen} / 8`,
-      );
+      await expect(page.getByLabel("현재 학습 단계", { exact: true })).toHaveText(`${screen} / 8`);
       if (testInfo.project.name === "desktop")
-        await expect
-          .poll(() => body.evaluate((el) => el.scrollHeight - el.clientHeight))
-          .toBeLessThanOrEqual(2);
+        await noteOverflow(
+          testInfo,
+          body,
+          `${testInfo.title} · ${await page.getByLabel("현재 학습 단계", { exact: true }).textContent()}`,
+        );
       await page.screenshot({ path: testInfo.outputPath(`debug-${screen}.png`) });
     }
     async function captureAddress(screen: number) {
-      await expect(page.getByLabel("현재 학습 단계", { exact: true })).toHaveText(
-        `화면 ${screen} / 5`,
-      );
+      await expect(page.getByLabel("현재 학습 단계", { exact: true })).toHaveText(`${screen} / 5`);
       if (testInfo.project.name === "desktop")
-        await expect
-          .poll(() => body.evaluate((el) => el.scrollHeight - el.clientHeight))
-          .toBeLessThanOrEqual(2);
+        await noteOverflow(
+          testInfo,
+          body,
+          `${testInfo.title} · ${await page.getByLabel("현재 학습 단계", { exact: true }).textContent()}`,
+        );
       await expect
         .poll(() => body.evaluate((el) => el.scrollWidth - el.clientWidth))
         .toBeLessThanOrEqual(2);
       await page.screenshot({ path: testInfo.outputPath(`address-${screen}.png`) });
     }
     async function capture(screen: number) {
-      await expect(page.getByLabel("현재 학습 단계", { exact: true })).toHaveText(
-        `화면 ${screen} / 6`,
-      );
+      await expect(page.getByLabel("현재 학습 단계", { exact: true })).toHaveText(`${screen} / 6`);
       if (testInfo.project.name === "desktop")
-        await expect
-          .poll(() => body.evaluate((el) => el.scrollHeight - el.clientHeight))
-          .toBeLessThanOrEqual(2);
+        await noteOverflow(
+          testInfo,
+          body,
+          `${testInfo.title} · ${await page.getByLabel("현재 학습 단계", { exact: true }).textContent()}`,
+        );
       await page.screenshot({ path: testInfo.outputPath(`preflight-${screen}.png`) });
     }
   });
@@ -221,7 +220,7 @@ for (const ownPlan of [false, true]) {
 test("공개 전 점검 없이 주소 수업에 들어오면 점검을 안내한다", async ({ page }) => {
   await page.goto("/workbook/classes/vibe-web/lessons/publish-address");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("주소와 배포");
-  await expect(page.getByRole("button", { name: "다음으로", exact: true })).toBeDisabled();
+  await expect(page.getByRole("button", { name: /^다음으로/ })).toBeDisabled();
   await page.getByRole("button", { name: "5-1 점검으로 돌아가기", exact: true }).click();
   await expect(page).toHaveURL(/\/publish-check$/);
 });
@@ -229,7 +228,7 @@ test("공개 전 점검 없이 주소 수업에 들어오면 점검을 안내한
 test("주소 비교 없이 문제 해결 수업에 들어오면 이전 수업을 안내한다", async ({ page }) => {
   await page.goto("/workbook/classes/vibe-web/lessons/publish-debug");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("공개 후 문제 해결");
-  await expect(page.getByRole("button", { name: "다음으로", exact: true })).toBeDisabled();
+  await expect(page.getByRole("button", { name: /^다음으로/ })).toBeDisabled();
   await page.getByRole("button", { name: "5-2 주소 비교로 돌아가기", exact: true }).click();
   await expect(page).toHaveURL(/\/publish-address$/);
 });

@@ -7,7 +7,13 @@
 import type { CSSProperties, ReactNode } from "react";
 import { moodOptions } from "@/lib/workbook-plan-options";
 import { Nanum_Myeongjo } from "next/font/google";
-import { ASK_INTRO, findPlanButton, planLines } from "@/lib/workbook-plan-readers";
+import {
+  ASK_INTRO,
+  findPlanButton,
+  planButtons,
+  planLines,
+  planReaders,
+} from "@/lib/workbook-plan-readers";
 import type { ProjectRecord } from "./WorkbookProjectLesson";
 import { FIRST_PAGE_TITLE } from "./WorkbookFileAsk";
 import styles from "./WorkbookMyPage.module.scss";
@@ -30,6 +36,23 @@ export function myPageFromRecord(record: ProjectRecord, limit = 6) {
     mood: record.mood || undefined,
     layout: (record.layout || undefined) as MyPageLayout | undefined,
   };
+}
+
+/** 2단원 기획이 비어 있을 때(3단원으로 바로 들어온 경우) 쓰는 예시 페이지. 2-1 첫 번째 읽을 사람의 예시를 쓴다. */
+export function myPageSample() {
+  const reader = planReaders[0];
+  return {
+    title: reader.stickers[1].text,
+    intro: "",
+    sections: reader.cards.slice(0, 3).map((label) => ({ label, state: "filled" as const })),
+    button: planButtons.find((item) => item.id === reader.button)?.label,
+    mood: undefined,
+    layout: undefined as MyPageLayout | undefined,
+  };
+}
+/** 기획에 넣을 내용이 있으면 내 페이지, 없으면 예시 페이지. */
+export function myPageOrSample(record: ProjectRecord, limit = 6) {
+  return planLines(record.content).length ? myPageFromRecord(record, limit) : myPageSample();
 }
 
 export function WorkbookMyPage({

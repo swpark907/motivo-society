@@ -3,6 +3,8 @@
 $frame: var(--workbook-ink, #2b2925);
 
 .window {
+  // 페이지는 브라우저 폭이 아니라 이 창의 폭에 맞춰 바뀐다(3단원에서 휴대폰 틀 · 늘였다 줄였다 하는 창에 그대로 쓴다).
+  container: mypage / inline-size;
   --my-paper: #ffffff;
   --my-ink: #222222;
   --my-accent: var(--accent);
@@ -72,9 +74,13 @@ $frame: var(--workbook-ink, #2b2925);
   padding: 0;
   list-style: none;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  // 좁으면 한 줄로 쌓이고, 넓어질수록 두 칸 · 세 칸으로 나뉜다(3-1에서 휴대폰은 한 줄로 쌓인다고 보여 준다).
+  grid-template-columns: minmax(0, 1fr);
   gap: 8px;
-  @include up(md) {
+  @container mypage (min-width: 400px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  @container mypage (min-width: 480px) {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
   li {
@@ -148,7 +154,7 @@ $frame: var(--workbook-ink, #2b2925);
 }
 // 두 칸: 넓은 화면에서 왼쪽 제목 · 소개, 오른쪽 내용 목록
 .window[data-layout="two"] .page {
-  @include up(md) {
+  @container mypage (min-width: 560px) {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
     column-gap: 18px;
     .head {

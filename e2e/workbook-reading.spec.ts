@@ -55,7 +55,9 @@ test("홈 홍보에서 짧은 글을 목차 없이 읽고 관련 글·홈으로 
     ).toHaveCount(2);
   }
   await page.goto("/workbook/reading/not-a-real-note");
-  await expect(page.getByRole("heading", { name: "404", exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "이 주소의 화면이 없어요", exact: true }),
+  ).toBeVisible();
 });
 
 test("테스트 댓글은 글별로 유지되고 삭제와 새로고침으로 초기화된다", async ({ page }) => {

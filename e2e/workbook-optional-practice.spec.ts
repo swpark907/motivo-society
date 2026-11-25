@@ -7,7 +7,7 @@ test("3단원의 자기 파일 확인 도움말은 기본 비교 학습의 필�
     .click();
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("두 화면에서 문제 찾기");
   await expect(page.getByLabel("개선 또는 유지 이유", { exact: true })).toHaveCount(0);
-  const next = page.getByRole("button", { name: "다음으로", exact: true });
+  const next = page.getByRole("button", { name: /^다음으로/ });
   const help = page.getByText("연습 화면의 폭과 내 파일 확인 방법", { exact: true });
   expect(await help.evaluate((el) => el.parentElement!.hasAttribute("open"))).toBe(false);
   await help.click();
@@ -36,7 +36,7 @@ test("4단원은 상세 보기 선택 실습 없이 입력 실험을 마치고 �
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("입력과 화면 변화");
   await expect(page.getByLabel("상세 보기 적용 또는 생략 이유", { exact: true })).toHaveCount(0);
   await expect(page.getByLabel("저장 적용 또는 생략 이유", { exact: true })).toHaveCount(0);
-  const next = page.getByRole("button", { name: "다음으로", exact: true });
+  const next = page.getByRole("button", { name: /^다음으로/ });
   await next.click();
   await page
     .getByRole("button", { name: "화면에 표시하기 버튼을 눌러야 나타나요", exact: true })

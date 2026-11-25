@@ -1,0 +1,79 @@
+// 3-1 화면 5: 2-1 방문자 카드 → 그 사람이 주로 보는 화면(휴대폰 또는 컴퓨터) 속 내 페이지.
+// 오렌지는 카드의 상황 도장 한 곳. 수업 공통 p 규칙보다 우선하도록 .where 아래에서 지정한다.
+$ink: var(--workbook-ink, #2b2925);
+
+.where {
+  word-break: keep-all;
+}
+.where .title {
+  margin: 0;
+}
+.where .lead {
+  margin-top: 10px;
+  max-width: 58rem;
+  p {
+    margin: 0;
+  }
+}
+.desk {
+  margin-top: 12px;
+  display: grid;
+  gap: 16px;
+  justify-items: center;
+  @include up(md) {
+    grid-template-columns: minmax(0, 24rem) auto auto;
+    justify-content: center;
+    align-items: center;
+    gap: 28px;
+  }
+}
+.card {
+  width: 100%;
+}
+.arrow {
+  font-size: 2rem;
+  font-weight: 800;
+  rotate: 90deg;
+  @include up(md) {
+    rotate: 0deg;
+  }
+}
+.screen {
+  margin: 0;
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  figcaption {
+    font-size: 0.85rem;
+    font-weight: 700;
+  }
+}
+.frame {
+  display: block;
+  overflow: hidden;
+  background: #ffffff;
+  .screen[data-device="phone"] & {
+    width: 190px;
+    height: 300px;
+    border: 7px solid $ink;
+    border-radius: 22px;
+  }
+  .screen[data-device="desktop"] & {
+    width: 300px;
+    height: 190px;
+    border: 7px solid $ink;
+    border-radius: 8px;
+  }
+}
+.page {
+  display: block;
+}
+.where .advice {
+  margin: 14px 0 0;
+  max-width: 58rem;
+}
+.where .next {
+  margin: 8px 0 0;
+  max-width: 58rem;
+  color: var(--ink-muted);
+}

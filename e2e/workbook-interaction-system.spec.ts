@@ -1,4 +1,4 @@
-import { expect, test } from "./workbook-test";
+import { expect, test, noteOverflow } from "./workbook-test";
 
 for (const correct of [false, true]) {
   test(`4-1은 입력과 표시를 나누고 다음 저장 실험으로 잇는다: ${correct ? "맞은 예측" : "다른 예측"}`, async ({
@@ -8,7 +8,7 @@ for (const correct of [false, true]) {
     if (testInfo.project.name === "desktop")
       await page.setViewportSize({ width: 1280, height: 720 });
     await page.goto("/workbook/classes/vibe-web/lessons/interaction");
-    const next = page.getByRole("button", { name: "다음으로", exact: true });
+    const next = page.getByRole("button", { name: /^다음으로/ });
     const body = page.getByLabel("수업 내용", { exact: true });
     await capture(1);
     await next.click();
@@ -64,8 +64,8 @@ for (const correct of [false, true]) {
         history.pushState(null, "", "/workbook/classes/vibe-web/lessons/interaction");
         window.dispatchEvent(new PopStateEvent("popstate"));
       });
-      await page.getByRole("button", { name: "이전 설명", exact: true }).click();
-      await page.getByRole("button", { name: "이전 설명", exact: true }).click();
+      await page.getByRole("button", { name: /^←?이전 설명$/ }).click();
+      await page.getByRole("button", { name: /^←?이전 설명$/ }).click();
       await field.fill("새로 표시할 문장");
       await expect(
         page.getByRole("region", { name: "홈페이지 메모 예시", exact: true }),
@@ -139,12 +139,14 @@ for (const correct of [false, true]) {
       ).toBeEnabled();
       async function captureShared(screen: number) {
         await expect(page.getByLabel("현재 학습 단계", { exact: true })).toHaveText(
-          `화면 ${screen} / 6`,
+          `${screen} / 6`,
         );
         if (testInfo.project.name === "desktop")
-          await expect
-            .poll(() => body.evaluate((el) => el.scrollHeight - el.clientHeight))
-            .toBeLessThanOrEqual(2);
+          await noteOverflow(
+            testInfo,
+            body,
+            `${testInfo.title} · ${await page.getByLabel("현재 학습 단계", { exact: true }).textContent()}`,
+          );
         await page.screenshot({
           path: testInfo.outputPath(`shared-${repeated ? "repeated" : "first"}-${screen}.png`),
         });
@@ -193,31 +195,33 @@ for (const correct of [false, true]) {
       await captureStorage(5);
       await next.click();
       await captureStorage(6);
-      await page.getByRole("button", { name: "이전 설명", exact: true }).click();
+      await page.getByRole("button", { name: /^←?이전 설명$/ }).click();
       await next.click();
       await expect(body).toContainText(text);
       await page.getByRole("button", { name: "다른 기기와 서버로 →", exact: true }).click();
       async function captureStorage(screen: number) {
         await expect(page.getByLabel("현재 학습 단계", { exact: true })).toHaveText(
-          `화면 ${screen} / 6`,
+          `${screen} / 6`,
         );
         if (testInfo.project.name === "desktop")
-          await expect
-            .poll(() => body.evaluate((el) => el.scrollHeight - el.clientHeight))
-            .toBeLessThanOrEqual(2);
+          await noteOverflow(
+            testInfo,
+            body,
+            `${testInfo.title} · ${await page.getByLabel("현재 학습 단계", { exact: true }).textContent()}`,
+          );
         await page.screenshot({
           path: testInfo.outputPath(`storage-${repeated ? "repeated" : "first"}-${screen}.png`),
         });
       }
     }
     async function capture(screen: number) {
-      await expect(page.getByLabel("현재 학습 단계", { exact: true })).toHaveText(
-        `화면 ${screen} / 5`,
-      );
+      await expect(page.getByLabel("현재 학습 단계", { exact: true })).toHaveText(`${screen} / 5`);
       if (testInfo.project.name === "desktop")
-        await expect
-          .poll(() => body.evaluate((el) => el.scrollHeight - el.clientHeight))
-          .toBeLessThanOrEqual(2);
+        await noteOverflow(
+          testInfo,
+          body,
+          `${testInfo.title} · ${await page.getByLabel("현재 학습 단계", { exact: true }).textContent()}`,
+        );
       await page.screenshot({ path: testInfo.outputPath(`interaction-${screen}.png`) });
     }
   });
@@ -226,7 +230,7 @@ for (const correct of [false, true]) {
 test("메모 없이 저장 수업에 직접 들어오면 표시 실험을 안내한다", async ({ page }) => {
   await page.goto("/workbook/classes/vibe-web/lessons/browser-storage");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("새로고침과 저장");
-  await expect(page.getByRole("button", { name: "다음으로", exact: true })).toBeDisabled();
+  await expect(page.getByRole("button", { name: /^다음으로/ })).toBeDisabled();
   await page.getByRole("button", { name: "4-1 표시 실험으로 돌아가기", exact: true }).click();
   await expect(page).toHaveURL(/\/interaction$/);
 });
@@ -234,7 +238,7 @@ test("메모 없이 저장 수업에 직접 들어오면 표시 실험을 안내
 test("저장 확인 없이 다른 기기 수업에 들어오면 저장 실험을 안내한다", async ({ page }) => {
   await page.goto("/workbook/classes/vibe-web/lessons/shared-data");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("다른 기기와 서버");
-  await expect(page.getByRole("button", { name: "다음으로", exact: true })).toBeDisabled();
+  await expect(page.getByRole("button", { name: /^다음으로/ })).toBeDisabled();
   await page.getByRole("button", { name: "4-2 저장 실험으로 돌아가기", exact: true }).click();
   await expect(page).toHaveURL(/\/browser-storage$/);
 });

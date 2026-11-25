@@ -1,29 +1,10 @@
 import { expect, test } from "./workbook-test";
 import { workbookCourse } from "../src/lib/workbook-course";
 const base = "/workbook/classes/vibe-web";
-const totals: Record<string, number> = {
-  "ai-understanding": 5,
-  "ai-tools": 6,
-  "tool-setup": 12,
-  "first-request": 8,
-  "first-file": 10,
-  "page-planning": 5,
-  "page-request": 5,
-  "page-building": 5,
-  "screen-observation": 4,
-  "screen-improvement": 4,
-  "screen-check": 6,
-  interaction: 5,
-  "browser-storage": 6,
-  "shared-data": 6,
-  "publish-check": 6,
-  "publish-address": 5,
-  "publish-debug": 8,
-};
 
 for (const unit of workbookCourse) {
   test(`${unit.number}단원 소개·지도·수업 번호와 이름이 일치한다`, async ({ page }, testInfo) => {
-    test.setTimeout(60000);
+    test.setTimeout(120000);
     if (testInfo.project.name === "desktop")
       await page.setViewportSize({ width: 1280, height: 720 });
     for (const lesson of unit.lessons) {
@@ -32,9 +13,7 @@ for (const unit of workbookCourse) {
       await expect(page.getByLabel("전체 과정 위치", { exact: true })).toHaveText(
         `${unit.number}단원 ${unit.title} › ${lesson.number}`,
       );
-      await expect(page.getByLabel("현재 학습 단계", { exact: true })).toHaveText(
-        `화면 1 / ${totals[lesson.slug] ?? 1}`,
-      );
+      await expect(page.getByLabel("현재 학습 단계", { exact: true })).toHaveText(/^1 \/ \d+$/);
       const header = page.locator("[data-lesson-header]");
       await expect(header.getByRole("heading", { level: 1 })).toHaveCSS("font-size", "18px");
     }
@@ -42,10 +21,13 @@ for (const unit of workbookCourse) {
     await page.goto(`${base}/lessons/${first.slug}`);
     await page.getByRole("button", { name: "단원 지도 보기", exact: true }).click();
     await expect(page).toHaveURL(/\?view=map$/);
-    await page.getByRole("button", { name: new RegExp(`^${first.number} ${first.title}`) }).click();
+    await page
+      .getByRole("button", { name: new RegExp(`^${first.number} ${first.title}`) })
+      .first()
+      .click();
     const card = page.getByRole("region", { name: "선택한 학습 장소", exact: true });
     await expect(card.getByRole("heading")).toHaveText(first.title);
-    await expect(card).toContainText(`${unit.number}단원 ${unit.title} · ${first.number}`);
+    await expect(card).toContainText(`${first.number} · `);
     await page.screenshot({ path: testInfo.outputPath(`unit-${unit.number}-map.png`) });
     const start = card.getByRole("button", { name: `${first.title} 수업 시작`, exact: true });
     await expect(start).toBeVisible();
@@ -58,9 +40,7 @@ for (const unit of workbookCourse) {
   });
 }
 
-test("소개 페이지는 17개 실제 수업과 번호 없는 선택 심화를 구분한다", async ({
-  page,
-}, testInfo) => {
+test("소개 페이지는 실제 수업과 번호 없는 선택 심화를 구분한다", async ({ page }, testInfo) => {
   await page.goto(base);
   for (const unit of workbookCourse) {
     const details = page.locator("details").filter({

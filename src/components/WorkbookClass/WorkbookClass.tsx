@@ -21,7 +21,11 @@ import { availablePublishStep, publishProgress } from "@/lib/workbook-publish";
 import { WorkbookDataMap } from "./WorkbookDataMap";
 import { availableDataStep, dataProgress } from "@/lib/workbook-data";
 import { WorkbookExperienceMap } from "./WorkbookExperienceMap";
-import { availableExperienceStep, experienceProgress } from "@/lib/workbook-experience";
+import {
+  availableExperienceStep,
+  experienceProgress,
+  experienceStepsDone,
+} from "@/lib/workbook-experience";
 import { WorkbookPracticalLesson } from "./WorkbookPracticalLesson";
 import { useWorkbookLessonState } from "./useWorkbookLessonState";
 import { WorkbookLessons } from "./WorkbookLessons";
@@ -201,6 +205,8 @@ export function WorkbookClass() {
   const planReady = isPlanReady(project);
   // 2단원 여섯 수업을 마쳤는지는 workbook-project-steps.ts 한 곳에서 계산한다.
   const projectDone = projectStepsDone(project, projectCompleted);
+  // 3단원 수업마다 마쳤는지는 workbook-experience.ts 한 곳에서 계산한다.
+  const experienceDone = experienceStepsDone(experience, experienceCompleted);
   function canOpenPractical(stage: PracticalStage) {
     if (stage === "agent") return mapWorld === "ai" && completed.includes(L.firstFile);
     if (completed.length !== L.aiCount) return false;
@@ -258,20 +264,12 @@ export function WorkbookClass() {
       {
         id: "experience",
         image: "experience-river-garden-v1.png",
-        count: [
-          experienceProgress(experience).observed,
-          experienceProgress(experience).requested,
-          experienceCompleted,
-        ].filter(Boolean).length,
-        total: 3,
+        count: experienceDone.filter(Boolean).length,
+        total: experienceDone.length,
         available: projectCompleted,
         reason: "기획하고 첫 화면 만들기를 마치면 열려요",
         next: workbookCourse[2].lessons.map((item) => `${item.number} ${item.title}`)[
-          [
-            experienceProgress(experience).observed,
-            experienceProgress(experience).requested,
-            experienceCompleted,
-          ].findIndex((value) => !value)
+          experienceDone.findIndex((value) => !value)
         ],
       },
       {
@@ -320,11 +318,7 @@ export function WorkbookClass() {
   const learningDone = {
     ai: Array.from({ length: L.aiCount }, (_, index) => completed.includes(index)),
     project: projectDone,
-    experience: [
-      experienceProgress(experience).observed,
-      experienceProgress(experience).requested,
-      experienceCompleted,
-    ],
+    experience: experienceDone,
     data: [dataProgress(data).displayed, dataProgress(data).stored, dataCompleted],
     publish: [
       publishProgress(publish).inspected,

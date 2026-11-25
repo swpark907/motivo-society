@@ -1,6 +1,9 @@
-import { expect, test } from "./workbook-test";
+import { expect, fillPlanWithExample, test } from "./workbook-test";
+import { workbookCourse } from "../src/lib/workbook-course";
 
-test("공개 홈부터 17수업 예시 학습과 최종 정리 홈 왕복을 한 방문에서 완료한다", async ({
+const [unitOne, unitTwo] = workbookCourse;
+
+test("공개 홈부터 모든 기본 수업 예시 학습과 최종 정리 홈 왕복을 한 방문에서 완료한다", async ({
   page,
 }, info) => {
   test.setTimeout(180000);
@@ -11,106 +14,71 @@ test("공개 홈부터 17수업 예시 학습과 최종 정리 홈 왕복을 한
     await button(name).click();
   };
   const next = async (count = 1) => {
-    for (let i = 0; i < count; i++) await click("다음으로");
+    for (let i = 0; i < count; i++) await click(/^다음으로/);
   };
   const fill = async (name: string, value: string) => {
     await page.getByRole("textbox", { name, exact: true }).fill(value);
   };
+  const progress = page.getByLabel("현재 학습 단계", { exact: true });
   const lesson = async (slug: string) => {
     await expect(page).toHaveURL(new RegExp(`/lessons/${slug}$`));
   };
-  const mapNext = async (number: string) => {
+  // 단원 정리의 "n단원 시작하기 →"로 다음 단원 지도에 도착해 첫 수업을 시작한다.
+  const unitNext = async (unit: (typeof workbookCourse)[number]) => {
+    await click(`${unit.number}단원 시작하기 →`);
     await expect(page).toHaveURL(/view=map$/);
-    await click(new RegExp(`^다음 수업 시작 · ${number} `));
+    await expect(page.getByText(`${unit.number - 1}단원을 마쳤어요.`)).toBeVisible();
+    await click(`${unit.lessons[0].title} 수업 시작`);
   };
-  const unitNext = async (number: string) => {
+  // 3단원부터는 단원을 마치면 지도의 완료 안내에서 다음 단원 첫 수업으로 간다.
+  const handoffNext = async (unit: (typeof workbookCourse)[number]) => {
     await expect(page).toHaveURL(/view=map$/);
     const handoff = page.getByRole("region", { name: "단원 학습 완료와 다음 학습", exact: true });
-    await handoff.getByRole("button", { name: new RegExp(`^${number} .* 시작 →$`) }).click();
+    await handoff
+      .getByRole("button", { name: `${unit.lessons[0].number} ${unit.lessons[0].title} 시작 →` })
+      .click();
   };
   // Exactly one initial navigation. Every subsequent transition uses the public UI.
   await page.goto("/workbook");
   await page.getByRole("link", { name: "웹페이지 만들기 클래스 보기 →", exact: true }).click();
   await click("강의 시작하기 ↗");
-  await click("기초강의 시작하기 →");
-  await lesson("ai-understanding");
-  await next(3);
-  await click("예시 결과 보기");
-  await click("이미 1만 명이 선택했다는 내용");
-  await next();
-  await click("학습 마치고 단원 지도로 →");
-  await mapNext("1-2");
-  await lesson("ai-tools");
-  await next(5);
-  await click("학습 마치고 단원 지도로 →");
-  await mapNext("1-3");
-  await lesson("tool-setup");
-  await next(2);
-  await click("모바일에서 복습하기");
-  await next(7);
-  await click("작업 폴더 → 요청 → 파일 변경 → 실행·확인 → 수정 요청");
-  await next();
-  await click("학습 정리 보기");
-  await click("학습 마치고 단원 지도로 →");
-  await mapNext("1-4");
-  await lesson("first-request");
-  await next();
-  await click("예시로 복습하기");
-  await next();
-  await click("예시 요청 가져오기");
-  await next();
-  await click("미리 만든 결과 살펴보기");
-  await fill("확인한 점 하나", "첫 문장이 길어요.");
-  await next();
-  await click("수정 예시 가져오기");
-  await next();
-  await click("미리 만든 수정 결과 보기");
-  await next();
-  await click("첫 문장은 짧게 바꾸고 장소의 특징은 유지해줘");
-  await click("학습 정리 보기");
-  await click("학습 마치고 단원 지도로 →");
-  await mapNext("1-5");
-  await lesson("first-file");
-  await next();
-  await click("예시로 복습하기");
-  await next();
-  await click("예시 요청 가져오기");
-  await next();
-  await click("미리 만든 결과 살펴보기");
-  await click("작업 보기");
-  await next();
-  await fill("확인한 점 하나", "제목과 목록이 보이고 버튼이 목록으로 이동해요.");
-  await next();
-  await click("수정 예시 가져오기");
-  await next();
-  await click("미리 만든 수정 결과 보기");
-  await click("수정된 작업 보기");
-  await next();
-  await click("바뀐 파일과 브라우저 화면·버튼을 직접 확인해요");
-  await next();
+  await expect(page).toHaveURL(/view=map$/);
+  await click("클래스 인트로 인트로 보기");
+  await click("4. 준비하고 시작하기");
+  await click("첫 수업 시작 →");
+  // 1단원: 정리 화면의 "다음 수업" 버튼으로 이어 간다. 입력은 모두 선택이다.
+  for (const [index, item] of unitOne.lessons.entries()) {
+    await lesson(item.slug);
+    const total = Number((await progress.textContent())!.split("/")[1].trim());
+    await next(total - 1);
+    await expect(progress).toHaveText(`${total} / ${total}`);
+    const following = unitOne.lessons[index + 1];
+    if (following) await click(`다음 수업 ${following.number} ${following.title} 시작`);
+  }
   await expect(page.getByLabel("수업 내용", { exact: true }).getByRole("checkbox")).toHaveCount(0);
-  await click("학습 정리 보기");
-  await click("1단원 마치고 다음 학습 보기 →");
-  await unitNext("2-1");
-  await lesson("page-planning");
-  await next();
-  await click("빈 항목에 구성 예시 넣기");
-  await next(3);
-  await click("제작 요청 다듬기로 →");
+  await unitNext(unitTwo);
+  // 2단원: 기획 네 수업은 예시로 고르고, 2-5는 예시로 따라가고, 2-6은 대조·수정 요청까지.
+  await lesson(unitTwo.lessons[0].slug);
+  await fillPlanWithExample(page, { toRequest: true });
   await lesson("page-request");
-  await click("내 기획으로 요청 초안 만들기");
+  await click("메모로 옮기기 →");
   await next(2);
-  await click(/기획 미리보기로 복습하기/);
+  await click(/예시로 따라갈게요$/);
   await next(2);
-  await click("첫 화면 확인하기로 →");
+  await click(/^다음 수업 2-6/);
   await lesson("page-building");
+  for (const name of ["제목 있어요", "소개 글 있어요", "맨 아래 버튼 있어요"]) await click(name);
+  await click("넣을 내용 순서 달라요");
   await next();
-  await click("내용 보기");
+  await click("작업 의뢰 문의하기");
+  await next();
+  await click("넣을 내용 순서");
   await next(2);
-  await fill("내 화면에서 확인한 점", "제목과 소개가 보이고 버튼이 목록으로 이동해요.");
-  await next();
-  await click("2단원 마치고 다음 학습 보기 →");
-  await unitNext("3-1");
+  await unitNext(workbookCourse[2]);
+  // 3-1 반응형 화면이란 무엇인가: 개념 수업이라 화면을 넘기고 정리에서 다음 수업으로 간다.
+  await lesson("responsive-basics");
+  while (await button(/^다음으로/).isVisible()) await next();
+  await click(/^다음 수업/);
   await lesson("screen-observation");
   await next();
   await click("이 화면 확인했어요");
@@ -141,7 +109,7 @@ test("공개 홈부터 17수업 예시 학습과 최종 정리 홈 왕복을 한
   );
   await next();
   await click("단원 마치고 다음 학습 보기 →");
-  await unitNext("4-1");
+  await handoffNext(workbookCourse[3]);
   await lesson("interaction");
   await next();
   await click("화면에 표시하기 버튼을 눌러야 나타나요");
@@ -170,7 +138,7 @@ test("공개 홈부터 17수업 예시 학습과 최종 정리 홈 왕복을 한
   await fill("표시·저장·공유가 다른 이유", "다른 기기는 같은 브라우저 저장 칸을 쓰지 않아요.");
   await next();
   await click("단원 마치고 다음 학습 보기 →");
-  await unitNext("5-1");
+  await handoffNext(workbookCourse[4]);
   await lesson("publish-check");
   await next();
   await click(/^공개 여부를 확인한 제목·소개·작업 목록/);
@@ -225,6 +193,7 @@ test("공개 홈부터 17수업 예시 학습과 최종 정리 홈 왕복을 한
   await expect(actual).not.toContainText("최종 프로젝트 확인 기록이 있어요");
   await page.screenshot({ path: info.outputPath("full-preview-summary.png") });
   await click("메뉴 펼치기");
+  await expect(button("메뉴 접기")).toHaveAttribute("aria-expanded", "true");
   await page.getByRole("link", { name: "워크북 홈 ↗", exact: true }).click();
   await expect(page).toHaveURL(/\/workbook$/);
   await page.getByRole("link", { name: "클래스 마지막 정리 보기 →", exact: true }).click();

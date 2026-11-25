@@ -33,8 +33,10 @@ const topics = [
     ],
   },
   {
-    description: "반응형 화면 만들기 3수업 · 두 화면을 비교하고 너비 한 부분을 개선해요.",
+    description:
+      "반응형 화면 만들기 4수업 · 기기마다 다른 화면 크기를 알고, 두 화면을 비교해 한 부분을 개선해요.",
     lessons: [
+      "반응형 웹 · 화면 크기가 다른 기기와 다시 놓이는 페이지",
       "CSS 기초 · 화면 너비와 배치",
       "반응형 웹 · 모바일과 데스크톱 비교",
       "사용성 점검 · 잘리는 제목과 콘텐츠 찾기",
@@ -76,7 +78,7 @@ export const workbookCurriculum = topics.map((unit, index) => ({
 export const workbookPointTopics: Record<PracticalStage, number[][]> = {
   agent: [[0], [1, 2], [3], [4], [5, 6], [7]],
   project: [[0, 1], [2], [3, 4], [5, 6], [7, 8], [9]],
-  experience: [[0, 1, 2], [3], [4, 5]],
+  experience: [[0], [1, 2, 3], [4], [5, 6]],
   data: [
     [0, 1],
     [2, 3],

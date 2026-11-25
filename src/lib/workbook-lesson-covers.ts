@@ -96,6 +96,14 @@ export const workbookLessonCovers: Record<string, { goals: string[]; summary: st
     ],
     summary: "첫 화면을 기획과 비교하고, 의도와 다른 부분을 구체적으로 짚어요.",
   },
+  "responsive-basics": {
+    goals: [
+      "휴대폰 · 태블릿 · 컴퓨터처럼 화면 크기가 다른 기기 알아보기",
+      "화면 크기에 맞춰 다시 놓이는 페이지, 반응형이 무엇인지 알기",
+      "화면이 좁아지면 무엇이 바뀌는지 보기",
+    ],
+    summary: "같은 내 페이지가 휴대폰과 컴퓨터에서 어떻게 다르게 놓이는지 알아봐요.",
+  },
   "screen-observation": {
     goals: [
       "PC와 모바일 폭에서 같은 페이지 비교하기",
